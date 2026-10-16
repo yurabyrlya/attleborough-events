@@ -13,8 +13,10 @@ use Illuminate\Contracts\Pagination\Paginator;
 /**
  * Read model for the public list (CAL-01..05).
  *
- * Base set: event published or cancelled (cancelled shows a badge),
- * occurrence scheduled or cancelled, and not yet expired (expires_at > now,
+ * Base set: event and occurrence statuses that are publicly listed per the
+ * enums' publiclyListed() (events published or cancelled, occurrences
+ * scheduled or cancelled; cancelled shows a badge, hidden never shows), and
+ * not yet expired (expires_at > now,
  * strictly). Ordered by starts_at then id for a stable order.
  *
  * With a date filter, an occurrence is in the window when
@@ -44,8 +46,8 @@ final class PublicOccurrenceQuery
         return EventOccurrence::query()
             ->select('event_occurrences.*')
             ->join('events', 'events.id', '=', 'event_occurrences.event_id')
-            ->whereIn('events.status', [EventStatus::Published->value, EventStatus::Cancelled->value])
-            ->whereIn('event_occurrences.status', [OccurrenceStatus::Scheduled->value, OccurrenceStatus::Cancelled->value])
+            ->whereIn('events.status', array_map(fn (EventStatus $s): string => $s->value, EventStatus::publiclyListed()))
+            ->whereIn('event_occurrences.status', array_map(fn (OccurrenceStatus $s): string => $s->value, OccurrenceStatus::publiclyListed()))
             ->where('event_occurrences.expires_at', '>', $notExpiredBefore->utc())
             ->when($window, fn ($query, DateWindow $window) => $query->where('event_occurrences.starts_at', '<', $window->endUtc()))
             ->when($filters->category, fn ($query, Category $category) => $query->where('events.category_id', $category->id))

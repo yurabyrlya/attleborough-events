@@ -3,10 +3,12 @@
 namespace App\Filament\Resources\Events\Tables;
 
 use App\Calendar\ManualRecurrence;
+use App\Enums\EventStatus;
 use App\Models\Event;
 use Carbon\CarbonImmutable;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Throwable;
 
@@ -35,10 +37,15 @@ class EventsTable
                     ->badge(),
             ])
             ->filters([
-                //
+                // Lets the admin find hidden and cancelled events to show or
+                // reinstate them. No default: every status is listed.
+                SelectFilter::make('status')
+                    ->options(EventStatus::class),
             ])
             // Edit opens EditEvent, which saves through UpdatePublishedEvent.
-            // No delete: no Eloquent write path bypasses App\Publishing\Actions.
+            // No delete, bulk delete or force delete (ADM-03): hiding is the
+            // only way to take an event off the public calendar, and no
+            // Eloquent write path bypasses App\Publishing\Actions.
             ->recordActions([
                 EditAction::make(),
             ])
