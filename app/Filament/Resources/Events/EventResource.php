@@ -3,7 +3,9 @@
 namespace App\Filament\Resources\Events;
 
 use App\Filament\Resources\Events\Pages\CreateEvent;
+use App\Filament\Resources\Events\Pages\EditEvent;
 use App\Filament\Resources\Events\Pages\ListEvents;
+use App\Filament\Resources\Events\RelationManagers\OccurrencesRelationManager;
 use App\Filament\Resources\Events\Schemas\EventForm;
 use App\Filament\Resources\Events\Tables\EventsTable;
 use App\Models\Event;
@@ -34,7 +36,7 @@ class EventResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            OccurrencesRelationManager::class,
         ];
     }
 
@@ -43,7 +45,7 @@ class EventResource extends Resource
         return [
             'index' => ListEvents::route('/'),
             'create' => CreateEvent::route('/create'),
-            // 'edit' arrives in plan 01-04 via UpdatePublishedEvent.
+            'edit' => EditEvent::route('/{record}/edit'),
         ];
     }
 }

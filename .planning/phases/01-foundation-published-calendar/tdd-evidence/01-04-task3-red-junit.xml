@@ -1,0 +1,1020 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="21" assertions="49" errors="0" failures="18" skipped="0" time="3.607630">
+    <testsuite name="Tests\Feature\Publishing\UpdatePublishedEventTest" file="tests/Feature/Publishing/UpdatePublishedEventTest.php" tests="8" assertions="13" errors="0" failures="7" skipped="0" time="0.903809">
+      <testcase name="it keeps every recurrence key, id and admin status when only the start time changes" file="tests/Feature/Publishing/UpdatePublishedEventTest.php::it keeps every recurrence key, id and admin status when only the start time changes" class="Tests\Feature\Publishing\UpdatePublishedEventTest" classname="Tests.Feature.Publishing.UpdatePublishedEventTest" assertions="4" time="0.590958">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it keeps every recurrence key, id and admin status when only the start time changesFailed asserting that two strings are identical.
+at tests/Feature/Publishing/UpdatePublishedEventTest.php:82</failure>
+      </testcase>
+      <testcase name="it prunes future rows of the old weekday (even cancelled ones) and keeps past rows when the weekday changes" file="tests/Feature/Publishing/UpdatePublishedEventTest.php::it prunes future rows of the old weekday (even cancelled ones) and keeps past rows when the weekday changes" class="Tests\Feature\Publishing\UpdatePublishedEventTest" classname="Tests.Feature.Publishing.UpdatePublishedEventTest" assertions="2" time="0.065917">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it prunes future rows of the old weekday (even cancelled ones) and keeps past rows when the weekday changesExpecting […] not to have key '2026-11-13'.
+at tests/Feature/Publishing/UpdatePublishedEventTest.php:98</failure>
+      </testcase>
+      <testcase name="it changes nothing when the same data is saved again" file="tests/Feature/Publishing/UpdatePublishedEventTest.php::it changes nothing when the same data is saved again" class="Tests\Feature\Publishing\UpdatePublishedEventTest" classname="Tests.Feature.Publishing.UpdatePublishedEventTest" assertions="1" time="0.035487"/>
+      <testcase name="it leaves exactly one future occurrence keyed by start_date when a series becomes &quot;Does not repeat&quot;" file="tests/Feature/Publishing/UpdatePublishedEventTest.php::it leaves exactly one future occurrence keyed by start_date when a series becomes &quot;Does not repeat&quot;" class="Tests\Feature\Publishing\UpdatePublishedEventTest" classname="Tests.Feature.Publishing.UpdatePublishedEventTest" assertions="1" time="0.033326">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it leaves exactly one future occurrence keyed by start_date when a series becomes "Does not repeat"Failed asserting that 'FREQ=WEEKLY;BYDAY=FR' is null.
+at tests/Feature/Publishing/UpdatePublishedEventTest.php:119</failure>
+      </testcase>
+      <testcase name="it sets ends_at NULL and expires_at = starts_at + 3h on every future occurrence when the end time is cleared" file="tests/Feature/Publishing/UpdatePublishedEventTest.php::it sets ends_at NULL and expires_at = starts_at + 3h on every future occurrence when the end time is cleared" class="Tests\Feature\Publishing\UpdatePublishedEventTest" classname="Tests.Feature.Publishing.UpdatePublishedEventTest" assertions="2" time="0.035411">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it sets ends_at NULL and expires_at = starts_at + 3h on every future occurrence when the end time is clearedFailed asserting that false is true.
+at tests/Feature/Publishing/UpdatePublishedEventTest.php:133</failure>
+      </testcase>
+      <testcase name="it never changes status, origin, approver or approval time" file="tests/Feature/Publishing/UpdatePublishedEventTest.php::it never changes status, origin, approver or approval time" class="Tests\Feature\Publishing\UpdatePublishedEventTest" classname="Tests.Feature.Publishing.UpdatePublishedEventTest" assertions="1" time="0.040114">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it never changes status, origin, approver or approval timeFailed asserting that two strings are identical.
+at tests/Feature/Publishing/UpdatePublishedEventTest.php:146</failure>
+      </testcase>
+      <testcase name="it refuses an editor who is not the admin and changes nothing" file="tests/Feature/Publishing/UpdatePublishedEventTest.php::it refuses an editor who is not the admin and changes nothing" class="Tests\Feature\Publishing\UpdatePublishedEventTest" classname="Tests.Feature.Publishing.UpdatePublishedEventTest" assertions="1" time="0.061149">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it refuses an editor who is not the admin and changes nothingException [Illuminate\Auth\Access\AuthorizationException] not thrown.
+at tests/Feature/Publishing/UpdatePublishedEventTest.php:158</failure>
+      </testcase>
+      <testcase name="it rolls the event back when the occurrence sync throws" file="tests/Feature/Publishing/UpdatePublishedEventTest.php::it rolls the event back when the occurrence sync throws" class="Tests\Feature\Publishing\UpdatePublishedEventTest" classname="Tests.Feature.Publishing.UpdatePublishedEventTest" assertions="1" time="0.041446">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it rolls the event back when the occurrence sync throwsException [RuntimeException] not thrown.
+at tests/Feature/Publishing/UpdatePublishedEventTest.php:171</failure>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\Filament\EditEventTest" file="tests/Feature/Filament/EditEventTest.php" tests="7" assertions="19" errors="0" failures="5" skipped="0" time="2.290921">
+      <testcase name="it opens the edit form hydrated with the Repeats and Ends fields from the stored rule" file="tests/Feature/Filament/EditEventTest.php::it opens the edit form hydrated with the Repeats and Ends fields from the stored rule" class="Tests\Feature\Filament\EditEventTest" classname="Tests.Feature.Filament.EditEventTest" assertions="4" time="0.237952">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it opens the edit form hydrated with the Repeats and Ends fields from the stored ruleFailed asserting that a component [repeats] has the expected state in the [form] schema on the [App\Filament\Resources\Events\Pages\EditEvent] component.
+Failed asserting that null matches expected 'monthly_last'.
+at vendor/filament/schemas/src/Testing/TestsSchemas.php:191
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at vendor/filament/forms/src/Testing/TestsForms.php:78
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/EditEventTest.php:47</failure>
+      </testcase>
+      <testcase name="it saves an edit through the form and shows the change on the public list" file="tests/Feature/Filament/EditEventTest.php::it saves an edit through the form and shows the change on the public list" class="Tests\Feature\Filament\EditEventTest" classname="Tests.Feature.Filament.EditEventTest" assertions="3" time="0.179868">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it saves an edit through the form and shows the change on the public listComponent has errors: "data.repeats" =&gt; ["The repeats field is required."]
+Failed asserting that false is true.
+at vendor/livewire/livewire/src/Features/SupportValidation/TestsValidation.php:127
+at vendor/filament/forms/src/Testing/TestsForms.php:138
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/EditEventTest.php:62</failure>
+      </testcase>
+      <testcase name="it has no delete action on the edit page" file="tests/Feature/Filament/EditEventTest.php::it has no delete action on the edit page" class="Tests\Feature\Filament\EditEventTest" classname="Tests.Feature.Filament.EditEventTest" assertions="2" time="0.064580"/>
+      <testcase name="it keeps the public order by id when an edit makes two occurrences share a start time" file="tests/Feature/Filament/EditEventTest.php::it keeps the public order by id when an edit makes two occurrences share a start time" class="Tests\Feature\Filament\EditEventTest" classname="Tests.Feature.Filament.EditEventTest" assertions="3" time="0.132027">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it keeps the public order by id when an edit makes two occurrences share a start timeComponent has errors: "data.repeats" =&gt; ["The repeats field is required."]
+Failed asserting that false is true.
+at vendor/livewire/livewire/src/Features/SupportValidation/TestsValidation.php:127
+at vendor/filament/forms/src/Testing/TestsForms.php:138
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/EditEventTest.php:83</failure>
+      </testcase>
+      <testcase name="it lists the series occurrences sorted by start, shown in London time" file="tests/Feature/Filament/EditEventTest.php::it lists the series occurrences sorted by start, shown in London time" class="Tests\Feature\Filament\EditEventTest" classname="Tests.Feature.Filament.EditEventTest" assertions="2" time="1.174733">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it lists the series occurrences sorted by start, shown in London timeFailed asserting that '&lt;div wire:key="lw-1467062119-0" wire:snapshot="" wire:effects="" wire:id="eozhJKwHCFiKmS6JKOHk" wire:name="App\Filament\Resources\Events\RelationManagers\OccurrencesRelationManager" class="fi-resource-relation-manager"&gt;\n
+    \n
+        &lt;div x-data="filamentSchema({ livewireId: 'eozhJKwHCFiKmS6JKOHk', schemaKey: 'content' })" x-on:form-validation-error.window="handleFormValidationError" x-on:reset-schema-component-state.window="handleClientSideStateReset" class="fi-grid  fi-sc  fi-sc-has-gap" style="--cols-default: repeat(1, minmax(0, 1fr));"&gt;\n
+                                                \n
+        &lt;div                                        wire:partial="schema-component::content.resourceTabs"\n
+                                    wire:key="eozhJKwHCFiKmS6JKOHk.content.resourceTabs" class="fi-grid-col fi-hidden" style="--col-span-default: span 1 / span 1;"        &gt;\n
+                    &lt;/div&gt;\n
+\n
+                                                                                                                                        \n
+        &lt;div                                                    x-data="filamentSchemaComponent({\n
+                    path: '',\n
+                    containerPath: '',\n
+                    $wire,\n
+                })"\n
+                                                        class="fi-grid-col" style="--col-span-default: span 1 / span 1;"        &gt;\n
+                            &lt;div\n
+                    class="fi-sc-component"\n
+                &gt;\n
+                    &lt;div\n
+        x-data="filamentTable({\n
+                areGroupsCollapsedByDefault: false,\n
+                canTrackDeselectedRecords: true,\n
+                currentSelectionLivewireProperty: null,\n
+                maxSelectableRecords: null,\n
+                reorderMessage: ':label moved to position :position of :count.',\n
+                selectsCurrentPageOnly: false,\n
+                $wire,\n
+            })"\n
+    class="fi-ta"\n
+&gt;\n
+    &lt;input\n
+        type="hidden"\n
+        value=""\n
+        x-ref="allSelectableRecordsCount"\n
+    /&gt;\n
+\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    &lt;div\n
+        class="fi-ta-ctn fi-ta-ctn-with-footer fi-ta-ctn-with-header"\n
+    &gt;\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+        &lt;div class="fi-ta-main"&gt;\n
+            &lt;div\n
+                                x-show="true || false || (getSelectedRecordsCount() &amp;&amp; 0)"\n
+                wire:key="eozhJKwHCFiKmS6JKOHk.table.header.visible"\n
+                class="fi-ta-header-ctn"\n
+            &gt;\n
+                \n
+\n
+                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                    &lt;div\n
+                        class="fi-ta-header"\n
+                    &gt;\n
+                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                            &lt;div&gt;\n
+                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                    &lt;h2\n
+                                        class="fi-ta-header-heading"\n
+                                    &gt;\n
+                                        Occurrences\n
+                                    &lt;/h2&gt;\n
+                                &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                            &lt;/div&gt;\n
+                        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                    &lt;/div&gt;\n
+                &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                \n
+\n
+                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                \n
+\n
+                &lt;div\n
+                     x-cloak                     x-show="false || false || (getSelectedRecordsCount() &amp;&amp; 0)"\n
+                    wire:key="eozhJKwHCFiKmS6JKOHk.table.header-toolbar.hidden"\n
+                    class="fi-ta-header-toolbar"\n
+                &gt;\n
+                    \n
+\n
+                    &lt;div class="fi-ta-actions fi-align-start fi-wrapped"&gt;\n
+                        \n
+\n
+                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                        \n
+\n
+                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                        \n
+\n
+                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                        \n
+                    &lt;/div&gt;\n
+\n
+                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                    \n
+                &lt;/div&gt;\n
+\n
+                \n
+            &lt;/div&gt;\n
+\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+            \n
+\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                &lt;div\n
+                                        wire:loading.attr="aria-busy"\n
+                                        wire:target="activeTab,applyTableFilters,gotoPage,nextPage,previousPage,removeTableFilter,removeTableFilters,reorderTable,resetTableColumnSearch,resetTableFiltersForm,resetTableSearch,setPage,sortTable,tableColumnSearches,tableFilters,tableGrouping,tableRecordsPerPage,tableSearch,tableSort,toggleTableReordering"\n
+                    class="fi-ta-content-ctn fi-fixed-positioning-context"\n
+                &gt;\n
+                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                        \n
+                        &lt;div\n
+                            role="status"\n
+                            aria-live="polite"\n
+                            aria-atomic="true"\n
+                            class="fi-sr-only"\n
+                        &gt;\n
+                            3 results\n
+                        &lt;/div&gt;\n
+\n
+                        &lt;div\n
+                            wire:loading.delay.default.block\n
+                            wire:target="activeTab,applyTableFilters,gotoPage,nextPage,previousPage,removeTableFilter,removeTableFilters,reorderTable,resetTableColumnSearch,resetTableFiltersForm,resetTableSearch,setPage,sortTable,tableColumnSearches,tableFilters,tableGrouping,tableRecordsPerPage,tableSearch,tableSort,toggleTableReordering"\n
+                            role="status"\n
+                            aria-live="polite"\n
+                            data-testid="table-loading-state"\n
+                            class="fi-sr-only"\n
+                        &gt;\n
+                            Loading...\n
+                        &lt;/div&gt;\n
+                    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                        \n
+                        &lt;table\n
+                            aria-label="Occurrences"\n
+                            class="fi-ta-table"\n
+                        &gt;\n
+                            &lt;thead&gt;\n
+                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                &lt;tr&gt;\n
+                                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                    \n
+                                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                &lt;/tr&gt;\n
+                            &lt;/thead&gt;\n
+\n
+                            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                &lt;tbody\n
+                                    class="fi-ta-records"\n
+                                                                                                        &gt;\n
+                                    \n
+                                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                        \n
+                                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                            &lt;tr\n
+                                                wire:key="eozhJKwHCFiKmS6JKOHk.table.records.116"\n
+                                                \n
+                                                \n
+                                                x-bind:class="{\n
+                                                        \n
+                                                        'fi-selected': false &amp;&amp; isRecordSelected('116'),\n
+                                                    }"\n
+                                                class="fi-ta-row"\n
+                                            &gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                            &lt;/tr&gt;\n
+                                        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                                                                                    \n
+                                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                            &lt;tr\n
+                                                wire:key="eozhJKwHCFiKmS6JKOHk.table.records.117"\n
+                                                \n
+                                                \n
+                                                x-bind:class="{\n
+                                                        \n
+                                                        'fi-selected': false &amp;&amp; isRecordSelected('117'),\n
+                                                    }"\n
+                                                class="fi-ta-row"\n
+                                            &gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                            &lt;/tr&gt;\n
+                                        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                                                                                    \n
+                                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                            &lt;tr\n
+                                                wire:key="eozhJKwHCFiKmS6JKOHk.table.records.118"\n
+                                                \n
+                                                \n
+                                                x-bind:class="{\n
+                                                        \n
+                                                        'fi-selected': false &amp;&amp; isRecordSelected('118'),\n
+                                                    }"\n
+                                                class="fi-ta-row"\n
+                                            &gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                            &lt;/tr&gt;\n
+                                        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                                            &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                &lt;/tbody&gt;\n
+                            &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                        &lt;/table&gt;\n
+                    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                &lt;/div&gt;\n
+            &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+            \n
+\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                \n
+                &lt;nav\n
+    aria-label="Pagination navigation"\n
+    class="fi-pagination"\n
+&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;        &lt;span class="fi-pagination-overview"&gt;\n
+            Showing 1 to 3 of 3 results\n
+        &lt;/span&gt;\n
+    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;        &lt;div class="fi-pagination-records-per-page-select-ctn"&gt;\n
+            &lt;label class="fi-pagination-records-per-page-select fi-compact"&gt;\n
+                &lt;div\n
+        class="fi-input-wrp"\n
+&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    &lt;div\n
+                class="fi-input-wrp-content-ctn"\n
+    &gt;\n
+        &lt;select\n
+    class="fi-select-input" wire:model.live="tableRecordsPerPage"\n
+&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                            &lt;option value="5"&gt;\n
+                                5\n
+                            &lt;/option&gt;\n
+                                                    &lt;option value="10"&gt;\n
+                                10\n
+                            &lt;/option&gt;\n
+                                                    &lt;option value="25"&gt;\n
+                                25\n
+                            &lt;/option&gt;\n
+                                                    &lt;option value="50"&gt;\n
+                                50\n
+                            &lt;/option&gt;\n
+                        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+&lt;/select&gt;\n
+    &lt;/div&gt;\n
+\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/div&gt;\n
+\n
+                &lt;span class="fi-sr-only"&gt;\n
+                    Per page\n
+                &lt;/span&gt;\n
+            &lt;/label&gt;\n
+\n
+            &lt;label class="fi-pagination-records-per-page-select"&gt;\n
+                &lt;div\n
+        class="fi-input-wrp"\n
+&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;        &lt;div\n
+                                        x-on:click="if (! $event.target.closest('.fi-input-wrp-actions')) $dispatch('focus-input')"\n
+                        class="fi-input-wrp-prefix fi-input-wrp-prefix-has-content fi-input-wrp-prefix-has-label"\n
+        &gt;\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+            \n
+\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                &lt;span class="fi-input-wrp-label"&gt;\n
+                    Per page\n
+                &lt;/span&gt;\n
+            &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;        &lt;/div&gt;\n
+    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    &lt;div\n
+                class="fi-input-wrp-content-ctn"\n
+    &gt;\n
+        &lt;select\n
+    class="fi-select-input" wire:model.live="tableRecordsPerPage"\n
+&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                            &lt;option value="5"&gt;\n
+                                5\n
+                            &lt;/option&gt;\n
+                                                    &lt;option value="10"&gt;\n
+                                10\n
+                            &lt;/option&gt;\n
+                                                    &lt;option value="25"&gt;\n
+                                25\n
+                            &lt;/option&gt;\n
+                                                    &lt;option value="50"&gt;\n
+                                50\n
+                            &lt;/option&gt;\n
+                        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+&lt;/select&gt;\n
+    &lt;/div&gt;\n
+\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/div&gt;\n
+            &lt;/label&gt;\n
+        &lt;/div&gt;\n
+    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/nav&gt;\n
+            &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;        &lt;/div&gt;\n
+\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    &lt;/div&gt;\n
+\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;    &lt;div\n
+        wire:partial="action-modals"\n
+        x-data="filamentActionModals({\n
+                    livewireId: 'eozhJKwHCFiKmS6JKOHk',\n
+                })"\n
+        style="height: 0"\n
+    &gt;\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    &lt;/div&gt;\n
+\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/div&gt;\n
+                &lt;/div&gt;\n
+                    &lt;/div&gt;\n
+\n
+                                                                                                            &lt;/div&gt;\n
+\n
+        \n
+\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/div&gt;\n
+' [ASCII](length: 19164) contains "Fri 30 Oct 2026, 19:30" [ASCII](length: 22).
+at vendor/livewire/livewire/src/Features/SupportTesting/MakesAssertions.php:47
+at tests/Feature/Filament/EditEventTest.php:95</failure>
+      </testcase>
+      <testcase name="it offers no create, edit or delete action on the occurrences table" file="tests/Feature/Filament/EditEventTest.php::it offers no create, edit or delete action on the occurrences table" class="Tests\Feature\Filament\EditEventTest" classname="Tests.Feature.Filament.EditEventTest" assertions="4" time="0.061390"/>
+      <testcase name="it shows a Repeats column and an edit action in the events table" file="tests/Feature/Filament/EditEventTest.php::it shows a Repeats column and an edit action in the events table" class="Tests\Feature\Filament\EditEventTest" classname="Tests.Feature.Filament.EditEventTest" assertions="1" time="0.440372">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it shows a Repeats column and an edit action in the events tableFailed asserting that '&lt;div wire:key="lw-1467062119-0" wire:snapshot="" wire:effects="" wire:id="BkVWfg5omm4eYikKlGM2" wire:name="App\Filament\Resources\Events\Pages\ListEvents"\n
+    class="fi-page fi-resource-list-records-page fi-resource-events"\n
+&gt;\n
+    \n
+\n
+    &lt;div class="fi-page-header-main-ctn"&gt;\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;            \n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                &lt;header\n
+    class="fi-header fi-header-has-breadcrumbs"\n
+&gt;\n
+    \n
+                    \n
+\n
+    \n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;        &lt;div&gt;        \n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;            &lt;nav\n
+    class="fi-breadcrumbs" aria-label="Breadcrumb"\n
+&gt;\n
+    &lt;ol class="fi-breadcrumbs-list"&gt;\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;            &lt;li class="fi-breadcrumbs-item"&gt;\n
+                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                    &lt;a\n
+                        href="http://localhost:8000/admin/events"\n
+                                                class="fi-breadcrumbs-item-label"\n
+                    &gt;\n
+                        Events\n
+                    &lt;/a&gt;\n
+                &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;            &lt;/li&gt;\n
+                    &lt;li class="fi-breadcrumbs-item"&gt;\n
+                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                    &lt;svg aria-hidden="true" class="fi-breadcrumbs-item-separator fi-ltr fi-icon fi-size-md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon"&gt;\n
+  &lt;path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/&gt;\n
+&lt;/svg&gt;\n
+\n
+                    &lt;svg aria-hidden="true" class="fi-breadcrumbs-item-separator fi-rtl fi-icon fi-size-md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon"&gt;\n
+  &lt;path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd"/&gt;\n
+&lt;/svg&gt;\n
+                &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                    &lt;span\n
+                         aria-current="page"                         class="fi-breadcrumbs-item-label"\n
+                    &gt;\n
+                        List\n
+                    &lt;/span&gt;\n
+                &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;            &lt;/li&gt;\n
+        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    &lt;/ol&gt;\n
+&lt;/nav&gt;\n
+        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+        \n
+\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;            &lt;h1 class="fi-header-heading"&gt;\n
+                Events\n
+            &lt;/h1&gt;\n
+        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+        \n
+\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    \n
+            &lt;/div&gt;\n
+    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    \n
+    \n
+                    \n
+\n
+    \n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;        &lt;div class="fi-header-actions-ctn"&gt;\n
+                    \n
+        \n
+\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;    &lt;div\n
+        class="fi-ac fi-align-start"\n
+    &gt;\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                \n
+        \n
+        \n
+        &lt;a                            href="http://localhost:8000/admin/events/create"                                                            class="fi-ac-btn-action fi-btn fi-size-md  fi-color fi-color-primary fi-bg-color-400 hover:fi-bg-color-300 dark:fi-bg-color-600 dark:hover:fi-bg-color-500 fi-text-color-900 hover:fi-text-color-800 dark:fi-text-color-950 dark:hover:fi-text-color-950"        &gt;\n
+                                                                        \n
+                                                New event                            \n
+            \n
+            \n
+                    &lt;/a&gt;\n
+\n
+        \n
+        \n
+            &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    &lt;/div&gt;\n
+&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+        \n
+    \n
+            \n
+        &lt;/div&gt;\n
+    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/header&gt;\n
+            &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+        &lt;div class="fi-page-main"&gt;\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+            &lt;div class="fi-page-content"&gt;\n
+                \n
+\n
+                \n
+\n
+                \n
+\n
+                &lt;div x-data="filamentSchema({ livewireId: 'BkVWfg5omm4eYikKlGM2', schemaKey: 'content' })" x-on:form-validation-error.window="handleFormValidationError" x-on:reset-schema-component-state.window="handleClientSideStateReset" class="fi-grid  fi-sc  fi-sc-has-gap" style="--cols-default: repeat(1, minmax(0, 1fr));"&gt;\n
+                                                \n
+        &lt;div                                        wire:partial="schema-component::content.resourceTabs"\n
+                                    wire:key="BkVWfg5omm4eYikKlGM2.content.resourceTabs" class="fi-grid-col fi-hidden" style="--col-span-default: span 1 / span 1;"        &gt;\n
+                    &lt;/div&gt;\n
+\n
+                                                                                                                                        \n
+        &lt;div                                                    x-data="filamentSchemaComponent({\n
+                    path: '',\n
+                    containerPath: '',\n
+                    $wire,\n
+                })"\n
+                                                        class="fi-grid-col" style="--col-span-default: span 1 / span 1;"        &gt;\n
+                            &lt;div\n
+                    class="fi-sc-component"\n
+                &gt;\n
+                    &lt;div\n
+        x-data="filamentTable({\n
+                areGroupsCollapsedByDefault: false,\n
+                canTrackDeselectedRecords: true,\n
+                currentSelectionLivewireProperty: null,\n
+                maxSelectableRecords: null,\n
+                reorderMessage: ':label moved to position :position of :count.',\n
+                selectsCurrentPageOnly: false,\n
+                $wire,\n
+            })"\n
+    class="fi-ta"\n
+&gt;\n
+    &lt;input\n
+        type="hidden"\n
+        value=""\n
+        x-ref="allSelectableRecordsCount"\n
+    /&gt;\n
+\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    &lt;div\n
+        class="fi-ta-ctn fi-ta-ctn-with-footer fi-ta-ctn-with-header"\n
+    &gt;\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+        &lt;div class="fi-ta-main"&gt;\n
+            &lt;div\n
+                                x-show="true || false || (getSelectedRecordsCount() &amp;&amp; 0)"\n
+                wire:key="BkVWfg5omm4eYikKlGM2.table.header.visible"\n
+                class="fi-ta-header-ctn"\n
+            &gt;\n
+                \n
+\n
+                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                \n
+\n
+                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                \n
+\n
+                &lt;div\n
+                                        x-show="true || false || (getSelectedRecordsCount() &amp;&amp; 0)"\n
+                    wire:key="BkVWfg5omm4eYikKlGM2.table.header-toolbar.visible"\n
+                    class="fi-ta-header-toolbar"\n
+                &gt;\n
+                    \n
+\n
+                    &lt;div class="fi-ta-actions fi-align-start fi-wrapped"&gt;\n
+                        \n
+\n
+                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                        \n
+\n
+                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                        \n
+\n
+                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                        \n
+                    &lt;/div&gt;\n
+\n
+                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                        &lt;div&gt;\n
+                            \n
+\n
+                            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                \n
+                                &lt;div\n
+    x-id="['input']"\n
+    class="fi-ta-search-field"\n
+&gt;\n
+    &lt;label\n
+        x-bind:for="$id('input')"\n
+        class="fi-sr-only"\n
+    &gt;\n
+        Search\n
+    &lt;/label&gt;\n
+\n
+    &lt;div\n
+        class="fi-input-wrp"\n
+&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;        &lt;div\n
+                                        x-on:click="if (! $event.target.closest('.fi-input-wrp-actions')) $dispatch('focus-input')"\n
+                        class="fi-input-wrp-prefix fi-input-wrp-prefix-has-content fi-inline"\n
+        &gt;\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+            &lt;svg wire:loading.remove.delay.default="1" wire:target="tableSearch" class="fi-icon fi-size-md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon"&gt;\n
+  &lt;path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clip-rule="evenodd"/&gt;\n
+&lt;/svg&gt;\n
+\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                    &lt;svg\n
+        fill="none"\n
+        viewBox="0 0 24 24"\n
+        xmlns="http://www.w3.org/2000/svg"\n
+        aria-hidden="true" wire:loading.delay.default="" wire:target="tableSearch" class="fi-icon fi-loading-indicator fi-size-md"\n
+    &gt;\n
+        &lt;path\n
+            clip-rule="evenodd"\n
+            d="M12 19C15.866 19 19 15.866 19 12C19 8.13401 15.866 5 12 5C8.13401 5 5 8.13401 5 12C5 15.866 8.13401 19 12 19ZM12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"\n
+            fill-rule="evenodd"\n
+            fill="currentColor"\n
+            opacity="0.2"\n
+        &gt;&lt;/path&gt;\n
+        &lt;path\n
+            d="M2 12C2 6.47715 6.47715 2 12 2V5C8.13401 5 5 8.13401 5 12H2Z"\n
+            fill="currentColor"\n
+        &gt;&lt;/path&gt;\n
+    &lt;/svg&gt;\n
+            &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;        &lt;/div&gt;\n
+    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    &lt;div\n
+                class="fi-input-wrp-content-ctn"\n
+    &gt;\n
+        &lt;input\n
+    class="fi-input fi-input-has-inline-prefix" autocomplete="off" maxlength="1000" placeholder="Search" type="search" wire:key="BkVWfg5omm4eYikKlGM2.table.tableSearch.field.input" wire:model.live.debounce.500ms="tableSearch" x-bind:id="$id('input')" x-on:keyup="if ($event.key === 'Enter') { $wire.$refresh() }"\n
+/&gt;\n
+    &lt;/div&gt;\n
+\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/div&gt;\n
+&lt;/div&gt;\n
+                            &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                            \n
+\n
+                            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                        &lt;/div&gt;\n
+                    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                    \n
+                &lt;/div&gt;\n
+\n
+                \n
+            &lt;/div&gt;\n
+\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+            \n
+\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                &lt;div\n
+                                        wire:loading.attr="aria-busy"\n
+                                        wire:target="activeTab,applyTableFilters,gotoPage,nextPage,previousPage,removeTableFilter,removeTableFilters,reorderTable,resetTableColumnSearch,resetTableFiltersForm,resetTableSearch,setPage,sortTable,tableColumnSearches,tableFilters,tableGrouping,tableRecordsPerPage,tableSearch,tableSort,toggleTableReordering"\n
+                    class="fi-ta-content-ctn fi-fixed-positioning-context"\n
+                &gt;\n
+                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                        \n
+                        &lt;div\n
+                            role="status"\n
+                            aria-live="polite"\n
+                            aria-atomic="true"\n
+                            class="fi-sr-only"\n
+                        &gt;\n
+                            1 result\n
+                        &lt;/div&gt;\n
+\n
+                        &lt;div\n
+                            wire:loading.delay.default.block\n
+                            wire:target="activeTab,applyTableFilters,gotoPage,nextPage,previousPage,removeTableFilter,removeTableFilters,reorderTable,resetTableColumnSearch,resetTableFiltersForm,resetTableSearch,setPage,sortTable,tableColumnSearches,tableFilters,tableGrouping,tableRecordsPerPage,tableSearch,tableSort,toggleTableReordering"\n
+                            role="status"\n
+                            aria-live="polite"\n
+                            data-testid="table-loading-state"\n
+                            class="fi-sr-only"\n
+                        &gt;\n
+                            Loading...\n
+                        &lt;/div&gt;\n
+                    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                        \n
+                        &lt;table\n
+                            aria-label="events"\n
+                            class="fi-ta-table"\n
+                        &gt;\n
+                            &lt;thead&gt;\n
+                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                &lt;tr&gt;\n
+                                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                    \n
+                                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                            \n
+                                            &lt;th\n
+                                                                                                    aria-sort="none"\n
+                                                                                                scope="col"\n
+                                                class="fi-ta-header-cell fi-ta-header-cell-title"\n
+                                            &gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                                    &lt;button\n
+                                                                                                                    type="button"\n
+                                                                                                                wire:click="sortTable('title')"\n
+                                                        wire:target="sortTable('title')"\n
+                                                        class="fi-ta-header-cell-sort-btn"\n
+                                                    &gt;\n
+                                                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                                            Title\n
+                                                        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                        &lt;svg wire:loading.remove.delay.default="1" wire:target="sortTable('title')" class="fi-icon fi-size-md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon"&gt;\n
+  &lt;path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/&gt;\n
+&lt;/svg&gt;\n
+\n
+                                                            &lt;svg\n
+        fill="none"\n
+        viewBox="0 0 24 24"\n
+        xmlns="http://www.w3.org/2000/svg"\n
+        aria-hidden="true" wire:loading.delay.default="" wire:target="sortTable('title')" class="fi-icon fi-loading-indicator fi-size-md"\n
+    &gt;\n
+        &lt;path\n
+            clip-rule="evenodd"\n
+            d="M12 19C15.866 19 19 15.866 19 12C19 8.13401 15.866 5 12 5C8.13401 5 5 8.13401 5 12C5 15.866 8.13401 19 12 19ZM12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"\n
+            fill-rule="evenodd"\n
+            fill="currentColor"\n
+            opacity="0.2"\n
+        &gt;&lt;/path&gt;\n
+        &lt;path\n
+            d="M2 12C2 6.47715 6.47715 2 12 2V5C8.13401 5 5 8.13401 5 12H2Z"\n
+            fill="currentColor"\n
+        &gt;&lt;/path&gt;\n
+    &lt;/svg&gt;\n
+                                                    &lt;/button&gt;\n
+                                                &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                            &lt;/th&gt;\n
+                                        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                                                            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                            \n
+                                            &lt;th\n
+                                                                                                scope="col"\n
+                                                class="fi-ta-header-cell fi-ta-header-cell-category.name"\n
+                                            &gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                                        Category\n
+                                                    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                                &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                            &lt;/th&gt;\n
+                                        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                                                            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                            \n
+                                            &lt;th\n
+                                                                                                scope="col"\n
+                                                class="fi-ta-header-cell fi-ta-header-cell-next-occurrence.starts-at"\n
+                                            &gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                                        Next occurrence\n
+                                                    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                                &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                            &lt;/th&gt;\n
+                                        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                                                            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                            \n
+                                            &lt;th\n
+                                                                                                scope="col"\n
+                                                class="fi-ta-header-cell fi-ta-header-cell-status"\n
+                                            &gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                                        Status\n
+                                                    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                                &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                            &lt;/th&gt;\n
+                                        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                &lt;/tr&gt;\n
+                            &lt;/thead&gt;\n
+\n
+                            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                &lt;tbody\n
+                                    class="fi-ta-records"\n
+                                                                                                        &gt;\n
+                                    \n
+                                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                        \n
+                                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                            &lt;tr\n
+                                                wire:key="BkVWfg5omm4eYikKlGM2.table.records.16"\n
+                                                \n
+                                                \n
+                                                x-bind:class="{\n
+                                                        \n
+                                                        'fi-selected': false &amp;&amp; isRecordSelected('16'),\n
+                                                    }"\n
+                                                class="fi-ta-row fi-clickable"\n
+                                            &gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                                                    \n
+                                                    &lt;td\n
+                                                        wire:key="BkVWfg5omm4eYikKlGM2.table.record.16.column.title"\n
+                                                        class="fi-ta-cell fi-ta-cell-title"\n
+                                                    &gt;\n
+                                                        \n
+                                                        &lt;a\n
+                                                                                                                            href="http://localhost:8000/admin/events/16/edit"\n
+                                                                                                                                    \n
+                                                                                                                                                                                        class="fi-ta-col"\n
+                                                        &gt;\n
+                                                            &lt;div class="fi-ta-text fi-ta-text-item fi-size-sm"&gt;Last Friday Ceilidh&lt;/div&gt;\n
+                                                        &lt;/a&gt;\n
+                                                        \n
+                                                    &lt;/td&gt;\n
+                                                                                                    \n
+                                                    &lt;td\n
+                                                        wire:key="BkVWfg5omm4eYikKlGM2.table.record.16.column.category.name"\n
+                                                        class="fi-ta-cell fi-ta-cell-category.name"\n
+                                                    &gt;\n
+                                                        \n
+                                                        &lt;a\n
+                                                                                                                            href="http://localhost:8000/admin/events/16/edit"\n
+                                                                                                                                    \n
+                                                                                                                                                                                        class="fi-ta-col"\n
+                                                        &gt;\n
+                                                            &lt;div class="fi-ta-text fi-ta-text-item fi-size-sm"&gt;Magni itaque&lt;/div&gt;\n
+                                                        &lt;/a&gt;\n
+                                                        \n
+                                                    &lt;/td&gt;\n
+                                                                                                    \n
+                                                    &lt;td\n
+                                                        wire:key="BkVWfg5omm4eYikKlGM2.table.record.16.column.nextOccurrence.starts_at"\n
+                                                        class="fi-ta-cell fi-ta-cell-next-occurrence.starts-at"\n
+                                                    &gt;\n
+                                                        \n
+                                                        &lt;a\n
+                                                                                                                            href="http://localhost:8000/admin/events/16/edit"\n
+                                                                                                                                    \n
+                                                                                                                                                                                        class="fi-ta-col"\n
+                                                        &gt;\n
+                                                            &lt;div class="fi-ta-text fi-ta-text-item fi-size-sm"&gt;Fri 30 Oct 2026, 19:30&lt;/div&gt;\n
+                                                        &lt;/a&gt;\n
+                                                        \n
+                                                    &lt;/td&gt;\n
+                                                                                                    \n
+                                                    &lt;td\n
+                                                        wire:key="BkVWfg5omm4eYikKlGM2.table.record.16.column.status"\n
+                                                        class="fi-ta-cell fi-ta-cell-status"\n
+                                                    &gt;\n
+                                                        \n
+                                                        &lt;a\n
+                                                                                                                            href="http://localhost:8000/admin/events/16/edit"\n
+                                                                                                                                    \n
+                                                                                                                                                                                        class="fi-ta-col"\n
+                                                        &gt;\n
+                                                            &lt;div class="fi-ta-text fi-ta-text-item fi-ta-text-has-badges"&gt;&lt;span class="fi-badge fi-size-sm fi-color fi-color-success fi-text-color-700 dark:fi-text-color-300"&gt;Published&lt;/span&gt;&lt;/div&gt;\n
+                                                        &lt;/a&gt;\n
+                                                        \n
+                                                    &lt;/td&gt;\n
+                                                &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                            &lt;/tr&gt;\n
+                                        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                                                            &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                                    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                                &lt;/tbody&gt;\n
+                            &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+                            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                        &lt;/table&gt;\n
+                    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;                &lt;/div&gt;\n
+            &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+            \n
+\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                \n
+                &lt;nav\n
+    aria-label="Pagination navigation"\n
+    class="fi-pagination"\n
+&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;        &lt;span class="fi-pagination-overview"&gt;\n
+            Showing 1 result\n
+        &lt;/span&gt;\n
+    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;        &lt;div class="fi-pagination-records-per-page-select-ctn"&gt;\n
+            &lt;label class="fi-pagination-records-per-page-select fi-compact"&gt;\n
+                &lt;div\n
+        class="fi-input-wrp"\n
+&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    &lt;div\n
+                class="fi-input-wrp-content-ctn"\n
+    &gt;\n
+        &lt;select\n
+    class="fi-select-input" wire:model.live="tableRecordsPerPage"\n
+&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                            &lt;option value="5"&gt;\n
+                                5\n
+                            &lt;/option&gt;\n
+                                                    &lt;option value="10"&gt;\n
+                                10\n
+                            &lt;/option&gt;\n
+                                                    &lt;option value="25"&gt;\n
+                                25\n
+                            &lt;/option&gt;\n
+                                                    &lt;option value="50"&gt;\n
+                                50\n
+                            &lt;/option&gt;\n
+                        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+&lt;/select&gt;\n
+    &lt;/div&gt;\n
+\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/div&gt;\n
+\n
+                &lt;span class="fi-sr-only"&gt;\n
+                    Per page\n
+                &lt;/span&gt;\n
+            &lt;/label&gt;\n
+\n
+            &lt;label class="fi-pagination-records-per-page-select"&gt;\n
+                &lt;div\n
+        class="fi-input-wrp"\n
+&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;        &lt;div\n
+                                        x-on:click="if (! $event.target.closest('.fi-input-wrp-actions')) $dispatch('focus-input')"\n
+                        class="fi-input-wrp-prefix fi-input-wrp-prefix-has-content fi-input-wrp-prefix-has-label"\n
+        &gt;\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+            \n
+\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                &lt;span class="fi-input-wrp-label"&gt;\n
+                    Per page\n
+                &lt;/span&gt;\n
+            &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;        &lt;/div&gt;\n
+    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    &lt;div\n
+                class="fi-input-wrp-content-ctn"\n
+    &gt;\n
+        &lt;select\n
+    class="fi-select-input" wire:model.live="tableRecordsPerPage"\n
+&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;                            &lt;option value="5"&gt;\n
+                                5\n
+                            &lt;/option&gt;\n
+                                                    &lt;option value="10"&gt;\n
+                                10\n
+                            &lt;/option&gt;\n
+                                                    &lt;option value="25"&gt;\n
+                                25\n
+                            &lt;/option&gt;\n
+                                                    &lt;option value="50"&gt;\n
+                                50\n
+                            &lt;/option&gt;\n
+                        &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+&lt;/select&gt;\n
+    &lt;/div&gt;\n
+\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/div&gt;\n
+            &lt;/label&gt;\n
+        &lt;/div&gt;\n
+    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/nav&gt;\n
+            &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;        &lt;/div&gt;\n
+\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    &lt;/div&gt;\n
+\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;    &lt;div\n
+        wire:partial="action-modals"\n
+        x-data="filamentActionModals({\n
+                    livewireId: 'BkVWfg5omm4eYikKlGM2',\n
+                })"\n
+        style="height: 0"\n
+    &gt;\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    &lt;/div&gt;\n
+\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/div&gt;\n
+                &lt;/div&gt;\n
+                    &lt;/div&gt;\n
+\n
+                                                                                                            &lt;/div&gt;\n
+\n
+                \n
+\n
+                \n
+\n
+                \n
+            &lt;/div&gt;\n
+\n
+            &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;        &lt;/div&gt;\n
+\n
+        &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    &lt;/div&gt;\n
+\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    \n
+\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;&lt;/div&gt;\n
+' [ASCII](length: 33771) contains "Monthly on the last Friday" [ASCII](length: 26).
+at vendor/livewire/livewire/src/Features/SupportTesting/MakesAssertions.php:47
+at tests/Feature/Filament/EditEventTest.php:113</failure>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\Console\SyncOccurrencesCommandTest" file="tests/Feature/Console/SyncOccurrencesCommandTest.php" tests="6" assertions="17" errors="0" failures="6" skipped="0" time="0.412900">
+      <testcase name="it rolls the horizon forward by exactly one new weekly row and keeps existing ids" file="tests/Feature/Console/SyncOccurrencesCommandTest.php::it rolls the horizon forward by exactly one new weekly row and keeps existing ids" class="Tests\Feature\Console\SyncOccurrencesCommandTest" classname="Tests.Feature.Console.SyncOccurrencesCommandTest" assertions="4" time="0.176431">
+        <failure type="PHPUnit\Framework\AssertionFailedError">it rolls the horizon forward by exactly one new weekly row and keeps existing idsOutput does not contain "Synced 1 series, 0 failed".
+at vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:532
+at vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:475
+at vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+at tests/Feature/Console/SyncOccurrencesCommandTest.php:65</failure>
+      </testcase>
+      <testcase name="it keeps an admin-cancelled occurrence cancelled and also extends a hidden event" file="tests/Feature/Console/SyncOccurrencesCommandTest.php::it keeps an admin-cancelled occurrence cancelled and also extends a hidden event" class="Tests\Feature\Console\SyncOccurrencesCommandTest" classname="Tests.Feature.Console.SyncOccurrencesCommandTest" assertions="3" time="0.060637">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it keeps an admin-cancelled occurrence cancelled and also extends a hidden eventFailed asserting that an array has the key [2027-01-22]
+at tests/Feature/Console/SyncOccurrencesCommandTest.php:85</failure>
+      </testcase>
+      <testcase name="it leaves zero upcoming rows for a series whose UNTIL has passed, keeping rows that already started" file="tests/Feature/Console/SyncOccurrencesCommandTest.php::it leaves zero upcoming rows for a series whose UNTIL has passed, keeping rows that already started" class="Tests\Feature\Console\SyncOccurrencesCommandTest" classname="Tests.Feature.Console.SyncOccurrencesCommandTest" assertions="2" time="0.055450">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it leaves zero upcoming rows for a series whose UNTIL has passed, keeping rows that already startedFailed asserting that two arrays are identical.
+at tests/Feature/Console/SyncOccurrencesCommandTest.php:95</failure>
+      </testcase>
+      <testcase name="it changes nothing when run twice in a row" file="tests/Feature/Console/SyncOccurrencesCommandTest.php::it changes nothing when run twice in a row" class="Tests\Feature\Console\SyncOccurrencesCommandTest" classname="Tests.Feature.Console.SyncOccurrencesCommandTest" assertions="4" time="0.046889">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it changes nothing when run twice in a rowFailed asserting that an array has the key [2027-01-22]
+at tests/Feature/Console/SyncOccurrencesCommandTest.php:106</failure>
+      </testcase>
+      <testcase name="it isolates a failing event: the others still sync, the exit code is 1 and the failing id is named" file="tests/Feature/Console/SyncOccurrencesCommandTest.php::it isolates a failing event: the others still sync, the exit code is 1 and the failing id is named" class="Tests\Feature\Console\SyncOccurrencesCommandTest" classname="Tests.Feature.Console.SyncOccurrencesCommandTest" assertions="3" time="0.046171">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it isolates a failing event: the others still sync, the exit code is 1 and the failing id is namedExpected status code 1 but received 0.
+Failed asserting that 0 matches expected 1.
+at vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:464
+at vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+at tests/Feature/Console/SyncOccurrencesCommandTest.php:119</failure>
+      </testcase>
+      <testcase name="it schedules calendar:sync-occurrences daily at 03:10 Europe/London without overlapping" file="tests/Feature/Console/SyncOccurrencesCommandTest.php::it schedules calendar:sync-occurrences daily at 03:10 Europe/London without overlapping" class="Tests\Feature\Console\SyncOccurrencesCommandTest" classname="Tests.Feature.Console.SyncOccurrencesCommandTest" assertions="1" time="0.027322">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it schedules calendar:sync-occurrences daily at 03:10 Europe/London without overlappingFailed asserting that actual size 0 matches expected size 1.
+at tests/Feature/Console/SyncOccurrencesCommandTest.php:130</failure>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>
