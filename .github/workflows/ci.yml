@@ -43,6 +43,34 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
 
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      # Lockfile-exact install; no package lifecycle scripts run (T-01-SC).
+      - name: Install npm dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Built asset gates
+        run: |
+          set -euo pipefail
+          deny='fonts\.bunny\.net|fonts\.googleapis\.com|fonts\.gstatic\.com|use\.typekit\.net|cdn\.jsdelivr\.net|unpkg\.com|cdnjs\.cloudflare\.com|cdn\.tailwindcss\.com'
+          test -s public/build/manifest.json || { echo "::error::public/build/manifest.json is missing"; exit 1; }
+          if grep -rEl "$deny" public/build; then echo "::error::third-party host found in public/build"; exit 1; fi
+          bad_urls=$(grep -ohE 'url\([^)]*\)' public/build/assets/*.css | grep -vE '^url\((["'"'"']?)(/build/|data:)' || true)
+          if [ -n "$bad_urls" ]; then echo "::error::url() outside /build/ or data:"; echo "$bad_urls"; exit 1; fi
+          maps=$(find public/build -name '*.map')
+          if [ -n "$maps" ]; then echo "::error::source maps in public/build"; echo "$maps"; exit 1; fi
+          for css in public/build/assets/app-*.css; do
+            size=$(wc -c < "$css")
+            if [ "$size" -gt 60000 ]; then echo "::error::$css is $size bytes (limit 60000)"; exit 1; fi
+          done
+          echo "Asset gates passed"
+
       - name: Prepare environment
         run: cp .env.example .env && php artisan key:generate
 
