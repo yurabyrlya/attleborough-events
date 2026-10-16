@@ -93,7 +93,7 @@ Not in this phase:
 <code_context>
 ## Existing Code Insights
 
-Phase 1 is mid-execution (plan 01-01 of 10 complete as of this discussion). Planners should re-scan `app/` before planning, because later Phase 1 plans will add more.
+Phase 1 was mid-execution during this discussion: STATE.md showed 1/10 plans, and git history showed commits up to plan 01-06. Planners must re-scan `app/` before planning, because Phase 1 plans will have added and changed files listed below.
 
 ### Reusable Assets
 - `app/Publishing/Actions/PublishEvent.php`: the single creator of `Event` rows. Persists the event as published, with approver and time, and syncs occurrences in one transaction. Phase 2's approval action must wrap or call it, never bypass it.
