@@ -17,8 +17,18 @@ use InvalidArgumentException;
  *  - Timed with end: ends at end_time on (end_date ?? instance date). An end
  *    that is not after the start rolls over to the next day (overnight).
  *  - Timed without end: ends_at is null; expires `calendar.no_end_expiry_hours`
- *    (3) absolute hours after the start.
- *  - expires_at = ends_at when there is an end.
+ *    (3) absolute hours after the start. Exception: a timed event whose
+ *    end_date is after its start date but has no end_time runs to the end of
+ *    that last day (exclusive next local midnight).
+ *  - All-day (single or multi-day): ONE occurrence from local 00:00 on the
+ *    first day to local 00:00 on the day AFTER the last day.
+ *
+ * Exclusive-end convention: an all-day ends_at is the first instant that is
+ * NOT part of the event (next local midnight), never 23:59:59. A Sat-Sun
+ * event therefore ends at Monday 00:00 Europe/London. DST days are 23h/25h
+ * long because the arithmetic is done on London wall-clock dates.
+ *
+ *  - expires_at = ends_at whenever there is an end.
  */
 final class EventTiming
 {
@@ -29,19 +39,26 @@ final class EventTiming
         $tz = $event->timezone ?: (string) config('calendar.timezone', 'Europe/London');
         $date = $instanceDate instanceof CarbonImmutable ? $instanceDate->format('Y-m-d') : $instanceDate;
 
+        if ($event->all_day) {
+            return $this->allDay($event, $date, $tz);
+        }
+
         if ($event->start_time === null) {
             throw new InvalidArgumentException("Event [{$event->id}] has no start time.");
         }
 
         $startsAt = $this->localDateTime($date, $event->start_time, $tz);
         $endsAt = null;
+        $endDate = $this->endDate($event, $date, $tz);
 
         if ($event->end_time !== null) {
-            $endsAt = $this->localDateTime($this->endDate($event, $date, $tz), $event->end_time, $tz);
+            $endsAt = $this->localDateTime($endDate, $event->end_time, $tz);
 
             if ($endsAt->lessThanOrEqualTo($startsAt)) {
                 $endsAt = $endsAt->addDay(); // overnight: same wall-clock time on the next local day
             }
+        } elseif ($endDate !== $date) {
+            $endsAt = $this->localMidnight($endDate, $tz)->addDay();
         }
 
         $expiresAt = $endsAt ?? $startsAt->utc()->addHours($this->noEndExpiryHours());
@@ -52,6 +69,24 @@ final class EventTiming
             endsAt: $endsAt?->utc(),
             expiresAt: $expiresAt->utc(),
         );
+    }
+
+    private function allDay(Event $event, string $date, string $tz): OccurrenceTiming
+    {
+        $startsAt = $this->localMidnight($date, $tz);
+        $endsAt = $this->localMidnight($this->endDate($event, $date, $tz), $tz)->addDay();
+
+        return new OccurrenceTiming(
+            key: $date,
+            startsAt: $startsAt->utc(),
+            endsAt: $endsAt->utc(),
+            expiresAt: $endsAt->utc(),
+        );
+    }
+
+    private function localMidnight(string $date, string $tz): CarbonImmutable
+    {
+        return $this->localDateTime($date, '00:00:00', $tz);
     }
 
     /**

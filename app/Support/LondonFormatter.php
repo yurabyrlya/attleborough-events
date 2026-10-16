@@ -37,13 +37,40 @@ final class LondonFormatter
     }
 
     /**
-     * Card time, e.g. "Sat 14 Nov, 7:30pm" or "Sat 14 Nov, 7pm".
+     * Card time:
+     *  - timed: "Sat 14 Nov, 7:30pm" / "Sat 14 Nov, 7pm"
+     *  - timed, ends on a later day: "Sat 31 Oct, 7pm until Sun 1 Nov"
+     *  - all-day: "All day"
+     *  - all-day over several days: "All day until Sun 1 Nov"
      */
     public static function cardTime(EventOccurrence $occurrence): string
     {
         $start = self::local($occurrence->starts_at);
+        $lastDay = self::lastDay($occurrence);
+        $until = $lastDay !== null && ! $lastDay->isSameDay($start)
+            ? ' until '.$lastDay->format('D j M')
+            : '';
 
-        return $start->format('D j M').', '.self::time($start);
+        if ($occurrence->event->all_day) {
+            return 'All day'.$until;
+        }
+
+        return $start->format('D j M').', '.self::time($start).$until;
+    }
+
+    /**
+     * The last local calendar day the occurrence covers. All-day ends are
+     * exclusive (next local midnight), so step back one second.
+     */
+    private static function lastDay(EventOccurrence $occurrence): ?CarbonImmutable
+    {
+        if ($occurrence->ends_at === null) {
+            return null;
+        }
+
+        $end = self::local($occurrence->ends_at);
+
+        return $occurrence->event->all_day ? $end->subSecond()->startOfDay() : $end->startOfDay();
     }
 
     /**
