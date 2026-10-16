@@ -82,6 +82,7 @@ Residents can open one trustworthy, up-to-date calendar on their phone and see w
 | Database queue, no Redis; cheapest VPS hosting | Low volume; minimal cost and ops | - Pending |
 | Full v1.1 Definition of Done before launch | Owner preference over a lean launch | - Pending |
 | Revised spec kept as `docs/product-specification.md` v1.1 | Single baseline for planning | - Pending |
+| Laravel Boost as a dev-only tool (MCP + AI guidelines for coding agents) | Learning project built with AI-assisted development; Boost improves agent output. Never a production dependency, so no LLM in the product | - Pending |
 
 ## Evolution
 

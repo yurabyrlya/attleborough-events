@@ -27,6 +27,9 @@ Not in this phase: drafts, review queue and submissions (Phase 2); any ingestion
 - **D-07:** The logo is a **text wordmark plus a small calendar-pin icon**, delivered as inline SVG in the repo. Favicon and apple-touch-icon are derived from the icon. A default OG image is generated from wordmark + accent (static asset is fine).
 - **D-08:** **Dark mode follows the device setting** (`prefers-color-scheme`, no toggle). Tailwind 4 dark variant; both themes meet AA contrast.
 
+### Developer tooling
+- **D-09:** **Use Laravel Boost** (`laravel/boost`, dev dependency only). Run `php artisan boost:install` for the GitHub Copilot (VS Code) agent during scaffold. This gives coding agents the Boost MCP server (app info, DB schema/query, logs, docs search) and Laravel/Livewire/Tailwind/Pest/Pint guidelines and skills. Project-specific rules go in `.ai/guidelines/` / `.ai/rules/`. Boost must never be a production dependency (`composer install --no-dev` on deploy), and its MCP server never runs on the VPS. It is a dev-time aid and does not breach the "no LLM in the product" rule. It overrides the earlier STACK/SUMMARY note to decline Boost. Ref: https://laravel.com/framework/docs/boost
+
 ### Carried forward from project level (do not re-ask)
 - Stack: Laravel ^13.37, PHP 8.5 (Composer floor ^8.4), PostgreSQL 18 (+ `pg_trgm`), Filament ^5.10, Livewire ^4.4, Tailwind ^4.3 + Vite 8, Alpine only on non-Livewire public pages, Pest 5, Larastan, Pint. No Redis (database queue, cache and session). Tests run on PostgreSQL, never SQLite, with `Http::preventStrayRequests()`.
 - Hosting: Hetzner CX23, Ubuntu 26.04, Caddy, PHP-FPM 8.5, PG 18, systemd queue workers, cron `schedule:run`, Deployer 8 via GitHub Actions. Deploy to the VPS in this phase.
