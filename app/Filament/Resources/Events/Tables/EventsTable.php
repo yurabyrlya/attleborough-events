@@ -2,8 +2,13 @@
 
 namespace App\Filament\Resources\Events\Tables;
 
+use App\Calendar\ManualRecurrence;
+use App\Models\Event;
+use Carbon\CarbonImmutable;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Throwable;
 
 class EventsTable
 {
@@ -23,15 +28,37 @@ class EventsTable
                     ->dateTime('D j M Y, H:i')
                     ->timezone('Europe/London')
                     ->placeholder('None upcoming'),
+                TextColumn::make('repeats')
+                    ->label('Repeats')
+                    ->state(fn (Event $record): string => self::repeatsLabel($record)),
                 TextColumn::make('status')
                     ->badge(),
             ])
             ->filters([
                 //
             ])
-            // No edit/delete here: updates arrive through UpdatePublishedEvent (plan 01-04)
-            // so no Eloquent write path bypasses App\Publishing\Actions.
-            ->recordActions([])
+            // Edit opens EditEvent, which saves through UpdatePublishedEvent.
+            // No delete: no Eloquent write path bypasses App\Publishing\Actions.
+            ->recordActions([
+                EditAction::make(),
+            ])
             ->toolbarActions([]);
+    }
+
+    private static function repeatsLabel(Event $event): string
+    {
+        if ($event->recurrence_rule === null) {
+            return 'One-off';
+        }
+
+        try {
+            $start = CarbonImmutable::createFromFormat('!Y-m-d', $event->start_date->format('Y-m-d'), $event->timezone);
+
+            return $start instanceof CarbonImmutable
+                ? ManualRecurrence::fromRrule($event->recurrence_rule, $event->all_day)->label($start)
+                : 'Repeats';
+        } catch (Throwable) {
+            return 'Repeats';
+        }
     }
 }
