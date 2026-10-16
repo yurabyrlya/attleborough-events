@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Heartbeat;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -14,3 +15,9 @@ Schedule::command('calendar:sync-occurrences')
     ->dailyAt('03:10')
     ->timezone('Europe/London')
     ->withoutOverlapping();
+
+// Scheduler liveness (OPS-04): every schedule:run proves cron is alive by
+// upserting the 'scheduler' heartbeat row (a table, never the cache).
+Schedule::call(fn () => Heartbeat::beat(Heartbeat::SCHEDULER))
+    ->everyMinute()
+    ->name('heartbeat:scheduler');
