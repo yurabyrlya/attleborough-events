@@ -56,14 +56,14 @@ Not in the skeleton (01-01..01-03). These come later in Phase 1, without changin
 - Hide / cancel / reinstate for events and single occurrences (01-05)
 - Today / weekend / week, category, Free and family filters, `noindex`, D-05 empty states (01-06)
 - Brand, Tailwind, self-hosted font, icons, dark mode (01-07)
-- Event page, meta/OG, JSON-LD, `.ics`, Google link, share (01-08)
+- Event page, meta/OG, `.ics` (01-08); JSON-LD, Google link, share (01-10)
 - Heartbeats, System health page, failed-job retry, Laravel daily logs (01-09)
 
 Not in Phase 1 at all:
 - Drafts, review queue and public submissions (Phase 2)
 - Any ingestion, crawling or source health (Phases 3-4)
 - Sitemap, feeds, privacy/legal pages, analytics, WCAG audit, backups + restore drill (Phase 5)
-- Admin MFA (open question; Phase 5 hardening at the latest)
+- Admin MFA (deferred to Phase 5 hardening; RESEARCH Open Question 4 RESOLVED)
 - Cloudflare orange-cloud proxy, Redis, Docker in production, Livewire on public pages, a month-grid view, public user accounts
 
 ## Subsequent Slice Plan
@@ -74,7 +74,8 @@ Each later slice extends this skeleton without altering its architectural decisi
 - 01-05: the admin cancels or hides an event or a single occurrence; residents see a "Cancelled" badge
 - 01-06: residents narrow the list with plain-link filters that work without JS
 - 01-07: the site looks like "What's On Attleborough" (D-01, D-05..D-08)
-- 01-08: residents open an event page, add it to their calendar and share it
+- 01-08: residents open an event page and add a date to their calendar (.ics)
+- 01-10: residents share an event and use the Google Calendar link; search engines get Event JSON-LD
 - 01-09: the admin sees scheduler/queue heartbeats and failed jobs in Filament
 - Phase 2: organisers submit events; every draft goes through one review queue that calls `PublishEvent`
 - Phase 3: ICS sources fetched on a schedule become drafts with change and duplicate handling

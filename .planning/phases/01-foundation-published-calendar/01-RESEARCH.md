@@ -962,18 +962,22 @@ it('keeps a weekly 10:00 event at 10:00 local across 25 Oct 2026', function () {
 | A10 | Disabling Boost `.ai/rules` is preferable to a second decision log | Boost | Low; owner preference |
 | A11 | Atkinson Hyperlegible Next as the font (discretion item) | Stack | Cosmetic |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Ubuntu 26.04 on Hetzner Cloud and exact package availability**
    - What we know: STACK verified `php 8.5` and `postgresql 18` packages for resolute.
    - What's unclear: whether a Hetzner image exists today (packages.ubuntu.com lookups timed out this session: no observation).
    - Recommendation: the human checkpoint creates the server; the provision script runs `apt-cache policy php8.5-fpm postgresql-18 caddy` first and stops if anything is missing.
+   - RESOLVED: 01-02 Task 1 `checkpoint:decision` (OS image: ubuntu-2604 vs ubuntu-2404 fallback) plus the provision-script `apt-cache policy` pre-flight that exits 1 naming any missing package.
 2. **Recurring events with multi-day spans** (e.g. a monthly two-day market)
    - Recommendation: out of scope in Phase 1 (form validation blocks it). Revisit if the owner needs it.
+   - RESOLVED: out of scope in Phase 1. 01-04 Flagged Assumptions + form validation (a repeating event is single-day timed, overnight end allowed, or single-day all-day).
 3. **How many upcoming dates to show on a series' event page**
    - Recommendation: next 10 (matches the JSON-LD cap), each with its own "Add to calendar" link, and "More dates" text if the series continues beyond.
+   - RESOLVED: next 10 dates with per-date add-to-calendar links and "More dates" text (01-08 Task 2).
 4. **Admin MFA**
    - Filament 5 ships app/email MFA. Recommendation: enable app (TOTP) MFA for the single admin if it's a ≤1-task addition; otherwise defer to Phase 5 hardening.
+   - RESOLVED: deferred to Phase 5 hardening. Phase 1 admin access = single `ADMIN_EMAIL` user + strong password + Filament login rate limit + secure cookies/HSTS (01-01 Flagged Assumptions, 01-03 T-01-13 residual accepted, 01-SKELETON "Not in Phase 1").
 
 ## Environment Availability
 
