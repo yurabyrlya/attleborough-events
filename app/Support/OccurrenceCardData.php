@@ -35,7 +35,8 @@ final readonly class OccurrenceCardData
     public static function fromOccurrence(EventOccurrence $occurrence): self
     {
         $event = $occurrence->event;
-        [$sourceUrl, $sourceHost] = self::safeSource($event->source_url);
+        $source = SafeLinks::http($event->source_url);
+        $sourceUrl = $source['url'] ?? null;
         $contact = $sourceUrl === null ? self::blankToNull($event->organiser_contact) : null;
 
         return new self(
@@ -51,11 +52,10 @@ final readonly class OccurrenceCardData
             priceLabel: self::priceLabel($event->price_type, self::blankToNull($event->price_text)),
             organiserName: self::blankToNull($event->organiser_name),
             sourceUrl: $sourceUrl,
-            sourceHost: $sourceHost,
+            sourceHost: $source['host'] ?? null,
             contactText: $contact,
-            contactHref: $contact !== null && filter_var($contact, FILTER_VALIDATE_EMAIL) !== false
-                ? 'mailto:'.$contact
-                : null,
+            // Cards link only email contacts (never tel:), as in 01-06.
+            contactHref: SafeLinks::mailto($contact),
             isCancelled: $event->status === EventStatus::Cancelled
                 || $occurrence->status === OccurrenceStatus::Cancelled,
         );
@@ -96,37 +96,13 @@ final readonly class OccurrenceCardData
      * Free → "Free"; paid → price text or "Paid"; unknown → price text or
      * nothing. The price text is shown exactly as entered.
      */
-    private static function priceLabel(PriceType $type, ?string $text): ?string
+    public static function priceLabel(PriceType $type, ?string $text): ?string
     {
         return match ($type) {
             PriceType::Free => 'Free',
             PriceType::Paid => $text ?? 'Paid',
             PriceType::Unknown => $text,
         };
-    }
-
-    /**
-     * Only http(s) URLs with a host become links (T-01-23).
-     *
-     * @return array{0: string|null, 1: string|null}
-     */
-    private static function safeSource(?string $url): array
-    {
-        $url = self::blankToNull($url);
-
-        if ($url === null) {
-            return [null, null];
-        }
-
-        $parts = parse_url($url);
-        $scheme = is_array($parts) ? strtolower($parts['scheme'] ?? '') : '';
-        $host = is_array($parts) ? strtolower($parts['host'] ?? '') : '';
-
-        if (! in_array($scheme, ['http', 'https'], true) || $host === '') {
-            return [null, null];
-        }
-
-        return [$url, (string) preg_replace('/^www\./', '', $host)];
     }
 
     private static function blankToNull(?string $value): ?string

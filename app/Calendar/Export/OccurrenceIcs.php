@@ -7,6 +7,7 @@ use App\Enums\OccurrenceStatus;
 use App\Models\EventOccurrence;
 use App\Support\LondonFormatter;
 use App\Support\PublicUrl;
+use App\Support\TextLimit;
 use Carbon\CarbonImmutable;
 use Sabre\VObject\Component\VCalendar;
 
@@ -22,6 +23,8 @@ use Sabre\VObject\Component\VCalendar;
  *  - SEQUENCE = whole seconds from 2026-01-01T00:00:00Z to LAST-MODIFIED
  *    (the later of the event's and the occurrence's updated_at), so it
  *    only ever rises
+ *  - DESCRIPTION: the description cut at 1000 grapheme clusters with its
+ *    line breaks kept (TextLimit without collapsing), then the event URL
  *  - STATUS CANCELLED when the event or the occurrence is cancelled
  */
 final class OccurrenceIcs
@@ -30,7 +33,7 @@ final class OccurrenceIcs
 
     private const SEQUENCE_EPOCH = '2026-01-01T00:00:00Z';
 
-    private const DESCRIPTION_CHARS = 1000;
+    private const DESCRIPTION_GRAPHEMES = 1000;
 
     public static function for(EventOccurrence $occurrence, CarbonImmutable $now): string
     {
@@ -101,11 +104,8 @@ final class OccurrenceIcs
             $lines[] = 'Finish time not given.';
         }
 
-        $text = trim(str_replace(["\r\n", "\r"], "\n", $occurrence->event->description));
-
-        if (mb_strlen($text) > self::DESCRIPTION_CHARS) {
-            $text = rtrim(mb_substr($text, 0, self::DESCRIPTION_CHARS - 1)).'…';
-        }
+        // Grapheme-safe cut that keeps the line breaks (no whitespace collapsing).
+        $text = TextLimit::graphemes($occurrence->event->description, self::DESCRIPTION_GRAPHEMES, collapse: false);
 
         if ($text !== '') {
             $lines[] = $text;

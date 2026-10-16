@@ -39,6 +39,18 @@ final class LondonFormatter
     }
 
     /**
+     * Short date for titles: "Fri 23 Oct", with the year added outside the
+     * current London year ("Fri 1 Jan 2027"), the same rule as heading().
+     */
+    public static function shortDate(CarbonImmutable $instant, ?CarbonImmutable $now = null): string
+    {
+        $day = self::local($instant);
+        $year = self::local($now ?? CarbonImmutable::now())->year;
+
+        return $day->year === $year ? $day->format('D j M') : $day->format('D j M Y');
+    }
+
+    /**
      * Card time:
      *  - timed: "Sat 14 Nov, 7:30pm" / "Sat 14 Nov, 7pm"
      *  - timed, ends on a later day: "Sat 31 Oct, 7pm until Sun 1 Nov"

@@ -80,6 +80,16 @@ class Event extends Model
     }
 
     /**
+     * Slugs this event used to have; they 301 to the current slug (EVT-02).
+     *
+     * @return HasMany<EventSlug, $this>
+     */
+    public function slugHistory(): HasMany
+    {
+        return $this->hasMany(EventSlug::class);
+    }
+
+    /**
      * The next occurrence that has not yet expired.
      *
      * @return HasOne<EventOccurrence, $this>

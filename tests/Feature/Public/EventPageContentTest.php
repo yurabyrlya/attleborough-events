@@ -12,7 +12,9 @@ use App\Models\Venue;
 use App\Publishing\Actions\ChangeEventStatus;
 use App\Publishing\Actions\PublishEvent;
 use App\Publishing\Data\PublishableEventData;
+use Dom\Element;
 use Dom\HTMLDocument;
+use Dom\Node;
 use Illuminate\Testing\TestResponse;
 
 use function Pest\Laravel\get;
@@ -54,7 +56,7 @@ function contentPublish(array $base, array $overrides = []): Event
     );
 }
 
-function contentMain(TestResponse $response): Dom\Element
+function contentMain(TestResponse $response): Element
 {
     $document = HTMLDocument::createFromString((string) $response->getContent(), LIBXML_NOERROR);
     $main = $document->querySelector('main');
@@ -63,7 +65,7 @@ function contentMain(TestResponse $response): Dom\Element
     return $main;
 }
 
-function contentText(?Dom\Node $node): string
+function contentText(?Node $node): string
 {
     return trim((string) preg_replace('/\s+/u', ' ', (string) $node?->textContent));
 }

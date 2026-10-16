@@ -9,6 +9,7 @@ use App\Models\Venue;
 use App\Publishing\Actions\ChangeEventStatus;
 use App\Publishing\Actions\PublishEvent;
 use App\Publishing\Data\PublishableEventData;
+use Dom\Element;
 use Dom\HTMLDocument;
 use Illuminate\Testing\TestResponse;
 
@@ -54,7 +55,7 @@ function seoHead(TestResponse $response): HTMLDocument
 function seoMeta(HTMLDocument $document, string $selector): array
 {
     return array_map(
-        fn (Dom\Element $element): string => (string) $element->getAttribute('content'),
+        fn (Element $element): string => (string) $element->getAttribute('content'),
         iterator_to_array($document->querySelectorAll($selector)),
     );
 }
@@ -106,7 +107,7 @@ it('has a self-referencing canonical from config that ignores tracking parameter
     foreach (['/events/quiz-night', '/events/quiz-night?fbclid=abc&utm_source=x'] as $uri) {
         $document = seoHead(get($uri)->assertOk());
         $canonicals = array_map(
-            fn (Dom\Element $link): string => (string) $link->getAttribute('href'),
+            fn (Element $link): string => (string) $link->getAttribute('href'),
             iterator_to_array($document->querySelectorAll('link[rel="canonical"]')),
         );
 

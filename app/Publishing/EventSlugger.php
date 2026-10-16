@@ -3,6 +3,7 @@
 namespace App\Publishing;
 
 use App\Models\Event;
+use App\Models\EventSlug;
 use Illuminate\Support\Str;
 
 /**
@@ -16,8 +17,15 @@ use Illuminate\Support\Str;
  * current slug while that is still one of its title's candidates, so an
  * unrelated edit never moves the URL.
  *
- * The UNIQUE index on events.slug makes a concurrent duplicate save fail
- * rather than share a slug.
+ * History (event_slugs): when an existing event's slug changes, the old one
+ * is kept for this event so /events/{old} answers 301; renaming back makes a
+ * history slug current again and removes it from history. A slug held in
+ * ANOTHER event's history counts as taken, so old shared links never land on
+ * a different event. Phase 5 merges can move a duplicate's slugs onto the
+ * kept event.
+ *
+ * The UNIQUE indexes on events.slug and event_slugs.slug make a concurrent
+ * duplicate save fail rather than share a slug.
  */
 final class EventSlugger
 {
@@ -46,6 +54,23 @@ final class EventSlugger
         }
 
         $event->slug = $slug;
+
+        if ($current !== null && $current !== '' && $current !== $slug) {
+            $this->remember($event, $current, $slug);
+        }
+    }
+
+    /**
+     * Keep the old slug for this event and drop the new one from its history
+     * (renamed back). Runs inside the caller's transaction.
+     */
+    private function remember(Event $event, string $old, string $new): void
+    {
+        $event->slugHistory()->where('slug', $new)->delete();
+
+        if (! EventSlug::query()->where('slug', $old)->exists()) {
+            $event->slugHistory()->create(['slug' => $old]);
+        }
     }
 
     /**
@@ -74,13 +99,17 @@ final class EventSlugger
     }
 
     /**
-     * Taken when another event holds it as its current slug.
+     * Taken when another event holds it as its current slug or in its history.
      */
     private function isTaken(string $slug, Event $event): bool
     {
         return Event::query()
             ->where('slug', $slug)
             ->when($event->exists, fn ($query) => $query->whereKeyNot($event->getKey()))
-            ->exists();
+            ->exists()
+            || EventSlug::query()
+                ->where('slug', $slug)
+                ->when($event->exists, fn ($query) => $query->where('event_id', '!=', $event->getKey()))
+                ->exists();
     }
 }

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="x-release" content="{{ basename(base_path()) }}">
     <title>@yield('title', "What's on") | {{ config('site.name') }}</title>
-    <meta name="description" content="{{ config('site.tagline') }}">
+    <meta name="description" content="@yield('description', config('site.tagline'))">
     <meta name="color-scheme" content="light dark">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#2E6B3F">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111614">
