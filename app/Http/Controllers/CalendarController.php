@@ -2,23 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Calendar\CalendarFilters;
 use App\Calendar\PublicOccurrenceQuery;
+use App\Models\Category;
 use App\Models\EventOccurrence;
 use App\Support\LondonFormatter;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 
 /**
- * Public, date-grouped list of upcoming occurrences (CAL-01).
+ * Public, date-grouped and filterable list of upcoming occurrences
+ * (CAL-01..07). Plain server-rendered Blade: every filter is a link.
  */
 class CalendarController extends Controller
 {
-    public function __invoke(PublicOccurrenceQuery $query): View
+    public function __invoke(Request $request, PublicOccurrenceQuery $query): View
     {
-        $now = CarbonImmutable::now();
+        $now = now()->toImmutable();
         $today = LondonFormatter::local($now)->startOfDay();
 
-        $occurrences = $query->paginate($now);
+        $filters = CalendarFilters::fromRequest($request);
+        $occurrences = $query->paginate($filters, $now);
 
         /** @var array<string, array{date: CarbonImmutable, heading: string, occurrences: list<EventOccurrence>}> $groups */
         $groups = [];
@@ -41,6 +46,8 @@ class CalendarController extends Controller
         return view('calendar.index', [
             'groups' => $groups,
             'occurrences' => $occurrences,
+            'filters' => $filters,
+            'categories' => Category::query()->orderBy('sort')->orderBy('name')->get(),
         ]);
     }
 }

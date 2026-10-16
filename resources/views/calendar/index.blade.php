@@ -2,8 +2,17 @@
 
 @section('title', "What's on")
 
+@push('head')
+    <link rel="canonical" href="{{ rtrim((string) config('app.url'), '/') }}/">
+    @if ($filters->hasQueryString)
+        <meta name="robots" content="noindex, follow">
+    @endif
+@endpush
+
 @section('content')
     <h1>What's on in Attleborough</h1>
+
+    @include('calendar.partials.filter-chips', ['filters' => $filters, 'categories' => $categories])
 
     @forelse ($groups as $group)
         <section aria-labelledby="day-{{ $group['date']->format('Y-m-d') }}">

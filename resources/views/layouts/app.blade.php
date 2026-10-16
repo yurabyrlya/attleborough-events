@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="x-release" content="{{ basename(base_path()) }}">
     <title>@yield('title', "What's on") | {{ config('site.name') }}</title>
+    @stack('head')
     <meta name="description" content="{{ config('site.tagline') }}">
 </head>
 <body>
