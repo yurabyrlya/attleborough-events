@@ -21,6 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 ## Phase Details
 
 ### Phase 1: Foundation & Published Calendar
+
 **Goal**: Residents can open a live, mobile-first calendar at the production HTTPS URL and browse admin-entered events (including recurring ones), open event pages, add them to their calendar and share them
 **Mode:** mvp
 **Depends on**: Nothing (first phase)
@@ -31,10 +32,23 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. The admin can edit, hide, unhide or cancel a whole event or a single occurrence. Cancelled items show a text "Cancelled" badge, and occurrence statuses set by the admin survive the scheduled occurrence regeneration.
   4. A visitor opens an event page with a readable slug, title/meta/canonical/OG tags, Schema.org `Event` JSON-LD per upcoming occurrence, and the full description and attribution. From there they can add an occurrence to their calendar (`.ics` with stable UID, or a Google Calendar link) and share it via Web Share or WhatsApp/Facebook/email/copy-link fallbacks.
   5. Pushing to `main` runs Pest, Larastan and Pint in CI on PostgreSQL and deploys to the VPS with zero downtime. The admin can see the scheduler heartbeat and failed jobs, and logs rotate.
+
 **Plans**: TBD
+- [x] 01-01-PLAN.md
+- [ ] 01-02-PLAN.md
+- [ ] 01-03-PLAN.md
+- [ ] 01-04-PLAN.md
+- [ ] 01-05-PLAN.md
+- [ ] 01-06-PLAN.md
+- [ ] 01-07-PLAN.md
+- [ ] 01-08-PLAN.md
+- [ ] 01-09-PLAN.md
+- [ ] 01-10-PLAN.md
+
 **UI hint**: yes
 
 ### Phase 2: Draft Model, Review Queue & Submissions
+
 **Goal**: Organisers can submit events, and the admin can triage every incoming draft quickly through one review queue that is the only path to publication. By the end, the local source inventory is verified and fixtures are saved.
 **Mode:** mvp
 **Depends on**: Phase 1
@@ -45,10 +59,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. The admin can approve, edit-and-approve, or reject (with an optional reason) a draft. A recurring series is approved once and its occurrences appear automatically. Every published event records the approving admin and time, and manual entry publishes through the same review path.
   4. The admin can work through the queue on an "Approve & next" page with keyboard shortcuts, and can bulk approve and bulk reject. Bulk approve visibly skips drafts with parse errors, duplicate warnings or Low quality.
   5. `docs/research/event-sources.md` lists verified local sources with priority P0-P3, platform, extraction method, robots status and legal basis. TEC endpoints, dated RSS feeds and JSON-LD presence are verified live, and fixture samples are saved for every P0/P1 source.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 3: Ingestion Backbone, ICS & Change/Duplicate Handling
+
 **Goal**: The admin can register ICS sources that are fetched politely on a schedule. Each run turns new, changed, cancelled and missing items into the right drafts with duplicate warnings, and source health is visible. Nothing published is ever lost to a source failure.
 **Mode:** mvp
 **Depends on**: Phase 2
@@ -59,10 +75,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. When an incoming event matches a published event or pending draft (same canonical URL, or same date + similar venue + similar title), the draft shows a duplicate warning linking the suspected event. The admin can mark it as a duplicate without anything new being published.
   4. Every fetch respects robots.txt (a disallow shows as a `blocked` run), sends the descriptive User-Agent and waits at least 5s per host. A bot wall or wrong content type is logged as a failed `content_invalid` run. After 3 / 5 consecutive failures the source shows as degraded / unhealthy (paused), a sudden zero-items run is flagged, and no previously published event disappears.
   5. Approved discovered events show visible source attribution with a link, plus an excerpt of at most 200 characters with phone numbers and emails stripped and a "Read more at {source}" link.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 4: Extraction Ladder, Geofence & Live Sources
+
 **Goal**: Every rung of the deterministic extraction ladder works and regional sources are geofenced to the Attleborough area. The admin can preview any source safely, and the real P0 sources are producing drafts in production.
 **Mode:** mvp
 **Depends on**: Phase 3
@@ -73,9 +91,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A listing date with an ambiguous format, or with no year where the year can't be resolved by the rules, arrives as a draft with a parse error and Low quality instead of a guessed date. Every extractor passes offline fixture tests built from real samples, including DST dates.
   4. Events from a regional (`filter`) source outside NR17 / NR16 / NR18 / IP24 and the allowlisted place names are skipped and counted, online-only events are skipped, and events with unknown locations arrive as flagged drafts.
   5. The initial P0 sources from `docs/research/event-sources.md` are configured in production and producing pending drafts on schedule.
+
 **Plans**: TBD
 
 ### Phase 5: Launch Readiness
+
 **Goal**: The site is discoverable, legally compliant, measurable and operationally safe enough to launch publicly in Attleborough
 **Mode:** mvp
 **Depends on**: Phase 4
@@ -86,6 +106,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A visitor can subscribe to a public ICS feed (all events or per category) and an RSS feed of newly published events, both with stable identifiers.
   4. The admin dashboard shows per-period counts: sources checked, failures, drafts created / approved / rejected / duplicates, and approval rate per source. Cookieless analytics (no cookie banner) records source clicks, add-to-calendar, shares and submissions.
   5. Public pages pass a WCAG 2.2 AA check (automated and manual screen-reader pass). Nightly off-site backups run, and a full restore drill has succeeded.
+
 **Plans**: TBD
 **UI hint**: yes
 
@@ -96,7 +117,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Published Calendar | 0/TBD | Not started | - |
+| 1. Foundation & Published Calendar | 1/10 | In Progress | - |
 | 2. Draft Model, Review Queue & Submissions | 0/TBD | Not started | - |
 | 3. Ingestion Backbone, ICS & Change/Duplicate Handling | 0/TBD | Not started | - |
 | 4. Extraction Ladder, Geofence & Live Sources | 0/TBD | Not started | - |
