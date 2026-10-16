@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="13" assertions="18" errors="0" failures="13" skipped="0" time="1.068789">
+    <testsuite name="Tests\Unit\Brand\ContrastTest" file="tests/Unit/Brand/ContrastTest.php" tests="5" assertions="5" errors="0" failures="5" skipped="0" time="0.487897">
+      <testcase name="it defines exactly the same ten colour tokens in the light and dark blocks" file="tests/Unit/Brand/ContrastTest.php::it defines exactly the same ten colour tokens in the light and dark blocks" class="Tests\Unit\Brand\ContrastTest" classname="Tests.Unit.Brand.ContrastTest" assertions="1" time="0.387776">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it defines exactly the same ten colour tokens in the light and dark blocksFailed asserting that two arrays are identical.
+at tests/Unit/Brand/ContrastTest.php:84</failure>
+      </testcase>
+      <testcase name="it removes the default Tailwind palette" file="tests/Unit/Brand/ContrastTest.php::it removes the default Tailwind palette" class="Tests\Unit\Brand\ContrastTest" classname="Tests.Unit.Brand.ContrastTest" assertions="1" time="0.023673">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it removes the default Tailwind paletteFailed asserting that '\n
+    --font-sans: 'Atkinson Hyperlegible Next Variable', ui-sans-serif, system-ui, sans-serif;\n
+' matches PCRE pattern "/--color-\*\s*:\s*initial\s*;/".
+at tests/Unit/Brand/ContrastTest.php:89</failure>
+      </testcase>
+      <testsuite name="it meets AA for text pairs and 3:1 for focus and border pairs" tests="2" assertions="2" errors="0" failures="2" skipped="0" time="0.062418">
+        <testcase name="it meets AA for text pairs and 3:1 for focus and border pairs with data set &quot;('light')&quot;" file="tests/Unit/Brand/ContrastTest.php::it meets AA for text pairs and 3:1 for focus and border pairs with data set &quot;('light')&quot;" class="Tests\Unit\Brand\ContrastTest" classname="Tests.Unit.Brand.ContrastTest" assertions="1" time="0.048782">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it meets AA for text pairs and 3:1 for focus and border pairs with data set "('light')"Failed asserting that an array has the key [accent]
+at tests/Unit/Brand/ContrastTest.php:95</failure>
+        </testcase>
+        <testcase name="it meets AA for text pairs and 3:1 for focus and border pairs with data set &quot;('dark')&quot;" file="tests/Unit/Brand/ContrastTest.php::it meets AA for text pairs and 3:1 for focus and border pairs with data set &quot;('dark')&quot;" class="Tests\Unit\Brand\ContrastTest" classname="Tests.Unit.Brand.ContrastTest" assertions="1" time="0.013637">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it meets AA for text pairs and 3:1 for focus and border pairs with data set "('dark')"Failed asserting that an array has the key [accent]
+at tests/Unit/Brand/ContrastTest.php:95</failure>
+        </testcase>
+      </testsuite>
+      <testcase name="it pins the Norfolk green accents and proves the ratio function" file="tests/Unit/Brand/ContrastTest.php::it pins the Norfolk green accents and proves the ratio function" class="Tests\Unit\Brand\ContrastTest" classname="Tests.Unit.Brand.ContrastTest" assertions="1" time="0.014029">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it pins the Norfolk green accents and proves the ratio functionFailed asserting that null is identical to '#2E6B3F'.
+at tests/Unit/Brand/ContrastTest.php:116</failure>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\Public\BrandHeadTest" file="tests/Feature/Public/BrandHeadTest.php" tests="8" assertions="13" errors="0" failures="8" skipped="0" time="0.580892">
+      <testcase name="it declares light and dark colour schemes with theme colours read from the tokens" file="tests/Feature/Public/BrandHeadTest.php::it declares light and dark colour schemes with theme colours read from the tokens" class="Tests\Feature\Public\BrandHeadTest" classname="Tests.Feature.Public.BrandHeadTest" assertions="2" time="0.351949">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it declares light and dark colour schemes with theme colours read from the tokensFailed asserting that null is identical to 'light dark'.
+at tests/Feature/Public/BrandHeadTest.php:40</failure>
+      </testcase>
+      <testcase name="it links the SVG favicon, the ICO fallback and the apple touch icon" file="tests/Feature/Public/BrandHeadTest.php::it links the SVG favicon, the ICO fallback and the apple touch icon" class="Tests\Feature\Public\BrandHeadTest" classname="Tests.Feature.Public.BrandHeadTest" assertions="2" time="0.045896">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it links the SVG favicon, the ICO fallback and the apple touch iconExpecting null not to be null .
+at tests/Feature/Public/BrandHeadTest.php:50</failure>
+      </testcase>
+      <testcase name="it renders the default Open Graph and Twitter metadata once, escaped once" file="tests/Feature/Public/BrandHeadTest.php::it renders the default Open Graph and Twitter metadata once, escaped once" class="Tests\Feature\Public\BrandHeadTest" classname="Tests.Feature.Public.BrandHeadTest" assertions="2" time="0.027998">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it renders the default Open Graph and Twitter metadata once, escaped onceFailed asserting that 0 is identical to 1.
+at tests/Feature/Public/BrandHeadTest.php:60</failure>
+      </testcase>
+      <testcase name="it never puts the request Host header into the response" file="tests/Feature/Public/BrandHeadTest.php::it never puts the request Host header into the response" class="Tests\Feature\Public\BrandHeadTest" classname="Tests.Feature.Public.BrandHeadTest" assertions="2" time="0.029353">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it never puts the request Host header into the responseFailed asserting that '' starts with "http://localhost:8000".
+at tests/Feature/Public/BrandHeadTest.php:79</failure>
+      </testcase>
+      <testcase name="it lets a page replace the default share metadata through the og stack" file="tests/Feature/Public/BrandHeadTest.php::it lets a page replace the default share metadata through the og stack" class="Tests\Feature\Public\BrandHeadTest" classname="Tests.Feature.Public.BrandHeadTest" assertions="1" time="0.025544">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it lets a page replace the default share metadata through the og stackFailed asserting that 0 is identical to 1.
+at tests/Feature/Public/BrandHeadTest.php:89</failure>
+      </testcase>
+      <testcase name="it shows the wordmark: a decorative calendar-pin svg and the live site name linking home" file="tests/Feature/Public/BrandHeadTest.php::it shows the wordmark: a decorative calendar-pin svg and the live site name linking home" class="Tests\Feature\Public\BrandHeadTest" classname="Tests.Feature.Public.BrandHeadTest" assertions="2" time="0.027136">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it shows the wordmark: a decorative calendar-pin svg and the live site name linking homeExpecting null not to be null .
+at tests/Feature/Public/BrandHeadTest.php:105</failure>
+      </testcase>
+      <testcase name="it keeps the inline calendar-pin identical to the master SVG" file="tests/Feature/Public/BrandHeadTest.php::it keeps the inline calendar-pin identical to the master SVG" class="Tests\Feature\Public\BrandHeadTest" classname="Tests.Feature.Public.BrandHeadTest" assertions="1" time="0.048528">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it keeps the inline calendar-pin identical to the master SVGExpecting [] not to be empty .
+at tests/Feature/Public/BrandHeadTest.php:128</failure>
+      </testcase>
+      <testcase name="it ships the favicon, apple touch icon and default share image at the right sizes" file="tests/Feature/Public/BrandHeadTest.php::it ships the favicon, apple touch icon and default share image at the right sizes" class="Tests\Feature\Public\BrandHeadTest" classname="Tests.Feature.Public.BrandHeadTest" assertions="1" time="0.024489">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it ships the favicon, apple touch icon and default share image at the right sizesFailed asserting that '' matches PCRE pattern "/&lt;svg\b[^&gt;]*\bviewBox="/".
+at tests/Feature/Public/BrandHeadTest.php:138</failure>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>
