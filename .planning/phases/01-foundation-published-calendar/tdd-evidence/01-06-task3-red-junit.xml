@@ -1,0 +1,597 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="55" assertions="157" errors="0" failures="31" skipped="0" time="2.941839">
+    <testsuite name="Tests\Feature\Public\AttributeFiltersTest" file="tests/Feature/Public/AttributeFiltersTest.php" tests="29" assertions="68" errors="0" failures="17" skipped="0" time="1.830002">
+      <testcase name="it filters by category slug" file="tests/Feature/Public/AttributeFiltersTest.php::it filters by category slug" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="2" time="0.720926">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it filters by category slugFailed asserting that two arrays are identical.
+at tests/Feature/Public/AttributeFiltersTest.php:38</failure>
+      </testcase>
+      <testcase name="it compares category slugs case-insensitively" file="tests/Feature/Public/AttributeFiltersTest.php::it compares category slugs case-insensitively" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="2" time="0.063035">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it compares category slugs case-insensitivelyFailed asserting that two arrays are identical.
+at tests/Feature/Public/AttributeFiltersTest.php:45</failure>
+      </testcase>
+      <testcase name="it returns 404 for a category slug that does not exist" file="tests/Feature/Public/AttributeFiltersTest.php::it returns 404 for a category slug that does not exist" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="1" time="0.032111">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it returns 404 for a category slug that does not existExpected response status code [404] but received 200.
+Failed asserting that 200 is identical to 404.
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+at vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:151
+at tests/Feature/Public/AttributeFiltersTest.php:49</failure>
+      </testcase>
+      <testcase name="it returns 404 for a malformed category value without echoing it" file="tests/Feature/Public/AttributeFiltersTest.php::it returns 404 for a malformed category value without echoing it" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="1" time="0.031974">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it returns 404 for a malformed category value without echoing itExpected response status code [404] but received 200.
+Failed asserting that 200 is identical to 404.
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+at vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:151
+at tests/Feature/Public/AttributeFiltersTest.php:53</failure>
+      </testcase>
+      <testsuite name="it rejects malformed slugs with 404 before any category lookup" tests="3" assertions="3" errors="0" failures="3" skipped="0" time="0.092224">
+        <testcase name="it rejects malformed slugs with 404 before any category lookup with data set &quot;dataset &quot;percent-encoded symbol&quot;&quot;" file="tests/Feature/Public/AttributeFiltersTest.php::it rejects malformed slugs with 404 before any category lookup with data set &quot;dataset &quot;percent-encoded symbol&quot;&quot;" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="1" time="0.029522">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it rejects malformed slugs with 404 before any category lookup with data set "dataset "percent-encoded symbol""Expected response status code [404] but received 200.
+Failed asserting that 200 is identical to 404.
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+at vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:151
+at tests/Feature/Public/AttributeFiltersTest.php:66</failure>
+        </testcase>
+        <testcase name="it rejects malformed slugs with 404 before any category lookup with data set &quot;dataset &quot;non-ASCII&quot;&quot;" file="tests/Feature/Public/AttributeFiltersTest.php::it rejects malformed slugs with 404 before any category lookup with data set &quot;dataset &quot;non-ASCII&quot;&quot;" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="1" time="0.031881">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it rejects malformed slugs with 404 before any category lookup with data set "dataset "non-ASCII""Expected response status code [404] but received 200.
+Failed asserting that 200 is identical to 404.
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+at vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:151
+at tests/Feature/Public/AttributeFiltersTest.php:66</failure>
+        </testcase>
+        <testcase name="it rejects malformed slugs with 404 before any category lookup with data set &quot;dataset &quot;longer than 64&quot;&quot;" file="tests/Feature/Public/AttributeFiltersTest.php::it rejects malformed slugs with 404 before any category lookup with data set &quot;dataset &quot;longer than 64&quot;&quot;" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="1" time="0.030821">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it rejects malformed slugs with 404 before any category lookup with data set "dataset "longer than 64""Expected response status code [404] but received 200.
+Failed asserting that 200 is identical to 404.
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+at vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:151
+at tests/Feature/Public/AttributeFiltersTest.php:66</failure>
+        </testcase>
+      </testsuite>
+      <testcase name="it treats an empty category as absent but still noindexes the URL" file="tests/Feature/Public/AttributeFiltersTest.php::it treats an empty category as absent but still noindexes the URL" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="4" time="0.046796"/>
+      <testcase name="it filters Free to price_type free only" file="tests/Feature/Public/AttributeFiltersTest.php::it filters Free to price_type free only" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="2" time="0.042653">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it filters Free to price_type free onlyFailed asserting that two arrays are identical.
+at tests/Feature/Public/AttributeFiltersTest.php:89</failure>
+      </testcase>
+      <testcase name="it ignores free values other than 1" file="tests/Feature/Public/AttributeFiltersTest.php::it ignores free values other than 1" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="2" time="0.038738"/>
+      <testcase name="it filters family-friendly by the flag, independent of the Family category" file="tests/Feature/Public/AttributeFiltersTest.php::it filters family-friendly by the flag, independent of the Family category" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="2" time="0.046260">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it filters family-friendly by the flag, independent of the Family categoryFailed asserting that two arrays are identical.
+at tests/Feature/Public/AttributeFiltersTest.php:103</failure>
+      </testcase>
+      <testcase name="it combines date, category, free and family with AND" file="tests/Feature/Public/AttributeFiltersTest.php::it combines date, category, free and family with AND" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="2" time="0.070321">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it combines date, category, free and family with ANDFailed asserting that two arrays are identical.
+at tests/Feature/Public/AttributeFiltersTest.php:114</failure>
+      </testcase>
+      <testcase name="it builds chip hrefs that keep other filters, toggle Free off and never carry page" file="tests/Feature/Public/AttributeFiltersTest.php::it builds chip hrefs that keep other filters, toggle Free off and never carry page" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="2" time="0.029833">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it builds chip hrefs that keep other filters, toggle Free off and never carry pageFailed asserting that '&lt;!DOCTYPE html&gt;\n
+&lt;html lang="en-GB"&gt;\n
+&lt;head&gt;\n
+    &lt;meta charset="utf-8"&gt;\n
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;\n
+    &lt;meta name="x-release" content="attleborough-events"&gt;\n
+    &lt;title&gt;This weekend | What&amp;#039;s On Attleborough&lt;/title&gt;\n
+        &lt;link rel="canonical" href="http://localhost:8000/"&gt;\n
+            &lt;meta name="robots" content="noindex, follow"&gt;\n
+        &lt;meta name="description" content="See what&amp;#039;s on in Attleborough in one place."&gt;\n
+&lt;/head&gt;\n
+&lt;body&gt;\n
+    &lt;header&gt;\n
+        &lt;a href="http://localhost:8000"&gt;What&amp;#039;s On Attleborough&lt;/a&gt;\n
+        &lt;p&gt;See what&amp;#039;s on in Attleborough in one place.&lt;/p&gt;\n
+    &lt;/header&gt;\n
+\n
+    &lt;main id="main"&gt;\n
+            &lt;h1&gt;What's on&lt;/h1&gt;\n
+\n
+    &lt;nav aria-label="Filter events" class="filter-chips"&gt;\n
+    &lt;div role="group" aria-labelledby="chips-when"&gt;\n
+        &lt;span id="chips-when"&gt;When&lt;/span&gt;\n
+        &lt;a href="http://localhost:8000"&gt;All upcoming&lt;/a&gt;\n
+                    &lt;a href="http://localhost:8000?when=today"&gt;Today&lt;/a&gt;\n
+                    &lt;a href="http://localhost:8000?when=weekend" aria-current="true"&gt;This weekend&lt;/a&gt;\n
+                    &lt;a href="http://localhost:8000?when=week"&gt;This week&lt;/a&gt;\n
+            &lt;/div&gt;\n
+&lt;/nav&gt;\n
+\n
+            &lt;p class="filter-summary"&gt;Showing: This weekend&lt;/p&gt;\n
+    \n
+            &lt;div class="empty-state"&gt;\n
+                &lt;p&gt;You've reached the end of the list. &lt;a href="http://localhost:8000?when=weekend"&gt;Back to the first page&lt;/a&gt;&lt;/p&gt;\n
+            &lt;/div&gt;\n
+    \n
+        &lt;/main&gt;\n
+\n
+    &lt;footer&gt;\n
+        &lt;p&gt;Contact: &lt;a href="mailto:hello@whatsonattleborough.co.uk"&gt;hello@whatsonattleborough.co.uk&lt;/a&gt;&lt;/p&gt;\n
+    &lt;/footer&gt;\n
+&lt;/body&gt;\n
+&lt;/html&gt;\n
+' [ASCII](length: 1626) contains "href="http://localhost:8000?when=weekend&amp;amp;category=music&amp;amp;free=1"&gt;Music&lt;/a&gt;" [ASCII](length: 81).
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:720
+at tests/Feature/Public/AttributeFiltersTest.php:119</failure>
+      </testcase>
+      <testcase name="it replaces the category when another category chip is chosen" file="tests/Feature/Public/AttributeFiltersTest.php::it replaces the category when another category chip is chosen" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="2" time="0.028560">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it replaces the category when another category chip is chosenFailed asserting that '&lt;!DOCTYPE html&gt;\n
+&lt;html lang="en-GB"&gt;\n
+&lt;head&gt;\n
+    &lt;meta charset="utf-8"&gt;\n
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;\n
+    &lt;meta name="x-release" content="attleborough-events"&gt;\n
+    &lt;title&gt;What&amp;#039;s on | What&amp;#039;s On Attleborough&lt;/title&gt;\n
+        &lt;link rel="canonical" href="http://localhost:8000/"&gt;\n
+            &lt;meta name="robots" content="noindex, follow"&gt;\n
+        &lt;meta name="description" content="See what&amp;#039;s on in Attleborough in one place."&gt;\n
+&lt;/head&gt;\n
+&lt;body&gt;\n
+    &lt;header&gt;\n
+        &lt;a href="http://localhost:8000"&gt;What&amp;#039;s On Attleborough&lt;/a&gt;\n
+        &lt;p&gt;See what&amp;#039;s on in Attleborough in one place.&lt;/p&gt;\n
+    &lt;/header&gt;\n
+\n
+    &lt;main id="main"&gt;\n
+            &lt;h1&gt;What's on&lt;/h1&gt;\n
+\n
+    &lt;nav aria-label="Filter events" class="filter-chips"&gt;\n
+    &lt;div role="group" aria-labelledby="chips-when"&gt;\n
+        &lt;span id="chips-when"&gt;When&lt;/span&gt;\n
+        &lt;a href="http://localhost:8000" aria-current="true"&gt;All upcoming&lt;/a&gt;\n
+                    &lt;a href="http://localhost:8000?when=today"&gt;Today&lt;/a&gt;\n
+                    &lt;a href="http://localhost:8000?when=weekend"&gt;This weekend&lt;/a&gt;\n
+                    &lt;a href="http://localhost:8000?when=week"&gt;This week&lt;/a&gt;\n
+            &lt;/div&gt;\n
+&lt;/nav&gt;\n
+\n
+    \n
+            &lt;div class="empty-state"&gt;\n
+                &lt;p&gt;Nothing on yet. Check back soon.&lt;/p&gt;\n
+    &lt;/div&gt;\n
+    \n
+        &lt;/main&gt;\n
+\n
+    &lt;footer&gt;\n
+        &lt;p&gt;Contact: &lt;a href="mailto:hello@whatsonattleborough.co.uk"&gt;hello@whatsonattleborough.co.uk&lt;/a&gt;&lt;/p&gt;\n
+    &lt;/footer&gt;\n
+&lt;/body&gt;\n
+&lt;/html&gt;\n
+' [ASCII](length: 1481) contains "&lt;a href="http://localhost:8000?category=family"&gt;Family&lt;/a&gt;" [ASCII](length: 58).
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:720
+at tests/Feature/Public/AttributeFiltersTest.php:130</failure>
+      </testcase>
+      <testsuite name="it treats invalid and array-valued params as absent with 200" tests="8" assertions="24" errors="0" failures="0" skipped="0" time="0.287274">
+        <testcase name="it treats invalid and array-valued params as absent with 200 with data set &quot;('when=tomorrow')&quot;" file="tests/Feature/Public/AttributeFiltersTest.php::it treats invalid and array-valued params as absent with 200 with data set &quot;('when=tomorrow')&quot;" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="3" time="0.035235"/>
+        <testcase name="it treats invalid and array-valued params as absent with 200 with data set &quot;('when[]=today')&quot;" file="tests/Feature/Public/AttributeFiltersTest.php::it treats invalid and array-valued params as absent with 200 with data set &quot;('when[]=today')&quot;" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="3" time="0.034748"/>
+        <testcase name="it treats invalid and array-valued params as absent with 200 with data set &quot;('family[]=1')&quot;" file="tests/Feature/Public/AttributeFiltersTest.php::it treats invalid and array-valued params as absent with 200 with data set &quot;('family[]=1')&quot;" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="3" time="0.035000"/>
+        <testcase name="it treats invalid and array-valued params as absent with 200 with data set &quot;('free[]=1')&quot;" file="tests/Feature/Public/AttributeFiltersTest.php::it treats invalid and array-valued params as absent with 200 with data set &quot;('free[]=1')&quot;" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="3" time="0.035834"/>
+        <testcase name="it treats invalid and array-valued params as absent with 200 with data set &quot;('category[]=music')&quot;" file="tests/Feature/Public/AttributeFiltersTest.php::it treats invalid and array-valued params as absent with 200 with data set &quot;('category[]=music')&quot;" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="3" time="0.036225"/>
+        <testcase name="it treats invalid and array-valued params as absent with 200 with data set &quot;('page=abc')&quot;" file="tests/Feature/Public/AttributeFiltersTest.php::it treats invalid and array-valued params as absent with 200 with data set &quot;('page=abc')&quot;" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="3" time="0.037104"/>
+        <testcase name="it treats invalid and array-valued params as absent with 200 with data set &quot;('when=')&quot;" file="tests/Feature/Public/AttributeFiltersTest.php::it treats invalid and array-valued params as absent with 200 with data set &quot;('when=')&quot;" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="3" time="0.036708"/>
+        <testcase name="it treats invalid and array-valued params as absent with 200 with data set &quot;('free=')&quot;" file="tests/Feature/Public/AttributeFiltersTest.php::it treats invalid and array-valued params as absent with 200 with data set &quot;('free=')&quot;" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="3" time="0.036420"/>
+      </testsuite>
+      <testcase name="it noindexes unknown params and never propagates them into links" file="tests/Feature/Public/AttributeFiltersTest.php::it noindexes unknown params and never propagates them into links" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="4" time="0.047155"/>
+      <testcase name="it keeps a cancelled match listed with its badge and never shows a hidden match" file="tests/Feature/Public/AttributeFiltersTest.php::it keeps a cancelled match listed with its badge and never shows a hidden match" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="5" time="0.044638"/>
+      <testsuite name="it uses the attribute-filter empty state when a category, Free or Family filter matches nothing" tests="4" assertions="8" errors="0" failures="4" skipped="0" time="0.172363">
+        <testcase name="it uses the attribute-filter empty state when a category, Free or Family filter matches nothing with data set &quot;('category=music')&quot;" file="tests/Feature/Public/AttributeFiltersTest.php::it uses the attribute-filter empty state when a category, Free or Family filter matches nothing with data set &quot;('category=music')&quot;" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="2" time="0.039410">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it uses the attribute-filter empty state when a category, Free or Family filter matches nothing with data set "('category=music')"Failed asserting that '&lt;!DOCTYPE html&gt;
+&lt;html lang="en-GB"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;meta name="x-release" content="attleborough-events"&gt;
+    &lt;title&gt;What&amp;#039;s on | What&amp;#039;s On Attleborough&lt;/title&gt;
+        &lt;link rel="canonical" href="http://localhost:8000/"&gt;
+            &lt;meta name="robots" content="noindex, follow"&gt;
+        &lt;meta name="description" content="See what&amp;#039;s on in Attleborough in one place."&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header&gt;
+        &lt;a href="http://localhost:8000"&gt;What&amp;#039;s On Attleborough&lt;/a&gt;
+        &lt;p&gt;See what&amp;#039;s on in Attleborough in one place.&lt;/p&gt;
+    &lt;/header&gt;
+
+    &lt;main id="main"&gt;
+            &lt;h1&gt;What's on&lt;/h1&gt;
+
+    &lt;nav aria-label="Filter events" class="filter-chips"&gt;
+    &lt;div role="group" aria-labelledby="chips-when"&gt;
+        &lt;span id="chips-when"&gt;When&lt;/span&gt;
+        &lt;a href="http://localhost:8000" aria-current="true"&gt;All upcoming&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=today"&gt;Today&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=weekend"&gt;This weekend&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=week"&gt;This week&lt;/a&gt;
+            &lt;/div&gt;
+&lt;/nav&gt;
+
+    
+            &lt;section aria-labelledby="day-2026-10-30"&gt;
+            &lt;h2 id="day-2026-10-30"&gt;
+                &lt;time datetime="2026-10-30"&gt;Friday 30 October&lt;/time&gt;
+            &lt;/h2&gt;
+            &lt;ul&gt;
+                                    &lt;li&gt;
+    &lt;article&gt;
+        &lt;h3&gt;Paid Gig&lt;/h3&gt;
+        &lt;p&gt;
+            &lt;time datetime="2026-10-30T12:00:00+00:00"&gt;Fri 30 Oct, 12pm&lt;/time&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Hughes Ltd Hall&lt;/p&gt;
+    &lt;/article&gt;
+&lt;/li&gt;
+                            &lt;/ul&gt;
+        &lt;/section&gt;
+    
+        &lt;/main&gt;
+
+    &lt;footer&gt;
+        &lt;p&gt;Contact: &lt;a href="mailto:hello@whatsonattleborough.co.uk"&gt;hello@whatsonattleborough.co.uk&lt;/a&gt;&lt;/p&gt;
+    &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+' contains "No events match these filters. Try removing one, or see everything coming up."..
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:777
+at tests/Feature/Public/AttributeFiltersTest.php:179</failure>
+        </testcase>
+        <testcase name="it uses the attribute-filter empty state when a category, Free or Family filter matches nothing with data set &quot;('free=1')&quot;" file="tests/Feature/Public/AttributeFiltersTest.php::it uses the attribute-filter empty state when a category, Free or Family filter matches nothing with data set &quot;('free=1')&quot;" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="2" time="0.049988">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it uses the attribute-filter empty state when a category, Free or Family filter matches nothing with data set "('free=1')"Failed asserting that '&lt;!DOCTYPE html&gt;
+&lt;html lang="en-GB"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;meta name="x-release" content="attleborough-events"&gt;
+    &lt;title&gt;What&amp;#039;s on | What&amp;#039;s On Attleborough&lt;/title&gt;
+        &lt;link rel="canonical" href="http://localhost:8000/"&gt;
+            &lt;meta name="robots" content="noindex, follow"&gt;
+        &lt;meta name="description" content="See what&amp;#039;s on in Attleborough in one place."&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header&gt;
+        &lt;a href="http://localhost:8000"&gt;What&amp;#039;s On Attleborough&lt;/a&gt;
+        &lt;p&gt;See what&amp;#039;s on in Attleborough in one place.&lt;/p&gt;
+    &lt;/header&gt;
+
+    &lt;main id="main"&gt;
+            &lt;h1&gt;What's on&lt;/h1&gt;
+
+    &lt;nav aria-label="Filter events" class="filter-chips"&gt;
+    &lt;div role="group" aria-labelledby="chips-when"&gt;
+        &lt;span id="chips-when"&gt;When&lt;/span&gt;
+        &lt;a href="http://localhost:8000" aria-current="true"&gt;All upcoming&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=today"&gt;Today&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=weekend"&gt;This weekend&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=week"&gt;This week&lt;/a&gt;
+            &lt;/div&gt;
+&lt;/nav&gt;
+
+    
+            &lt;section aria-labelledby="day-2026-10-30"&gt;
+            &lt;h2 id="day-2026-10-30"&gt;
+                &lt;time datetime="2026-10-30"&gt;Friday 30 October&lt;/time&gt;
+            &lt;/h2&gt;
+            &lt;ul&gt;
+                                    &lt;li&gt;
+    &lt;article&gt;
+        &lt;h3&gt;Paid Gig&lt;/h3&gt;
+        &lt;p&gt;
+            &lt;time datetime="2026-10-30T12:00:00+00:00"&gt;Fri 30 Oct, 12pm&lt;/time&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Ross Ltd Hall&lt;/p&gt;
+    &lt;/article&gt;
+&lt;/li&gt;
+                            &lt;/ul&gt;
+        &lt;/section&gt;
+    
+        &lt;/main&gt;
+
+    &lt;footer&gt;
+        &lt;p&gt;Contact: &lt;a href="mailto:hello@whatsonattleborough.co.uk"&gt;hello@whatsonattleborough.co.uk&lt;/a&gt;&lt;/p&gt;
+    &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+' contains "No events match these filters. Try removing one, or see everything coming up."..
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:777
+at tests/Feature/Public/AttributeFiltersTest.php:179</failure>
+        </testcase>
+        <testcase name="it uses the attribute-filter empty state when a category, Free or Family filter matches nothing with data set &quot;('family=1')&quot;" file="tests/Feature/Public/AttributeFiltersTest.php::it uses the attribute-filter empty state when a category, Free or Family filter matches nothing with data set &quot;('family=1')&quot;" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="2" time="0.044251">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it uses the attribute-filter empty state when a category, Free or Family filter matches nothing with data set "('family=1')"Failed asserting that '&lt;!DOCTYPE html&gt;
+&lt;html lang="en-GB"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;meta name="x-release" content="attleborough-events"&gt;
+    &lt;title&gt;What&amp;#039;s on | What&amp;#039;s On Attleborough&lt;/title&gt;
+        &lt;link rel="canonical" href="http://localhost:8000/"&gt;
+            &lt;meta name="robots" content="noindex, follow"&gt;
+        &lt;meta name="description" content="See what&amp;#039;s on in Attleborough in one place."&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header&gt;
+        &lt;a href="http://localhost:8000"&gt;What&amp;#039;s On Attleborough&lt;/a&gt;
+        &lt;p&gt;See what&amp;#039;s on in Attleborough in one place.&lt;/p&gt;
+    &lt;/header&gt;
+
+    &lt;main id="main"&gt;
+            &lt;h1&gt;What's on&lt;/h1&gt;
+
+    &lt;nav aria-label="Filter events" class="filter-chips"&gt;
+    &lt;div role="group" aria-labelledby="chips-when"&gt;
+        &lt;span id="chips-when"&gt;When&lt;/span&gt;
+        &lt;a href="http://localhost:8000" aria-current="true"&gt;All upcoming&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=today"&gt;Today&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=weekend"&gt;This weekend&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=week"&gt;This week&lt;/a&gt;
+            &lt;/div&gt;
+&lt;/nav&gt;
+
+    
+            &lt;section aria-labelledby="day-2026-10-30"&gt;
+            &lt;h2 id="day-2026-10-30"&gt;
+                &lt;time datetime="2026-10-30"&gt;Friday 30 October&lt;/time&gt;
+            &lt;/h2&gt;
+            &lt;ul&gt;
+                                    &lt;li&gt;
+    &lt;article&gt;
+        &lt;h3&gt;Paid Gig&lt;/h3&gt;
+        &lt;p&gt;
+            &lt;time datetime="2026-10-30T12:00:00+00:00"&gt;Fri 30 Oct, 12pm&lt;/time&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Wright Ltd Hall&lt;/p&gt;
+    &lt;/article&gt;
+&lt;/li&gt;
+                            &lt;/ul&gt;
+        &lt;/section&gt;
+    
+        &lt;/main&gt;
+
+    &lt;footer&gt;
+        &lt;p&gt;Contact: &lt;a href="mailto:hello@whatsonattleborough.co.uk"&gt;hello@whatsonattleborough.co.uk&lt;/a&gt;&lt;/p&gt;
+    &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+' contains "No events match these filters. Try removing one, or see everything coming up."..
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:777
+at tests/Feature/Public/AttributeFiltersTest.php:179</failure>
+        </testcase>
+        <testcase name="it uses the attribute-filter empty state when a category, Free or Family filter matches nothing with data set &quot;('when=today&amp;free=1')&quot;" file="tests/Feature/Public/AttributeFiltersTest.php::it uses the attribute-filter empty state when a category, Free or Family filter matches nothing with data set &quot;('when=today&amp;free=1')&quot;" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="2" time="0.038713">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it uses the attribute-filter empty state when a category, Free or Family filter matches nothing with data set "('when=today&amp;free=1')"Failed asserting that '&lt;!DOCTYPE html&gt;
+&lt;html lang="en-GB"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;meta name="x-release" content="attleborough-events"&gt;
+    &lt;title&gt;Today | What&amp;#039;s On Attleborough&lt;/title&gt;
+        &lt;link rel="canonical" href="http://localhost:8000/"&gt;
+            &lt;meta name="robots" content="noindex, follow"&gt;
+        &lt;meta name="description" content="See what&amp;#039;s on in Attleborough in one place."&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header&gt;
+        &lt;a href="http://localhost:8000"&gt;What&amp;#039;s On Attleborough&lt;/a&gt;
+        &lt;p&gt;See what&amp;#039;s on in Attleborough in one place.&lt;/p&gt;
+    &lt;/header&gt;
+
+    &lt;main id="main"&gt;
+            &lt;h1&gt;What's on&lt;/h1&gt;
+
+    &lt;nav aria-label="Filter events" class="filter-chips"&gt;
+    &lt;div role="group" aria-labelledby="chips-when"&gt;
+        &lt;span id="chips-when"&gt;When&lt;/span&gt;
+        &lt;a href="http://localhost:8000"&gt;All upcoming&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=today" aria-current="true"&gt;Today&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=weekend"&gt;This weekend&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=week"&gt;This week&lt;/a&gt;
+            &lt;/div&gt;
+&lt;/nav&gt;
+
+            &lt;p class="filter-summary"&gt;Showing: Today&lt;/p&gt;
+    
+            &lt;div class="empty-state"&gt;
+                &lt;p&gt;Nothing on today. &lt;a href="http://localhost:8000?when=weekend"&gt;Why not check the weekend?&lt;/a&gt;&lt;/p&gt;
+            &lt;/div&gt;
+    
+        &lt;/main&gt;
+
+    &lt;footer&gt;
+        &lt;p&gt;Contact: &lt;a href="mailto:hello@whatsonattleborough.co.uk"&gt;hello@whatsonattleborough.co.uk&lt;/a&gt;&lt;/p&gt;
+    &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+' contains "No events match these filters. Try removing one, or see everything coming up."..
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:777
+at tests/Feature/Public/AttributeFiltersTest.php:179</failure>
+        </testcase>
+      </testsuite>
+      <testcase name="it lists every category chip in sort order with All categories first" file="tests/Feature/Public/AttributeFiltersTest.php::it lists every category chip in sort order with All categories first" class="Tests\Feature\Public\AttributeFiltersTest" classname="Tests.Feature.Public.AttributeFiltersTest" assertions="2" time="0.035142">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it lists every category chip in sort order with All categories firstFailed asserting that '&lt;!DOCTYPE html&gt;
+&lt;html lang="en-GB"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;meta name="x-release" content="attleborough-events"&gt;
+    &lt;title&gt;What&amp;#039;s on | What&amp;#039;s On Attleborough&lt;/title&gt;
+        &lt;link rel="canonical" href="http://localhost:8000/"&gt;
+        &lt;meta name="description" content="See what&amp;#039;s on in Attleborough in one place."&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header&gt;
+        &lt;a href="http://localhost:8000"&gt;What&amp;#039;s On Attleborough&lt;/a&gt;
+        &lt;p&gt;See what&amp;#039;s on in Attleborough in one place.&lt;/p&gt;
+    &lt;/header&gt;
+
+    &lt;main id="main"&gt;
+            &lt;h1&gt;What's on&lt;/h1&gt;
+
+    &lt;nav aria-label="Filter events" class="filter-chips"&gt;
+    &lt;div role="group" aria-labelledby="chips-when"&gt;
+        &lt;span id="chips-when"&gt;When&lt;/span&gt;
+        &lt;a href="http://localhost:8000" aria-current="true"&gt;All upcoming&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=today"&gt;Today&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=weekend"&gt;This weekend&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=week"&gt;This week&lt;/a&gt;
+            &lt;/div&gt;
+&lt;/nav&gt;
+
+    
+            &lt;div class="empty-state"&gt;
+                &lt;p&gt;Nothing on yet. Check back soon.&lt;/p&gt;
+    &lt;/div&gt;
+    
+        &lt;/main&gt;
+
+    &lt;footer&gt;
+        &lt;p&gt;Contact: &lt;a href="mailto:hello@whatsonattleborough.co.uk"&gt;hello@whatsonattleborough.co.uk&lt;/a&gt;&lt;/p&gt;
+    &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+' contains "All categories" in specified order..
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:748
+at tests/Feature/Public/AttributeFiltersTest.php:184</failure>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\Public\OccurrenceCardTest" file="tests/Feature/Public/OccurrenceCardTest.php" tests="26" assertions="89" errors="0" failures="14" skipped="0" time="1.111836">
+      <testcase name="it shows every CAL-07 field on the card" file="tests/Feature/Public/OccurrenceCardTest.php::it shows every CAL-07 field on the card" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="6" time="0.049044">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it shows every CAL-07 field on the cardFailed asserting that '&lt;article&gt;\n
+        &lt;h3&gt;Brass Band Concert&lt;/h3&gt;\n
+        &lt;p&gt;\n
+            &lt;time datetime="2026-10-31T19:30:00+00:00"&gt;Sat 31 Oct, 7:30pm&lt;/time&gt;\n
+        &lt;/p&gt;\n
+        &lt;p&gt;Connaught Hall&lt;/p&gt;\n
+    &lt;/article&gt;' [ASCII](length: 196) contains "An evening of marches and film themes." [ASCII](length: 38).
+at tests/Feature/Public/OccurrenceCardTest.php:57</failure>
+      </testcase>
+      <testsuite name="it labels the price from price_type and price_text" tests="5" assertions="15" errors="0" failures="4" skipped="0" time="0.231463">
+        <testcase name="it labels the price from price_type and price_text with data set &quot;dataset &quot;free&quot;&quot;" file="tests/Feature/Public/OccurrenceCardTest.php::it labels the price from price_type and price_text with data set &quot;dataset &quot;free&quot;&quot;" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="3" time="0.053553">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it labels the price from price_type and price_text with data set "dataset "free""Failed asserting that '&lt;article&gt;\n
+        &lt;h3&gt;Rerum tenetur reiciendis&lt;/h3&gt;\n
+        &lt;p&gt;\n
+            &lt;time datetime="2026-10-31T19:30:00+00:00"&gt;Sat 31 Oct, 7:30pm&lt;/time&gt;\n
+        &lt;/p&gt;\n
+        &lt;p&gt;Gray Ltd Hall&lt;/p&gt;\n
+    &lt;/article&gt;' [ASCII](length: 201) contains "&lt;p class="price"&gt;Free&lt;/p&gt;" [ASCII](length: 25).
+at tests/Feature/Public/OccurrenceCardTest.php:70</failure>
+        </testcase>
+        <testcase name="it labels the price from price_type and price_text with data set &quot;dataset &quot;paid with text, verbatim&quot;&quot;" file="tests/Feature/Public/OccurrenceCardTest.php::it labels the price from price_type and price_text with data set &quot;dataset &quot;paid with text, verbatim&quot;&quot;" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="3" time="0.053336">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it labels the price from price_type and price_text with data set "dataset "paid with text, verbatim""Failed asserting that '&lt;article&gt;\n
+        &lt;h3&gt;Doloribus voluptas nam&lt;/h3&gt;\n
+        &lt;p&gt;\n
+            &lt;time datetime="2026-10-31T19:30:00+00:00"&gt;Sat 31 Oct, 7:30pm&lt;/time&gt;\n
+        &lt;/p&gt;\n
+        &lt;p&gt;Bell Ltd Hall&lt;/p&gt;\n
+    &lt;/article&gt;' [ASCII](length: 199) contains "&lt;p class="price"&gt;£2.50 adults, £1 children&lt;/p&gt;" [UTF-8](length: 48).
+at tests/Feature/Public/OccurrenceCardTest.php:70</failure>
+        </testcase>
+        <testcase name="it labels the price from price_type and price_text with data set &quot;dataset &quot;paid without text&quot;&quot;" file="tests/Feature/Public/OccurrenceCardTest.php::it labels the price from price_type and price_text with data set &quot;dataset &quot;paid without text&quot;&quot;" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="3" time="0.045068">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it labels the price from price_type and price_text with data set "dataset "paid without text""Failed asserting that '&lt;article&gt;\n
+        &lt;h3&gt;Id explicabo eligendi&lt;/h3&gt;\n
+        &lt;p&gt;\n
+            &lt;time datetime="2026-10-31T19:30:00+00:00"&gt;Sat 31 Oct, 7:30pm&lt;/time&gt;\n
+        &lt;/p&gt;\n
+        &lt;p&gt;Collins Ltd Hall&lt;/p&gt;\n
+    &lt;/article&gt;' [ASCII](length: 201) contains "&lt;p class="price"&gt;Paid&lt;/p&gt;" [ASCII](length: 25).
+at tests/Feature/Public/OccurrenceCardTest.php:70</failure>
+        </testcase>
+        <testcase name="it labels the price from price_type and price_text with data set &quot;dataset &quot;unknown with text&quot;&quot;" file="tests/Feature/Public/OccurrenceCardTest.php::it labels the price from price_type and price_text with data set &quot;dataset &quot;unknown with text&quot;&quot;" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="3" time="0.040600">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it labels the price from price_type and price_text with data set "dataset "unknown with text""Failed asserting that '&lt;article&gt;\n
+        &lt;h3&gt;Dolore officiis occaecati&lt;/h3&gt;\n
+        &lt;p&gt;\n
+            &lt;time datetime="2026-10-31T19:30:00+00:00"&gt;Sat 31 Oct, 7:30pm&lt;/time&gt;\n
+        &lt;/p&gt;\n
+        &lt;p&gt;James Ltd Hall&lt;/p&gt;\n
+    &lt;/article&gt;' [ASCII](length: 203) contains "&lt;p class="price"&gt;Donations welcome&lt;/p&gt;" [ASCII](length: 38).
+at tests/Feature/Public/OccurrenceCardTest.php:70</failure>
+        </testcase>
+        <testcase name="it labels the price from price_type and price_text with data set &quot;dataset &quot;unknown without text&quot;&quot;" file="tests/Feature/Public/OccurrenceCardTest.php::it labels the price from price_type and price_text with data set &quot;dataset &quot;unknown without text&quot;&quot;" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="3" time="0.038907"/>
+      </testsuite>
+      <testsuite name="it links an http(s) source by host" tests="2" assertions="6" errors="0" failures="2" skipped="0" time="0.089938">
+        <testcase name="it links an http(s) source by host with data set &quot;('https://example.org/events/1', 'example.org')&quot;" file="tests/Feature/Public/OccurrenceCardTest.php::it links an http(s) source by host with data set &quot;('https://example.org/events/1', 'example.org')&quot;" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="3" time="0.047031">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it links an http(s) source by host with data set "('https://example.org/events/1', 'example.org')"Failed asserting that '&lt;article&gt;\n
+        &lt;h3&gt;Rem corrupti et&lt;/h3&gt;\n
+        &lt;p&gt;\n
+            &lt;time datetime="2026-10-31T19:30:00+00:00"&gt;Sat 31 Oct, 7:30pm&lt;/time&gt;\n
+        &lt;/p&gt;\n
+        &lt;p&gt;Saunders Ltd Hall&lt;/p&gt;\n
+    &lt;/article&gt;' [ASCII](length: 196) contains "href="https://example.org/events/1"" [ASCII](length: 35).
+at tests/Feature/Public/OccurrenceCardTest.php:84</failure>
+        </testcase>
+        <testcase name="it links an http(s) source by host with data set &quot;('http://www.example.org/whats-on', 'example.org')&quot;" file="tests/Feature/Public/OccurrenceCardTest.php::it links an http(s) source by host with data set &quot;('http://www.example.org/whats-on', 'example.org')&quot;" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="3" time="0.042907">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it links an http(s) source by host with data set "('http://www.example.org/whats-on', 'example.org')"Failed asserting that '&lt;article&gt;\n
+        &lt;h3&gt;Eligendi non vero&lt;/h3&gt;\n
+        &lt;p&gt;\n
+            &lt;time datetime="2026-10-31T19:30:00+00:00"&gt;Sat 31 Oct, 7:30pm&lt;/time&gt;\n
+        &lt;/p&gt;\n
+        &lt;p&gt;Mitchell Ltd Hall&lt;/p&gt;\n
+    &lt;/article&gt;' [ASCII](length: 198) contains "href="http://www.example.org/whats-on"" [ASCII](length: 38).
+at tests/Feature/Public/OccurrenceCardTest.php:84</failure>
+        </testcase>
+      </testsuite>
+      <testcase name="it never renders a non-http source_url as a link" file="tests/Feature/Public/OccurrenceCardTest.php::it never renders a non-http source_url as a link" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="4" time="0.033462"/>
+      <testcase name="it falls back to a mailto contact when there is no source link" file="tests/Feature/Public/OccurrenceCardTest.php::it falls back to a mailto contact when there is no source link" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="3" time="0.034161">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it falls back to a mailto contact when there is no source linkFailed asserting that '&lt;article&gt;\n
+        &lt;h3&gt;Quia aut ut&lt;/h3&gt;\n
+        &lt;p&gt;\n
+            &lt;time datetime="2026-10-31T19:30:00+00:00"&gt;Sat 31 Oct, 7:30pm&lt;/time&gt;\n
+        &lt;/p&gt;\n
+        &lt;p&gt;Robinson Ltd Hall&lt;/p&gt;\n
+    &lt;/article&gt;' [ASCII](length: 192) contains "&lt;a href="mailto:hello@example.org"&gt;hello@example.org&lt;/a&gt;" [ASCII](length: 56).
+at tests/Feature/Public/OccurrenceCardTest.php:101</failure>
+      </testcase>
+      <testcase name="it shows a non-email contact as plain text" file="tests/Feature/Public/OccurrenceCardTest.php::it shows a non-email contact as plain text" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="3" time="0.033360">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it shows a non-email contact as plain textFailed asserting that '&lt;article&gt;\n
+        &lt;h3&gt;Ducimus doloribus laborum&lt;/h3&gt;\n
+        &lt;p&gt;\n
+            &lt;time datetime="2026-10-31T19:30:00+00:00"&gt;Sat 31 Oct, 7:30pm&lt;/time&gt;\n
+        &lt;/p&gt;\n
+        &lt;p&gt;Graham Ltd Hall&lt;/p&gt;\n
+    &lt;/article&gt;' [ASCII](length: 204) contains "Contact: 01953 123456" [ASCII](length: 21).
+at tests/Feature/Public/OccurrenceCardTest.php:107</failure>
+      </testcase>
+      <testcase name="it shows only the source link when both source and contact are set" file="tests/Feature/Public/OccurrenceCardTest.php::it shows only the source link when both source and contact are set" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="3" time="0.034629">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it shows only the source link when both source and contact are setFailed asserting that '&lt;article&gt;\n
+        &lt;h3&gt;Cumque similique nemo&lt;/h3&gt;\n
+        &lt;p&gt;\n
+            &lt;time datetime="2026-10-31T19:30:00+00:00"&gt;Sat 31 Oct, 7:30pm&lt;/time&gt;\n
+        &lt;/p&gt;\n
+        &lt;p&gt;Harrison Ltd Hall&lt;/p&gt;\n
+    &lt;/article&gt;' [ASCII](length: 202) contains "example.org&lt;/a&gt;" [ASCII](length: 15).
+at tests/Feature/Public/OccurrenceCardTest.php:113</failure>
+      </testcase>
+      <testcase name="it renders no empty lines for missing optional fields" file="tests/Feature/Public/OccurrenceCardTest.php::it renders no empty lines for missing optional fields" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="8" time="0.034427"/>
+      <testcase name="it shows a 140-character description in full" file="tests/Feature/Public/OccurrenceCardTest.php::it shows a 140-character description in full" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="3" time="0.032074">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it shows a 140-character description in fullFailed asserting that null is identical to 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'.
+at tests/Feature/Public/OccurrenceCardTest.php:140</failure>
+      </testcase>
+      <testcase name="it shortens a 141-character description at a word boundary with an ellipsis" file="tests/Feature/Public/OccurrenceCardTest.php::it shortens a 141-character description at a word boundary with an ellipsis" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="4" time="0.071720">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it shortens a 141-character description at a word boundary with an ellipsisFailed asserting that null is of type string.
+at tests/Feature/Public/OccurrenceCardTest.php:149</failure>
+      </testcase>
+      <testcase name="it collapses newlines and whitespace runs in the excerpt" file="tests/Feature/Public/OccurrenceCardTest.php::it collapses newlines and whitespace runs in the excerpt" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="3" time="0.044030">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it collapses newlines and whitespace runs in the excerptFailed asserting that null is identical to 'Line one. Line two. End.'.
+at tests/Feature/Public/OccurrenceCardTest.php:156</failure>
+      </testcase>
+      <testcase name="it keeps the excerpt valid UTF-8 when the cut lands next to multi-byte characters" file="tests/Feature/Public/OccurrenceCardTest.php::it keeps the excerpt valid UTF-8 when the cut lands next to multi-byte characters" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="3" time="0.043198">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it keeps the excerpt valid UTF-8 when the cut lands next to multi-byte charactersFailed asserting that null is of type string.
+at tests/Feature/Public/OccurrenceCardTest.php:162</failure>
+      </testcase>
+      <testcase name="it escapes card text" file="tests/Feature/Public/OccurrenceCardTest.php::it escapes card text" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="5" time="0.035475"/>
+      <testcase name="it shows exactly one Cancelled badge when both event and occurrence are cancelled" file="tests/Feature/Public/OccurrenceCardTest.php::it shows exactly one Cancelled badge when both event and occurrence are cancelled" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="3" time="0.036558"/>
+      <testcase name="it shows no Cancelled badge on a scheduled occurrence of a published event" file="tests/Feature/Public/OccurrenceCardTest.php::it shows no Cancelled badge on a scheduled occurrence of a published event" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="3" time="0.040305"/>
+      <testcase name="it renders cards with an identical start in id order" file="tests/Feature/Public/OccurrenceCardTest.php::it renders cards with an identical start in id order" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="2" time="0.040824"/>
+      <testcase name="it renders occurrences of one event on different days as separate cards under their own headings" file="tests/Feature/Public/OccurrenceCardTest.php::it renders occurrences of one event on different days as separate cards under their own headings" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="3" time="0.046248"/>
+      <testsuite name="it shows London wall-clock hours and minutes only" tests="4" assertions="12" errors="0" failures="0" skipped="0" time="0.180919">
+        <testcase name="it shows London wall-clock hours and minutes only with data set &quot;('2026-10-31 19:00', 'Sat 31 Oct, 7pm')&quot;" file="tests/Feature/Public/OccurrenceCardTest.php::it shows London wall-clock hours and minutes only with data set &quot;('2026-10-31 19:00', 'Sat 31 Oct, 7pm')&quot;" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="3" time="0.041818"/>
+        <testcase name="it shows London wall-clock hours and minutes only with data set &quot;('2026-10-31 19:30', 'Sat 31 Oct, 7:30pm')&quot;" file="tests/Feature/Public/OccurrenceCardTest.php::it shows London wall-clock hours and minutes only with data set &quot;('2026-10-31 19:30', 'Sat 31 Oct, 7:30pm')&quot;" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="3" time="0.041071"/>
+        <testcase name="it shows London wall-clock hours and minutes only with data set &quot;('2026-10-31 12:00', 'Sat 31 Oct, 12pm')&quot;" file="tests/Feature/Public/OccurrenceCardTest.php::it shows London wall-clock hours and minutes only with data set &quot;('2026-10-31 12:00', 'Sat 31 Oct, 12pm')&quot;" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="3" time="0.041568"/>
+        <testcase name="it shows London wall-clock hours and minutes only with data set &quot;('2026-10-31 00:30', 'Sat 31 Oct, 12:30am')&quot;" file="tests/Feature/Public/OccurrenceCardTest.php::it shows London wall-clock hours and minutes only with data set &quot;('2026-10-31 00:30', 'Sat 31 Oct, 12:30am')&quot;" class="Tests\Feature\Public\OccurrenceCardTest" classname="Tests.Feature.Public.OccurrenceCardTest" assertions="3" time="0.056463"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>
