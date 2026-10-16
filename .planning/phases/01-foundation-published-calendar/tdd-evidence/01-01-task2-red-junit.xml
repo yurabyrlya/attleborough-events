@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="26" assertions="61" errors="6" failures="3" skipped="0" time="4.796408">
+    <testsuite name="Tests\Unit\Calendar\EventTimingTest" file="tests/Unit/Calendar/EventTimingTest.php" tests="6" assertions="11" errors="3" failures="0" skipped="0" time="0.912729">
+      <testcase name="it maps a timed event with an end time to UTC instants (BST)" file="tests/Unit/Calendar/EventTimingTest.php::it maps a timed event with an end time to UTC instants (BST)" class="Tests\Unit\Calendar\EventTimingTest" classname="Tests.Unit.Calendar.EventTimingTest" assertions="4" time="0.825896"/>
+      <testcase name="it expires a timed event with no end time 3 hours after its start" file="tests/Unit/Calendar/EventTimingTest.php::it expires a timed event with no end time 3 hours after its start" class="Tests\Unit\Calendar\EventTimingTest" classname="Tests.Unit.Calendar.EventTimingTest" assertions="3" time="0.021247"/>
+      <testcase name="it rolls an end time earlier than the start over to the next day across the 2026-10-25 DST change" file="tests/Unit/Calendar/EventTimingTest.php::it rolls an end time earlier than the start over to the next day across the 2026-10-25 DST change" class="Tests\Unit\Calendar\EventTimingTest" classname="Tests.Unit.Calendar.EventTimingTest" assertions="4" time="0.016509"/>
+      <testcase name="it makes an all-day event on Sun 2026-10-25 span the 25-hour local day" file="tests/Unit/Calendar/EventTimingTest.php::it makes an all-day event on Sun 2026-10-25 span the 25-hour local day" class="Tests\Unit\Calendar\EventTimingTest" classname="Tests.Unit.Calendar.EventTimingTest" assertions="0" time="0.023814">
+        <error type="InvalidArgumentException">it makes an all-day event on Sun 2026-10-25 span the 25-hour local dayInvalidArgumentException: Event [] has no start time.
+at app/Calendar/EventTiming.php:33
+at tests/Unit/Calendar/EventTimingTest.php:61</error>
+      </testcase>
+      <testcase name="it makes an all-day event on Sun 2027-03-28 span the 23-hour local day" file="tests/Unit/Calendar/EventTimingTest.php::it makes an all-day event on Sun 2027-03-28 span the 23-hour local day" class="Tests\Unit\Calendar\EventTimingTest" classname="Tests.Unit.Calendar.EventTimingTest" assertions="0" time="0.012938">
+        <error type="InvalidArgumentException">it makes an all-day event on Sun 2027-03-28 span the 23-hour local dayInvalidArgumentException: Event [] has no start time.
+at app/Calendar/EventTiming.php:33
+at tests/Unit/Calendar/EventTimingTest.php:73</error>
+      </testcase>
+      <testcase name="it makes a Sat-Sun all-day event one timing ending Monday 00:00 London (exclusive)" file="tests/Unit/Calendar/EventTimingTest.php::it makes a Sat-Sun all-day event one timing ending Monday 00:00 London (exclusive)" class="Tests\Unit\Calendar\EventTimingTest" classname="Tests.Unit.Calendar.EventTimingTest" assertions="0" time="0.012325">
+        <error type="InvalidArgumentException">it makes a Sat-Sun all-day event one timing ending Monday 00:00 London (exclusive)InvalidArgumentException: Event [] has no start time.
+at app/Calendar/EventTiming.php:33
+at tests/Unit/Calendar/EventTimingTest.php:83</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\Publishing\PublishEventTest" file="tests/Feature/Publishing/PublishEventTest.php" tests="7" assertions="17" errors="1" failures="0" skipped="0" time="0.821427">
+      <testcase name="it publishes with origin, approver and approval time recorded" file="tests/Feature/Publishing/PublishEventTest.php::it publishes with origin, approver and approval time recorded" class="Tests\Feature\Publishing\PublishEventTest" classname="Tests.Feature.Publishing.PublishEventTest" assertions="4" time="0.556358"/>
+      <testcase name="it stores a 19:30 BST start on 20 Oct 2026 as 18:30 UTC" file="tests/Feature/Publishing/PublishEventTest.php::it stores a 19:30 BST start on 20 Oct 2026 as 18:30 UTC" class="Tests\Feature\Publishing\PublishEventTest" classname="Tests.Feature.Publishing.PublishEventTest" assertions="1" time="0.056203"/>
+      <testcase name="it stores ends_at NULL and expires_at = starts_at + 3h when there is no end time" file="tests/Feature/Publishing/PublishEventTest.php::it stores ends_at NULL and expires_at = starts_at + 3h when there is no end time" class="Tests\Feature\Publishing\PublishEventTest" classname="Tests.Feature.Publishing.PublishEventTest" assertions="2" time="0.048034"/>
+      <testcase name="it stores a Sat-Sun all-day event as exactly one occurrence ending Monday 00:00 London" file="tests/Feature/Publishing/PublishEventTest.php::it stores a Sat-Sun all-day event as exactly one occurrence ending Monday 00:00 London" class="Tests\Feature\Publishing\PublishEventTest" classname="Tests.Feature.Publishing.PublishEventTest" assertions="0" time="0.050958">
+        <error type="InvalidArgumentException">it stores a Sat-Sun all-day event as exactly one occurrence ending Monday 00:00 LondonInvalidArgumentException: Event [4] has no start time.
+at app/Calendar/EventTiming.php:33
+at app/Calendar/OccurrenceGenerator.php:61
+at app/Calendar/OccurrenceGenerator.php:36
+at app/Publishing/Actions/PublishEvent.php:37
+at vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+at vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+at vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+at app/Publishing/Actions/PublishEvent.php:29
+at tests/Feature/Publishing/PublishEventTest.php:68</error>
+      </testcase>
+      <testcase name="it persists price, family-friendly, organiser and source note" file="tests/Feature/Publishing/PublishEventTest.php::it persists price, family-friendly, organiser and source note" class="Tests\Feature\Publishing\PublishEventTest" classname="Tests.Feature.Publishing.PublishEventTest" assertions="5" time="0.039805"/>
+      <testcase name="it persists nothing when occurrence generation throws" file="tests/Feature/Publishing/PublishEventTest.php::it persists nothing when occurrence generation throws" class="Tests\Feature\Publishing\PublishEventTest" classname="Tests.Feature.Publishing.PublishEventTest" assertions="3" time="0.032637"/>
+      <testcase name="it creates two separate events when invoked twice with identical data (no implicit dedupe)" file="tests/Feature/Publishing/PublishEventTest.php::it creates two separate events when invoked twice with identical data (no implicit dedupe)" class="Tests\Feature\Publishing\PublishEventTest" classname="Tests.Feature.Publishing.PublishEventTest" assertions="2" time="0.037432"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\Filament\CreateEventTest" file="tests/Feature/Filament/CreateEventTest.php" tests="6" assertions="22" errors="0" failures="3" skipped="0" time="2.519216">
+      <testcase name="it stores a 10:00 TimePicker value on a BST date as start_time 10:00:00" file="tests/Feature/Filament/CreateEventTest.php::it stores a 10:00 TimePicker value on a BST date as start_time 10:00:00" class="Tests\Feature\Filament\CreateEventTest" classname="Tests.Feature.Filament.CreateEventTest" assertions="4" time="2.033594"/>
+      <testcase name="it rejects an end time equal to the start time on the same day" file="tests/Feature/Filament/CreateEventTest.php::it rejects an end time equal to the start time on the same day" class="Tests\Feature\Filament\CreateEventTest" classname="Tests.Feature.Filament.CreateEventTest" assertions="3" time="0.123028">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it rejects an end time equal to the start time on the same dayComponent has no errors.
+Failed asserting that false is true.
+at vendor/livewire/livewire/src/Features/SupportValidation/TestsValidation.php:41
+at vendor/filament/forms/src/Testing/TestsForms.php:103
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/CreateEventTest.php:47</failure>
+      </testcase>
+      <testcase name="it rejects an end date before the start date" file="tests/Feature/Filament/CreateEventTest.php::it rejects an end date before the start date" class="Tests\Feature\Filament\CreateEventTest" classname="Tests.Feature.Filament.CreateEventTest" assertions="3" time="0.093815">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it rejects an end date before the start dateComponent has no errors.
+Failed asserting that false is true.
+at vendor/livewire/livewire/src/Features/SupportValidation/TestsValidation.php:41
+at vendor/filament/forms/src/Testing/TestsForms.php:103
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/CreateEventTest.php:56</failure>
+      </testcase>
+      <testcase name="it accepts an end time earlier than the start time as overnight" file="tests/Feature/Filament/CreateEventTest.php::it accepts an end time earlier than the start time as overnight" class="Tests\Feature\Filament\CreateEventTest" classname="Tests.Feature.Filament.CreateEventTest" assertions="4" time="0.069575"/>
+      <testcase name="it requires a source URL when there is no organiser contact" file="tests/Feature/Filament/CreateEventTest.php::it requires a source URL when there is no organiser contact" class="Tests\Feature\Filament\CreateEventTest" classname="Tests.Feature.Filament.CreateEventTest" assertions="5" time="0.100199"/>
+      <testcase name="it creates an all-day multi-day event with price, family-friendly and source note as one occurrence" file="tests/Feature/Filament/CreateEventTest.php::it creates an all-day multi-day event with price, family-friendly and source note as one occurrence" class="Tests\Feature\Filament\CreateEventTest" classname="Tests.Feature.Filament.CreateEventTest" assertions="3" time="0.099005">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it creates an all-day multi-day event with price, family-friendly and source note as one occurrenceComponent has errors: "data.start_time" =&gt; ["The start time field is required."]
+Failed asserting that false is true.
+at vendor/livewire/livewire/src/Features/SupportValidation/TestsValidation.php:127
+at vendor/filament/forms/src/Testing/TestsForms.php:138
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/CreateEventTest.php:92</failure>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\Public\CalendarListTest" file="tests/Feature/Public/CalendarListTest.php" tests="7" assertions="11" errors="2" failures="0" skipped="0" time="0.543035">
+      <testcase name="it renders an empty state with 200 when nothing is published" file="tests/Feature/Public/CalendarListTest.php::it renders an empty state with 200 when nothing is published" class="Tests\Feature\Public\CalendarListTest" classname="Tests.Feature.Public.CalendarListTest" assertions="2" time="0.221014"/>
+      <testcase name="it does not list an occurrence whose expires_at equals now" file="tests/Feature/Public/CalendarListTest.php::it does not list an occurrence whose expires_at equals now" class="Tests\Feature\Public\CalendarListTest" classname="Tests.Feature.Public.CalendarListTest" assertions="3" time="0.062866"/>
+      <testcase name="it lists an occurrence expiring one second after now" file="tests/Feature/Public/CalendarListTest.php::it lists an occurrence expiring one second after now" class="Tests\Feature\Public\CalendarListTest" classname="Tests.Feature.Public.CalendarListTest" assertions="2" time="0.070942"/>
+      <testcase name="it orders occurrences with an identical start by id" file="tests/Feature/Public/CalendarListTest.php::it orders occurrences with an identical start by id" class="Tests\Feature\Public\CalendarListTest" classname="Tests.Feature.Public.CalendarListTest" assertions="2" time="0.065822"/>
+      <testcase name="it groups an ongoing multi-day occurrence that started yesterday under Today" file="tests/Feature/Public/CalendarListTest.php::it groups an ongoing multi-day occurrence that started yesterday under Today" class="Tests\Feature\Public\CalendarListTest" classname="Tests.Feature.Public.CalendarListTest" assertions="0" time="0.036926">
+        <error type="InvalidArgumentException">it groups an ongoing multi-day occurrence that started yesterday under TodayInvalidArgumentException: Event [17] has no start time.
+at app/Calendar/EventTiming.php:33
+at app/Calendar/OccurrenceGenerator.php:61
+at app/Calendar/OccurrenceGenerator.php:36
+at app/Publishing/Actions/PublishEvent.php:37
+at vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+at vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+at vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+at app/Publishing/Actions/PublishEvent.php:29
+at tests/Feature/Public/CalendarListTest.php:18
+at tests/Feature/Public/CalendarListTest.php:61</error>
+      </testcase>
+      <testcase name="it labels a single all-day occurrence &quot;All day&quot; under its date heading" file="tests/Feature/Public/CalendarListTest.php::it labels a single all-day occurrence &quot;All day&quot; under its date heading" class="Tests\Feature\Public\CalendarListTest" classname="Tests.Feature.Public.CalendarListTest" assertions="0" time="0.035308">
+        <error type="InvalidArgumentException">it labels a single all-day occurrence "All day" under its date headingInvalidArgumentException: Event [18] has no start time.
+at app/Calendar/EventTiming.php:33
+at app/Calendar/OccurrenceGenerator.php:61
+at app/Calendar/OccurrenceGenerator.php:36
+at app/Publishing/Actions/PublishEvent.php:37
+at vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+at vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+at vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+at app/Publishing/Actions/PublishEvent.php:29
+at tests/Feature/Public/CalendarListTest.php:18
+at tests/Feature/Public/CalendarListTest.php:79</error>
+      </testcase>
+      <testcase name="it uses Today and Tomorrow headings and drops :00 from whole-hour times" file="tests/Feature/Public/CalendarListTest.php::it uses Today and Tomorrow headings and drops :00 from whole-hour times" class="Tests\Feature\Public\CalendarListTest" classname="Tests.Feature.Public.CalendarListTest" assertions="2" time="0.050158"/>
+    </testsuite>
+  </testsuite>
+</testsuites>
