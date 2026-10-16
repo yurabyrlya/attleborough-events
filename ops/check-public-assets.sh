@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 #
 # Public asset check (CAL-01, T-01-37): every resource / references is
-# same-origin, the Vite stylesheet and its self-hosted fonts load, and / has
-# no script element.
+# same-origin, the Vite stylesheet and its self-hosted fonts load, the brand
+# files (favicon.svg/.ico, apple-touch-icon, og:image) load, and / has no
+# script element.
 #
 # Usage: ops/check-public-assets.sh [BASE_URL]
 #   BASE_URL defaults to http://localhost:8000 (local APP_URL, served by
@@ -171,5 +172,36 @@ while IFS= read -r ref; do
 done < "$TMP/css-urls"
 
 [ "$fonts" -ge 1 ] || fail "the stylesheet references no woff2 font"
+
+# --- Brand files (D-07) ------------------------------------------------------
+# check_file PATH_OR_URL NAME EXPECTED_TYPE_PREFIX ("" = any type, non-empty body)
+check_file() {
+    local status type
+    status="$(fetch "$(absolute "$1")" "$2")"
+    [ "$status" = "200" ] || fail "$1 is not 200 (got $status)"
+    [ -s "$TMP/$2.body" ] || fail "$1 is empty"
+    if [ -n "$3" ]; then
+        type="$(header_of "$2" content-type)"
+        case "$type" in
+            "$3"*) ;;
+            *) fail "$1 content-type is '$type', expected $3" ;;
+        esac
+    fi
+}
+
+check_file /favicon.svg favicon-svg image/svg+xml
+check_file /favicon.ico favicon-ico ""
+check_file /apple-touch-icon.png apple-touch image/png
+
+{ grep -oiE "<meta[[:space:]][^>]*property=(\"og:image\"|'og:image')[^>]*>" "$TMP/index.flat" || true; } > "$TMP/og-image"
+og_count="$(grep -c . "$TMP/og-image" || true)"
+[ "$og_count" = "1" ] || fail "og:image count on / is $og_count, expected 1"
+og_url="$({ grep -oiE "[[:space:]]content=(\"[^\"]*\"|'[^']*')" "$TMP/og-image" || true; } | head -n 1 | attr_value)"
+case "$og_url" in
+    http://* | https://*) ;;
+    *) fail "og:image is not an absolute URL: $og_url" ;;
+esac
+[ "$(host_of "$og_url")" = "$BASE_HOST" ] || fail "THIRD-PARTY: $og_url (og:image)"
+check_file "$og_url" og-image image/png
 
 echo "PUBLIC ASSETS OK: css=$css_path fonts=$fonts third-party=0"

@@ -10,22 +10,22 @@
 <nav aria-label="Filter events" class="filter-chips">
     <div role="group" aria-labelledby="chips-when">
         <span id="chips-when">When</span>
-        <a href="{{ route('calendar', $filters->queryWith(['when' => null])) }}"@if ($filters->when === null) aria-current="true"@endif>All upcoming</a>
+        <a href="{{ route('calendar', $filters->queryWith(['when' => null]), absolute: false) }}"@if ($filters->when === null) aria-current="true"@endif>All upcoming</a>
         @foreach (\App\Enums\DateFilter::cases() as $case)
-            <a href="{{ route('calendar', $filters->queryWith(['when' => $case->value])) }}"@if ($filters->when === $case) aria-current="true"@endif>{{ $case->label() }}</a>
+            <a href="{{ route('calendar', $filters->queryWith(['when' => $case->value]), absolute: false) }}"@if ($filters->when === $case) aria-current="true"@endif>{{ $case->label() }}</a>
         @endforeach
     </div>
     <div role="group" aria-labelledby="chips-category">
         <span id="chips-category">Category</span>
-        <a href="{{ route('calendar', $filters->queryWith(['category' => null])) }}"@if ($filters->category === null) aria-current="true"@endif>All categories</a>
+        <a href="{{ route('calendar', $filters->queryWith(['category' => null]), absolute: false) }}"@if ($filters->category === null) aria-current="true"@endif>All categories</a>
         @foreach ($categories as $category)
-            <a href="{{ route('calendar', $filters->queryWith(['category' => $category->slug])) }}"@if ($filters->category?->is($category)) aria-current="true"@endif>{{ $category->name }}</a>
+            <a href="{{ route('calendar', $filters->queryWith(['category' => $category->slug]), absolute: false) }}"@if ($filters->category?->is($category)) aria-current="true"@endif>{{ $category->name }}</a>
         @endforeach
     </div>
     <div role="group" aria-labelledby="chips-only">
         <span id="chips-only">Show only</span>
-        <a href="{{ route('calendar', $filters->queryWith(['free' => $filters->free ? null : '1'])) }}"@if ($filters->free) aria-current="true"@endif>Free</a>
-        <a href="{{ route('calendar', $filters->queryWith(['family' => $filters->family ? null : '1'])) }}"@if ($filters->family) aria-current="true"@endif>Family-friendly</a>
+        <a href="{{ route('calendar', $filters->queryWith(['free' => $filters->free ? null : '1']), absolute: false) }}"@if ($filters->free) aria-current="true"@endif>Free</a>
+        <a href="{{ route('calendar', $filters->queryWith(['family' => $filters->family ? null : '1']), absolute: false) }}"@if ($filters->family) aria-current="true"@endif>Family-friendly</a>
     </div>
 </nav>
 <style>

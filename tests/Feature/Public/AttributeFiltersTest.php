@@ -116,10 +116,10 @@ it('combines date, category, free and family with AND', function () {
 
 it('builds chip hrefs that keep other filters, toggle Free off and never carry page', function () {
     $response = get('/?when=weekend&free=1&page=2')->assertOk()
-        ->assertSee('href="'.e(route('calendar', ['when' => 'weekend', 'category' => 'music', 'free' => '1'])).'">Music</a>', false)
-        ->assertSee('<a href="'.e(route('calendar', ['when' => 'weekend'])).'" aria-current="true">Free</a>', false)
-        ->assertSee('<a href="'.e(route('calendar', ['when' => 'weekend', 'free' => '1'])).'" aria-current="true">All categories</a>', false)
-        ->assertSee('<a href="'.e(route('calendar', ['when' => 'weekend', 'free' => '1', 'family' => '1'])).'">Family-friendly</a>', false);
+        ->assertSee('href="'.e(route('calendar', ['when' => 'weekend', 'category' => 'music', 'free' => '1'], absolute: false)).'">Music</a>', false)
+        ->assertSee('<a href="'.e(route('calendar', ['when' => 'weekend'], absolute: false)).'" aria-current="true">Free</a>', false)
+        ->assertSee('<a href="'.e(route('calendar', ['when' => 'weekend', 'free' => '1'], absolute: false)).'" aria-current="true">All categories</a>', false)
+        ->assertSee('<a href="'.e(route('calendar', ['when' => 'weekend', 'free' => '1', 'family' => '1'], absolute: false)).'">Family-friendly</a>', false);
 
     preg_match('#<nav aria-label="Filter events".*?</nav>#s', (string) $response->getContent(), $nav);
     expect($nav[0])->not->toContain('page=');
@@ -127,7 +127,7 @@ it('builds chip hrefs that keep other filters, toggle Free off and never carry p
 
 it('replaces the category when another category chip is chosen', function () {
     get('/?category=music')->assertOk()
-        ->assertSee('<a href="'.e(route('calendar', ['category' => 'family'])).'">Family</a>', false)
+        ->assertSee('<a href="'.e(route('calendar', ['category' => 'family'], absolute: false)).'">Family</a>', false)
         ->assertSee('aria-current="true">Music</a>', false);
 });
 
@@ -177,7 +177,7 @@ it('uses the attribute-filter empty state when a category, Free or Family filter
 
     get('/?'.$query)->assertOk()
         ->assertSeeText('No events match these filters. Try removing one, or see everything coming up.', false)
-        ->assertSee('<a href="'.e(route('calendar')).'">see everything coming up.</a>', false);
+        ->assertSee('<a href="'.e(route('calendar', absolute: false)).'">see everything coming up.</a>', false);
 })->with(['category=music', 'free=1', 'family=1', 'when=today&free=1']);
 
 it('lists every category chip in sort order with All categories first', function () {

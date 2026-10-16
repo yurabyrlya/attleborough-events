@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>What's On Attleborough: default share image</title>
+<style>
+    /* Offline render: the font loads from the local npm package, nothing remote. */
+    @font-face {
+        font-family: 'Atkinson Hyperlegible Next Variable';
+        font-style: normal;
+        font-weight: 200 800;
+        src: url('../../node_modules/@fontsource-variable/atkinson-hyperlegible-next/files/atkinson-hyperlegible-next-latin-wght-normal.woff2') format('woff2-variations');
+    }
+
+    html, body {
+        margin: 0;
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+    }
+
+    body {
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 88px;
+        background: #2E6B3F;
+        color: #FFFFFF;
+        font-family: 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif;
+    }
+
+    svg {
+        width: 160px;
+        height: 160px;
+        margin-left: -14px;
+    }
+
+    h1 {
+        margin: 24px 0 0;
+        font-size: 88px;
+        font-weight: 700;
+        line-height: 1.05;
+        letter-spacing: -0.01em;
+    }
+
+    p {
+        margin: 24px 0 0;
+        font-size: 40px;
+        font-weight: 400;
+        color: #E9F2EC;
+    }
+</style>
+</head>
+<body>
+    <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M5.25 5.25h13.5a1.5 1.5 0 0 1 1.5 1.5v12a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-12a1.5 1.5 0 0 1 1.5-1.5Z"/>
+        <path d="M3.75 9.75h16.5"/>
+        <path d="M7.5 3v4.5"/>
+        <path d="M16.5 3v4.5"/>
+        <path d="M12 18.75s-2.25-2.25-2.25-4.5a2.25 2.25 0 1 1 4.5 0c0 2.25-2.25 4.5-2.25 4.5Z"/>
+        <path d="M12.375 14.25a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/>
+    </svg>
+    <h1>What's On Attleborough</h1>
+    <p>See what's on in Attleborough in one place.</p>
+</body>
+</html>

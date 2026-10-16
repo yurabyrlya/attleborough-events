@@ -174,7 +174,7 @@ it('shows the Today empty state linking to the weekend chip', function () {
 
     get('/?when=today')->assertOk()
         ->assertSeeText('Nothing on today. Why not check the weekend?', false)
-        ->assertSee('<a href="'.e(route('calendar', ['when' => 'weekend'])).'">Why not check the weekend?</a>', false)
+        ->assertSee('<a href="'.e(route('calendar', ['when' => 'weekend'], absolute: false)).'">Why not check the weekend?</a>', false)
         ->assertSee('aria-current="true">Today</a>', false);
 });
 
@@ -184,7 +184,7 @@ it('shows the weekend and week empty states linking to everything coming up', fu
 
     $response = get('/?when='.$when)->assertOk()->assertSeeText($message, false);
     expect(cardTitles($response))->toBe([]);
-    $response->assertSee('<a href="'.e(route('calendar')).'">See everything coming up.</a>', false);
+    $response->assertSee('<a href="'.e(route('calendar', absolute: false)).'">See everything coming up.</a>', false);
 })->with([
     ['weekend', 'Nothing on this weekend yet. See everything coming up.'],
     ['week', 'Nothing else on this week. See everything coming up.'],
@@ -196,7 +196,7 @@ it('shows the end-of-list state for a page past the end, linking to page 1 with 
 
     get('/?when=weekend&page=5')->assertOk()
         ->assertSeeText("You've reached the end of the list.", false)
-        ->assertSee('<a href="'.e(route('calendar', ['when' => 'weekend'])).'">Back to the first page</a>', false)
+        ->assertSee('<a href="'.e(route('calendar', ['when' => 'weekend'], absolute: false)).'">Back to the first page</a>', false)
         ->assertDontSee('Nothing on this weekend yet');
 });
 

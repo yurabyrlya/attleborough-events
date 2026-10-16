@@ -3,14 +3,65 @@
 
 @source '../views/**/*.blade.php';
 
+/*
+ * Ten semantic colour tokens (D-06, D-08). Tailwind's default palette is
+ * removed so public views can only use these. Light values here, dark
+ * values in the base layer below; tests/Unit/Brand/ContrastTest.php proves
+ * every pair meets WCAG 2.2 AA in both themes.
+ */
 @theme static {
+    --color-*: initial;
+    --color-bg: #FFFFFF;
+    --color-surface: #F3F7F4;
+    --color-ink: #1A1F1C;
+    --color-muted: #4B5550;
+    --color-accent: #2E6B3F;
+    --color-accent-ink: #FFFFFF;
+    --color-accent-soft: #E9F2EC;
+    --color-line: #6B7A71;
+    --color-focus: #2E6B3F;
+    --color-cancel: #B42318;
+
     --font-sans: 'Atkinson Hyperlegible Next Variable', ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
+    /* Dark theme follows the device setting (prefers-color-scheme) only. */
+    :root {
+        @variant dark {
+            --color-bg: #111614;
+            --color-surface: #1B221E;
+            --color-ink: #E8EDEA;
+            --color-muted: #A9B4AE;
+            --color-accent: #86CF97;
+            --color-accent-ink: #111614;
+            --color-accent-soft: #1B3A25;
+            --color-line: #6B7A71;
+            --color-focus: #86CF97;
+            --color-cancel: #FDA29B;
+        }
+    }
+
     html {
+        color-scheme: light dark;
+        background-color: var(--color-bg);
+        color: var(--color-ink);
         font-family: var(--font-sans);
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }
+
+    /* Visible focus everywhere (WCAG 2.4.7 / 2.4.13); never removed. */
+    :focus-visible {
+        outline: 2px solid var(--color-focus);
+        outline-offset: 2px;
+    }
+}
+
+/* At least 44x44px, above the 24x24px WCAG 2.5.8 minimum. */
+@utility tap-target {
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+    display: inline-flex;
+    align-items: center;
 }

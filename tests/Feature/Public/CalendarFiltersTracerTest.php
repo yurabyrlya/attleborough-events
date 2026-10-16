@@ -36,7 +36,7 @@ it('marks /?when=weekend noindex with a canonical built from config', function (
 it('renders the weekend chip as a plain anchor on / without noindex and lists everything', function () {
     get('/')
         ->assertOk()
-        ->assertSee('href="'.e(route('calendar', ['when' => 'weekend'])).'"', false)
+        ->assertSee('href="'.e(route('calendar', ['when' => 'weekend'], absolute: false)).'"', false)
         ->assertDontSee('name="robots"', false)
         ->assertSee('Wednesday Quiz')
         ->assertSee('Saturday Market')
@@ -48,7 +48,7 @@ it('marks the active weekend chip and points All upcoming at the bare route', fu
     get('/?when=weekend')
         ->assertOk()
         ->assertSee('aria-current="true">This weekend</a>', false)
-        ->assertSee('<a href="'.e(route('calendar')).'">All upcoming</a>', false);
+        ->assertSee('<a href="'.e(route('calendar', absolute: false)).'">All upcoming</a>', false);
 });
 
 it('renders no form and no script on / and /?when=weekend', function (string $uri) {
