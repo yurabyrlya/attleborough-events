@@ -40,7 +40,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 01-06-PLAN.md
 - [ ] 01-07-PLAN.md
 - [ ] 01-08-PLAN.md
-- [ ] 01-09-PLAN.md
+- [x] 01-09-PLAN.md
 - [ ] 01-10-PLAN.md
 
 **UI hint**: yes
@@ -110,6 +110,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 2 planned so far (more added when Phase 5 is planned)
 - [ ] 05-01-PLAN.md (server provisioning + owner infra checkpoints; moved from 01-02)
 - [ ] 05-02-PLAN.md (zero-downtime deploy + production ops checks; moved from 01-03)
+
 **UI hint**: yes
 
 ## Progress
@@ -119,7 +120,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Published Calendar | 4/8 | In Progress | - |
+| 1. Foundation & Published Calendar | 5/8 | In Progress | - |
 | 2. Draft Model, Review Queue & Submissions | 0/TBD | Not started | - |
 | 3. Ingestion Backbone, ICS & Change/Duplicate Handling | 0/TBD | Not started | - |
 | 4. Extraction Ladder, Geofence & Live Sources | 0/TBD | Not started | - |
