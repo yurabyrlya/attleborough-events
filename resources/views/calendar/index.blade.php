@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', "What's on")
+@section('title', $filters->hasAny() ? $filters->summary() : "What's on")
 
 @push('head')
     <link rel="canonical" href="{{ rtrim((string) config('app.url'), '/') }}/">
@@ -10,9 +10,13 @@
 @endpush
 
 @section('content')
-    <h1>What's on in Attleborough</h1>
+    <h1>What's on</h1>
 
     @include('calendar.partials.filter-chips', ['filters' => $filters, 'categories' => $categories])
+
+    @if ($filters->hasAny())
+        <p class="filter-summary">Showing: {{ $filters->summary() }}</p>
+    @endif
 
     @forelse ($groups as $group)
         <section aria-labelledby="day-{{ $group['date']->format('Y-m-d') }}">
@@ -26,7 +30,7 @@
             </ul>
         </section>
     @empty
-        <p>Nothing on yet. Check back soon.</p>
+        @include('calendar.partials.empty-state', ['filters' => $filters, 'context' => $emptyContext])
     @endforelse
 
     @if ($occurrences->hasMorePages())

@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Testing\TestResponse;
+
 use function Pest\Laravel\get;
 
 /*
@@ -12,7 +14,7 @@ use function Pest\Laravel\get;
  *
  * @return list<string>
  */
-function cardTitles(Illuminate\Testing\TestResponse $response): array
+function cardTitles(TestResponse $response): array
 {
     return array_map(function (string $card): string {
         preg_match('#<h3[^>]*>\s*(.*?)\s*(<|$)#s', $card, $m);

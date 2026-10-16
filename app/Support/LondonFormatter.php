@@ -18,7 +18,9 @@ final class LondonFormatter
     }
 
     /**
-     * Date-group heading: "Today", "Tomorrow" or "Saturday 31 October".
+     * Date-group heading: "Today", "Tomorrow" or "Saturday 31 October",
+     * with the year added outside the current London year
+     * ("Friday 1 January 2027").
      */
     public static function heading(CarbonImmutable $date, ?CarbonImmutable $now = null): string
     {
@@ -33,7 +35,7 @@ final class LondonFormatter
             return 'Tomorrow';
         }
 
-        return $day->format('l j F');
+        return $day->year === $today->year ? $day->format('l j F') : $day->format('l j F Y');
     }
 
     /**

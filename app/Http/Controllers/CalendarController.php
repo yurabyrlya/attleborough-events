@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Calendar\CalendarFilters;
+use App\Calendar\DateWindow;
 use App\Calendar\PublicOccurrenceQuery;
 use App\Models\Category;
 use App\Models\EventOccurrence;
@@ -25,14 +26,21 @@ class CalendarController extends Controller
         $filters = CalendarFilters::fromRequest($request);
         $occurrences = $query->paginate($filters, $now);
 
+        // Group under the London date of max(starts_at, clamp): the window
+        // start when a date filter is active (the Saturday for This weekend),
+        // otherwise today. An ongoing occurrence therefore shows under the
+        // window's first heading. Grouping never re-sorts the query order.
+        $clamp = $filters->when !== null
+            ? DateWindow::for($filters->when, $now)->start->startOfDay()
+            : $today;
+
         /** @var array<string, array{date: CarbonImmutable, heading: string, occurrences: list<EventOccurrence>}> $groups */
         $groups = [];
 
         foreach ($occurrences->items() as $occurrence) {
             /** @var EventOccurrence $occurrence */
             $start = LondonFormatter::local($occurrence->starts_at);
-            // An ongoing occurrence that started before today is grouped under today.
-            $date = ($start->lessThan($today) ? $today : $start)->startOfDay();
+            $date = ($start->lessThan($clamp) ? $clamp : $start)->startOfDay();
             $key = $date->format('Y-m-d');
 
             $groups[$key] ??= [
@@ -47,7 +55,22 @@ class CalendarController extends Controller
             'groups' => $groups,
             'occurrences' => $occurrences,
             'filters' => $filters,
+            'emptyContext' => $this->emptyContext($filters, $occurrences->currentPage()),
             'categories' => Category::query()->orderBy('sort')->orderBy('name')->get(),
         ]);
+    }
+
+    /**
+     * Which D-05 empty-state message applies when the page has no items:
+     * none, today, weekend, week, attributes or end-of-list.
+     */
+    private function emptyContext(CalendarFilters $filters, int $page): string
+    {
+        return match (true) {
+            $page > 1 => 'end-of-list',
+            $filters->hasAttributeFilters() => 'attributes',
+            $filters->when !== null => $filters->when->value,
+            default => 'none',
+        };
     }
 }

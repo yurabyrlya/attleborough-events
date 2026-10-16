@@ -5,7 +5,7 @@
 @endphp
 <li>
     <article>
-        <h3>{{ $event->title }}</h3>
+        <h3>{{ $event->title }}@if ($event->status === \App\Enums\EventStatus::Cancelled || $occurrence->status === \App\Enums\OccurrenceStatus::Cancelled) <strong class="badge">Cancelled</strong>@endif</h3>
         <p>
             <time datetime="{{ $localStart->toIso8601String() }}">{{ \App\Support\LondonFormatter::cardTime($occurrence) }}</time>
         </p>
