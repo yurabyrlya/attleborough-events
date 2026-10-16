@@ -3,8 +3,11 @@
 namespace App\Filament\Resources\Events\Schemas;
 
 use App\Calendar\ManualRecurrence;
+use App\Calendar\RecurrenceExpander;
 use App\Enums\PriceType;
+use App\Enums\RepeatEnds;
 use App\Enums\RepeatPattern;
+use App\Models\Event;
 use Carbon\CarbonImmutable;
 use Closure;
 use Filament\Forms\Components\DatePicker;
@@ -14,6 +17,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
@@ -109,7 +113,59 @@ class EventForm
                             ->default(RepeatPattern::None->value)
                             ->selectablePlaceholder(false)
                             ->live()
-                            ->required(),
+                            ->required()
+                            ->rules([
+                                fn (Get $get): Closure => function (string $attribute, mixed $value, Closure $fail) use ($get): void {
+                                    $start = self::startLocal($get);
+                                    $pattern = RepeatPattern::tryFrom((string) $value);
+
+                                    if ($start === null || $pattern === null) {
+                                        return;
+                                    }
+
+                                    if (! (new ManualRecurrence($pattern))->isValidFor($start)) {
+                                        $fail("Pick a repeat option again: it doesn't match the new start date.");
+                                    }
+                                },
+                            ]),
+                        Radio::make('repeat_ends')
+                            ->label('Ends')
+                            ->options([
+                                RepeatEnds::Never->value => 'Never',
+                                RepeatEnds::OnDate->value => 'On a date',
+                                RepeatEnds::AfterCount->value => 'After a number of times',
+                            ])
+                            ->default(RepeatEnds::Never->value)
+                            ->live()
+                            ->required()
+                            ->visible(fn (Get $get): bool => self::repeats($get) !== RepeatPattern::None),
+                        DatePicker::make('repeat_until')
+                            ->label('Last date')
+                            ->native(false)
+                            ->displayFormat('D j M Y')
+                            ->live()
+                            ->visible(fn (Get $get): bool => self::repeats($get) !== RepeatPattern::None && self::ends($get) === RepeatEnds::OnDate)
+                            ->required(fn (Get $get): bool => self::ends($get) === RepeatEnds::OnDate)
+                            ->afterOrEqual('start_date')
+                            ->validationMessages([
+                                'after_or_equal' => 'The last date cannot be before the start date.',
+                            ]),
+                        TextInput::make('repeat_count')
+                            ->label('Number of times')
+                            ->helperText('Includes the first date.')
+                            ->integer()
+                            ->minValue(1)
+                            ->maxValue(200)
+                            ->live(onBlur: true)
+                            ->visible(fn (Get $get): bool => self::repeats($get) !== RepeatPattern::None && self::ends($get) === RepeatEnds::AfterCount)
+                            ->required(fn (Get $get): bool => self::ends($get) === RepeatEnds::AfterCount),
+                        TextEntry::make('next_dates')
+                            ->label('Next dates')
+                            ->state(fn (Get $get): array => self::nextDates($get))
+                            ->listWithLineBreaks()
+                            ->placeholder('No upcoming dates')
+                            ->visible(fn (Get $get): bool => self::repeats($get) !== RepeatPattern::None)
+                            ->columnSpanFull(),
                     ]),
 
                 Section::make('Where')
@@ -193,6 +249,77 @@ class EventForm
         }
 
         return RepeatPattern::tryFrom((string) $value) ?? RepeatPattern::None;
+    }
+
+    private static function ends(Get $get): RepeatEnds
+    {
+        $value = $get('repeat_ends');
+
+        if ($value instanceof RepeatEnds) {
+            return $value;
+        }
+
+        return RepeatEnds::tryFrom((string) $value) ?? RepeatEnds::Never;
+    }
+
+    /**
+     * The first 5 dates of the series being edited, from today over the
+     * horizon, formatted "Fri 23 Oct, 10am" or "Sun 25 Oct, all day" (D-05).
+     * Formatted inline: LondonFormatter belongs to plan 01-06 in this wave.
+     *
+     * @return list<string>
+     */
+    private static function nextDates(Get $get): array
+    {
+        $start = self::startLocal($get);
+        $allDay = (bool) $get('all_day');
+        $startTime = self::hhmm($get('start_time'));
+
+        if ($start === null || self::repeats($get) === RepeatPattern::None || (! $allDay && $startTime === '')) {
+            return [];
+        }
+
+        try {
+            $until = $get('repeat_until');
+            $count = $get('repeat_count');
+            $recurrence = new ManualRecurrence(
+                self::repeats($get),
+                self::ends($get),
+                blank($until) ? null : substr((string) $until, 0, 10),
+                blank($count) ? null : (int) $count,
+            );
+
+            if (! $recurrence->isValidFor($start)) {
+                return [];
+            }
+
+            $event = new Event([
+                'timezone' => $start->timezoneName,
+                'all_day' => $allDay,
+                'start_date' => $start->format('Y-m-d'),
+                'start_time' => $allDay ? null : $startTime,
+                'recurrence_rule' => $recurrence->toRrule($start, $allDay),
+            ]);
+
+            $today = CarbonImmutable::now($start->timezone)->startOfDay();
+            $keys = app(RecurrenceExpander::class)->instanceDates(
+                $event,
+                $today,
+                $today->addDays((int) config('calendar.horizon_days', 90)),
+            );
+        } catch (Throwable) {
+            return [];
+        }
+
+        return array_map(function (string $key) use ($start, $allDay, $startTime): string {
+            if ($allDay) {
+                return CarbonImmutable::createFromFormat('!Y-m-d', $key, $start->timezone)?->format('D j M').', all day';
+            }
+
+            $local = CarbonImmutable::createFromFormat('!Y-m-d H:i', "{$key} {$startTime}", $start->timezone);
+
+            return $local?->format('D j M, ').str_replace(':00', '', (string) $local?->format('g:ia'));
+        }, array_slice($keys, 0, 5));
     }
 
     private static function startLocal(Get $get): ?CarbonImmutable

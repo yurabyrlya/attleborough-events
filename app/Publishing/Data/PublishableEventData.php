@@ -39,7 +39,19 @@ final readonly class PublishableEventData
         public RepeatEnds $repeatEnds = RepeatEnds::Never,
         public ?string $repeatUntil = null,
         public ?int $repeatCount = null,
-    ) {}
+    ) {
+        // Validated here, not only in the form: Phase 2's approval path does
+        // not go through Filament (T-01-17).
+        if ($this->isRecurring()) {
+            if ($this->endDate !== null && $this->endDate !== $this->startDate) {
+                throw new InvalidArgumentException("Repeating events can't span several days.");
+            }
+
+            if (! $this->recurrence()->isValidFor($this->startLocal())) {
+                throw new InvalidArgumentException("The repeat option [{$this->repeats->value}] does not fit the start date {$this->startDate}.");
+            }
+        }
+    }
 
     /**
      * @param  array<string, mixed>  $data  Validated Filament form state

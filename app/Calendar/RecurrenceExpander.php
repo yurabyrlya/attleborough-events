@@ -10,6 +10,7 @@ use InvalidArgumentException;
 use RuntimeException;
 use Sabre\VObject\Component;
 use Sabre\VObject\Component\VCalendar;
+use Sabre\VObject\DateTimeParser;
 use Sabre\VObject\Recur\EventIterator;
 use Sabre\VObject\Recur\NoInstancesException;
 
@@ -46,7 +47,12 @@ final class RecurrenceExpander
         try {
             $uid = 'event-'.($event->id ?? 'preview').'@'.config('site.domain');
             $calendar = new VCalendar;
-            $this->describe($calendar->add('VEVENT', ['UID' => $uid]), $event, $tz);
+            $dtStart = $this->describe($calendar->add('VEVENT', ['UID' => $uid]), $event, $tz);
+
+            // sabre always yields DTSTART itself, even when UNTIL precedes it.
+            if ($this->untilPrecedes($event->recurrence_rule, $dtStart, $tz)) {
+                return [];
+            }
 
             // ALWAYS pass the timezone: sabre defaults to UTC.
             $iterator = new EventIterator($calendar, $uid, $tz);
@@ -82,7 +88,7 @@ final class RecurrenceExpander
      * Adds DTSTART (TZID or VALUE=DATE) and RRULE to the synthetic VEVENT. No
      * DTEND: the window filter does not need it.
      */
-    private function describe(mixed $vevent, Event $event, DateTimeZone $tz): void
+    private function describe(mixed $vevent, Event $event, DateTimeZone $tz): DateTimeImmutable
     {
         if (! $vevent instanceof Component) {
             throw new RuntimeException('Could not build the synthetic VEVENT.');
@@ -91,16 +97,29 @@ final class RecurrenceExpander
         $date = $event->start_date->format('Y-m-d');
 
         if ($event->all_day) {
-            $vevent->add('DTSTART', $this->localDateTime($date, '00:00:00', $tz), ['VALUE' => 'DATE']);
+            $dtStart = $this->localDateTime($date, '00:00:00', $tz);
+            $vevent->add('DTSTART', $dtStart, ['VALUE' => 'DATE']);
         } else {
             if ($event->start_time === null) {
                 throw new InvalidArgumentException("Event [{$event->id}] has no start time.");
             }
 
-            $vevent->add('DTSTART', $this->localDateTime($date, $event->start_time, $tz));
+            $dtStart = $this->localDateTime($date, $event->start_time, $tz);
+            $vevent->add('DTSTART', $dtStart);
         }
 
         $vevent->add('RRULE', $event->recurrence_rule);
+
+        return $dtStart;
+    }
+
+    private function untilPrecedes(string $rule, DateTimeImmutable $dtStart, DateTimeZone $tz): bool
+    {
+        if (preg_match('/(?:^|;)UNTIL=([0-9TZ]+)/', $rule, $m) !== 1) {
+            return false;
+        }
+
+        return DateTimeParser::parse($m[1], $tz) < $dtStart;
     }
 
     private function localDateTime(string $date, string $time, DateTimeZone $tz): DateTimeImmutable
