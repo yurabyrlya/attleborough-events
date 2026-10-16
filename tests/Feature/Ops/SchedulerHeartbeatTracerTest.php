@@ -4,6 +4,7 @@ use App\Models\Heartbeat;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
+use Livewire\Livewire;
 use Tests\Feature\Ops\OpsFixtures;
 
 use function Pest\Laravel\actingAs;
@@ -12,6 +13,10 @@ use function Pest\Laravel\get;
 beforeEach(function () {
     $this->travelTo(CarbonImmutable::parse('2026-10-20T09:00:00Z'));
 });
+
+// Livewire keeps "a component rendered this request" in a static that
+// outlives the test; reset it so later public-page tests see no injected script.
+afterEach(fn () => Livewire::flushState());
 
 /**
  * @return array{n: int, s: string}
@@ -53,6 +58,7 @@ it('shows the scheduler as OK on the System health page when the heartbeat is 60
 });
 
 it('shows the scheduler as OK at 180 s, Stale at 181 s and Never seen with no heartbeat', function (?int $age, string $label, string $absent) {
+    OpsFixtures::beatAgo(Heartbeat::QUEUE, 30, ['latency_seconds' => 1]);
     if ($age !== null) {
         OpsFixtures::beatAgo(Heartbeat::SCHEDULER, $age);
     }
@@ -60,7 +66,7 @@ it('shows the scheduler as OK at 180 s, Stale at 181 s and Never seen with no he
     actingAs(OpsFixtures::admin())
         ->get('/admin/system-health')
         ->assertOk()
-        ->assertSee($label)
+        ->assertSeeInOrder(['Scheduler', $label, 'Expected every minute'])
         ->assertDontSee($absent);
 })->with([
     '180 s' => [180, 'OK', 'Stale'],
@@ -79,12 +85,13 @@ it('forbids a non-admin user and redirects a guest to the login page', function 
 
 it('prints scheduler: OK from ops:health when fresh, and scheduler: STALE / NEVER SEEN with UNHEALTHY and exit 1 otherwise', function () {
     OpsFixtures::beatAgo(Heartbeat::SCHEDULER, 30);
+    OpsFixtures::beatAgo(Heartbeat::QUEUE, 30, ['latency_seconds' => 1]);
     $this->artisan('ops:health')
         ->expectsOutputToContain('scheduler: OK')
         ->expectsOutput('HEALTHY')
         ->assertExitCode(0);
 
-    DB::table('heartbeats')->delete();
+    DB::table('heartbeats')->where('name', Heartbeat::SCHEDULER)->delete();
     $this->artisan('ops:health')
         ->expectsOutputToContain('scheduler: NEVER SEEN')
         ->expectsOutput('UNHEALTHY')

@@ -6,6 +6,7 @@ use App\Models\Heartbeat;
 use App\Ops\HealthReport;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
+use Livewire\Livewire;
 use Tests\Feature\Ops\OpsFixtures;
 
 use function Pest\Laravel\actingAs;
@@ -13,6 +14,10 @@ use function Pest\Laravel\actingAs;
 beforeEach(function () {
     $this->travelTo(CarbonImmutable::parse('2026-10-20T09:00:00Z'));
 });
+
+// Livewire keeps "a component rendered this request" in a static that
+// outlives the test; reset it so later public-page tests see no injected script.
+afterEach(fn () => Livewire::flushState());
 
 it('shows the queue worker as OK at 600 s, Stale at 601 s and Never seen with no heartbeat', function (?int $age, HealthState $state) {
     OpsFixtures::beatAgo(Heartbeat::SCHEDULER, 10);

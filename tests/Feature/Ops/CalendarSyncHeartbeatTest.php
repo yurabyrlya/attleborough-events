@@ -13,6 +13,7 @@ use App\Publishing\Actions\PublishEvent;
 use App\Publishing\Data\PublishableEventData;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
+use Livewire\Livewire;
 use Tests\Feature\Ops\OpsFixtures;
 
 use function Pest\Laravel\actingAs;
@@ -23,6 +24,10 @@ beforeEach(function () {
     OpsFixtures::beatAgo(Heartbeat::SCHEDULER, 10);
     OpsFixtures::beatAgo(Heartbeat::QUEUE, 10, ['latency_seconds' => 1]);
 });
+
+// Livewire keeps "a component rendered this request" in a static that
+// outlives the test; reset it so later public-page tests see no injected script.
+afterEach(fn () => Livewire::flushState());
 
 function publishOpsSeries(User $admin, string $title): Event
 {

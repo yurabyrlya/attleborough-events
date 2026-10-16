@@ -3,13 +3,17 @@
 namespace App\Ops;
 
 use App\Enums\HealthState;
+use App\Models\FailedJob;
 use App\Models\Heartbeat;
 use Carbon\CarbonImmutable;
+use Carbon\CarbonInterval;
+use Illuminate\Support\Facades\DB;
 
 /**
  * The single source of health states for the System health page, its nav
- * badge and ops:health (OPS-04). Reads the heartbeats table only, never the
- * cache store.
+ * badge and ops:health (OPS-04). Reads the heartbeats, jobs and failed_jobs
+ * tables only, never the cache store. Every query is a single cheap lookup
+ * or aggregate.
  */
 class HealthReport
 {
@@ -24,34 +28,73 @@ class HealthReport
         );
     }
 
-    /** RED scaffold. */
     public function queue(): HealthCheck
     {
-        return new HealthCheck('queue', 'Queue worker', HealthState::NeverSeen, null, null, '');
+        $waiting = $this->pendingJobs();
+        $detail = "Jobs waiting: {$waiting}";
+
+        if ($waiting > 0 && ($oldest = $this->oldestPendingAgeSeconds()) !== null) {
+            $detail .= ', oldest waiting '.CarbonInterval::seconds($oldest)->cascade()->forHumans(['parts' => 2]);
+        }
+
+        return $this->freshness(
+            key: 'queue',
+            title: 'Queue worker',
+            heartbeat: Heartbeat::find(Heartbeat::QUEUE),
+            staleAfter: (int) config('ops.queue_stale_after'),
+            expectation: 'Expected every 5 minutes; stale after 10 minutes',
+            detail: $detail,
+        );
     }
 
-    /** RED scaffold. */
     public function calendarSync(): HealthCheck
     {
-        return new HealthCheck('calendar-sync', 'Daily calendar sync', HealthState::NotRunYet, null, null, '');
+        $expectation = 'Runs daily at 03:10 (UK time)';
+        $heartbeat = Heartbeat::find(Heartbeat::CALENDAR_SYNC);
+
+        if ($heartbeat === null) {
+            return new HealthCheck('calendar-sync', 'Daily calendar sync', HealthState::NotRunYet, null, null, $expectation);
+        }
+
+        $meta = $heartbeat->meta ?? [];
+        $synced = (int) ($meta['synced'] ?? 0);
+        $failed = (int) ($meta['failed'] ?? 0);
+        $failedIds = array_map('intval', (array) ($meta['failed_ids'] ?? []));
+
+        $detail = "{$synced} series synced, {$failed} failed";
+        if ($failedIds !== []) {
+            $detail .= ' (event ids: '.implode(', ', $failedIds).')';
+        }
+
+        $age = $this->ageOf($heartbeat->last_seen_at);
+
+        $state = match (true) {
+            $age > (int) config('ops.calendar_sync_stale_after') => HealthState::Stale,
+            $failed > 0 => HealthState::Failed,
+            default => HealthState::Ok,
+        };
+
+        return new HealthCheck('calendar-sync', 'Daily calendar sync', $state, $heartbeat->last_seen_at, $age, $expectation, $detail);
     }
 
-    /** RED scaffold. */
     public function failedJobCount(): int
     {
-        return 0;
+        return FailedJob::query()->count();
     }
 
-    /** RED scaffold. */
     public function pendingJobs(): int
     {
-        return 0;
+        return DB::table('jobs')->count();
     }
 
-    /** RED scaffold. */
+    /**
+     * Age in seconds of the oldest row in jobs, or null when it is empty.
+     */
     public function oldestPendingAgeSeconds(): ?int
     {
-        return null;
+        $oldest = DB::table('jobs')->min('created_at');
+
+        return $oldest === null ? null : max(0, CarbonImmutable::now()->getTimestamp() - (int) $oldest);
     }
 
     /**
@@ -59,7 +102,7 @@ class HealthReport
      */
     public function all(): array
     {
-        return [$this->scheduler()];
+        return [$this->scheduler(), $this->queue(), $this->calendarSync()];
     }
 
     /**

@@ -23,5 +23,7 @@
                 </div>
             </x-filament::section>
         @endforeach
+
+        {{ $this->table }}
     </div>
 </x-filament-panels::page>

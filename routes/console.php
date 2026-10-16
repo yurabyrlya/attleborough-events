@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\QueueHeartbeat;
 use App\Models\Heartbeat;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -21,3 +22,13 @@ Schedule::command('calendar:sync-occurrences')
 Schedule::call(fn () => Heartbeat::beat(Heartbeat::SCHEDULER))
     ->everyMinute()
     ->name('heartbeat:scheduler');
+
+// Worker liveness (OPS-04): only a worker processing this job writes the
+// 'queue' heartbeat. ShouldBeUnique keeps at most one waiting copy. The class
+// name (not an instance) is passed so queued_at is taken at dispatch time.
+Schedule::job(QueueHeartbeat::class, 'default', 'database')
+    ->everyFiveMinutes();
+
+// Keep failed_jobs to 30 days (config ops.failed_jobs_retention_hours = 720).
+Schedule::command('queue:prune-failed --hours=720')
+    ->daily();

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Calendar\OccurrenceGenerator;
 use App\Models\Event;
+use App\Models\Heartbeat;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -53,14 +54,23 @@ class SyncOccurrences extends Command
             }
         }
 
+        $exitCode = $failed === [] ? self::SUCCESS : self::FAILURE;
+
+        // OPS-04: every run (scheduled or manual) records its result, outside
+        // the per-event transactions. Ids only, never event content.
+        Heartbeat::beat(Heartbeat::CALENDAR_SYNC, [
+            'synced' => $synced,
+            'failed' => count($failed),
+            'failed_ids' => array_slice($failed, 0, 20),
+            'exit_code' => $exitCode,
+        ]);
+
         $this->info("Synced {$synced} series, ".count($failed).' failed.');
 
         if ($failed !== []) {
             $this->error('Failed event ids: '.implode(', ', $failed));
-
-            return self::FAILURE;
         }
 
-        return self::SUCCESS;
+        return $exitCode;
     }
 }

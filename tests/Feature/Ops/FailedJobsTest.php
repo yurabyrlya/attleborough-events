@@ -10,6 +10,7 @@ use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Livewire\Livewire;
 use Tests\Feature\Ops\OpsFixtures;
 
 use function Pest\Laravel\actingAs;
@@ -29,6 +30,10 @@ beforeEach(function () {
         }
     });
 });
+
+// Livewire keeps "a component rendered this request" in a static that
+// outlives the test; reset it so later public-page tests see no injected script.
+afterEach(fn () => Livewire::flushState());
 
 it('runs the drill end to end: fails into failed_jobs, is listed, retried after its window and then succeeds', function () {
     $this->artisan('ops:drill', ['--fail-for' => 60])
