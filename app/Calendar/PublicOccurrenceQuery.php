@@ -6,6 +6,7 @@ use App\Enums\EventStatus;
 use App\Enums\OccurrenceStatus;
 use App\Enums\PriceType;
 use App\Models\Category;
+use App\Models\Event;
 use App\Models\EventOccurrence;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Pagination\Paginator;
@@ -60,5 +61,47 @@ final class PublicOccurrenceQuery
             // Root-relative page links: the Host header never reaches the HTML (T-01-41).
             ->withPath(route('calendar', absolute: false))
             ->appends($filters->toQuery());
+    }
+
+    /**
+     * The event page's dates (EVT-01): this event's occurrences with a
+     * publicly listed status that have not expired, ordered by starts_at then
+     * id, at most $limit of them, plus the count of the rest.
+     */
+    public function upcomingForEvent(Event $event, CarbonImmutable $now, int $limit): UpcomingDates
+    {
+        $query = $event->occurrences()
+            ->whereIn('status', self::listedOccurrenceStatuses())
+            ->where('expires_at', '>', $now->utc());
+
+        $total = (clone $query)->count();
+        $occurrences = $query->orderBy('starts_at')->orderBy('id')->limit(max(0, $limit))->get();
+        $occurrences->each(fn (EventOccurrence $occurrence) => $occurrence->setRelation('event', $event));
+
+        return new UpcomingDates($occurrences, max(0, $total - $occurrences->count()));
+    }
+
+    /**
+     * One occurrence of the event by recurrence key, when its status is
+     * publicly listed. No expiry filter: a past date can still be downloaded.
+     */
+    public function findListedOccurrence(Event $event, string $key): ?EventOccurrence
+    {
+        $occurrence = $event->occurrences()
+            ->where('recurrence_key', $key)
+            ->whereIn('status', self::listedOccurrenceStatuses())
+            ->first();
+
+        $occurrence?->setRelation('event', $event);
+
+        return $occurrence;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function listedOccurrenceStatuses(): array
+    {
+        return array_map(fn (OccurrenceStatus $s): string => $s->value, OccurrenceStatus::publiclyListed());
     }
 }

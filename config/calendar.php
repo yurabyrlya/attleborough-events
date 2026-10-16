@@ -27,4 +27,7 @@ return [
     // before it is shortened with an ellipsis.
     'card_description_chars' => 140,
 
+    // Upcoming dates listed on an event page before "{n} more dates after these."
+    'event_page_dates' => 10,
+
 ];

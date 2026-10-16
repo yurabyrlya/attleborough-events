@@ -59,7 +59,7 @@ beforeEach(function () {
     };
 
     $this->titlesOn = fn (string $uri): array => array_map(
-        fn (string $card): string => preg_match('#<h3[^>]*>\s*(.*?)\s*<#s', $card, $m) ? html_entity_decode(trim($m[1])) : '',
+        cardTitle(...),
         cardsIn(get($uri)->assertOk()),
     );
 

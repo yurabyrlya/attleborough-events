@@ -24,11 +24,7 @@ function titlesOn(string $uri): array
 {
     $response = get($uri)->assertOk();
 
-    return array_map(function (string $card): string {
-        preg_match('#<h3[^>]*>\s*(.*?)\s*(<|$)#s', $card, $m);
-
-        return html_entity_decode($m[1] ?? '');
-    }, cardsIn($response));
+    return array_map(cardTitle(...), cardsIn($response));
 }
 
 it('filters by category slug', function () {

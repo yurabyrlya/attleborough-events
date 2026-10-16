@@ -29,7 +29,8 @@ class EventFactory extends Factory
 
         return [
             'title' => $title,
-            'slug' => Str::slug($title),
+            // Random suffix: events.slug is UNIQUE (01-08) and factory titles can repeat.
+            'slug' => Str::slug($title).'-'.Str::lower(Str::random(8)),
             'description' => fake()->paragraph(),
             'category_id' => Category::factory(),
             'venue_id' => Venue::factory(),

@@ -6,6 +6,7 @@ use App\Calendar\OccurrenceGenerator;
 use App\Models\Event;
 use App\Models\User;
 use App\Publishing\Data\PublishableEventData;
+use App\Publishing\EventSlugger;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 
@@ -23,7 +24,10 @@ use Illuminate\Support\Facades\DB;
  */
 final class UpdatePublishedEvent
 {
-    public function __construct(private OccurrenceGenerator $occurrences) {}
+    public function __construct(
+        private OccurrenceGenerator $occurrences,
+        private EventSlugger $slugger,
+    ) {}
 
     /**
      * @throws AuthorizationException when the editor is not the configured admin
@@ -36,6 +40,8 @@ final class UpdatePublishedEvent
             $locked = Event::query()->whereKey($event->id)->lockForUpdate()->firstOrFail();
 
             $locked->fill($data->toAttributes());
+            // Replaces the DTO's recompute-from-title slug with a unique one (EVT-02).
+            $this->slugger->assign($locked);
             $locked->save();
 
             $this->occurrences->sync($locked);

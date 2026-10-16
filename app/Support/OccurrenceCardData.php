@@ -15,6 +15,7 @@ final readonly class OccurrenceCardData
 {
     public function __construct(
         public string $title,
+        public string $eventPath,
         public string $timeLabel,
         public string $datetimeIso,
         public string $venueName,
@@ -39,6 +40,7 @@ final readonly class OccurrenceCardData
 
         return new self(
             title: $event->title,
+            eventPath: PublicUrl::eventPath($event),
             timeLabel: LondonFormatter::cardTime($occurrence),
             datetimeIso: LondonFormatter::local($occurrence->starts_at)->toIso8601String(),
             venueName: $event->venue->name,

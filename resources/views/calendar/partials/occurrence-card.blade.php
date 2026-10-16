@@ -15,7 +15,7 @@
             <x-category-icon :slug="$card->categorySlug" class="size-7" />
         </div>
         <div class="min-w-0 flex-1 wrap-anywhere [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-2">
-            <h3 class="text-lg font-semibold text-ink wrap-anywhere">{{ $card->title }}@if ($card->isCancelled) <strong class="badge ml-2 inline-block rounded-full border border-cancel px-2 align-middle text-sm font-bold text-cancel">Cancelled</strong>@endif</h3>
+            <h3 class="text-lg font-semibold text-ink wrap-anywhere"><a href="{{ $card->eventPath }}">{{ $card->title }}</a>@if ($card->isCancelled) <strong class="badge ml-2 inline-block rounded-full border border-cancel px-2 align-middle text-sm font-bold text-cancel">Cancelled</strong>@endif</h3>
             <p class="when mt-1 font-medium text-ink"><time datetime="{{ $card->datetimeIso }}">{{ $card->timeLabel }}</time></p>
             <p class="venue text-muted">{{ $card->venueName }}</p>
             <p class="category text-muted">{{ $card->categoryName }}</p>

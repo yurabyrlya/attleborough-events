@@ -91,6 +91,22 @@ function cardsIn(TestResponse $response): array
 }
 
 /**
+ * The event title shown in a card's <h3>: the visible text with the
+ * "Cancelled" badge left out, entities decoded. Tolerates the 01-08 title
+ * link (<h3><a href="/events/{slug}">Title</a> <strong>Cancelled</strong></h3>).
+ */
+function cardTitle(string $card): string
+{
+    if (preg_match('#<h3\b[^>]*>(.*?)</h3>#s', $card, $m) !== 1) {
+        return '';
+    }
+
+    $inner = (string) preg_replace('#<strong\b.*?</strong>#s', '', $m[1]);
+
+    return html_entity_decode(trim((string) preg_replace('/\s+/u', ' ', strip_tags($inner))));
+}
+
+/**
  * Assert the response has an <a> with exactly this href (null = any) and
  * this visible text (whitespace collapsed). $current true requires
  * aria-current="true", false requires no aria-current, null skips the

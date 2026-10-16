@@ -8,6 +8,7 @@ use App\Enums\EventStatus;
 use App\Models\Event;
 use App\Models\User;
 use App\Publishing\Data\PublishableEventData;
+use App\Publishing\EventSlugger;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -22,17 +23,24 @@ use Illuminate\Support\Facades\DB;
  */
 final class PublishEvent
 {
-    public function __construct(private OccurrenceGenerator $occurrences) {}
+    public function __construct(
+        private OccurrenceGenerator $occurrences,
+        private EventSlugger $slugger,
+    ) {}
 
     public function __invoke(PublishableEventData $data, User $approver, EventOrigin $origin): Event
     {
         return DB::transaction(function () use ($data, $approver, $origin): Event {
-            $event = Event::create($data->toAttributes() + [
+            $event = new Event($data->toAttributes() + [
                 'status' => EventStatus::Published,
                 'origin' => $origin,
                 'approved_by' => $approver->id,
                 'approved_at' => now()->utc(),
             ]);
+
+            // The slugger's unique slug overrides the DTO's candidate (EVT-02).
+            $this->slugger->assign($event);
+            $event->save();
 
             $this->occurrences->sync($event);
 

@@ -16,11 +16,7 @@ use function Pest\Laravel\get;
  */
 function cardTitles(TestResponse $response): array
 {
-    return array_map(function (string $card): string {
-        preg_match('#<h3[^>]*>\s*(.*?)\s*(<|$)#s', $card, $m);
-
-        return html_entity_decode($m[1] ?? '');
-    }, cardsIn($response));
+    return array_map(cardTitle(...), cardsIn($response));
 }
 
 it('lists only occurrences overlapping today', function () {
