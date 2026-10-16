@@ -2,7 +2,7 @@
 
 ## Overview
 
-The build starts with a live, deployed public calendar fed by admin manual entry, so the published model, recurrence and DST handling, and VPS ops are proven before anything is crawled. Next comes the draft model and a fast review queue, fed first by organiser submissions, while the owner finishes the local source inventory. Then the ingestion backbone arrives with ICS as the first rung, including polite fetching, source health, and update/cancellation/duplicate handling. After that, the rest of the extraction ladder (The Events Calendar, JSON-LD, CSS selectors, RSS) plus the geofence and test-run tooling, ending with real P0 sources producing drafts in production. The last phase covers launch readiness: SEO lifecycle, outbound feeds, legal and complaints handling, analytics, dashboard, accessibility and a backup restore drill. Each phase ends with something usable and verifiable on the real site.
+The build starts with a local-dev public calendar fed by admin manual entry, with CI on PostgreSQL, so the published model, recurrence and DST handling, and app-level ops visibility are proven before anything is crawled. Infrastructure (domain registration, Cloudflare DNS, the Hetzner VPS, provisioning and zero-downtime deploys) is deferred to Phase 5 (scope change 2026-10-16); the brand domain whatsonattleborough.co.uk stays the intended name. Next comes the draft model and a fast review queue, fed first by organiser submissions, while the owner finishes the local source inventory. Then the ingestion backbone arrives with ICS as the first rung, including polite fetching, source health, and update/cancellation/duplicate handling. After that, the rest of the extraction ladder (The Events Calendar, JSON-LD, CSS selectors, RSS) plus the geofence and test-run tooling, ending with real P0 sources producing drafts in production. The last phase covers launch readiness: SEO lifecycle, outbound feeds, legal and complaints handling, analytics, dashboard, accessibility and a backup restore drill. Each phase ends with something usable and verifiable on the local app with green CI; Phase 5 takes it live.
 
 ## Phases
 
@@ -12,31 +12,29 @@ The build starts with a live, deployed public calendar fed by admin manual entry
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation & Published Calendar** - Live VPS deploy of a mobile-first calendar fed by admin manual entry, with recurrence, detail pages, add-to-calendar and share
+- [ ] **Phase 1: Foundation & Published Calendar** - Local-dev mobile-first calendar (CI on PostgreSQL) fed by admin manual entry, with recurrence, detail pages, add-to-calendar and share
 - [ ] **Phase 2: Draft Model, Review Queue & Submissions** - Organiser submissions become drafts that the admin triages in a fast review queue; source research completed
 - [ ] **Phase 3: Ingestion Backbone, ICS & Change/Duplicate Handling** - Polite scheduled fetching of ICS sources producing new/update/cancellation drafts with duplicate warnings and source health
 - [ ] **Phase 4: Extraction Ladder, Geofence & Live Sources** - TEC, JSON-LD, selector and RSS rungs, geofence and test run; P0 sources producing drafts in production
-- [ ] **Phase 5: Launch Readiness** - SEO lifecycle, public feeds, privacy and complaints, analytics, dashboard, accessibility and restore drill
+- [ ] **Phase 5: Launch Readiness** - Domain, VPS and zero-downtime deploy (deferred from Phase 1), production ops, SEO lifecycle, public feeds, privacy and complaints, analytics, dashboard, accessibility and restore drill
 
 ## Phase Details
 
 ### Phase 1: Foundation & Published Calendar
 
-**Goal**: Residents can open a live, mobile-first calendar at the production HTTPS URL and browse admin-entered events (including recurring ones), open event pages, add them to their calendar and share them
+**Goal**: Residents can open a mobile-first calendar on the local app and browse admin-entered events (including recurring ones), open event pages, add them to their calendar and share them
 **Mode:** mvp
 **Depends on**: Nothing (first phase)
-**Requirements**: OPS-01, OPS-02, OPS-04, CAL-01, CAL-02, CAL-03, CAL-04, CAL-05, CAL-06, CAL-07, CAL-08, EVT-01, EVT-02, EVT-03, EVT-06, EVT-07, REC-01, REC-02, ADM-01, ADM-02, ADM-03
+**Requirements**: OPS-01, OPS-04, CAL-01, CAL-02, CAL-03, CAL-04, CAL-05, CAL-06, CAL-07, CAL-08, EVT-01, EVT-02, EVT-03, EVT-06, EVT-07, REC-01, REC-02, ADM-01, ADM-02, ADM-03
 **Success Criteria** (what must be TRUE):
-  1. A visitor on a phone at the production HTTPS URL sees upcoming published occurrences grouped under date headings. They can narrow the list with Today / This weekend / This week, category, Free and family-friendly filters that work as plain links with JavaScript disabled, and the filter URLs are `noindex`.
+  1. A visitor on a phone (or mobile emulation) using the local app sees upcoming published occurrences grouped under date headings. They can narrow the list with Today / This weekend / This week, category, Free and family-friendly filters that work as plain links with JavaScript disabled, and the filter URLs are `noindex`.
   2. The admin logs in to Filament and creates a manual event repeating weekly or on the nth weekday of the month. It appears once per upcoming occurrence over the next 90 days. Multi-day events appear in every window they overlap. Finished occurrences drop off at end time, start + 3h, or end of day for all-day events, with correct local times across the 25 Oct 2026 clock change.
   3. The admin can edit, hide, unhide or cancel a whole event or a single occurrence. Cancelled items show a text "Cancelled" badge, and occurrence statuses set by the admin survive the scheduled occurrence regeneration.
   4. A visitor opens an event page with a readable slug, title/meta/canonical/OG tags, Schema.org `Event` JSON-LD per upcoming occurrence, and the full description and attribution. From there they can add an occurrence to their calendar (`.ics` with stable UID, or a Google Calendar link) and share it via Web Share or WhatsApp/Facebook/email/copy-link fallbacks.
-  5. Pushing to `main` runs Pest, Larastan and Pint in CI on PostgreSQL and deploys to the VPS with zero downtime. The admin can see the scheduler heartbeat and failed jobs, and logs rotate.
+  5. Pushing to `main` runs Pest, Larastan and Pint in CI on PostgreSQL (CI only; deploys are Phase 5). On the local app the admin can see the scheduler heartbeat and failed jobs, and logs rotate daily (14 days).
 
 **Plans**: TBD
 - [x] 01-01-PLAN.md
-- [ ] 01-02-PLAN.md
-- [ ] 01-03-PLAN.md
 - [x] 01-04-PLAN.md
 - [x] 01-05-PLAN.md
 - [x] 01-06-PLAN.md
@@ -99,15 +97,19 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Goal**: The site is discoverable, legally compliant, measurable and operationally safe enough to launch publicly in Attleborough
 **Mode:** mvp
 **Depends on**: Phase 4
-**Requirements**: EVT-04, EVT-05, EVT-08, CAL-09, FEED-01, FEED-02, LEG-01, LEG-02, LEG-03, ADM-05, ADM-07, OPS-03
+**Requirements**: EVT-04, EVT-05, EVT-08, CAL-09, FEED-01, FEED-02, LEG-01, LEG-02, LEG-03, ADM-05, ADM-07, OPS-03, OPS-02, OPS-01b, OPS-04b
 **Success Criteria** (what must be TRUE):
   1. A visitor can read the privacy notice and send a takedown, correction or data-protection complaint through the contact form, or use "Report a problem" from an event page with the event reference prefilled. The admin manages these requests with a visible 30-day acknowledgement deadline.
   2. `sitemap.xml` lists upcoming published events. An expired event page still loads with an "ended" banner, becomes `noindex` after 30 days, and returns 410 after 12 months or when hidden or rejected as wrong. Merged duplicates 301 to the kept event.
   3. A visitor can subscribe to a public ICS feed (all events or per category) and an RSS feed of newly published events, both with stable identifiers.
   4. The admin dashboard shows per-period counts: sources checked, failures, drafts created / approved / rejected / duplicates, and approval rate per source. Cookieless analytics (no cookie banner) records source clicks, add-to-calendar, shares and submissions.
   5. Public pages pass a WCAG 2.2 AA check (automated and manual screen-reader pass). Nightly off-site backups run, and a full restore drill has succeeded.
+  6. whatsonattleborough.co.uk is registered, on Cloudflare DNS (DNS-only) with hello@ email routing, and serves the app over HTTPS from the hardened Hetzner VPS (PHP 8.5, PostgreSQL 18, Caddy, apex canonical with www 301). Pushing to `main` deploys with zero downtime after CI passes (built assets uploaded from CI; rollback documented), and the production admin exists. *(Deferred from Phase 1.)*
+  7. In production the systemd queue worker and cron scheduler run, `ops:health` reports HEALTHY within 7 minutes of a deploy, the ops drill (failed job visible, then retried) passes, production logs rotate daily for 14 days, and the event page/share/.ics checks and Rich Results Test pass against the live URL. *(Deferred from Phase 1.)*
 
-**Plans**: TBD
+**Plans**: 2 planned so far (more added when Phase 5 is planned)
+- [ ] 05-01-PLAN.md (server provisioning + owner infra checkpoints; moved from 01-02)
+- [ ] 05-02-PLAN.md (zero-downtime deploy + production ops checks; moved from 01-03)
 **UI hint**: yes
 
 ## Progress
@@ -117,11 +119,11 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Published Calendar | 4/10 | In Progress | - |
+| 1. Foundation & Published Calendar | 4/8 | In Progress | - |
 | 2. Draft Model, Review Queue & Submissions | 0/TBD | Not started | - |
 | 3. Ingestion Backbone, ICS & Change/Duplicate Handling | 0/TBD | Not started | - |
 | 4. Extraction Ladder, Geofence & Live Sources | 0/TBD | Not started | - |
-| 5. Launch Readiness | 0/TBD | Not started | - |
+| 5. Launch Readiness | 0/2+ | Not started | - |
 
 ## Planning Notes
 
@@ -129,3 +131,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 - **Source research track:** RES-01..03 is mostly owner-collected URLs plus live checks. It runs alongside Phases 1-2 and must be complete before Phase 3 starts, because ICS and later rungs need real fixtures.
 - **EXT-05 (RSS/Atom)** is only part of the Definition of Done if source research finds a qualifying feed. Otherwise it ships as "supported, unused" with fixture tests.
 - **Split rule:** if Phase 3 proves too large during planning, split out "Change & Duplicates" (REV-05..07, PIPE-05..08) as an inserted Phase 3.1 rather than re-cutting the other phases.
+- **Scope change 2026-10-16:** infrastructure/domain deferred to Phase 5 (plans 01-02/01-03 moved to 05-01/05-02). Phase 1 is local-dev + CI only. Note: Phase 4 success criterion 5 and RES-04 say "in production"; until Phase 5 is live, P0 sources run on the local app (see STATE concerns).

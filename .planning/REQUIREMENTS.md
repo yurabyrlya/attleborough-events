@@ -114,10 +114,12 @@
 
 ### Platform & Operations (OPS)
 
-- [ ] **OPS-01**: Project runs on Laravel 13, PHP 8.5 (floor 8.4), PostgreSQL 18 and Filament 5, with Pest, Larastan, Pint and GitHub Actions CI running tests on PostgreSQL
+- [ ] **OPS-01**: Project runs on Laravel 13, PHP 8.4+ (Composer floor 8.4), PostgreSQL 18 and Filament 5, with Pest, Larastan, Pint and GitHub Actions CI running tests on PostgreSQL
+- [ ] **OPS-01b**: Production runs PHP 8.5 (split from OPS-01, scope change 2026-10-16; delivered with the Phase 5 deploy)
 - [ ] **OPS-02**: Site is deployed to a low-cost VPS with HTTPS, supervised queue workers, cron scheduler and zero-downtime deploys from GitHub Actions
 - [ ] **OPS-03**: Nightly database backups go to off-site storage, and a restore drill has been performed before launch
-- [ ] **OPS-04**: Admin can see scheduler heartbeat and failed jobs. Logs are rotated
+- [ ] **OPS-04**: Admin can see scheduler heartbeat and failed jobs. Logs are rotated (local app; app-level config)
+- [ ] **OPS-04b**: In production the queue worker runs under systemd, production `.env` sets daily 14-day logs, the ops drill passes and `ops:health` is HEALTHY within 7 minutes of a deploy (split from OPS-04, scope change 2026-10-16)
 
 ### Source Research (RES)
 
@@ -244,19 +246,21 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LEG-03 | Phase 5 | Pending |
 | LEG-04 | Phase 3 | Pending |
 | OPS-01 | Phase 1 | Pending |
-| OPS-02 | Phase 1 | Pending |
+| OPS-02 | Phase 5 | Pending |
 | OPS-03 | Phase 5 | Pending |
 | OPS-04 | Phase 1 | Pending |
+| OPS-01b | Phase 5 | Pending |
+| OPS-04b | Phase 5 | Pending |
 | RES-01 | Phase 2 | Pending |
 | RES-02 | Phase 2 | Pending |
 | RES-03 | Phase 2 | Pending |
 | RES-04 | Phase 4 | Pending |
 
 **Coverage:**
-- v1 requirements: 81 total
-- Mapped to phases: 81 (Phase 1: 21, Phase 2: 19, Phase 3: 20, Phase 4: 9, Phase 5: 12)
+- v1 requirements: 83 total (81 + OPS-01b, OPS-04b split out on 2026-10-16)
+- Mapped to phases: 83 (Phase 1: 20, Phase 2: 19, Phase 3: 20, Phase 4: 9, Phase 5: 15)
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-10-16*
-*Last updated: 2026-10-16 after roadmap creation (traceability mapped)*
+*Last updated: 2026-10-16 after scope change (infra/domain deferred to Phase 5; OPS-02 moved, OPS-01b/OPS-04b split out)*

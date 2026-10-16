@@ -2,20 +2,21 @@
 
 **Phase:** 1
 **Generated:** 2026-10-16
+**Revised:** 2026-10-16 — owner scope change: Phase 1 is local-dev + CI only; all production infrastructure and deploys moved to Phase 5 (05-01, 05-02)
 
 ## Capability Proven End-to-End
 
-The admin logs in at `https://whatsonattleborough.co.uk/admin` and creates a one-off event in Filament. A resident then opens `https://whatsonattleborough.co.uk/` on their phone and sees it under its London date heading. The app is served by a release that GitHub Actions deployed with zero downtime.
+The admin logs in to the local Filament panel at `/admin` and creates a one-off event. It then appears on `/` of the local app under its London date heading. Every push to `main` runs CI (Pint, Larastan, Pest) on PostgreSQL 18, so the same path is proven on a clean machine.
 
-The skeleton is three plans:
+The skeleton is one plan, executed and complete:
 
 | Plan | Slice of the skeleton | Proven by |
 |------|-----------------------|-----------|
 | 01-01 | Local full stack: Laravel scaffold → PostgreSQL schema → `PublishEvent` choke point → occurrence materialisation → `PublicOccurrenceQuery` → Blade list at `/` → Filament create page → CI on PostgreSQL 18 | `tests/Feature/WalkingSkeletonTest.php` (Filament create → event visible on `/`); CI green |
-| 01-02 | Production box: domain + Cloudflare DNS (DNS-only) + Hetzner CX23 → `ops/provision.sh` → Caddy (HTTPS, www→apex) → PHP 8.5-FPM → PostgreSQL 18; hardened; worker/cron ready | `curl https://whatsonattleborough.co.uk/` returns the DB-backed probe JSON; `ops/check.sh` → ALL CHECKS PASSED |
-| 01-03 | Deploy: first `dep deploy` (Deployer 8, `local_archive`) replaces the probe with the 01-01 app; CI deploy job on push to `main`; production admin created | Admin creates a real event in prod and sees it on a phone; curl loop during a deploy shows no non-200 |
 
-Local full-stack run command (until 01-03 lands): see `README.md`. In order: `docker start ae-pg`, `composer install`, `php artisan migrate --seed`, `php artisan make:filament-user`, `php artisan serve`, `php artisan queue:work`, `php artisan schedule:work`.
+Scope change 2026-10-16: the production half of the skeleton (formerly 01-02 provisioning and 01-03 zero-downtime deploy) is deferred to Phase 5 as plans 05-01 and 05-02. The brand/domain decision (D-02, `whatsonattleborough.co.uk`) stands as the intended name; only the purchase, DNS, hosting and deploys move. 05-02 deploys the complete Phase 1–4 app, not the bare skeleton.
+
+Local full-stack run (Phase 1 is local-dev only): see `README.md`. In order: `docker start ae-pg`, `composer install`, `php artisan migrate --seed`, `php artisan make:filament-user`, then `composer dev` (or `php artisan serve` + `php artisan queue:work` + `npm run dev`) and `php artisan schedule:work` for the scheduler.
 
 ## Architectural Decisions
 
@@ -32,12 +33,12 @@ Local full-stack run command (until 01-03 lands): see `README.md`. In order: `do
 | Auth | Filament session login. Only the user whose email equals `config('app.admin_email')` (`ADMIN_EMAIL`) can access the panel. No registration or reset. Database sessions | Single-admin product (ADM-01) with the smallest attack surface |
 | Queue / cache / session | `database` drivers. No Redis anywhere | Small VPS budget. `queue:restart` signals through the shared database cache |
 | Tests & CI | Pest 5 on PostgreSQL with `Http::preventStrayRequests()`. GitHub Actions runs Pint `--test`, Larastan (level 6) and Pest on `postgres:18` with `TZ=America/New_York` | Catches system-timezone reliance and engine differences before prod |
-| Hosting | Hetzner Cloud CX23. Ubuntu 26.04 (or 24.04 + ondrej PPA + PGDG, decided at the 01-02 checkpoint). Native packages, no Docker in prod. Rebuilt from the versioned `ops/provision.sh` | Low monthly cost. Reproducible from the repo. Deployer's own provision recipe is not used (it adds a PPA unconditionally and installs Redis) |
-| Web server / TLS | Caddy 2 (official apt repo): automatic Let's Encrypt, HSTS, www → apex 301, `php_fastcgi … resolve_root_symlink` to the FPM pool socket `/run/php/php8.5-fpm-attleborough.sock` | Zero-config TLS. `resolve_root_symlink` means symlink-swap deploys are served without reloading PHP-FPM (opcache pitfall) |
-| Process model | PHP-FPM pool, systemd queue worker (`attleborough-queue.service`, started by a `.path` unit once `current/artisan` exists) and cron `schedule:run` all run as `deployer`. `deployer` has no sudo | One file owner for web, worker and cron (no log-permission split). Deploys never need root |
-| DNS / domain / email | Canonical `whatsonattleborough.co.uk` with no www (D-02). Cloudflare Free DNS, DNS-only records (D-03). `hello@` via Cloudflare Email Routing (D-04) | Origin TLS end-to-end and real client IPs for Phase 2 rate limits. Switching to proxied later is reversible |
-| Deployment | Deployer 8 `recipe/laravel.php`, `update_code_strategy = local_archive`, `deploy_path = /var/www/attleborough-events`, `shared/.env`, `keep_releases = 5`. Vite assets built in CI and uploaded (from 01-07). Runs from GitHub Actions on push to `main` (01-03) | Atomic symlink releases with no GitHub access needed on the server. `--no-dev` keeps Boost and Pest off the box (D-09). Migrations must be expand → contract because they run before the swap |
-| Ops visibility | Logs: Laravel `daily` 14 days (01-09), journald 200M cap, Caddy roll 10 × 50MiB / 14 days, logrotate backstop (01-02). Heartbeats + Filament "System health" (01-09) | OPS-04 on a box nobody watches daily |
+| Hosting (Phase 5) | Hetzner Cloud CX23. Ubuntu 26.04 (or 24.04 + ondrej PPA + PGDG, decided at the 05-01 checkpoint). Native packages, no Docker in prod. Rebuilt from the versioned `ops/provision.sh` | Low monthly cost. Reproducible from the repo. Deployer's own provision recipe is not used (it adds a PPA unconditionally and installs Redis) |
+| Web server / TLS (Phase 5) | Caddy 2 (official apt repo): automatic Let's Encrypt, HSTS, www → apex 301, `php_fastcgi … resolve_root_symlink` to the FPM pool socket `/run/php/php8.5-fpm-attleborough.sock` | Zero-config TLS. `resolve_root_symlink` means symlink-swap deploys are served without reloading PHP-FPM (opcache pitfall) |
+| Process model | Locally: `php artisan queue:work` (or `composer dev`) and `php artisan schedule:work`. Production (Phase 5, 05-01/05-02): PHP-FPM pool, systemd queue worker (`attleborough-queue.service`, started by a `.path` unit once `current/artisan` exists) and cron `schedule:run` all run as `deployer`. `deployer` has no sudo | One file owner for web, worker and cron (no log-permission split). Deploys never need root |
+| DNS / domain / email | Canonical `whatsonattleborough.co.uk` with no www (D-02, the brand name used in config `site.domain`, ICS UIDs and copy from Phase 1). Registration, Cloudflare Free DNS with DNS-only records (D-03) and `hello@` via Cloudflare Email Routing (D-04) are executed in Phase 5 (05-01) | Origin TLS end-to-end and real client IPs for Phase 2 rate limits. Switching to proxied later is reversible |
+| Deployment (Phase 5) | Phase 1: push to `main` runs CI only (Pest, Larastan, Pint on PostgreSQL, plus 01-07's asset build and gates). Phase 5 (05-02): Deployer 8 `recipe/laravel.php`, `update_code_strategy = local_archive`, `deploy_path = /var/www/attleborough-events`, `shared/.env`, `keep_releases = 5`, Vite assets built in CI and uploaded by `deploy:assets`, deploy job on push to `main` | Atomic symlink releases with no GitHub access needed on the server. `--no-dev` keeps Boost and Pest off the box (D-09). Migrations must be expand → contract because they run before the swap |
+| Ops visibility | Laravel `daily` 14 days, heartbeats + Filament "System health", failed-job retry/delete, `ops:health` (01-09, verified locally). Production: journald 200M cap, Caddy roll 10 × 50MiB / 14 days, logrotate backstop (05-01); production LOG_* values, ops drill and HEALTHY-after-deploy (05-02) | OPS-04 on a box nobody watches daily |
 | Directory layout | Domain-grouped monolith: `app/Calendar` (timing, generator, queries), `app/Publishing/{Actions,Data}` (write choke point), `app/Enums`, `app/Filament/Resources/*/{Pages,Schemas,Tables}`, `app/Support`, `config/site.php`, `config/calendar.php`. Server config lives in `ops/` | Later phases add `app/Ingestion`, `app/Review` and `app/Submissions` beside these without moving them |
 | Dev tooling | Laravel Boost ^2.10, require-dev only. Project rules in `.ai/guidelines/attleborough.md`. AGENTS.md keeps the GSD block (D-09) | Agent help at dev time with no LLM in the product or on the VPS |
 
@@ -45,13 +46,14 @@ Local full-stack run command (until 01-03 lands): see `README.md`. In order: `do
 
 - [x] Project scaffold: Laravel 13 + Filament 5 + Pest 5 + Larastan + Pint, CI workflow (01-01)
 - [x] Routing: `GET /` (`calendar`) and the Filament panel `/admin` (01-01)
-- [x] Database: real write (`PublishEvent` → `events` + `event_occurrences` in one transaction) and real read (`PublicOccurrenceQuery`) on PostgreSQL 18 (01-01). Prod DB owned by the app role (01-02)
+- [x] Database: real write (`PublishEvent` → `events` + `event_occurrences` in one transaction) and real read (`PublicOccurrenceQuery`) on PostgreSQL 18 (01-01). Prod DB owned by the app role is Phase 5 (05-01)
 - [x] UI: Filament create-event form submits through `PublishEvent`, and the result renders on the public list (01-01)
-- [x] Deployment: documented local full-stack run (01-01 README). Production HTTPS box (01-02). Zero-downtime Deployer release from GitHub Actions (01-03)
+- [x] Deployment (Phase 1 scope): documented local full-stack run (01-01 README) and CI on PostgreSQL 18 for every push and pull request
+- [ ] Production HTTPS box and zero-downtime Deployer release from GitHub Actions: deferred to Phase 5 (05-01, 05-02)
 
 ## Out of Scope (Deferred to Later Slices)
 
-Not in the skeleton (01-01..01-03). These come later in Phase 1, without changing the decisions above:
+Not in the skeleton (01-01). These come later in Phase 1, without changing the decisions above:
 - Recurring series, edit via `UpdatePublishedEvent`, daily `calendar:sync-occurrences` (01-04)
 - Hide / cancel / reinstate for events and single occurrences (01-05)
 - Today / weekend / week, category, Free and family filters, `noindex`, D-05 empty states (01-06)
@@ -59,10 +61,14 @@ Not in the skeleton (01-01..01-03). These come later in Phase 1, without changin
 - Event page, meta/OG, `.ics` (01-08); JSON-LD, Google link, share (01-10)
 - Heartbeats, System health page, failed-job retry, Laravel daily logs (01-09)
 
+Deferred from Phase 1 to Phase 5 (scope change 2026-10-16):
+- Domain registration, Cloudflare DNS + Email Routing, Hetzner VPS, `ops/provision.sh`, hardening (05-01)
+- Deployer, CI deploy job, zero-downtime check, production admin, `deploy:assets` + CI artifact, production LOG_* values, ops drill, live asset/event-page checks, production phone UAT and Rich Results Test (05-02)
+
 Not in Phase 1 at all:
 - Drafts, review queue and public submissions (Phase 2)
 - Any ingestion, crawling or source health (Phases 3-4)
-- Sitemap, feeds, privacy/legal pages, analytics, WCAG audit, backups + restore drill (Phase 5)
+- Sitemap, feeds, privacy/legal pages, analytics, WCAG audit, backups + restore drill, and the production infrastructure/deploys above (Phase 5)
 - Admin MFA (deferred to Phase 5 hardening; RESEARCH Open Question 4 RESOLVED)
 - Cloudflare orange-cloud proxy, Redis, Docker in production, Livewire on public pages, a month-grid view, public user accounts
 
@@ -80,4 +86,4 @@ Each later slice extends this skeleton without altering its architectural decisi
 - Phase 2: organisers submit events; every draft goes through one review queue that calls `PublishEvent`
 - Phase 3: ICS sources fetched on a schedule become drafts with change and duplicate handling
 - Phase 4: the deterministic extraction ladder and geofence produce drafts from live P0 sources
-- Phase 5: discoverable, legally compliant, measurable and backed up, ready for public launch
+- Phase 5: production box (05-01) and zero-downtime deploys of the complete app (05-02), then discoverable, legally compliant, measurable and backed up, ready for public launch

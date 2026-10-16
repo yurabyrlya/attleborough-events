@@ -6,7 +6,7 @@ status: executing
 stopped_at: Phase 2 context gathered
 last_updated: "2026-10-16T21:39:36.561Z"
 last_activity: 2026-10-16
-last_activity_desc: Phase 1 execution started
+last_activity_desc: Scope change - infra deferred to Phase 5
 state_head: 558544634bbe622175a7a4b60fc3242461315efe
 progress:
   total_phases: 5
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-10-16)
 ## Current Position
 
 Phase: 1 (Foundation & Published Calendar) — EXECUTING
-Plan: 5 of 10
+Plan: 5 of 8 in Phase 1 (next ready: 01-07; remaining 01-07, 01-09, 01-08, 01-10). Milestone plans: 4/10 complete (Phase 1: 8, Phase 5: 2 so far)
 Status: Ready to execute
-Last activity: 2026-10-16 — Phase 1 execution started
+Last activity: 2026-10-16 — Scope change: infra/domain deferred to Phase 5 (01-02/01-03 moved to 05-01/05-02); Phase 1 is local-dev only
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [████░░░░░░] 40% of planned plans (4/10); phases complete: 0/5
 
 ## Performance Metrics
 
@@ -68,10 +68,11 @@ Progress: [░░░░░░░░░░] 0%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [Roadmap]: 5 coarse phases following research SUMMARY build order; published model + live VPS deploy first, review queue before any crawling
+- [Roadmap]: 5 coarse phases following research SUMMARY build order; published model first (live VPS deploy superseded by [Scope]: deferred to Phase 5), review queue before any crawling
 - [Roadmap]: Only review actions and manual entry write published events (single choke point, REV-02)
 - [Roadmap]: Source research (RES-01..03) runs alongside Phases 1-2 and gates Phase 3; RES-04 (P0 sources live) closes Phase 4
 - [Roadmap]: TEC is the verified platform adapter; no Squarespace `?format=` endpoints (robots-disallowed)
+- [Scope]: Infra/domain deferred to Phase 5; Phase 1 is local-dev only. (2026-10-16: 01-02/01-03 moved to 05-01/05-02; OPS-02 to Phase 5; OPS-01b/OPS-04b split out for production.)
 
 ### Pending Todos
 
@@ -79,10 +80,12 @@ None yet.
 
 ### Blockers/Concerns
 
-- [Phase 1]: Domain name / brand not chosen. Needed for the HTTPS deploy, and later for the crawler User-Agent and about page (Phase 3)
+- [Phase 5]: Domain registration + VPS deferred (name decided: whatsonattleborough.co.uk; .co.uk availability unconfirmed)
 - [Phase 1]: DST boundary on 25 Oct 2026 is imminent. Include DST fixtures in the occurrence/window tests from the start
 - [Phase 2→3]: Local source inventory is unknown (automated search was blocked). Owner URL collection is on the critical path for Phase 3
 - [Phase 5]: Umami Cloud UK GDPR data region / DPA unverified (fallback: Plausible)
+- [Phase 3]: Crawling needs a real User-Agent contact/about URL; until Phase 5 is live use a config placeholder (e.g. CRAWLER_CONTACT_URL in config/site.php / .env) and swap in the live URL at launch
+- [Phase 4]: Success criterion 5 / RES-04 say P0 sources are configured "in production", but production now arrives in Phase 5. Until then P0 sources run on the local app; revisit the wording when planning Phase 4 (or move the production half to Phase 5)
 
 ## Deferred Items
 
