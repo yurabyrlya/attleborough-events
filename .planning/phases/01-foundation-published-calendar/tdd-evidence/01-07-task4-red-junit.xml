@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\Public\PublicLookTest" file="tests/Feature/Public/PublicLookTest.php" tests="13" assertions="48" errors="0" failures="7" skipped="0" time="1.511308">
+    <testcase name="it gives every interactive element outside running text the tap-target utility" file="tests/Feature/Public/PublicLookTest.php::it gives every interactive element outside running text the tap-target utility" class="Tests\Feature\Public\PublicLookTest" classname="Tests.Feature.Public.PublicLookTest" assertions="5" time="0.829611">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">it gives every interactive element outside running text the tap-target utilityFailed asserting that an array contains 'tap-target'.
+at tests/Feature/Public/PublicLookTest.php:74</failure>
+    </testcase>
+    <testcase name="it starts the body with a skip link to the single main#main" file="tests/Feature/Public/PublicLookTest.php::it starts the body with a skip link to the single main#main" class="Tests\Feature\Public\PublicLookTest" classname="Tests.Feature.Public.PublicLookTest" assertions="2" time="0.073945">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">it starts the body with a skip link to the single main#mainFailed asserting that two strings are identical.
+at tests/Feature/Public/PublicLookTest.php:93</failure>
+    </testcase>
+    <testcase name="it keys chip styles to aria-current and marks active chips with a check icon" file="tests/Feature/Public/PublicLookTest.php::it keys chip styles to aria-current and marks active chips with a check icon" class="Tests\Feature\Public\PublicLookTest" classname="Tests.Feature.Public.PublicLookTest" assertions="3" time="0.049140">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">it keys chip styles to aria-current and marks active chips with a check iconExpecting [] not to be empty 'All upcoming has no aria-current keyed style'.
+at tests/Feature/Public/PublicLookTest.php:111</failure>
+    </testcase>
+    <testcase name="it shows one decorative category icon per card, picked from the slug allow-list" file="tests/Feature/Public/PublicLookTest.php::it shows one decorative category icon per card, picked from the slug allow-list" class="Tests\Feature\Public\PublicLookTest" classname="Tests.Feature.Public.PublicLookTest" assertions="2" time="0.063631">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">it shows one decorative category icon per card, picked from the slug allow-listFailed asserting that 0 is identical to 1.
+at tests/Feature/Public/PublicLookTest.php:135</failure>
+    </testcase>
+    <testcase name="it shows the Cancelled badge once, as visible text inside the title" file="tests/Feature/Public/PublicLookTest.php::it shows the Cancelled badge once, as visible text inside the title" class="Tests\Feature\Public\PublicLookTest" classname="Tests.Feature.Public.PublicLookTest" assertions="5" time="0.063341"/>
+    <testcase name="it keeps the title before the time element with the 01-06 datetime" file="tests/Feature/Public/PublicLookTest.php::it keeps the title before the time element with the 01-06 datetime" class="Tests\Feature\Public\PublicLookTest" classname="Tests.Feature.Public.PublicLookTest" assertions="6" time="0.067974"/>
+    <testcase name="it escapes ampersands and apostrophes exactly once" file="tests/Feature/Public/PublicLookTest.php::it escapes ampersands and apostrophes exactly once" class="Tests\Feature\Public\PublicLookTest" classname="Tests.Feature.Public.PublicLookTest" assertions="5" time="0.048334"/>
+    <testcase name="it lets a long unbroken title wrap anywhere" file="tests/Feature/Public/PublicLookTest.php::it lets a long unbroken title wrap anywhere" class="Tests\Feature\Public\PublicLookTest" classname="Tests.Feature.Public.PublicLookTest" assertions="3" time="0.056513">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">it lets a long unbroken title wrap anywhereFailed asserting that an array contains 'wrap-anywhere'.
+at tests/Feature/Public/PublicLookTest.php:214</failure>
+    </testcase>
+    <testcase name="it leaves no empty wrappers on a card with only the required fields" file="tests/Feature/Public/PublicLookTest.php::it leaves no empty wrappers on a card with only the required fields" class="Tests\Feature\Public\PublicLookTest" classname="Tests.Feature.Public.PublicLookTest" assertions="2" time="0.057476">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">it leaves no empty wrappers on a card with only the required fieldsFailed asserting that 0 is identical to 1.
+at tests/Feature/Public/PublicLookTest.php:231</failure>
+    </testcase>
+    <testcase name="it keeps the D-05 empty state inside the styled page with the chips still shown" file="tests/Feature/Public/PublicLookTest.php::it keeps the D-05 empty state inside the styled page with the chips still shown" class="Tests\Feature\Public\PublicLookTest" classname="Tests.Feature.Public.PublicLookTest" assertions="5" time="0.050288">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">it keeps the D-05 empty state inside the styled page with the chips still shownFailed asserting that an array contains 'tap-target'.
+at tests/Feature/Public/PublicLookTest.php:249</failure>
+    </testcase>
+    <testcase name="it links the contact email in the footer" file="tests/Feature/Public/PublicLookTest.php::it links the contact email in the footer" class="Tests\Feature\Public\PublicLookTest" classname="Tests.Feature.Public.PublicLookTest" assertions="2" time="0.043947"/>
+    <testsuite name="it still ships no script, form or Livewire markup" tests="2" assertions="8" errors="0" failures="0" skipped="0" time="0.107107">
+      <testcase name="it still ships no script, form or Livewire markup with data set &quot;('/')&quot;" file="tests/Feature/Public/PublicLookTest.php::it still ships no script, form or Livewire markup with data set &quot;('/')&quot;" class="Tests\Feature\Public\PublicLookTest" classname="Tests.Feature.Public.PublicLookTest" assertions="4" time="0.053637"/>
+      <testcase name="it still ships no script, form or Livewire markup with data set &quot;('/?when=weekend&amp;category=music')&quot;" file="tests/Feature/Public/PublicLookTest.php::it still ships no script, form or Livewire markup with data set &quot;('/?when=weekend&amp;category=music')&quot;" class="Tests\Feature\Public\PublicLookTest" classname="Tests.Feature.Public.PublicLookTest" assertions="4" time="0.053470"/>
+    </testsuite>
+  </testsuite>
+</testsuites>
