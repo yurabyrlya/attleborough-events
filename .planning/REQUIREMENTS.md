@@ -170,12 +170,93 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
+| CAL-01 | Phase 1 | Pending |
+| CAL-02 | Phase 1 | Pending |
+| CAL-03 | Phase 1 | Pending |
+| CAL-04 | Phase 1 | Pending |
+| CAL-05 | Phase 1 | Pending |
+| CAL-06 | Phase 1 | Pending |
+| CAL-07 | Phase 1 | Pending |
+| CAL-08 | Phase 1 | Pending |
+| CAL-09 | Phase 5 | Pending |
+| EVT-01 | Phase 1 | Pending |
+| EVT-02 | Phase 1 | Pending |
+| EVT-03 | Phase 1 | Pending |
+| EVT-04 | Phase 5 | Pending |
+| EVT-05 | Phase 5 | Pending |
+| EVT-06 | Phase 1 | Pending |
+| EVT-07 | Phase 1 | Pending |
+| EVT-08 | Phase 5 | Pending |
+| FEED-01 | Phase 5 | Pending |
+| FEED-02 | Phase 5 | Pending |
+| SUB-01 | Phase 2 | Pending |
+| SUB-02 | Phase 2 | Pending |
+| SUB-03 | Phase 2 | Pending |
+| SUB-04 | Phase 2 | Pending |
+| REV-01 | Phase 2 | Pending |
+| REV-02 | Phase 2 | Pending |
+| REV-03 | Phase 2 | Pending |
+| REV-04 | Phase 2 | Pending |
+| REV-05 | Phase 3 | Pending |
+| REV-06 | Phase 3 | Pending |
+| REV-07 | Phase 3 | Pending |
+| REV-08 | Phase 2 | Pending |
+| REV-09 | Phase 2 | Pending |
+| REV-10 | Phase 2 | Pending |
+| REV-11 | Phase 2 | Pending |
+| ADM-01 | Phase 1 | Pending |
+| ADM-02 | Phase 1 | Pending |
+| ADM-03 | Phase 1 | Pending |
+| ADM-04 | Phase 2 | Pending |
+| ADM-05 | Phase 5 | Pending |
+| ADM-06 | Phase 2 | Pending |
+| ADM-07 | Phase 5 | Pending |
+| SRC-01 | Phase 3 | Pending |
+| SRC-02 | Phase 4 | Pending |
+| SRC-03 | Phase 3 | Pending |
+| SRC-04 | Phase 3 | Pending |
+| SRC-05 | Phase 3 | Pending |
+| SRC-06 | Phase 3 | Pending |
+| SRC-07 | Phase 3 | Pending |
+| SRC-08 | Phase 3 | Pending |
+| SRC-09 | Phase 3 | Pending |
+| EXT-01 | Phase 3 | Pending |
+| EXT-02 | Phase 4 | Pending |
+| EXT-03 | Phase 4 | Pending |
+| EXT-04 | Phase 4 | Pending |
+| EXT-05 | Phase 4 | Pending |
+| EXT-06 | Phase 4 | Pending |
+| EXT-07 | Phase 3 | Pending |
+| EXT-08 | Phase 4 | Pending |
+| PIPE-01 | Phase 3 | Pending |
+| PIPE-02 | Phase 4 | Pending |
+| PIPE-03 | Phase 2 | Pending |
+| PIPE-04 | Phase 2 | Pending |
+| PIPE-05 | Phase 3 | Pending |
+| PIPE-06 | Phase 3 | Pending |
+| PIPE-07 | Phase 3 | Pending |
+| PIPE-08 | Phase 3 | Pending |
+| PIPE-09 | Phase 3 | Pending |
+| REC-01 | Phase 1 | Pending |
+| REC-02 | Phase 1 | Pending |
+| LEG-01 | Phase 5 | Pending |
+| LEG-02 | Phase 5 | Pending |
+| LEG-03 | Phase 5 | Pending |
+| LEG-04 | Phase 3 | Pending |
+| OPS-01 | Phase 1 | Pending |
+| OPS-02 | Phase 1 | Pending |
+| OPS-03 | Phase 5 | Pending |
+| OPS-04 | Phase 1 | Pending |
+| RES-01 | Phase 2 | Pending |
+| RES-02 | Phase 2 | Pending |
+| RES-03 | Phase 2 | Pending |
+| RES-04 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 81 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 81
+- Mapped to phases: 81 (Phase 1: 21, Phase 2: 19, Phase 3: 20, Phase 4: 9, Phase 5: 12)
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-10-16*
-*Last updated: 2026-10-16 after initial definition*
+*Last updated: 2026-10-16 after roadmap creation (traceability mapped)*
