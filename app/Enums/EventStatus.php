@@ -13,13 +13,20 @@ enum EventStatus: string implements HasColor, HasLabel
     case Cancelled = 'cancelled';
 
     /**
-     * RED scaffold: no transitions yet.
+     * Allowed moves (ARCHITECTURE Pattern 3). Deliberately no direct
+     * hidden <-> cancelled: showing an event must never silently drop its
+     * cancellation, and hiding a cancelled one would lose the badge state.
+     * Same-to-same is never allowed.
      *
      * @return list<self>
      */
     public function transitions(): array
     {
-        return [];
+        return match ($this) {
+            self::Published => [self::Hidden, self::Cancelled],
+            self::Hidden => [self::Published],
+            self::Cancelled => [self::Published],
+        };
     }
 
     public function canTransitionTo(self $to): bool
@@ -27,6 +34,9 @@ enum EventStatus: string implements HasColor, HasLabel
         return in_array($to, $this->transitions(), true);
     }
 
+    /**
+     * @throws InvalidStatusTransition
+     */
     public function assertCanTransitionTo(self $to): void
     {
         if (! $this->canTransitionTo($to)) {
@@ -35,13 +45,15 @@ enum EventStatus: string implements HasColor, HasLabel
     }
 
     /**
-     * RED scaffold.
+     * Statuses an event may have and still appear publicly (cancelled shows
+     * a badge until its dates expire; hidden never shows, and its event page
+     * 404s in plan 01-08).
      *
      * @return list<self>
      */
     public static function publiclyListed(): array
     {
-        return [];
+        return [self::Published, self::Cancelled];
     }
 
     public function isPubliclyListed(): bool

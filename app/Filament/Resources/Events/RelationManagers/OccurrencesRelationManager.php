@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Events\RelationManagers;
 
+use App\Enums\OccurrenceStatus;
 use App\Filament\Resources\Events\Actions\StatusActions;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 /**
@@ -40,6 +42,10 @@ class OccurrencesRelationManager extends RelationManager
                     ->label('Date key'),
                 TextColumn::make('status')
                     ->badge(),
+            ])
+            ->filters([
+                SelectFilter::make('status')
+                    ->options(OccurrenceStatus::class),
             ])
             ->headerActions([])
             ->recordActions(StatusActions::forOccurrence())

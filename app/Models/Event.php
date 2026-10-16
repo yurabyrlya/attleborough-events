@@ -45,6 +45,10 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property CarbonImmutable $approved_at
  * @property CarbonImmutable|null $status_changed_at
  * @property int|null $status_changed_by
+ *
+ * status after publish, status_changed_at and status_changed_by are written
+ * only by App\Publishing\Actions\ChangeEventStatus (audit columns are never
+ * fillable).
  */
 #[Fillable([
     'title', 'slug', 'description', 'category_id', 'venue_id', 'family_friendly',
@@ -110,6 +114,14 @@ class Event extends Model
     public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function statusChangedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'status_changed_by');
     }
 
     /**

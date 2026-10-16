@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Events\Pages;
 
+use App\Filament\Resources\Events\Actions\StatusActions;
 use App\Filament\Resources\Events\EventResource;
 use App\Models\Event;
 use App\Models\User;
@@ -13,8 +14,8 @@ use InvalidArgumentException;
 
 /**
  * Edits go through the single publishing choke point (ADM-03): this page never
- * writes the model itself, and has no delete action. Status actions arrive in
- * plan 01-05.
+ * writes the model itself, and has no delete action. Status changes go through
+ * StatusActions -> ChangeEventStatus.
  */
 class EditEvent extends EditRecord
 {
@@ -42,9 +43,12 @@ class EditEvent extends EditRecord
         return app(UpdatePublishedEvent::class)($this->event($record), PublishableEventData::fromForm($data), $editor);
     }
 
+    /**
+     * Status actions only (hide / show / cancel / reinstate); no delete.
+     */
     protected function getHeaderActions(): array
     {
-        return [];
+        return StatusActions::forEvent();
     }
 
     private function event(Model $record): Event
