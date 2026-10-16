@@ -4,6 +4,7 @@ namespace App\Publishing\Data;
 
 use App\Calendar\ManualRecurrence;
 use App\Enums\PriceType;
+use App\Enums\RepeatEnds;
 use App\Enums\RepeatPattern;
 use App\Models\Event;
 use Carbon\CarbonImmutable;
@@ -35,7 +36,7 @@ final readonly class PublishableEventData
         public ?string $sourceNote = null,
         public string $timezone = 'Europe/London',
         public RepeatPattern $repeats = RepeatPattern::None,
-        public string $repeatEnds = 'never',
+        public RepeatEnds $repeatEnds = RepeatEnds::Never,
         public ?string $repeatUntil = null,
         public ?int $repeatCount = null,
     ) {}
@@ -68,7 +69,7 @@ final readonly class PublishableEventData
             sourceNote: self::nullableString($data['source_note'] ?? null),
             timezone: (string) config('calendar.timezone', 'Europe/London'),
             repeats: RepeatPattern::from((string) ($data['repeats'] ?? RepeatPattern::None->value)),
-            repeatEnds: (string) ($data['repeat_ends'] ?? 'never'),
+            repeatEnds: RepeatEnds::from((string) ($data['repeat_ends'] ?? RepeatEnds::Never->value)),
             repeatUntil: self::nullableDate($data['repeat_until'] ?? null),
             repeatCount: self::nullableInt($data['repeat_count'] ?? null),
         );

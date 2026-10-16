@@ -2,6 +2,7 @@
 
 namespace App\Calendar;
 
+use App\Enums\RepeatEnds;
 use App\Enums\RepeatPattern;
 use Carbon\CarbonImmutable;
 use InvalidArgumentException;
@@ -29,7 +30,7 @@ final readonly class ManualRecurrence
 
     public function __construct(
         public RepeatPattern $pattern = RepeatPattern::None,
-        public string $ends = 'never',
+        public RepeatEnds $ends = RepeatEnds::Never,
         public ?string $untilDate = null,
         public ?int $count = null,
     ) {}
@@ -74,6 +75,11 @@ final readonly class ManualRecurrence
         ];
     }
 
+    public function isValidFor(CarbonImmutable $startLocal): bool
+    {
+        return true; // TODO(01-04 Task 2): implemented in GREEN
+    }
+
     public function label(CarbonImmutable $startLocal): string
     {
         return self::optionsFor($startLocal)[$this->pattern->value]
@@ -87,7 +93,7 @@ final readonly class ManualRecurrence
     {
         return [
             'repeats' => $this->pattern->value,
-            'repeat_ends' => $this->ends,
+            'repeat_ends' => $this->ends->value,
             'repeat_until' => $this->untilDate,
             'repeat_count' => $this->count,
         ];
