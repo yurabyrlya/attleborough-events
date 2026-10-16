@@ -24,6 +24,36 @@ class HealthReport
         );
     }
 
+    /** RED scaffold. */
+    public function queue(): HealthCheck
+    {
+        return new HealthCheck('queue', 'Queue worker', HealthState::NeverSeen, null, null, '');
+    }
+
+    /** RED scaffold. */
+    public function calendarSync(): HealthCheck
+    {
+        return new HealthCheck('calendar-sync', 'Daily calendar sync', HealthState::NotRunYet, null, null, '');
+    }
+
+    /** RED scaffold. */
+    public function failedJobCount(): int
+    {
+        return 0;
+    }
+
+    /** RED scaffold. */
+    public function pendingJobs(): int
+    {
+        return 0;
+    }
+
+    /** RED scaffold. */
+    public function oldestPendingAgeSeconds(): ?int
+    {
+        return null;
+    }
+
     /**
      * @return list<HealthCheck>
      */
