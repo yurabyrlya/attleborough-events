@@ -3,6 +3,7 @@
 use App\Models\Event;
 use App\Models\EventOccurrence;
 use Carbon\CarbonImmutable;
+use Dom\HTMLDocument;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Testing\TestResponse;
@@ -87,4 +88,45 @@ function cardsIn(TestResponse $response): array
     preg_match_all('#<article\b.*?</article>#s', (string) $response->getContent(), $matches);
 
     return $matches[0];
+}
+
+/**
+ * Assert the response has an <a> with exactly this href (null = any) and
+ * this visible text (whitespace collapsed). $current true requires
+ * aria-current="true", false requires no aria-current, null skips the
+ * check. Classes and decorative icons inside the link are ignored, so the
+ * 01-07 restyle cannot break the 01-06 link contract checks.
+ */
+function assertLink(TestResponse $response, ?string $href, string $text, ?bool $current = null): TestResponse
+{
+    $document = HTMLDocument::createFromString((string) $response->getContent(), LIBXML_NOERROR);
+    $found = false;
+
+    foreach ($document->querySelectorAll('a') as $anchor) {
+        $matches = ($href === null || $anchor->getAttribute('href') === $href)
+            && trim((string) preg_replace('/\s+/u', ' ', (string) $anchor->textContent)) === $text
+            && match ($current) {
+                true => $anchor->getAttribute('aria-current') === 'true',
+                false => ! $anchor->hasAttribute('aria-current'),
+                null => true,
+            };
+
+        if ($matches) {
+            $found = true;
+            break;
+        }
+    }
+
+    expect($found)->toBeTrue(sprintf(
+        'No <a> with href %s, text "%s"%s.',
+        $href === null ? '(any)' : '"'.$href.'"',
+        $text,
+        match ($current) {
+            true => ' and aria-current="true"',
+            false => ' and no aria-current',
+            null => '',
+        },
+    ));
+
+    return $response;
 }

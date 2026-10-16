@@ -29,17 +29,22 @@
     @vite('resources/css/app.css')
     @stack('head')
 </head>
-<body>
-    <header>
-        <x-brand.logo />
-    </header>
+<body class="min-h-screen bg-bg text-ink">
+    <a href="#main" class="tap-target sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-surface focus:px-4 focus:font-semibold focus:text-ink">Skip to main content</a>
 
-    <main id="main">
-        @yield('content')
-    </main>
+    <div class="mx-auto max-w-2xl px-4">
+        <header class="pt-6">
+            <x-brand.logo />
+        </header>
 
-    <footer>
-        <p>Contact: <a href="mailto:{{ config('site.contact_email') }}">{{ config('site.contact_email') }}</a></p>
-    </footer>
+        <main id="main" class="pb-10">
+            @yield('content')
+        </main>
+
+        <footer class="border-t border-line py-6 text-sm text-muted">
+            <p>{{ config('site.name') }}</p>
+            <p>Questions or corrections: <a href="mailto:{{ config('site.contact_email') }}" class="text-accent underline underline-offset-2">{{ config('site.contact_email') }}</a></p>
+        </footer>
+    </div>
 </body>
 </html>

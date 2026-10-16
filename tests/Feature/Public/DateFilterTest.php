@@ -151,7 +151,7 @@ it('walks every week occurrence exactly once through More events, keeping when=w
         $pages++;
 
         $uri = null;
-        if (preg_match('#<a href="([^"]+)" rel="next">More events</a>#', (string) $response->getContent(), $m)) {
+        if (preg_match('#<a href="([^"]+)" rel="next"[^>]*>More events</a>#', (string) $response->getContent(), $m)) {
             $uri = html_entity_decode($m[1]);
             expect($uri)->toContain('when=week');
         }
@@ -172,10 +172,10 @@ it('shows the Today empty state linking to the weekend chip', function () {
     freezeLondon('2026-10-28 12:00');
     makeOccurrence(['title' => 'Saturday Market'], '2026-10-31 10:00');
 
-    get('/?when=today')->assertOk()
-        ->assertSeeText('Nothing on today. Why not check the weekend?', false)
-        ->assertSee('<a href="'.e(route('calendar', ['when' => 'weekend'], absolute: false)).'">Why not check the weekend?</a>', false)
-        ->assertSee('aria-current="true">Today</a>', false);
+    $response = get('/?when=today')->assertOk()
+        ->assertSeeText('Nothing on today. Why not check the weekend?', false);
+    assertLink($response, route('calendar', ['when' => 'weekend'], absolute: false), 'Why not check the weekend?', false);
+    assertLink($response, route('calendar', ['when' => 'today'], absolute: false), 'Today', true);
 });
 
 it('shows the weekend and week empty states linking to everything coming up', function (string $when, string $message) {
@@ -184,7 +184,7 @@ it('shows the weekend and week empty states linking to everything coming up', fu
 
     $response = get('/?when='.$when)->assertOk()->assertSeeText($message, false);
     expect(cardTitles($response))->toBe([]);
-    $response->assertSee('<a href="'.e(route('calendar', absolute: false)).'">See everything coming up.</a>', false);
+    assertLink($response, route('calendar', absolute: false), 'See everything coming up.');
 })->with([
     ['weekend', 'Nothing on this weekend yet. See everything coming up.'],
     ['week', 'Nothing else on this week. See everything coming up.'],
@@ -194,10 +194,10 @@ it('shows the end-of-list state for a page past the end, linking to page 1 with 
     freezeLondon('2026-10-28 12:00');
     makeOccurrence(['title' => 'Saturday Market'], '2026-10-31 10:00');
 
-    get('/?when=weekend&page=5')->assertOk()
+    $response = get('/?when=weekend&page=5')->assertOk()
         ->assertSeeText("You've reached the end of the list.", false)
-        ->assertSee('<a href="'.e(route('calendar', ['when' => 'weekend'], absolute: false)).'">Back to the first page</a>', false)
         ->assertDontSee('Nothing on this weekend yet');
+    assertLink($response, route('calendar', ['when' => 'weekend'], absolute: false), 'Back to the first page');
 });
 
 it('keeps the 01-01 empty state when nothing is published and no filter is set', function () {

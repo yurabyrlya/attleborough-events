@@ -33,7 +33,7 @@ function onlyCard(array $attributes, string $start = '2026-10-31 19:30', string 
 
 function excerptOf(string $card): ?string
 {
-    return preg_match('#<p class="excerpt">(.*?)</p>#s', $card, $m) ? html_entity_decode($m[1]) : null;
+    return preg_match('#<p class="excerpt(?: [^"]*)?">(.*?)</p>#s', $card, $m) ? html_entity_decode($m[1]) : null;
 }
 
 it('shows every CAL-07 field on the card', function () {
@@ -65,9 +65,9 @@ it('labels the price from price_type and price_text', function (array $attribute
     $card = onlyCard($attributes);
 
     if ($label === null) {
-        expect($card)->not->toContain('class="price"');
+        expect($card)->not->toMatch('#class="price[ "]#');
     } else {
-        expect($card)->toContain('<p class="price">'.e($label).'</p>');
+        expect($card)->toMatch('#<p class="price(?: [^"]*)?">'.preg_quote(e($label), '#').'</p>#');
     }
 })->with([
     'free' => [['price_type' => PriceType::Free, 'price_text' => null], 'Free'],

@@ -10,7 +10,6 @@ use App\Models\User;
 use App\Publishing\Actions\ChangeEventStatus;
 use App\Publishing\Actions\ChangeOccurrenceStatus;
 use Carbon\CarbonImmutable;
-use Illuminate\Support\Str;
 
 use function Pest\Laravel\get;
 
@@ -60,7 +59,7 @@ beforeEach(function () {
     };
 
     $this->titlesOn = fn (string $uri): array => array_map(
-        fn (string $card): string => html_entity_decode(trim(Str::before(Str::after($card, '<h3>'), '<'))),
+        fn (string $card): string => preg_match('#<h3[^>]*>\s*(.*?)\s*<#s', $card, $m) ? html_entity_decode(trim($m[1])) : '',
         cardsIn(get($uri)->assertOk()),
     );
 

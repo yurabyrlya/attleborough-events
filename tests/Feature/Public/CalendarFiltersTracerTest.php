@@ -45,10 +45,9 @@ it('renders the weekend chip as a plain anchor on / without noindex and lists ev
 });
 
 it('marks the active weekend chip and points All upcoming at the bare route', function () {
-    get('/?when=weekend')
-        ->assertOk()
-        ->assertSee('aria-current="true">This weekend</a>', false)
-        ->assertSee('<a href="'.e(route('calendar', absolute: false)).'">All upcoming</a>', false);
+    $response = get('/?when=weekend')->assertOk();
+    assertLink($response, route('calendar', ['when' => 'weekend'], absolute: false), 'This weekend', true);
+    assertLink($response, route('calendar', absolute: false), 'All upcoming', false);
 });
 
 it('renders no form and no script on / and /?when=weekend', function (string $uri) {
