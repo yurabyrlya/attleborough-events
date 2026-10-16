@@ -2,8 +2,13 @@
 
 namespace App\Publishing\Data;
 
+use App\Calendar\ManualRecurrence;
 use App\Enums\PriceType;
+use App\Enums\RepeatPattern;
+use App\Models\Event;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 /**
  * Everything needed to publish an event, independent of where it came from
@@ -29,6 +34,10 @@ final readonly class PublishableEventData
         public ?string $sourceUrl = null,
         public ?string $sourceNote = null,
         public string $timezone = 'Europe/London',
+        public RepeatPattern $repeats = RepeatPattern::None,
+        public string $repeatEnds = 'never',
+        public ?string $repeatUntil = null,
+        public ?int $repeatCount = null,
     ) {}
 
     /**
@@ -58,7 +67,50 @@ final readonly class PublishableEventData
             sourceUrl: self::nullableString($data['source_url'] ?? null),
             sourceNote: self::nullableString($data['source_note'] ?? null),
             timezone: (string) config('calendar.timezone', 'Europe/London'),
+            repeats: RepeatPattern::from((string) ($data['repeats'] ?? RepeatPattern::None->value)),
+            repeatEnds: (string) ($data['repeat_ends'] ?? 'never'),
+            repeatUntil: self::nullableDate($data['repeat_until'] ?? null),
+            repeatCount: self::nullableInt($data['repeat_count'] ?? null),
         );
+    }
+
+    /**
+     * Form state for an existing event: its attributes plus the Repeats/Ends
+     * fields recovered from the stored recurrence_rule.
+     *
+     * @return array<string, mixed>
+     */
+    public static function fromEvent(Event $event): array
+    {
+        $attributes = $event->attributesToArray();
+        $attributes['start_date'] = $event->start_date->format('Y-m-d');
+        $attributes['end_date'] = $event->end_date?->format('Y-m-d');
+
+        return array_merge(
+            $attributes,
+            ManualRecurrence::fromRrule($event->recurrence_rule, $event->all_day)->toFormState(),
+        );
+    }
+
+    public function recurrence(): ManualRecurrence
+    {
+        return new ManualRecurrence($this->repeats, $this->repeatEnds, $this->repeatUntil, $this->repeatCount);
+    }
+
+    public function isRecurring(): bool
+    {
+        return $this->repeats !== RepeatPattern::None;
+    }
+
+    public function startLocal(): CarbonImmutable
+    {
+        $start = CarbonImmutable::createFromFormat('!Y-m-d', $this->startDate, $this->timezone);
+
+        if (! $start instanceof CarbonImmutable) {
+            throw new InvalidArgumentException("Invalid start date [{$this->startDate}].");
+        }
+
+        return $start;
     }
 
     /**
@@ -85,9 +137,10 @@ final readonly class PublishableEventData
             'all_day' => $this->allDay,
             'start_date' => $this->startDate,
             'start_time' => $this->allDay ? null : $this->startTime,
-            'end_date' => $this->endDate,
+            // Repeating events are single-day (overnight end allowed): no end_date.
+            'end_date' => $this->isRecurring() ? null : $this->endDate,
             'end_time' => $this->allDay ? null : $this->endTime,
-            'recurrence_rule' => null,
+            'recurrence_rule' => $this->recurrence()->toRrule($this->startLocal(), $this->allDay),
         ];
     }
 
@@ -100,6 +153,13 @@ final readonly class PublishableEventData
         $value = trim((string) $value);
 
         return $value === '' ? null : $value;
+    }
+
+    private static function nullableInt(mixed $value): ?int
+    {
+        $value = self::nullableString($value);
+
+        return $value === null ? null : (int) $value;
     }
 
     private static function date(mixed $value): string

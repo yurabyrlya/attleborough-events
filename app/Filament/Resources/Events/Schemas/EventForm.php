@@ -2,7 +2,10 @@
 
 namespace App\Filament\Resources\Events\Schemas;
 
+use App\Calendar\ManualRecurrence;
 use App\Enums\PriceType;
+use App\Enums\RepeatPattern;
+use Carbon\CarbonImmutable;
 use Closure;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Radio;
@@ -14,6 +17,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Throwable;
 
 /**
  * Manual event entry form.
@@ -57,6 +61,7 @@ class EventForm
                             ->label('Start date')
                             ->native(false)
                             ->displayFormat('D j M Y')
+                            ->live()
                             ->required(),
                         TimePicker::make('start_time')
                             ->label('Start time')
@@ -68,6 +73,8 @@ class EventForm
                             ->helperText('Only for events that run over several days.')
                             ->native(false)
                             ->displayFormat('D j M Y')
+                            // Repeating events are single-day (Phase 1): no end date.
+                            ->hidden(fn (Get $get): bool => self::repeats($get) !== RepeatPattern::None)
                             ->afterOrEqual('start_date')
                             ->validationMessages([
                                 'after_or_equal' => 'The end date cannot be before the start date.',
@@ -91,6 +98,18 @@ class EventForm
                                     }
                                 },
                             ]),
+                    ]),
+
+                Section::make('Repeats')
+                    ->columns(2)
+                    ->schema([
+                        Select::make('repeats')
+                            ->label('Repeats')
+                            ->options(fn (Get $get): array => self::repeatOptions($get))
+                            ->default(RepeatPattern::None->value)
+                            ->selectablePlaceholder(false)
+                            ->live()
+                            ->required(),
                     ]),
 
                 Section::make('Where')
@@ -147,6 +166,50 @@ class EventForm
                             ->maxLength(500),
                     ]),
             ]);
+    }
+
+    /**
+     * Repeats options computed from the chosen start date (Europe/London).
+     *
+     * @return array<string, string>
+     */
+    private static function repeatOptions(Get $get): array
+    {
+        $start = self::startLocal($get);
+
+        if ($start === null) {
+            return [RepeatPattern::None->value => 'Does not repeat'];
+        }
+
+        return ManualRecurrence::optionsFor($start);
+    }
+
+    private static function repeats(Get $get): RepeatPattern
+    {
+        $value = $get('repeats');
+
+        if ($value instanceof RepeatPattern) {
+            return $value;
+        }
+
+        return RepeatPattern::tryFrom((string) $value) ?? RepeatPattern::None;
+    }
+
+    private static function startLocal(Get $get): ?CarbonImmutable
+    {
+        $value = substr(trim((string) $get('start_date')), 0, 10);
+
+        if ($value === '') {
+            return null;
+        }
+
+        try {
+            $start = CarbonImmutable::createFromFormat('!Y-m-d', $value, (string) config('calendar.timezone', 'Europe/London'));
+        } catch (Throwable) {
+            return null;
+        }
+
+        return $start instanceof CarbonImmutable ? $start : null;
     }
 
     private static function hhmm(mixed $time): string

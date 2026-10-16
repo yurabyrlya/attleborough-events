@@ -29,6 +29,13 @@ use InvalidArgumentException;
  * long because the arithmetic is done on London wall-clock dates.
  *
  *  - expires_at = ends_at whenever there is an end.
+ *
+ * Recurring series (recurrence_rule set) are single-day: end_date is ignored
+ * and every computation is anchored on the INSTANCE date. A timed instance
+ * ends on the instance date (or the next day when end_time <= start_time);
+ * an all-day instance ends at the next local midnight. A nonexistent local
+ * time (e.g. 01:30 on 28 Mar 2027) is shifted forward by PHP (02:30 BST),
+ * matching sabre/vobject.
  */
 final class EventTiming
 {
@@ -95,8 +102,8 @@ final class EventTiming
      */
     private function endDate(Event $event, string $instanceDate, string $tz): string
     {
-        if ($event->end_date === null) {
-            return $instanceDate;
+        if ($event->end_date === null || $event->recurrence_rule !== null) {
+            return $instanceDate; // recurring instances never span several days
         }
 
         $spanDays = (int) $event->start_date->diffInDays($event->end_date);

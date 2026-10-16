@@ -7,10 +7,13 @@ use App\Models\Event;
 use App\Models\EventOccurrence;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
-use LogicException;
 
 /**
  * Materialises an event's occurrences.
+ *
+ * Recurring series are materialised over a rolling horizon:
+ * [today 00:00, today + calendar.horizon_days 00:00) Europe/London, with an
+ * exclusive end, expanded only by RecurrenceExpander (sabre/vobject).
  *
  * Upserts on (event_id, recurrence_key) and updates ONLY the instants, never
  * `status`, so admin-set cancellations/hides survive re-syncs. Future rows the
@@ -18,12 +21,16 @@ use LogicException;
  */
 final class OccurrenceGenerator
 {
-    public function __construct(private EventTiming $timing) {}
+    public function __construct(
+        private EventTiming $timing,
+        private RecurrenceExpander $expander,
+    ) {}
 
     public function sync(Event $event, ?CarbonImmutable $now = null): void
     {
         $tz = $event->timezone ?: (string) config('calendar.timezone', 'Europe/London');
         $windowStart = ($now ?? CarbonImmutable::now())->setTimezone($tz)->startOfDay();
+        $windowEnd = $windowStart->addDays((int) config('calendar.horizon_days', 90));
 
         $rows = array_map(fn (OccurrenceTiming $t): array => [
             'event_id' => $event->id,
@@ -33,7 +40,7 @@ final class OccurrenceGenerator
             'ends_at' => $t->endsAt?->utc()->format('Y-m-d H:i:s'),
             'expires_at' => $t->expiresAt->utc()->format('Y-m-d H:i:s'),
             'status' => OccurrenceStatus::Scheduled->value, // used on INSERT only
-        ], $this->instances($event));
+        ], $this->instances($event, $windowStart, $windowEnd));
 
         DB::transaction(function () use ($event, $rows, $windowStart): void {
             EventOccurrence::upsert(
@@ -50,14 +57,21 @@ final class OccurrenceGenerator
     }
 
     /**
+     * One-off: exactly one instance from start_date, regardless of horizon.
+     * Recurring: the instances sabre yields in [windowStart, windowEnd), in
+     * chronological order so that newly inserted ids ascend with date.
+     *
      * @return list<OccurrenceTiming>
      */
-    private function instances(Event $event): array
+    private function instances(Event $event, CarbonImmutable $windowStart, CarbonImmutable $windowEnd): array
     {
-        if ($event->recurrence_rule !== null) {
-            throw new LogicException('Recurring events are not supported yet.');
+        if ($event->recurrence_rule === null) {
+            return [$this->timing->forDate($event, $event->start_date->format('Y-m-d'))];
         }
 
-        return [$this->timing->forDate($event, $event->start_date->format('Y-m-d'))];
+        return array_map(
+            fn (string $key): OccurrenceTiming => $this->timing->forDate($event, $key),
+            $this->expander->instanceDates($event, $windowStart, $windowEnd),
+        );
     }
 }
