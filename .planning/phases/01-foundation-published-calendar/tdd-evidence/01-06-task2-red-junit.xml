@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="42" assertions="108" errors="0" failures="13" skipped="0" time="2.277280">
+    <testsuite name="Tests\Unit\Calendar\DateWindowTest" file="tests/Unit/Calendar/DateWindowTest.php" tests="7" assertions="14" errors="0" failures="0" skipped="0" time="0.464431">
+      <testcase name="it computes Fri 23 Oct 2026 15:00 windows across the October clock change" file="tests/Unit/Calendar/DateWindowTest.php::it computes Fri 23 Oct 2026 15:00 windows across the October clock change" class="Tests\Unit\Calendar\DateWindowTest" classname="Tests.Unit.Calendar.DateWindowTest" assertions="3" time="0.388318"/>
+      <testcase name="it computes Sun 25 Oct 2026 12:00 windows: 25h today, current weekend, week is today only" file="tests/Unit/Calendar/DateWindowTest.php::it computes Sun 25 Oct 2026 12:00 windows: 25h today, current weekend, week is today only" class="Tests\Unit\Calendar\DateWindowTest" classname="Tests.Unit.Calendar.DateWindowTest" assertions="3" time="0.017237"/>
+      <testcase name="it computes Mon 26 Oct 2026 08:00 windows: next weekend and the week to Mon 2 Nov" file="tests/Unit/Calendar/DateWindowTest.php::it computes Mon 26 Oct 2026 08:00 windows: next weekend and the week to Mon 2 Nov" class="Tests\Unit\Calendar\DateWindowTest" classname="Tests.Unit.Calendar.DateWindowTest" assertions="2" time="0.011533"/>
+      <testcase name="it computes the 47h weekend on Sat 27 Mar 2027 10:00" file="tests/Unit/Calendar/DateWindowTest.php::it computes the 47h weekend on Sat 27 Mar 2027 10:00" class="Tests\Unit\Calendar\DateWindowTest" classname="Tests.Unit.Calendar.DateWindowTest" assertions="1" time="0.012155"/>
+      <testcase name="it computes the 23h today on Sun 28 Mar 2027 22:00" file="tests/Unit/Calendar/DateWindowTest.php::it computes the 23h today on Sun 28 Mar 2027 22:00" class="Tests\Unit\Calendar\DateWindowTest" classname="Tests.Unit.Calendar.DateWindowTest" assertions="1" time="0.011278"/>
+      <testcase name="it keeps start and end zoned in Europe/London" file="tests/Unit/Calendar/DateWindowTest.php::it keeps start and end zoned in Europe/London" class="Tests\Unit\Calendar\DateWindowTest" classname="Tests.Unit.Calendar.DateWindowTest" assertions="3" time="0.011718"/>
+      <testcase name="it treats a UTC now that is already Saturday in London as the current weekend" file="tests/Unit/Calendar/DateWindowTest.php::it treats a UTC now that is already Saturday in London as the current weekend" class="Tests\Unit\Calendar\DateWindowTest" classname="Tests.Unit.Calendar.DateWindowTest" assertions="1" time="0.012191"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\Public\DateFilterTest" file="tests/Feature/Public/DateFilterTest.php" tests="28" assertions="77" errors="0" failures="13" skipped="0" time="1.547923">
+      <testcase name="it lists only occurrences overlapping today" file="tests/Feature/Public/DateFilterTest.php::it lists only occurrences overlapping today" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="2" time="0.346883"/>
+      <testcase name="it applies the weekend window edges exactly (half-open, consistent with expiry)" file="tests/Feature/Public/DateFilterTest.php::it applies the weekend window edges exactly (half-open, consistent with expiry)" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="2" time="0.072787"/>
+      <testcase name="it limits This week on Sunday 23:30 to what has not yet expired today" file="tests/Feature/Public/DateFilterTest.php::it limits This week on Sunday 23:30 to what has not yet expired today" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="2" time="0.045980"/>
+      <testcase name="it runs This week from Monday to the exclusive next Monday 00:00" file="tests/Feature/Public/DateFilterTest.php::it runs This week from Monday to the exclusive next Monday 00:00" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="2" time="0.046178"/>
+      <testcase name="it shows a multi-day event in every window it overlaps under the right heading (viewed Wednesday)" file="tests/Feature/Public/DateFilterTest.php::it shows a multi-day event in every window it overlaps under the right heading (viewed Wednesday)" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="2" time="0.071050">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it shows a multi-day event in every window it overlaps under the right heading (viewed Wednesday)Failed asserting that '&lt;!DOCTYPE html&gt;
+&lt;html lang="en-GB"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;meta name="x-release" content="attleborough-events"&gt;
+    &lt;title&gt;What&amp;#039;s on | What&amp;#039;s On Attleborough&lt;/title&gt;
+        &lt;link rel="canonical" href="http://localhost:8000/"&gt;
+            &lt;meta name="robots" content="noindex, follow"&gt;
+        &lt;meta name="description" content="See what&amp;#039;s on in Attleborough in one place."&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header&gt;
+        &lt;a href="http://localhost:8000"&gt;What&amp;#039;s On Attleborough&lt;/a&gt;
+        &lt;p&gt;See what&amp;#039;s on in Attleborough in one place.&lt;/p&gt;
+    &lt;/header&gt;
+
+    &lt;main id="main"&gt;
+            &lt;h1&gt;What's on in Attleborough&lt;/h1&gt;
+
+    &lt;nav aria-label="Filter events" class="filter-chips"&gt;
+    &lt;div role="group" aria-labelledby="chips-when"&gt;
+        &lt;span id="chips-when"&gt;When&lt;/span&gt;
+        &lt;a href="http://localhost:8000"&gt;All upcoming&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=today"&gt;Today&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=weekend" aria-current="true"&gt;This weekend&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=week"&gt;This week&lt;/a&gt;
+            &lt;/div&gt;
+&lt;/nav&gt;
+
+            &lt;section aria-labelledby="day-2026-10-30"&gt;
+            &lt;h2 id="day-2026-10-30"&gt;
+                &lt;time datetime="2026-10-30"&gt;Friday 30 October&lt;/time&gt;
+            &lt;/h2&gt;
+            &lt;ul&gt;
+                                    &lt;li&gt;
+    &lt;article&gt;
+        &lt;h3&gt;Harvest Fair&lt;/h3&gt;
+        &lt;p&gt;
+            &lt;time datetime="2026-10-30T00:00:00+00:00"&gt;All day until Sun 1 Nov&lt;/time&gt;
+        &lt;/p&gt;
+        &lt;p&gt;Bennett Ltd Hall&lt;/p&gt;
+    &lt;/article&gt;
+&lt;/li&gt;
+                            &lt;/ul&gt;
+        &lt;/section&gt;
+    
+        &lt;/main&gt;
+
+    &lt;footer&gt;
+        &lt;p&gt;Contact: &lt;a href="mailto:hello@whatsonattleborough.co.uk"&gt;hello@whatsonattleborough.co.uk&lt;/a&gt;&lt;/p&gt;
+    &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+' contains "Saturday 31 October" in specified order..
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:748
+at tests/Feature/Public/DateFilterTest.php:67</failure>
+      </testcase>
+      <testsuite name="it shows a multi-day event under Today in every window when viewed on its Saturday" tests="3" assertions="6" errors="0" failures="0" skipped="0" time="0.130979">
+        <testcase name="it shows a multi-day event under Today in every window when viewed on its Saturday with data set &quot;('today')&quot;" file="tests/Feature/Public/DateFilterTest.php::it shows a multi-day event under Today in every window when viewed on its Saturday with data set &quot;('today')&quot;" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="2" time="0.046049"/>
+        <testcase name="it shows a multi-day event under Today in every window when viewed on its Saturday with data set &quot;('weekend')&quot;" file="tests/Feature/Public/DateFilterTest.php::it shows a multi-day event under Today in every window when viewed on its Saturday with data set &quot;('weekend')&quot;" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="2" time="0.042427"/>
+        <testcase name="it shows a multi-day event under Today in every window when viewed on its Saturday with data set &quot;('week')&quot;" file="tests/Feature/Public/DateFilterTest.php::it shows a multi-day event under Today in every window when viewed on its Saturday with data set &quot;('week')&quot;" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="2" time="0.042503"/>
+      </testsuite>
+      <testcase name="it lists an all-day weekend event across the October clock change in weekend and week but not today" file="tests/Feature/Public/DateFilterTest.php::it lists an all-day weekend event across the October clock change in weekend and week but not today" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="3" time="0.041994"/>
+      <testsuite name="it keeps a cancelled occurrence listed with a Cancelled badge in every window until it expires" tests="3" assertions="9" errors="0" failures="3" skipped="0" time="0.112031">
+        <testcase name="it keeps a cancelled occurrence listed with a Cancelled badge in every window until it expires with data set &quot;('today')&quot;" file="tests/Feature/Public/DateFilterTest.php::it keeps a cancelled occurrence listed with a Cancelled badge in every window until it expires with data set &quot;('today')&quot;" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="3" time="0.034223">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it keeps a cancelled occurrence listed with a Cancelled badge in every window until it expires with data set "('today')"Failed asserting that '&lt;article&gt;\n
+        &lt;h3&gt;Bonfire&lt;/h3&gt;\n
+        &lt;p&gt;\n
+            &lt;time datetime="2026-10-31T19:00:00+00:00"&gt;Sat 31 Oct, 7pm&lt;/time&gt;\n
+        &lt;/p&gt;\n
+        &lt;p&gt;Patel Ltd Hall&lt;/p&gt;\n
+    &lt;/article&gt;' [ASCII](length: 182) contains "Cancelled" [ASCII](length: 9).
+at tests/Feature/Public/DateFilterTest.php:94</failure>
+        </testcase>
+        <testcase name="it keeps a cancelled occurrence listed with a Cancelled badge in every window until it expires with data set &quot;('weekend')&quot;" file="tests/Feature/Public/DateFilterTest.php::it keeps a cancelled occurrence listed with a Cancelled badge in every window until it expires with data set &quot;('weekend')&quot;" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="3" time="0.037986">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it keeps a cancelled occurrence listed with a Cancelled badge in every window until it expires with data set "('weekend')"Failed asserting that '&lt;article&gt;\n
+        &lt;h3&gt;Bonfire&lt;/h3&gt;\n
+        &lt;p&gt;\n
+            &lt;time datetime="2026-10-31T19:00:00+00:00"&gt;Sat 31 Oct, 7pm&lt;/time&gt;\n
+        &lt;/p&gt;\n
+        &lt;p&gt;Shaw Ltd Hall&lt;/p&gt;\n
+    &lt;/article&gt;' [ASCII](length: 181) contains "Cancelled" [ASCII](length: 9).
+at tests/Feature/Public/DateFilterTest.php:94</failure>
+        </testcase>
+        <testcase name="it keeps a cancelled occurrence listed with a Cancelled badge in every window until it expires with data set &quot;('week')&quot;" file="tests/Feature/Public/DateFilterTest.php::it keeps a cancelled occurrence listed with a Cancelled badge in every window until it expires with data set &quot;('week')&quot;" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="3" time="0.039822">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it keeps a cancelled occurrence listed with a Cancelled badge in every window until it expires with data set "('week')"Failed asserting that '&lt;article&gt;\n
+        &lt;h3&gt;Bonfire&lt;/h3&gt;\n
+        &lt;p&gt;\n
+            &lt;time datetime="2026-10-31T19:00:00+00:00"&gt;Sat 31 Oct, 7pm&lt;/time&gt;\n
+        &lt;/p&gt;\n
+        &lt;p&gt;Martin Ltd Hall&lt;/p&gt;\n
+    &lt;/article&gt;' [ASCII](length: 183) contains "Cancelled" [ASCII](length: 9).
+at tests/Feature/Public/DateFilterTest.php:94</failure>
+        </testcase>
+      </testsuite>
+      <testsuite name="it keeps an occurrence of a cancelled event listed with a Cancelled badge in every window" tests="3" assertions="9" errors="0" failures="3" skipped="0" time="0.113105">
+        <testcase name="it keeps an occurrence of a cancelled event listed with a Cancelled badge in every window with data set &quot;('today')&quot;" file="tests/Feature/Public/DateFilterTest.php::it keeps an occurrence of a cancelled event listed with a Cancelled badge in every window with data set &quot;('today')&quot;" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="3" time="0.040920">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it keeps an occurrence of a cancelled event listed with a Cancelled badge in every window with data set "('today')"Failed asserting that '&lt;article&gt;\n
+        &lt;h3&gt;Bonfire&lt;/h3&gt;\n
+        &lt;p&gt;\n
+            &lt;time datetime="2026-10-31T19:00:00+00:00"&gt;Sat 31 Oct, 7pm&lt;/time&gt;\n
+        &lt;/p&gt;\n
+        &lt;p&gt;Morgan Ltd Hall&lt;/p&gt;\n
+    &lt;/article&gt;' [ASCII](length: 183) contains "Cancelled" [ASCII](length: 9).
+at tests/Feature/Public/DateFilterTest.php:106</failure>
+        </testcase>
+        <testcase name="it keeps an occurrence of a cancelled event listed with a Cancelled badge in every window with data set &quot;('weekend')&quot;" file="tests/Feature/Public/DateFilterTest.php::it keeps an occurrence of a cancelled event listed with a Cancelled badge in every window with data set &quot;('weekend')&quot;" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="3" time="0.036772">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it keeps an occurrence of a cancelled event listed with a Cancelled badge in every window with data set "('weekend')"Failed asserting that '&lt;article&gt;\n
+        &lt;h3&gt;Bonfire&lt;/h3&gt;\n
+        &lt;p&gt;\n
+            &lt;time datetime="2026-10-31T19:00:00+00:00"&gt;Sat 31 Oct, 7pm&lt;/time&gt;\n
+        &lt;/p&gt;\n
+        &lt;p&gt;Brown Ltd Hall&lt;/p&gt;\n
+    &lt;/article&gt;' [ASCII](length: 182) contains "Cancelled" [ASCII](length: 9).
+at tests/Feature/Public/DateFilterTest.php:106</failure>
+        </testcase>
+        <testcase name="it keeps an occurrence of a cancelled event listed with a Cancelled badge in every window with data set &quot;('week')&quot;" file="tests/Feature/Public/DateFilterTest.php::it keeps an occurrence of a cancelled event listed with a Cancelled badge in every window with data set &quot;('week')&quot;" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="3" time="0.035412">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it keeps an occurrence of a cancelled event listed with a Cancelled badge in every window with data set "('week')"Failed asserting that '&lt;article&gt;\n
+        &lt;h3&gt;Bonfire&lt;/h3&gt;\n
+        &lt;p&gt;\n
+            &lt;time datetime="2026-10-31T19:00:00+00:00"&gt;Sat 31 Oct, 7pm&lt;/time&gt;\n
+        &lt;/p&gt;\n
+        &lt;p&gt;Campbell Ltd Hall&lt;/p&gt;\n
+    &lt;/article&gt;' [ASCII](length: 185) contains "Cancelled" [ASCII](length: 9).
+at tests/Feature/Public/DateFilterTest.php:106</failure>
+        </testcase>
+      </testsuite>
+      <testsuite name="it never shows hidden occurrences or occurrences of hidden events in any window" tests="4" assertions="16" errors="0" failures="0" skipped="0" time="0.191315">
+        <testcase name="it never shows hidden occurrences or occurrences of hidden events in any window with data set &quot;('/')&quot;" file="tests/Feature/Public/DateFilterTest.php::it never shows hidden occurrences or occurrences of hidden events in any window with data set &quot;('/')&quot;" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="4" time="0.047370"/>
+        <testcase name="it never shows hidden occurrences or occurrences of hidden events in any window with data set &quot;('/?when=today')&quot;" file="tests/Feature/Public/DateFilterTest.php::it never shows hidden occurrences or occurrences of hidden events in any window with data set &quot;('/?when=today')&quot;" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="4" time="0.046700"/>
+        <testcase name="it never shows hidden occurrences or occurrences of hidden events in any window with data set &quot;('/?when=weekend')&quot;" file="tests/Feature/Public/DateFilterTest.php::it never shows hidden occurrences or occurrences of hidden events in any window with data set &quot;('/?when=weekend')&quot;" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="4" time="0.045941"/>
+        <testcase name="it never shows hidden occurrences or occurrences of hidden events in any window with data set &quot;('/?when=week')&quot;" file="tests/Feature/Public/DateFilterTest.php::it never shows hidden occurrences or occurrences of hidden events in any window with data set &quot;('/?when=week')&quot;" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="4" time="0.051304"/>
+      </testsuite>
+      <testcase name="it orders a window by ongoing first, then starts_at, then id" file="tests/Feature/Public/DateFilterTest.php::it orders a window by ongoing first, then starts_at, then id" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="3" time="0.055092"/>
+      <testcase name="it walks every week occurrence exactly once through More events, keeping when=week" file="tests/Feature/Public/DateFilterTest.php::it walks every week occurrence exactly once through More events, keeping when=week" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="7" time="0.072541"/>
+      <testcase name="it adds the year to headings outside the current London year inside time datetime" file="tests/Feature/Public/DateFilterTest.php::it adds the year to headings outside the current London year inside time datetime" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="2" time="0.035688">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it adds the year to headings outside the current London year inside time datetimeFailed asserting that '&lt;!DOCTYPE html&gt;\n
+&lt;html lang="en-GB"&gt;\n
+&lt;head&gt;\n
+    &lt;meta charset="utf-8"&gt;\n
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;\n
+    &lt;meta name="x-release" content="attleborough-events"&gt;\n
+    &lt;title&gt;What&amp;#039;s on | What&amp;#039;s On Attleborough&lt;/title&gt;\n
+        &lt;link rel="canonical" href="http://localhost:8000/"&gt;\n
+        &lt;meta name="description" content="See what&amp;#039;s on in Attleborough in one place."&gt;\n
+&lt;/head&gt;\n
+&lt;body&gt;\n
+    &lt;header&gt;\n
+        &lt;a href="http://localhost:8000"&gt;What&amp;#039;s On Attleborough&lt;/a&gt;\n
+        &lt;p&gt;See what&amp;#039;s on in Attleborough in one place.&lt;/p&gt;\n
+    &lt;/header&gt;\n
+\n
+    &lt;main id="main"&gt;\n
+            &lt;h1&gt;What's on in Attleborough&lt;/h1&gt;\n
+\n
+    &lt;nav aria-label="Filter events" class="filter-chips"&gt;\n
+    &lt;div role="group" aria-labelledby="chips-when"&gt;\n
+        &lt;span id="chips-when"&gt;When&lt;/span&gt;\n
+        &lt;a href="http://localhost:8000" aria-current="true"&gt;All upcoming&lt;/a&gt;\n
+                    &lt;a href="http://localhost:8000?when=today"&gt;Today&lt;/a&gt;\n
+                    &lt;a href="http://localhost:8000?when=weekend"&gt;This weekend&lt;/a&gt;\n
+                    &lt;a href="http://localhost:8000?when=week"&gt;This week&lt;/a&gt;\n
+            &lt;/div&gt;\n
+&lt;/nav&gt;\n
+\n
+            &lt;section aria-labelledby="day-2027-01-01"&gt;\n
+            &lt;h2 id="day-2027-01-01"&gt;\n
+                &lt;time datetime="2027-01-01"&gt;Friday 1 January&lt;/time&gt;\n
+            &lt;/h2&gt;\n
+            &lt;ul&gt;\n
+                                    &lt;li&gt;\n
+    &lt;article&gt;\n
+        &lt;h3&gt;New Year Swim&lt;/h3&gt;\n
+        &lt;p&gt;\n
+            &lt;time datetime="2027-01-01T11:00:00+00:00"&gt;Fri 1 Jan, 11am&lt;/time&gt;\n
+        &lt;/p&gt;\n
+        &lt;p&gt;Cooper Ltd Hall&lt;/p&gt;\n
+    &lt;/article&gt;\n
+&lt;/li&gt;\n
+                            &lt;/ul&gt;\n
+        &lt;/section&gt;\n
+    \n
+        &lt;/main&gt;\n
+\n
+    &lt;footer&gt;\n
+        &lt;p&gt;Contact: &lt;a href="mailto:hello@whatsonattleborough.co.uk"&gt;hello@whatsonattleborough.co.uk&lt;/a&gt;&lt;/p&gt;\n
+    &lt;/footer&gt;\n
+&lt;/body&gt;\n
+&lt;/html&gt;\n
+' [ASCII](length: 1817) contains "&lt;time datetime="2027-01-01"&gt;Friday 1 January 2027&lt;/time&gt;" [ASCII](length: 56).
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:720
+at tests/Feature/Public/DateFilterTest.php:166</failure>
+      </testcase>
+      <testcase name="it shows the Today empty state linking to the weekend chip" file="tests/Feature/Public/DateFilterTest.php::it shows the Today empty state linking to the weekend chip" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="2" time="0.060140">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it shows the Today empty state linking to the weekend chipFailed asserting that '&lt;!DOCTYPE html&gt;
+&lt;html lang="en-GB"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;meta name="x-release" content="attleborough-events"&gt;
+    &lt;title&gt;What&amp;#039;s on | What&amp;#039;s On Attleborough&lt;/title&gt;
+        &lt;link rel="canonical" href="http://localhost:8000/"&gt;
+            &lt;meta name="robots" content="noindex, follow"&gt;
+        &lt;meta name="description" content="See what&amp;#039;s on in Attleborough in one place."&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header&gt;
+        &lt;a href="http://localhost:8000"&gt;What&amp;#039;s On Attleborough&lt;/a&gt;
+        &lt;p&gt;See what&amp;#039;s on in Attleborough in one place.&lt;/p&gt;
+    &lt;/header&gt;
+
+    &lt;main id="main"&gt;
+            &lt;h1&gt;What's on in Attleborough&lt;/h1&gt;
+
+    &lt;nav aria-label="Filter events" class="filter-chips"&gt;
+    &lt;div role="group" aria-labelledby="chips-when"&gt;
+        &lt;span id="chips-when"&gt;When&lt;/span&gt;
+        &lt;a href="http://localhost:8000"&gt;All upcoming&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=today" aria-current="true"&gt;Today&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=weekend"&gt;This weekend&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=week"&gt;This week&lt;/a&gt;
+            &lt;/div&gt;
+&lt;/nav&gt;
+
+            &lt;p&gt;Nothing on yet. Check back soon.&lt;/p&gt;
+    
+        &lt;/main&gt;
+
+    &lt;footer&gt;
+        &lt;p&gt;Contact: &lt;a href="mailto:hello@whatsonattleborough.co.uk"&gt;hello@whatsonattleborough.co.uk&lt;/a&gt;&lt;/p&gt;
+    &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+' contains "Nothing on today. Why not check the weekend?"..
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:777
+at tests/Feature/Public/DateFilterTest.php:174</failure>
+      </testcase>
+      <testsuite name="it shows the weekend and week empty states linking to everything coming up" tests="2" assertions="4" errors="0" failures="2" skipped="0" time="0.067695">
+        <testcase name="it shows the weekend and week empty states linking to everything coming up with data set &quot;('weekend', 'Nothing on this weekend yet. …ng up.')&quot;" file="tests/Feature/Public/DateFilterTest.php::it shows the weekend and week empty states linking to everything coming up with data set &quot;('weekend', 'Nothing on this weekend yet. …ng up.')&quot;" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="2" time="0.034774">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it shows the weekend and week empty states linking to everything coming up with data set "('weekend', 'Nothing on this weekend yet. …ng up.')"Failed asserting that '&lt;!DOCTYPE html&gt;
+&lt;html lang="en-GB"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;meta name="x-release" content="attleborough-events"&gt;
+    &lt;title&gt;What&amp;#039;s on | What&amp;#039;s On Attleborough&lt;/title&gt;
+        &lt;link rel="canonical" href="http://localhost:8000/"&gt;
+            &lt;meta name="robots" content="noindex, follow"&gt;
+        &lt;meta name="description" content="See what&amp;#039;s on in Attleborough in one place."&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header&gt;
+        &lt;a href="http://localhost:8000"&gt;What&amp;#039;s On Attleborough&lt;/a&gt;
+        &lt;p&gt;See what&amp;#039;s on in Attleborough in one place.&lt;/p&gt;
+    &lt;/header&gt;
+
+    &lt;main id="main"&gt;
+            &lt;h1&gt;What's on in Attleborough&lt;/h1&gt;
+
+    &lt;nav aria-label="Filter events" class="filter-chips"&gt;
+    &lt;div role="group" aria-labelledby="chips-when"&gt;
+        &lt;span id="chips-when"&gt;When&lt;/span&gt;
+        &lt;a href="http://localhost:8000"&gt;All upcoming&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=today"&gt;Today&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=weekend" aria-current="true"&gt;This weekend&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=week"&gt;This week&lt;/a&gt;
+            &lt;/div&gt;
+&lt;/nav&gt;
+
+            &lt;p&gt;Nothing on yet. Check back soon.&lt;/p&gt;
+    
+        &lt;/main&gt;
+
+    &lt;footer&gt;
+        &lt;p&gt;Contact: &lt;a href="mailto:hello@whatsonattleborough.co.uk"&gt;hello@whatsonattleborough.co.uk&lt;/a&gt;&lt;/p&gt;
+    &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+' contains "Nothing on this weekend yet. See everything coming up."..
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:777
+at tests/Feature/Public/DateFilterTest.php:183</failure>
+        </testcase>
+        <testcase name="it shows the weekend and week empty states linking to everything coming up with data set &quot;('week', 'Nothing else on this week. Se…ng up.')&quot;" file="tests/Feature/Public/DateFilterTest.php::it shows the weekend and week empty states linking to everything coming up with data set &quot;('week', 'Nothing else on this week. Se…ng up.')&quot;" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="2" time="0.032920">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it shows the weekend and week empty states linking to everything coming up with data set "('week', 'Nothing else on this week. Se…ng up.')"Failed asserting that '&lt;!DOCTYPE html&gt;
+&lt;html lang="en-GB"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;meta name="x-release" content="attleborough-events"&gt;
+    &lt;title&gt;What&amp;#039;s on | What&amp;#039;s On Attleborough&lt;/title&gt;
+        &lt;link rel="canonical" href="http://localhost:8000/"&gt;
+            &lt;meta name="robots" content="noindex, follow"&gt;
+        &lt;meta name="description" content="See what&amp;#039;s on in Attleborough in one place."&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header&gt;
+        &lt;a href="http://localhost:8000"&gt;What&amp;#039;s On Attleborough&lt;/a&gt;
+        &lt;p&gt;See what&amp;#039;s on in Attleborough in one place.&lt;/p&gt;
+    &lt;/header&gt;
+
+    &lt;main id="main"&gt;
+            &lt;h1&gt;What's on in Attleborough&lt;/h1&gt;
+
+    &lt;nav aria-label="Filter events" class="filter-chips"&gt;
+    &lt;div role="group" aria-labelledby="chips-when"&gt;
+        &lt;span id="chips-when"&gt;When&lt;/span&gt;
+        &lt;a href="http://localhost:8000"&gt;All upcoming&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=today"&gt;Today&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=weekend"&gt;This weekend&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=week" aria-current="true"&gt;This week&lt;/a&gt;
+            &lt;/div&gt;
+&lt;/nav&gt;
+
+            &lt;p&gt;Nothing on yet. Check back soon.&lt;/p&gt;
+    
+        &lt;/main&gt;
+
+    &lt;footer&gt;
+        &lt;p&gt;Contact: &lt;a href="mailto:hello@whatsonattleborough.co.uk"&gt;hello@whatsonattleborough.co.uk&lt;/a&gt;&lt;/p&gt;
+    &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+' contains "Nothing else on this week. See everything coming up."..
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:777
+at tests/Feature/Public/DateFilterTest.php:183</failure>
+        </testcase>
+      </testsuite>
+      <testcase name="it shows the end-of-list state for a page past the end, linking to page 1 with the same filters" file="tests/Feature/Public/DateFilterTest.php::it shows the end-of-list state for a page past the end, linking to page 1 with the same filters" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="2" time="0.033289">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it shows the end-of-list state for a page past the end, linking to page 1 with the same filtersFailed asserting that '&lt;!DOCTYPE html&gt;
+&lt;html lang="en-GB"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;meta name="x-release" content="attleborough-events"&gt;
+    &lt;title&gt;What&amp;#039;s on | What&amp;#039;s On Attleborough&lt;/title&gt;
+        &lt;link rel="canonical" href="http://localhost:8000/"&gt;
+            &lt;meta name="robots" content="noindex, follow"&gt;
+        &lt;meta name="description" content="See what&amp;#039;s on in Attleborough in one place."&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header&gt;
+        &lt;a href="http://localhost:8000"&gt;What&amp;#039;s On Attleborough&lt;/a&gt;
+        &lt;p&gt;See what&amp;#039;s on in Attleborough in one place.&lt;/p&gt;
+    &lt;/header&gt;
+
+    &lt;main id="main"&gt;
+            &lt;h1&gt;What's on in Attleborough&lt;/h1&gt;
+
+    &lt;nav aria-label="Filter events" class="filter-chips"&gt;
+    &lt;div role="group" aria-labelledby="chips-when"&gt;
+        &lt;span id="chips-when"&gt;When&lt;/span&gt;
+        &lt;a href="http://localhost:8000"&gt;All upcoming&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=today"&gt;Today&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=weekend" aria-current="true"&gt;This weekend&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=week"&gt;This week&lt;/a&gt;
+            &lt;/div&gt;
+&lt;/nav&gt;
+
+            &lt;p&gt;Nothing on yet. Check back soon.&lt;/p&gt;
+    
+        &lt;/main&gt;
+
+    &lt;footer&gt;
+        &lt;p&gt;Contact: &lt;a href="mailto:hello@whatsonattleborough.co.uk"&gt;hello@whatsonattleborough.co.uk&lt;/a&gt;&lt;/p&gt;
+    &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+' contains "You've reached the end of the list."..
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:777
+at tests/Feature/Public/DateFilterTest.php:196</failure>
+      </testcase>
+      <testcase name="it keeps the 01-01 empty state when nothing is published and no filter is set" file="tests/Feature/Public/DateFilterTest.php::it keeps the 01-01 empty state when nothing is published and no filter is set" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="2" time="0.027083"/>
+      <testcase name="it shows a Showing summary and page title for the active filter only" file="tests/Feature/Public/DateFilterTest.php::it shows a Showing summary and page title for the active filter only" class="Tests\Feature\Public\DateFilterTest" classname="Tests.Feature.Public.DateFilterTest" assertions="2" time="0.024095">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it shows a Showing summary and page title for the active filter onlyFailed asserting that '&lt;!DOCTYPE html&gt;
+&lt;html lang="en-GB"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;meta name="x-release" content="attleborough-events"&gt;
+    &lt;title&gt;What&amp;#039;s on | What&amp;#039;s On Attleborough&lt;/title&gt;
+        &lt;link rel="canonical" href="http://localhost:8000/"&gt;
+            &lt;meta name="robots" content="noindex, follow"&gt;
+        &lt;meta name="description" content="See what&amp;#039;s on in Attleborough in one place."&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header&gt;
+        &lt;a href="http://localhost:8000"&gt;What&amp;#039;s On Attleborough&lt;/a&gt;
+        &lt;p&gt;See what&amp;#039;s on in Attleborough in one place.&lt;/p&gt;
+    &lt;/header&gt;
+
+    &lt;main id="main"&gt;
+            &lt;h1&gt;What's on in Attleborough&lt;/h1&gt;
+
+    &lt;nav aria-label="Filter events" class="filter-chips"&gt;
+    &lt;div role="group" aria-labelledby="chips-when"&gt;
+        &lt;span id="chips-when"&gt;When&lt;/span&gt;
+        &lt;a href="http://localhost:8000"&gt;All upcoming&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=today"&gt;Today&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=weekend" aria-current="true"&gt;This weekend&lt;/a&gt;
+                    &lt;a href="http://localhost:8000?when=week"&gt;This week&lt;/a&gt;
+            &lt;/div&gt;
+&lt;/nav&gt;
+
+            &lt;p&gt;Nothing on yet. Check back soon.&lt;/p&gt;
+    
+        &lt;/main&gt;
+
+    &lt;footer&gt;
+        &lt;p&gt;Contact: &lt;a href="mailto:hello@whatsonattleborough.co.uk"&gt;hello@whatsonattleborough.co.uk&lt;/a&gt;&lt;/p&gt;
+    &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+' contains "Showing: This weekend"..
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:777
+at tests/Feature/Public/DateFilterTest.php:209</failure>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\Public\CalendarListTest" file="tests/Feature/Public/CalendarListTest.php" tests="7" assertions="17" errors="0" failures="0" skipped="0" time="0.264926">
+      <testcase name="it renders an empty state with 200 when nothing is published" file="tests/Feature/Public/CalendarListTest.php::it renders an empty state with 200 when nothing is published" class="Tests\Feature\Public\CalendarListTest" classname="Tests.Feature.Public.CalendarListTest" assertions="2" time="0.023337"/>
+      <testcase name="it does not list an occurrence whose expires_at equals now" file="tests/Feature/Public/CalendarListTest.php::it does not list an occurrence whose expires_at equals now" class="Tests\Feature\Public\CalendarListTest" classname="Tests.Feature.Public.CalendarListTest" assertions="3" time="0.041850"/>
+      <testcase name="it lists an occurrence expiring one second after now" file="tests/Feature/Public/CalendarListTest.php::it lists an occurrence expiring one second after now" class="Tests\Feature\Public\CalendarListTest" classname="Tests.Feature.Public.CalendarListTest" assertions="2" time="0.035727"/>
+      <testcase name="it orders occurrences with an identical start by id" file="tests/Feature/Public/CalendarListTest.php::it orders occurrences with an identical start by id" class="Tests\Feature\Public\CalendarListTest" classname="Tests.Feature.Public.CalendarListTest" assertions="2" time="0.041950"/>
+      <testcase name="it groups an ongoing multi-day occurrence that started yesterday under Today" file="tests/Feature/Public/CalendarListTest.php::it groups an ongoing multi-day occurrence that started yesterday under Today" class="Tests\Feature\Public\CalendarListTest" classname="Tests.Feature.Public.CalendarListTest" assertions="3" time="0.039126"/>
+      <testcase name="it labels a single all-day occurrence &quot;All day&quot; under its date heading" file="tests/Feature/Public/CalendarListTest.php::it labels a single all-day occurrence &quot;All day&quot; under its date heading" class="Tests\Feature\Public\CalendarListTest" classname="Tests.Feature.Public.CalendarListTest" assertions="3" time="0.038215"/>
+      <testcase name="it uses Today and Tomorrow headings and drops :00 from whole-hour times" file="tests/Feature/Public/CalendarListTest.php::it uses Today and Tomorrow headings and drops :00 from whole-hour times" class="Tests\Feature\Public\CalendarListTest" classname="Tests.Feature.Public.CalendarListTest" assertions="2" time="0.044722"/>
+    </testsuite>
+  </testsuite>
+</testsuites>
