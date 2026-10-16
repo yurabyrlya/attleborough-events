@@ -23,4 +23,8 @@ return [
     // Occurrences per page on the public list.
     'page_size' => 30,
 
+    // Maximum characters of the plain-text description shown on a card
+    // before it is shortened with an ellipsis.
+    'card_description_chars' => 140,
+
 ];

@@ -4,6 +4,8 @@ namespace App\Calendar;
 
 use App\Enums\EventStatus;
 use App\Enums\OccurrenceStatus;
+use App\Enums\PriceType;
+use App\Models\Category;
 use App\Models\EventOccurrence;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Pagination\Paginator;
@@ -20,6 +22,11 @@ use Illuminate\Contracts\Pagination\Paginator;
  * multi-day occurrence appears in every window it overlaps. Every Carbon
  * bound to the query is converted to UTC first: the query builder formats
  * Carbon values without converting zones.
+ *
+ * Category, Free (price_type = free only) and Family-friendly (the
+ * events.family_friendly flag, independent of category) only add AND
+ * constraints on top of the base set, so cancelled items stay listed and
+ * hidden ones never appear under any combination.
  */
 final class PublicOccurrenceQuery
 {
@@ -41,6 +48,9 @@ final class PublicOccurrenceQuery
             ->whereIn('event_occurrences.status', [OccurrenceStatus::Scheduled->value, OccurrenceStatus::Cancelled->value])
             ->where('event_occurrences.expires_at', '>', $notExpiredBefore->utc())
             ->when($window, fn ($query, DateWindow $window) => $query->where('event_occurrences.starts_at', '<', $window->endUtc()))
+            ->when($filters->category, fn ($query, Category $category) => $query->where('events.category_id', $category->id))
+            ->when($filters->free, fn ($query) => $query->where('events.price_type', PriceType::Free->value))
+            ->when($filters->family, fn ($query) => $query->where('events.family_friendly', true))
             ->orderBy('event_occurrences.starts_at')
             ->orderBy('event_occurrences.id')
             ->with(['event.venue', 'event.category'])

@@ -16,6 +16,8 @@ final readonly class CalendarFilters
 {
     private const KEYS = ['when', 'category', 'free', 'family'];
 
+    private const SLUG_PATTERN = '/^[a-z0-9-]{1,64}$/';
+
     public function __construct(
         public ?DateFilter $when = null,
         public ?Category $category = null,
@@ -30,8 +32,30 @@ final readonly class CalendarFilters
 
         return new self(
             when: $when !== null ? DateFilter::tryFrom($when) : null,
+            category: self::category(self::stringParam($request, 'category')),
+            free: self::stringParam($request, 'free') === '1',
+            family: self::stringParam($request, 'family') === '1',
             hasQueryString: $request->query->count() > 0,
         );
+    }
+
+    /**
+     * Resolve a category slug (lowercase ASCII). A malformed value 404s
+     * before any lookup; an unknown slug 404s. The raw value is never echoed.
+     */
+    private static function category(?string $value): ?Category
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $slug = strtolower($value);
+
+        if (preg_match(self::SLUG_PATTERN, $slug) !== 1) {
+            abort(404);
+        }
+
+        return Category::query()->where('slug', $slug)->first() ?? abort(404);
     }
 
     public static function none(): self
