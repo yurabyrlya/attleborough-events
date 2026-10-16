@@ -2,6 +2,7 @@
 
 use App\Calendar\EventTiming;
 use App\Models\Event;
+use Carbon\CarbonImmutable;
 
 /**
  * DST fixtures: BST ends Sun 25 Oct 2026 (25h day); BST starts Sun 28 Mar 2027 (23h day).
@@ -17,7 +18,7 @@ function timingEvent(array $attributes): Event
     ], $attributes));
 }
 
-function iso(?\Carbon\CarbonImmutable $value): ?string
+function iso(?CarbonImmutable $value): ?string
 {
     return $value?->utc()->format('Y-m-d\TH:i:s\Z');
 }

@@ -101,7 +101,7 @@ final class EventTiming
 
         $spanDays = (int) $event->start_date->diffInDays($event->end_date);
 
-        return CarbonImmutable::createFromFormat('!Y-m-d', $instanceDate, $tz)
+        return $this->localMidnight($instanceDate, $tz)
             ->addDays(max(0, $spanDays))
             ->format('Y-m-d');
     }
