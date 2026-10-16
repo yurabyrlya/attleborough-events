@@ -2,13 +2,16 @@
 
 namespace App\Filament\Resources\Events\RelationManagers;
 
+use App\Filament\Resources\Events\Actions\StatusActions;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 /**
- * Read-only list of a series' generated dates. Rows are written only by
- * OccurrenceGenerator; plan 01-05 adds Cancel/Hide/Restore record actions.
+ * A series' generated dates. Rows are written only by OccurrenceGenerator;
+ * the only mutations offered are the status record actions (cancel / hide /
+ * restore), which delegate to ChangeOccurrenceStatus. Read-only otherwise:
+ * no create, edit or delete.
  */
 class OccurrencesRelationManager extends RelationManager
 {
@@ -39,7 +42,7 @@ class OccurrencesRelationManager extends RelationManager
                     ->badge(),
             ])
             ->headerActions([])
-            ->recordActions([])
+            ->recordActions(StatusActions::forOccurrence())
             ->toolbarActions([]);
     }
 }

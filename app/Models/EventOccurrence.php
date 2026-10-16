@@ -20,7 +20,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property CarbonImmutable|null $ends_at
  * @property CarbonImmutable $expires_at
  * @property OccurrenceStatus $status
+ * @property CarbonImmutable|null $status_changed_at
+ * @property int|null $status_changed_by
  * @property-read Event $event
+ *
+ * status after insert, status_changed_at and status_changed_by are written
+ * only by App\Publishing\Actions\ChangeOccurrenceStatus (never fillable).
  */
 #[Fillable(['event_id', 'recurrence_key', 'starts_at', 'ends_at', 'expires_at', 'status'])]
 class EventOccurrence extends Model
@@ -41,6 +46,14 @@ class EventOccurrence extends Model
     }
 
     /**
+     * @return BelongsTo<User, $this>
+     */
+    public function statusChangedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'status_changed_by');
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array
@@ -50,6 +63,7 @@ class EventOccurrence extends Model
             'starts_at' => 'immutable_datetime',
             'ends_at' => 'immutable_datetime',
             'expires_at' => 'immutable_datetime',
+            'status_changed_at' => 'immutable_datetime',
             'created_at' => 'immutable_datetime',
             'updated_at' => 'immutable_datetime',
         ];
