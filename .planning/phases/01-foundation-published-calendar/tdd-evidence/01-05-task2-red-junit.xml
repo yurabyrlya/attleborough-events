@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="45" assertions="91" errors="0" failures="20" skipped="0" time="2.059155">
+    <testsuite name="Tests\Unit\Enums\StatusTransitionsTest" file="tests/Unit/Enums/StatusTransitionsTest.php" tests="21" assertions="39" errors="0" failures="5" skipped="0" time="0.539225">
+      <testsuite name="it allows exactly the event status transitions in the machine table" tests="9" assertions="14" errors="0" failures="4" skipped="0" time="0.399359">
+        <testcase name="it allows exactly the event status transitions in the machine table with data set &quot;dataset &quot;published → hidden&quot;&quot;" file="tests/Unit/Enums/StatusTransitionsTest.php::it allows exactly the event status transitions in the machine table with data set &quot;dataset &quot;published → hidden&quot;&quot;" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="1" time="0.298731">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it allows exactly the event status transitions in the machine table with data set "dataset "published → hidden""Failed asserting that false is identical to true.
+at tests/Unit/Enums/StatusTransitionsTest.php:37</failure>
+        </testcase>
+        <testcase name="it allows exactly the event status transitions in the machine table with data set &quot;dataset &quot;published → cancelled&quot;&quot;" file="tests/Unit/Enums/StatusTransitionsTest.php::it allows exactly the event status transitions in the machine table with data set &quot;dataset &quot;published → cancelled&quot;&quot;" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="1" time="0.020948">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it allows exactly the event status transitions in the machine table with data set "dataset "published → cancelled""Failed asserting that false is identical to true.
+at tests/Unit/Enums/StatusTransitionsTest.php:37</failure>
+        </testcase>
+        <testcase name="it allows exactly the event status transitions in the machine table with data set &quot;dataset &quot;published → published&quot;&quot;" file="tests/Unit/Enums/StatusTransitionsTest.php::it allows exactly the event status transitions in the machine table with data set &quot;dataset &quot;published → published&quot;&quot;" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="2" time="0.012293"/>
+        <testcase name="it allows exactly the event status transitions in the machine table with data set &quot;dataset &quot;hidden → published&quot;&quot;" file="tests/Unit/Enums/StatusTransitionsTest.php::it allows exactly the event status transitions in the machine table with data set &quot;dataset &quot;hidden → published&quot;&quot;" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="1" time="0.011954">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it allows exactly the event status transitions in the machine table with data set "dataset "hidden → published""Failed asserting that false is identical to true.
+at tests/Unit/Enums/StatusTransitionsTest.php:37</failure>
+        </testcase>
+        <testcase name="it allows exactly the event status transitions in the machine table with data set &quot;dataset &quot;hidden → cancelled&quot;&quot;" file="tests/Unit/Enums/StatusTransitionsTest.php::it allows exactly the event status transitions in the machine table with data set &quot;dataset &quot;hidden → cancelled&quot;&quot;" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="2" time="0.011321"/>
+        <testcase name="it allows exactly the event status transitions in the machine table with data set &quot;dataset &quot;hidden → hidden&quot;&quot;" file="tests/Unit/Enums/StatusTransitionsTest.php::it allows exactly the event status transitions in the machine table with data set &quot;dataset &quot;hidden → hidden&quot;&quot;" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="2" time="0.010731"/>
+        <testcase name="it allows exactly the event status transitions in the machine table with data set &quot;dataset &quot;cancelled → published&quot;&quot;" file="tests/Unit/Enums/StatusTransitionsTest.php::it allows exactly the event status transitions in the machine table with data set &quot;dataset &quot;cancelled → published&quot;&quot;" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="1" time="0.011613">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it allows exactly the event status transitions in the machine table with data set "dataset "cancelled → published""Failed asserting that false is identical to true.
+at tests/Unit/Enums/StatusTransitionsTest.php:37</failure>
+        </testcase>
+        <testcase name="it allows exactly the event status transitions in the machine table with data set &quot;dataset &quot;cancelled → hidden&quot;&quot;" file="tests/Unit/Enums/StatusTransitionsTest.php::it allows exactly the event status transitions in the machine table with data set &quot;dataset &quot;cancelled → hidden&quot;&quot;" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="2" time="0.010953"/>
+        <testcase name="it allows exactly the event status transitions in the machine table with data set &quot;dataset &quot;cancelled → cancelled&quot;&quot;" file="tests/Unit/Enums/StatusTransitionsTest.php::it allows exactly the event status transitions in the machine table with data set &quot;dataset &quot;cancelled → cancelled&quot;&quot;" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="2" time="0.010816"/>
+      </testsuite>
+      <testsuite name="it allows exactly the occurrence status transitions in the machine table" tests="9" assertions="14" errors="0" failures="0" skipped="0" time="0.101242">
+        <testcase name="it allows exactly the occurrence status transitions in the machine table with data set &quot;dataset &quot;scheduled → cancelled&quot;&quot;" file="tests/Unit/Enums/StatusTransitionsTest.php::it allows exactly the occurrence status transitions in the machine table with data set &quot;dataset &quot;scheduled → cancelled&quot;&quot;" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="1" time="0.011247"/>
+        <testcase name="it allows exactly the occurrence status transitions in the machine table with data set &quot;dataset &quot;scheduled → hidden&quot;&quot;" file="tests/Unit/Enums/StatusTransitionsTest.php::it allows exactly the occurrence status transitions in the machine table with data set &quot;dataset &quot;scheduled → hidden&quot;&quot;" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="1" time="0.010880"/>
+        <testcase name="it allows exactly the occurrence status transitions in the machine table with data set &quot;dataset &quot;scheduled → scheduled&quot;&quot;" file="tests/Unit/Enums/StatusTransitionsTest.php::it allows exactly the occurrence status transitions in the machine table with data set &quot;dataset &quot;scheduled → scheduled&quot;&quot;" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="2" time="0.011083"/>
+        <testcase name="it allows exactly the occurrence status transitions in the machine table with data set &quot;dataset &quot;cancelled → scheduled&quot;&quot;" file="tests/Unit/Enums/StatusTransitionsTest.php::it allows exactly the occurrence status transitions in the machine table with data set &quot;dataset &quot;cancelled → scheduled&quot;&quot;" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="1" time="0.011542"/>
+        <testcase name="it allows exactly the occurrence status transitions in the machine table with data set &quot;dataset &quot;cancelled → hidden&quot;&quot;" file="tests/Unit/Enums/StatusTransitionsTest.php::it allows exactly the occurrence status transitions in the machine table with data set &quot;dataset &quot;cancelled → hidden&quot;&quot;" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="2" time="0.011074"/>
+        <testcase name="it allows exactly the occurrence status transitions in the machine table with data set &quot;dataset &quot;cancelled → cancelled&quot;&quot;" file="tests/Unit/Enums/StatusTransitionsTest.php::it allows exactly the occurrence status transitions in the machine table with data set &quot;dataset &quot;cancelled → cancelled&quot;&quot;" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="2" time="0.011128"/>
+        <testcase name="it allows exactly the occurrence status transitions in the machine table with data set &quot;dataset &quot;hidden → scheduled&quot;&quot;" file="tests/Unit/Enums/StatusTransitionsTest.php::it allows exactly the occurrence status transitions in the machine table with data set &quot;dataset &quot;hidden → scheduled&quot;&quot;" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="1" time="0.011760"/>
+        <testcase name="it allows exactly the occurrence status transitions in the machine table with data set &quot;dataset &quot;hidden → cancelled&quot;&quot;" file="tests/Unit/Enums/StatusTransitionsTest.php::it allows exactly the occurrence status transitions in the machine table with data set &quot;dataset &quot;hidden → cancelled&quot;&quot;" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="2" time="0.011123"/>
+        <testcase name="it allows exactly the occurrence status transitions in the machine table with data set &quot;dataset &quot;hidden → hidden&quot;&quot;" file="tests/Unit/Enums/StatusTransitionsTest.php::it allows exactly the occurrence status transitions in the machine table with data set &quot;dataset &quot;hidden → hidden&quot;&quot;" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="2" time="0.011406"/>
+      </testsuite>
+      <testcase name="it names both statuses in the refused transition and exposes them" file="tests/Unit/Enums/StatusTransitionsTest.php::it names both statuses in the refused transition and exposes them" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="6" time="0.011260"/>
+      <testcase name="it lists published and cancelled events publicly but never hidden ones" file="tests/Unit/Enums/StatusTransitionsTest.php::it lists published and cancelled events publicly but never hidden ones" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="1" time="0.015265">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it lists published and cancelled events publicly but never hidden onesFailed asserting that two arrays are identical.
+at tests/Unit/Enums/StatusTransitionsTest.php:77</failure>
+      </testcase>
+      <testcase name="it lists scheduled and cancelled occurrences publicly but never hidden ones" file="tests/Unit/Enums/StatusTransitionsTest.php::it lists scheduled and cancelled occurrences publicly but never hidden ones" class="Tests\Unit\Enums\StatusTransitionsTest" classname="Tests.Unit.Enums.StatusTransitionsTest" assertions="4" time="0.012099"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\Publishing\ChangeOccurrenceStatusTest" file="tests/Feature/Publishing/ChangeOccurrenceStatusTest.php" tests="7" assertions="21" errors="0" failures="0" skipped="0" time="0.524239">
+      <testcase name="it hides then restores a scheduled date, back to scheduled" file="tests/Feature/Publishing/ChangeOccurrenceStatusTest.php::it hides then restores a scheduled date, back to scheduled" class="Tests\Feature\Publishing\ChangeOccurrenceStatusTest" classname="Tests.Feature.Publishing.ChangeOccurrenceStatusTest" assertions="4" time="0.294380"/>
+      <testcase name="it refuses cancelled to hidden and leaves the row as it was" file="tests/Feature/Publishing/ChangeOccurrenceStatusTest.php::it refuses cancelled to hidden and leaves the row as it was" class="Tests\Feature\Publishing\ChangeOccurrenceStatusTest" classname="Tests.Feature.Publishing.ChangeOccurrenceStatusTest" assertions="3" time="0.044450"/>
+      <testcase name="it never touches siblings, times or the recurrence key" file="tests/Feature/Publishing/ChangeOccurrenceStatusTest.php::it never touches siblings, times or the recurrence key" class="Tests\Feature\Publishing\ChangeOccurrenceStatusTest" classname="Tests.Feature.Publishing.ChangeOccurrenceStatusTest" assertions="4" time="0.038560"/>
+      <testcase name="it raises ModelNotFoundException for a row removed after it was loaded" file="tests/Feature/Publishing/ChangeOccurrenceStatusTest.php::it raises ModelNotFoundException for a row removed after it was loaded" class="Tests\Feature\Publishing\ChangeOccurrenceStatusTest" classname="Tests.Feature.Publishing.ChangeOccurrenceStatusTest" assertions="1" time="0.033517"/>
+      <testcase name="it can cancel and hide past occurrences for the record" file="tests/Feature/Publishing/ChangeOccurrenceStatusTest.php::it can cancel and hide past occurrences for the record" class="Tests\Feature\Publishing\ChangeOccurrenceStatusTest" classname="Tests.Feature.Publishing.ChangeOccurrenceStatusTest" assertions="2" time="0.044787"/>
+      <testcase name="it refuses a non-admin actor and changes nothing" file="tests/Feature/Publishing/ChangeOccurrenceStatusTest.php::it refuses a non-admin actor and changes nothing" class="Tests\Feature\Publishing\ChangeOccurrenceStatusTest" classname="Tests.Feature.Publishing.ChangeOccurrenceStatusTest" assertions="4" time="0.030272"/>
+      <testcase name="it logs one info entry with ids, from, to and user_id only" file="tests/Feature/Publishing/ChangeOccurrenceStatusTest.php::it logs one info entry with ids, from, to and user_id only" class="Tests\Feature\Publishing\ChangeOccurrenceStatusTest" classname="Tests.Feature.Publishing.ChangeOccurrenceStatusTest" assertions="3" time="0.038273"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\Publishing\ChangeEventStatusTest" file="tests/Feature/Publishing/ChangeEventStatusTest.php" tests="6" assertions="11" errors="0" failures="4" skipped="0" time="0.201346">
+      <testcase name="it hides a published event, records who and when, and changes nothing else" file="tests/Feature/Publishing/ChangeEventStatusTest.php::it hides a published event, records who and when, and changes nothing else" class="Tests\Feature\Publishing\ChangeEventStatusTest" classname="Tests.Feature.Publishing.ChangeEventStatusTest" assertions="1" time="0.031585">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it hides a published event, records who and when, and changes nothing elseFailed asserting that two variables reference the same object.
+at tests/Feature/Publishing/ChangeEventStatusTest.php:60</failure>
+      </testcase>
+      <testcase name="it refuses a non-admin actor and changes nothing" file="tests/Feature/Publishing/ChangeEventStatusTest.php::it refuses a non-admin actor and changes nothing" class="Tests\Feature\Publishing\ChangeEventStatusTest" classname="Tests.Feature.Publishing.ChangeEventStatusTest" assertions="1" time="0.031151">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it refuses a non-admin actor and changes nothingException [Illuminate\Auth\Access\AuthorizationException] not thrown.
+at tests/Feature/Publishing/ChangeEventStatusTest.php:77</failure>
+      </testcase>
+      <testcase name="it asserts the transition on the freshly locked status, not on a stale model" file="tests/Feature/Publishing/ChangeEventStatusTest.php::it asserts the transition on the freshly locked status, not on a stale model" class="Tests\Feature\Publishing\ChangeEventStatusTest" classname="Tests.Feature.Publishing.ChangeEventStatusTest" assertions="2" time="0.033810">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it asserts the transition on the freshly locked status, not on a stale modelException [App\Publishing\Exceptions\InvalidStatusTransition] not thrown.
+at tests/Feature/Publishing/ChangeEventStatusTest.php:93</failure>
+      </testcase>
+      <testcase name="it leaves an individually cancelled date cancelled, with its own audit values, when the event is reinstated" file="tests/Feature/Publishing/ChangeEventStatusTest.php::it leaves an individually cancelled date cancelled, with its own audit values, when the event is reinstated" class="Tests\Feature\Publishing\ChangeEventStatusTest" classname="Tests.Feature.Publishing.ChangeEventStatusTest" assertions="4" time="0.036287"/>
+      <testcase name="it hides, shows, cancels and reinstates an event whose only occurrence expired yesterday" file="tests/Feature/Publishing/ChangeEventStatusTest.php::it hides, shows, cancels and reinstates an event whose only occurrence expired yesterday" class="Tests\Feature\Publishing\ChangeEventStatusTest" classname="Tests.Feature.Publishing.ChangeEventStatusTest" assertions="2" time="0.038296"/>
+      <testcase name="it logs one info entry with ids, from, to and user_id only" file="tests/Feature/Publishing/ChangeEventStatusTest.php::it logs one info entry with ids, from, to and user_id only" class="Tests\Feature\Publishing\ChangeEventStatusTest" classname="Tests.Feature.Publishing.ChangeEventStatusTest" assertions="1" time="0.030217">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it logs one info entry with ids, from, to and user_id onlyFailed asserting that actual size 0 matches expected size 1.
+at tests/Feature/Publishing/ChangeEventStatusTest.php:137</failure>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\Filament\StatusActionsTest" file="tests/Feature/Filament/StatusActionsTest.php" tests="11" assertions="20" errors="0" failures="11" skipped="0" time="0.794345">
+      <testcase name="it offers Hide and Mark as cancelled for a published event" file="tests/Feature/Filament/StatusActionsTest.php::it offers Hide and Mark as cancelled for a published event" class="Tests\Feature\Filament\StatusActionsTest" classname="Tests.Feature.Filament.StatusActionsTest" assertions="1" time="0.145832">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it offers Hide and Mark as cancelled for a published eventFailed asserting that an action with name [hide] is visible on the [App\Filament\Resources\Events\Pages\EditEvent] component.
+Failed asserting that null is an instance of class Filament\Actions\Action.
+at vendor/filament/actions/src/Testing/TestsActions.php:153
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at vendor/filament/actions/src/Testing/TestsActions.php:220
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/StatusActionsTest.php:67</failure>
+      </testcase>
+      <testcase name="it offers only Show on calendar for a hidden event" file="tests/Feature/Filament/StatusActionsTest.php::it offers only Show on calendar for a hidden event" class="Tests\Feature\Filament\StatusActionsTest" classname="Tests.Feature.Filament.StatusActionsTest" assertions="1" time="0.074208">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it offers only Show on calendar for a hidden eventFailed asserting that an action with name [unhide] is visible on the [App\Filament\Resources\Events\Pages\EditEvent] component.
+Failed asserting that null is an instance of class Filament\Actions\Action.
+at vendor/filament/actions/src/Testing/TestsActions.php:153
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at vendor/filament/actions/src/Testing/TestsActions.php:220
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/StatusActionsTest.php:77</failure>
+      </testcase>
+      <testcase name="it offers only Reinstate for a cancelled event" file="tests/Feature/Filament/StatusActionsTest.php::it offers only Reinstate for a cancelled event" class="Tests\Feature\Filament\StatusActionsTest" classname="Tests.Feature.Filament.StatusActionsTest" assertions="1" time="0.068076">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it offers only Reinstate for a cancelled eventFailed asserting that an action with name [reinstate] is visible on the [App\Filament\Resources\Events\Pages\EditEvent] component.
+Failed asserting that null is an instance of class Filament\Actions\Action.
+at vendor/filament/actions/src/Testing/TestsActions.php:153
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at vendor/filament/actions/src/Testing/TestsActions.php:220
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/StatusActionsTest.php:87</failure>
+      </testcase>
+      <testcase name="it hides then shows the event from its edit page" file="tests/Feature/Filament/StatusActionsTest.php::it hides then shows the event from its edit page" class="Tests\Feature\Filament\StatusActionsTest" classname="Tests.Feature.Filament.StatusActionsTest" assertions="1" time="0.065155">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it hides then shows the event from its edit pageFailed asserting that an action with name [hide] is visible on the [App\Filament\Resources\Events\Pages\EditEvent] component.
+Failed asserting that null is an instance of class Filament\Actions\Action.
+at vendor/filament/actions/src/Testing/TestsActions.php:153
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at vendor/filament/actions/src/Testing/TestsActions.php:220
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at vendor/filament/actions/src/Testing/TestsActions.php:84
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/StatusActionsTest.php:96</failure>
+      </testcase>
+      <testcase name="it cancels then reinstates the event from its edit page" file="tests/Feature/Filament/StatusActionsTest.php::it cancels then reinstates the event from its edit page" class="Tests\Feature\Filament\StatusActionsTest" classname="Tests.Feature.Filament.StatusActionsTest" assertions="1" time="0.063740">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it cancels then reinstates the event from its edit pageFailed asserting that an action with name [cancel] is visible on the [App\Filament\Resources\Events\Pages\EditEvent] component.
+Failed asserting that null is an instance of class Filament\Actions\Action.
+at vendor/filament/actions/src/Testing/TestsActions.php:153
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at vendor/filament/actions/src/Testing/TestsActions.php:220
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at vendor/filament/actions/src/Testing/TestsActions.php:84
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/StatusActionsTest.php:106</failure>
+      </testcase>
+      <testcase name="it requires confirmation for every event and occurrence status action" file="tests/Feature/Filament/StatusActionsTest.php::it requires confirmation for every event and occurrence status action" class="Tests\Feature\Filament\StatusActionsTest" classname="Tests.Feature.Filament.StatusActionsTest" assertions="1" time="0.043020">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it requires confirmation for every event and occurrence status actionFailed asserting that two arrays are identical.
+at tests/Feature/Filament/StatusActionsTest.php:117</failure>
+      </testcase>
+      <testcase name="it changes nothing when a hidden action is called" file="tests/Feature/Filament/StatusActionsTest.php::it changes nothing when a hidden action is called" class="Tests\Feature\Filament\StatusActionsTest" classname="Tests.Feature.Filament.StatusActionsTest" assertions="1" time="0.060318">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it changes nothing when a hidden action is calledFailed asserting that an action with name [reinstate] exists on the [App\Filament\Resources\Events\Pages\EditEvent] component.
+Failed asserting that null is an instance of class Filament\Actions\Action.
+at vendor/filament/actions/src/Testing/TestsActions.php:153
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/StatusActionsTest.php:125</failure>
+      </testcase>
+      <testcase name="it offers Cancel and Hide on a scheduled row and only Restore on cancelled or hidden rows" file="tests/Feature/Filament/StatusActionsTest.php::it offers Cancel and Hide on a scheduled row and only Restore on cancelled or hidden rows" class="Tests\Feature\Filament\StatusActionsTest" classname="Tests.Feature.Filament.StatusActionsTest" assertions="6" time="0.096796">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it offers Cancel and Hide on a scheduled row and only Restore on cancelled or hidden rowsFailed asserting that an action with name [hide] is visible on the [App\Filament\Resources\Events\RelationManagers\OccurrencesRelationManager] component.
+Failed asserting that false is true.
+at vendor/filament/actions/src/Testing/TestsActions.php:162
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at vendor/filament/actions/src/Testing/TestsActions.php:220
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/StatusActionsTest.php:143</failure>
+      </testcase>
+      <testcase name="it restores a hidden row to scheduled from the Occurrences table" file="tests/Feature/Filament/StatusActionsTest.php::it restores a hidden row to scheduled from the Occurrences table" class="Tests\Feature\Filament\StatusActionsTest" classname="Tests.Feature.Filament.StatusActionsTest" assertions="3" time="0.066391">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it restores a hidden row to scheduled from the Occurrences tableFailed asserting that an action with name [restore] is visible on the [App\Filament\Resources\Events\RelationManagers\OccurrencesRelationManager] component.
+Failed asserting that false is true.
+at vendor/filament/actions/src/Testing/TestsActions.php:162
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at vendor/filament/actions/src/Testing/TestsActions.php:220
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at vendor/filament/actions/src/Testing/TestsActions.php:84
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/StatusActionsTest.php:159</failure>
+      </testcase>
+      <testcase name="it keeps the Occurrences table in starts_at ascending order after an action" file="tests/Feature/Filament/StatusActionsTest.php::it keeps the Occurrences table in starts_at ascending order after an action" class="Tests\Feature\Filament\StatusActionsTest" classname="Tests.Feature.Filament.StatusActionsTest" assertions="3" time="0.055205">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it keeps the Occurrences table in starts_at ascending order after an actionFailed asserting that an action with name [hide] is visible on the [App\Filament\Resources\Events\RelationManagers\OccurrencesRelationManager] component.
+Failed asserting that false is true.
+at vendor/filament/actions/src/Testing/TestsActions.php:162
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at vendor/filament/actions/src/Testing/TestsActions.php:220
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at vendor/filament/actions/src/Testing/TestsActions.php:84
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/StatusActionsTest.php:170</failure>
+      </testcase>
+      <testcase name="it filters the Occurrences table by status" file="tests/Feature/Filament/StatusActionsTest.php::it filters the Occurrences table by status" class="Tests\Feature\Filament\StatusActionsTest" classname="Tests.Feature.Filament.StatusActionsTest" assertions="1" time="0.055604">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it filters the Occurrences table by statusFailed asserting that a table filter with name [status] exists on the [App\Filament\Resources\Events\RelationManagers\OccurrencesRelationManager] component.
+Failed asserting that null is an instance of class Filament\Tables\Filters\BaseFilter.
+at vendor/filament/tables/src/Testing/TestsFilters.php:95
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at vendor/filament/tables/src/Testing/TestsFilters.php:30
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/StatusActionsTest.php:182</failure>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

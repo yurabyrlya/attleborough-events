@@ -23,6 +23,16 @@ final class StatusActions
     private const OCCURRENCE_CONFLICT = 'This date changed in the meantime. Refresh the page and try again.';
 
     /**
+     * RED scaffold: header actions for the edit page.
+     *
+     * @return list<Action>
+     */
+    public static function forEvent(): array
+    {
+        return [];
+    }
+
+    /**
      * Record actions for the Occurrences table.
      *
      * @return list<Action>
@@ -39,6 +49,9 @@ final class StatusActions
                 description: 'This date stays on the public calendar with a "Cancelled" label until it has passed.',
                 successTitle: 'Date cancelled',
             ),
+            // RED scaffold: names only, never visible, no behaviour.
+            Action::make('hide')->visible(false),
+            Action::make('restore')->visible(false),
         ];
     }
 

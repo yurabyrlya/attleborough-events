@@ -43,6 +43,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property EventOrigin $origin
  * @property int $approved_by
  * @property CarbonImmutable $approved_at
+ * @property CarbonImmutable|null $status_changed_at
+ * @property int|null $status_changed_by
  */
 #[Fillable([
     'title', 'slug', 'description', 'category_id', 'venue_id', 'family_friendly',
@@ -124,6 +126,7 @@ class Event extends Model
             'start_date' => 'immutable_date',
             'end_date' => 'immutable_date',
             'approved_at' => 'immutable_datetime',
+            'status_changed_at' => 'immutable_datetime',
             'created_at' => 'immutable_datetime',
             'updated_at' => 'immutable_datetime',
         ];
