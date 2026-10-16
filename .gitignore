@@ -2,7 +2,9 @@
 /vendor/
 /node_modules/
 /public/build/
+/public/css/filament
 /public/hot
+/public/js/filament
 /public/storage
 /storage/*.key
 /storage/pail
@@ -18,6 +20,13 @@ yarn-error.log
 auth.json
 Homestead.json
 Homestead.yaml
+*.log
+/public/fonts-manifest.dev.json
+/public/fonts/filament
+_ide_helper.php
+/.nova
+/.codex
+/.cursor/
 
 # OS / editors
 .DS_Store
@@ -26,3 +35,7 @@ Thumbs.db
 /.vscode/
 /.fleet/
 /.zed/
+# Filament assets: republished by `php artisan filament:upgrade` (composer post-autoload-dump)
+/public/js/filament/
+/public/css/filament/
+/public/fonts/filament/
