@@ -46,7 +46,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 01-14-PLAN.md (gap closure: test fixture alignment for stricter publish validation)
 - [x] 01-12-PLAN.md (gap closure: publish write path WR-01/02/03/07)
 - [x] 01-13-PLAN.md (gap closure: UID stability WR-06, edit-page resilience WR-09)
-- [ ] 01-15-PLAN.md (gap closure: WR-10 RRULE round-trip check, WR-11 occurrence status not fillable)
+- [x] 01-15-PLAN.md (gap closure: WR-10 RRULE round-trip check, WR-11 occurrence status not fillable)
 
 **UI hint**: yes
 
@@ -125,7 +125,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Published Calendar | 12/13 | In Progress (gap closure) | - |
+| 1. Foundation & Published Calendar | 13/13 | In Progress (gap closure) | - |
 | 2. Draft Model, Review Queue & Submissions | 0/TBD | Not started | - |
 | 3. Ingestion Backbone, ICS & Change/Duplicate Handling | 0/TBD | Not started | - |
 | 4. Extraction Ladder, Geofence & Live Sources | 0/TBD | Not started | - |
