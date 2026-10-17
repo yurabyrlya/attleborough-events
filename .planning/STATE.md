@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 02
 current_phase_name: Draft Model, Review Queue & Submissions
 status: executing
-stopped_at: Completed 02-10-PLAN.md
-last_updated: "2026-10-17T20:17:28.212Z"
+stopped_at: Completed 02-11-PLAN.md
+last_updated: "2026-10-17T20:26:08.690Z"
 last_activity: 2026-10-17
-last_activity_desc: "Completed 02-07 (Rules screen /admin/rules: Categories + Keyword rules tabs, SaveRules with refusals judged against the submitted state, CategoryAssigner keyword link)"
-state_head: 03158105fbec38755afc226dd3bb15d18046492f
+last_activity_desc: "Completed 02-11 (Rules screen: Category mappings + Geofence tabs, mapping link in CategoryAssigner, RulesSeeder)"
+state_head: 0e14a2c0561d9410c6cc16b6d14068695dacfeb5
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 31
-  completed_plans: 23
+  completed_plans: 24
   percent: 20
 ---
 
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 02 (Draft Model, Review Queue & Submissions) — EXECUTING
-Plan: 10 of 16 complete (02-01 to 02-10 done; wave 3 complete)
+Plan: 11 of 16 complete (02-01 to 02-11 done; wave 4 in progress — 02-12 next)
 Status: Ready to execute
-Last activity: 2026-10-17 — Completed 02-10 (per-IP rate limit on POST /submit: 5/hour + 10/day via the 'submissions' limiter, branded 429 page; D-17 Turnstile exception in AGENTS.md and .ai/guidelines/attleborough.md; Turnstile test keys in .env.example; System health 'Submission spam check' fails in production without keys; SUB-04 complete)
+Last activity: 2026-10-17 — Completed 02-11 (Rules screen complete: Category mappings + Geofence tabs; CategoryMapping is PIPE-03 link 2 "Mapped from '…'"; geofence_terms with NR17-style districts and place names; RulesSeeder create-only defaults wired into DatabaseSeeder; ADM-04 and PIPE-03 complete)
 
-Progress: 23/31 plans ([██░░░░░░░░] 20%); phase 2: 10/16; phases complete: 1/5
+Progress: 24/31 plans ([██░░░░░░░░] 20%); phase 2: 11/16; phases complete: 1/5
 
 ## Performance Metrics
 
@@ -79,6 +79,7 @@ Progress: 23/31 plans ([██░░░░░░░░] 20%); phase 2: 10/16; ph
 | Phase 02 P08 | 5min | 2 tasks | 8 files |
 | Phase 02 P09 | 8min | 3 tasks | 14 files |
 | Phase 02 P10 | 5min | 2 tasks | 10 files |
+| Phase 02 P11 | 6min | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -123,6 +124,9 @@ Recent decisions affecting current work:
 - [Phase 02]: 02-09: resting = production with empty Turnstile site key or secret; elsewhere a missing secret fails closed via the verifier
 - [Phase 02]: 02-10: submissions limiter keys are ip:{address}:hour / :day — identical by() keys in one named limiter share (and double-hit) a counter
 - [Phase 02]: 02-10: HealthReport::spamCheck() reuses StoreSubmissionRequest::formIsResting(); phpunit.xml pins TURNSTILE_* empty so a local .env can't leak into tests
+- [Phase 02]: 02-11: Category mappings are PIPE-03 link 2 (first mapping by id, normalised equality, reason "Mapped from '{value as given}'"); Phase 3 adds category_mappings.source_id and widens the key
+- [Phase 02]: 02-11: Geofence terms stored in geofence_terms (type postcode_district|place_name); districts upper-case without spaces matching ^[A-Z]{1,2}[0-9][0-9A-Z]?$; enforcement Phase 4
+- [Phase 02]: 02-11: RulesSeeder is create-only (case-insensitive firstOrCreate), so re-seeding never reverts admin edits; deleted defaults return on the next seed
 
 ### Pending Todos
 
@@ -156,6 +160,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-17T20:17:27.834Z
-Stopped at: Completed 02-10-PLAN.md
+Last session: 2026-10-17T20:26:08.296Z
+Stopped at: Completed 02-11-PLAN.md
 Resume file: None

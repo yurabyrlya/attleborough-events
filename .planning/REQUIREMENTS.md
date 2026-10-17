@@ -60,7 +60,7 @@
 - [x] **ADM-01**: Admin can log in to a Filament admin panel (single admin account; no public accounts)
 - [x] **ADM-02**: Admin can create an event manually, with simple recurrence (weekly, nth weekday of month) and a source note. It is published with origin `manual` and the admin recorded as approver
 - [x] **ADM-03**: Admin can edit, hide, unhide and cancel published events and individual occurrences. Occurrence status set by the admin survives occurrence regeneration
-- [ ] **ADM-04**: Admin can manage categories and a single Rules screen covering category mappings, title keyword rules, and geofence districts / place names
+- [x] **ADM-04**: Admin can manage categories and a single Rules screen covering category mappings, title keyword rules, and geofence districts / place names
 - [ ] **ADM-05**: Admin sees dashboard counts per period: sources checked, source failures, drafts created / approved / rejected / duplicates, and approval rate per source
 - [ ] **ADM-06**: Admin can search events and drafts
 - [ ] **ADM-07**: Admin can manage contact requests (problem reports, takedowns, data-protection complaints) with a visible 30-day acknowledgement deadline
@@ -92,7 +92,7 @@
 
 - [ ] **PIPE-01**: Past events and events more than 12 months ahead are skipped and counted, not drafted
 - [ ] **PIPE-02**: Events from `filter` sources are kept only if they match postcode districts NR17, NR16, NR18 or IP24 or an allowlisted place name. Online-only events are skipped and unknown locations become flagged drafts. `local` sources skip this filter
-- [ ] **PIPE-03**: Category is assigned deterministically: source default, then mapping of source values, then title keyword rules, else `Other` (flagged)
+- [x] **PIPE-03**: Category is assigned deterministically: source default, then mapping of source values, then title keyword rules, else `Other` (flagged)
 - [x] **PIPE-04**: Each draft gets a 0-100 quality score with band (High 80+, Medium 50-79, Low <50) and the reasons behind it
 - [ ] **PIPE-05**: Likely duplicates (same canonical URL, or same date + similar venue + `pg_trgm` title similarity above a configured threshold, against published events and pending drafts) produce a duplicate warning. Same source + external ID is treated as the same item
 - [ ] **PIPE-06**: A changed known item creates an update draft only when its normalised fields differ from the accepted baseline. Unchanged raw content is skipped. Only one pending draft exists per source item (replaced in place)
@@ -212,7 +212,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ADM-01 | Phase 1 | Complete |
 | ADM-02 | Phase 1 | Complete |
 | ADM-03 | Phase 1 | Complete |
-| ADM-04 | Phase 2 | Pending |
+| ADM-04 | Phase 2 | Complete |
 | ADM-05 | Phase 5 | Pending |
 | ADM-06 | Phase 2 | Pending |
 | ADM-07 | Phase 5 | Pending |
@@ -235,7 +235,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EXT-08 | Phase 4 | Pending |
 | PIPE-01 | Phase 3 | Pending |
 | PIPE-02 | Phase 4 | Pending |
-| PIPE-03 | Phase 2 | Pending |
+| PIPE-03 | Phase 2 | Complete |
 | PIPE-04 | Phase 2 | Complete |
 | PIPE-05 | Phase 3 | Pending |
 | PIPE-06 | Phase 3 | Pending |
