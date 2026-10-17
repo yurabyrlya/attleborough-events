@@ -93,7 +93,7 @@
 - [ ] **PIPE-01**: Past events and events more than 12 months ahead are skipped and counted, not drafted
 - [ ] **PIPE-02**: Events from `filter` sources are kept only if they match postcode districts NR17, NR16, NR18 or IP24 or an allowlisted place name. Online-only events are skipped and unknown locations become flagged drafts. `local` sources skip this filter
 - [ ] **PIPE-03**: Category is assigned deterministically: source default, then mapping of source values, then title keyword rules, else `Other` (flagged)
-- [ ] **PIPE-04**: Each draft gets a 0-100 quality score with band (High 80+, Medium 50-79, Low <50) and the reasons behind it
+- [x] **PIPE-04**: Each draft gets a 0-100 quality score with band (High 80+, Medium 50-79, Low <50) and the reasons behind it
 - [ ] **PIPE-05**: Likely duplicates (same canonical URL, or same date + similar venue + `pg_trgm` title similarity above a configured threshold, against published events and pending drafts) produce a duplicate warning. Same source + external ID is treated as the same item
 - [ ] **PIPE-06**: A changed known item creates an update draft only when its normalised fields differ from the accepted baseline. Unchanged raw content is skipped. Only one pending draft exists per source item (replaced in place)
 - [ ] **PIPE-07**: Items marked cancelled at the source (`STATUS:CANCELLED`, `eventStatus: EventCancelled`) create a cancellation draft
@@ -236,7 +236,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PIPE-01 | Phase 3 | Pending |
 | PIPE-02 | Phase 4 | Pending |
 | PIPE-03 | Phase 2 | Pending |
-| PIPE-04 | Phase 2 | Pending |
+| PIPE-04 | Phase 2 | Complete |
 | PIPE-05 | Phase 3 | Pending |
 | PIPE-06 | Phase 3 | Pending |
 | PIPE-07 | Phase 3 | Pending |

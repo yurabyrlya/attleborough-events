@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 02
 current_phase_name: Draft Model, Review Queue & Submissions
 status: executing
-stopped_at: Completed 02-07-PLAN.md
-last_updated: "2026-10-17T19:47:42.972Z"
+stopped_at: Completed 02-08-PLAN.md
+last_updated: "2026-10-17T19:56:16.717Z"
 last_activity: 2026-10-17
 last_activity_desc: "Completed 02-07 (Rules screen /admin/rules: Categories + Keyword rules tabs, SaveRules with refusals judged against the submitted state, CategoryAssigner keyword link)"
-state_head: 5dbf69f8a56d82aa7f12c8c0d9b1adaa69a2ba59
+state_head: 12232428d01fc5a58c2cb11ffe8d27284377f817
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 31
-  completed_plans: 20
+  completed_plans: 21
   percent: 20
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 02 (Draft Model, Review Queue & Submissions) — EXECUTING
-Plan: 7 of 16 complete (02-01 to 02-07 done; wave 3 in progress with 02-08 to 02-10)
+Plan: 8 of 16 complete (02-01 to 02-08 done; wave 3 in progress with 02-09 to 02-10)
 Status: Ready to execute
 Last activity: 2026-10-17 — Completed 02-07 (category_keyword_rules + CategoryAssigner link 3 by priority then id, whole-word NFC match; SaveRules admin-only, collect-all refusals inside one locked transaction, slugs fixed on create; Filament Rules page with Categories and Keyword rules tabs; PIPE-03/ADM-04 finish in 02-11)
 
@@ -76,6 +76,7 @@ Progress: 20/31 plans ([██░░░░░░░░] 20%); phase 2: 7/16; pha
 | Phase 02 P05 | 10min | 3 tasks | 14 files |
 | Phase 02 P06 | 8min | 2 tasks | 8 files |
 | Phase 02 P07 | 8min | 3 tasks | 11 files |
+| Phase 02 P08 | 5min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -111,6 +112,9 @@ Recent decisions affecting current work:
 - [Phase 02]: Rules refusals are evaluated inside the transaction after locking categories FOR UPDATE; order upsert categories -> sync keyword rules -> delete removed categories
 - [Phase 02]: Keywords stored NFC/whitespace-collapsed with case kept; matching and duplicate checks use CategoryAssigner::normalise(); new rows inserted in submitted order so earlier rows win ties
 - [Phase 02]: A draft uses a category via category_id OR submitted_category_id; new categories default to icon heroicon-o-tag
+- [Phase 02]: 02-08: 'Venue not recognised' (-20) only for a typed venue; a missing venue gets 'Missing venue' (-50) only
+- [Phase 02]: 02-08: Venue recognised = venue_id set or VenueMatcher::exact(name/alias/postcode) hit; matching never writes venue_id (D-05, D-21)
+- [Phase 02]: 02-08: 'No end time' applies to every non-all-day draft without an end time; parse errors deduct once, list 3 then 'and N more'
 
 ### Pending Todos
 
@@ -144,6 +148,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-17T19:47:42.604Z
-Stopped at: Completed 02-07-PLAN.md
+Last session: 2026-10-17T19:56:16.363Z
+Stopped at: Completed 02-08-PLAN.md
 Resume file: None
