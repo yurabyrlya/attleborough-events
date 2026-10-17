@@ -10,7 +10,7 @@ Every imported event goes to the review queue first: nothing is published withou
 - **B. Crawlable web pages (automatic import with page parsers):** 4 sources
 - **C. Allowed, but manual entry:** 5 sources
 - **D. Blocked:** 9 sources, manual entry until one of the listed solutions works
-- **E. Excluded (no usable events):** 10 sites
+- **E. Excluded (no usable events):** 11 sites
 
 ---
 
@@ -220,6 +220,7 @@ We never get around a block: no disguising the crawler as a browser, no CAPTCHA 
 - **Attleborough u3a** (http://u3asites.org.uk/attleborough/): no working site. The secure connection fails and plain HTTP shows an empty holding page. The owner may know the current site.
 - **The Events Calendar demo** (https://demo.theeventscalendar.com/): not local; used only to check the feed format.
 - **The Bear, Attleborough** (https://thebearattleborough.co.uk/): a brochure site with no events page (about, contact, gallery only).
+- **Attleborough Hall Farm** (https://www.attleboroughhallfarm.co.uk/): raw-milk dairy on Wix. robots.txt allows everything and there's no challenge, but there's no events page or events app; the pages (about, services, milk shed, contact) and two blog posts mention no open days or events. If it announces an open day, enter it by hand; recheck its blog feed occasionally.
 
 ---
 
@@ -229,7 +230,7 @@ Searched on 17 October (web search, domain checks, Wikipedia, national directori
 
 - **Rotary and Lions:** no website found (about ten likely domains don't exist; Rotary's club finder needs JavaScript). Probably Facebook only.
 - **Pubs:** The Griffin, The Cock, The London Tavern and The Mulberry Tree have no website found; The Bear's site has no events (see E). Quiz and music nights are probably on Facebook.
-- **Businesses and farms:** nothing new. The Thursday market on Queens Square is already in the Town Council feed.
+- **Businesses and farms:** Attleborough Hall Farm checked (no events, see E). Nothing else found. The Thursday market on Queens Square is already in the Town Council feed.
 - **Women's Institute:** the national WI directory needs JavaScript, and no Norfolk Federation site was found. Some WI sessions appear in the Town Council feed.
 - **Village halls and parish councils** (Besthorpe, Great Ellingham, Deopham, Morley, Rockland St Peter, Larling, Snetterton): no sites found; Old Buckenham's new site is an empty placeholder.
 - **Attleborough Sports Hall:** run by Everyone Active; its listings would be class timetables, not community events.
