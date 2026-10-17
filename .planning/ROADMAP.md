@@ -138,3 +138,14 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 - **EXT-05 (RSS/Atom)** is only part of the Definition of Done if source research finds a qualifying feed. Otherwise it ships as "supported, unused" with fixture tests.
 - **Split rule:** if Phase 3 proves too large during planning, split out "Change & Duplicates" (REV-05..07, PIPE-05..08) as an inserted Phase 3.1 rather than re-cutting the other phases.
 - **Scope change 2026-10-16:** infrastructure/domain deferred to Phase 5 (plans 01-02/01-03 moved to 05-01/05-02). Phase 1 is local-dev + CI only. Note: Phase 4 success criterion 5 and RES-04 say "in production"; until Phase 5 is live, P0 sources run on the local app (see STATE concerns).
+
+## Backlog
+
+### Phase 999.1: Follow-up — Phase 01 deferred UAT follow-up: Tests 8, 9 (BACKLOG)
+
+**Goal:** Resolve the UAT checkpoints deferred during Phase 01 verification
+**Source phase:** 01
+**Deferred at:** 2026-10-17 during /gsd-verify-work 1 session completion
+**Follow-ups:**
+- [ ] Test 8: Acknowledge the 5 insufficient_spec backstops (row-lock serialisation x2, heartbeat upsert, share.js re-entry, ZWJ excerpt cut) or add concurrency tests (deferred 2026-10-17)
+- [ ] Test 9: Review the 4 flagged prohibitions (accept, or add Pest arch/composer.json enforcement tests); owner: "do it at the end once we finish all phases" (deferred 2026-10-17)

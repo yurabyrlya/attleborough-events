@@ -53,7 +53,7 @@ result: pass — laptop parts: event page shows dates with per-date .ics + Googl
 expected: Owner accepts each, or asks for a concurrency test
 why_human: Concurrency or accepted limits with no deterministic test
 result: skipped
-reason: "Owner skipped on 2026-10-17 (backstops neither accepted nor given a test yet)"
+reason: "Deferred follow-up: owner will review the backstops at the end once all phases are finished"
 
 ### 9. Review 4 flagged prohibitions (1 judgment-tier, 3 test-tier with no enforcement test). See the Prohibitions table
 expected: Accept the verifier's manual check or add enforcement tests (e.g. a Pest arch / composer.json assertion)
@@ -85,6 +85,9 @@ None blocking. Minor UX findings from the browser walkthrough (2026-10-17), cand
 ## Deferred Follow-Ups
 
 ```yaml
+- test: 8
+  idea: "Acknowledge the 5 insufficient_spec backstops (or add concurrency tests) at the end once all phases are finished"
+  deferred_at: 2026-10-17
 - test: 9
   idea: "skip as I do it at the end once we finish all phases"
   deferred_at: 2026-10-17
