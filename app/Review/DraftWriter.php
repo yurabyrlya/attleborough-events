@@ -5,6 +5,7 @@ namespace App\Review;
 use App\Enums\DraftKind;
 use App\Enums\EventOrigin;
 use App\Enums\ReviewStatus;
+use App\Models\Category;
 use App\Models\EventDraft;
 use App\Review\Data\DraftData;
 use App\Review\Exceptions\InvalidReviewTransition;
@@ -36,7 +37,7 @@ final class DraftWriter
                 'kind' => DraftKind::New,
                 'review_status' => ReviewStatus::PendingReview,
                 'extraction_method' => $data->extractionMethod,
-                'submitted_category_id' => $data->origin === EventOrigin::Submission ? $data->preferredCategoryId : null,
+                'submitted_category_id' => $this->submittedCategoryId($data),
                 'raw_payload' => $data->rawPayload,
                 'consented_at' => $data->consentedAt?->utc(),
             ]);
@@ -46,6 +47,20 @@ final class DraftWriter
 
             return $draft;
         });
+    }
+
+    /**
+     * The organiser's category pick, kept for review. Only an existing
+     * category: a stale or tampered id is dropped (the draft then falls back
+     * to Other) instead of failing the submission on the foreign key.
+     */
+    private function submittedCategoryId(DraftData $data): ?int
+    {
+        if ($data->origin !== EventOrigin::Submission || $data->preferredCategoryId === null) {
+            return null;
+        }
+
+        return Category::query()->whereKey($data->preferredCategoryId)->exists() ? $data->preferredCategoryId : null;
     }
 
     /**
