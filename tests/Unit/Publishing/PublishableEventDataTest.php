@@ -81,12 +81,55 @@ it('rejects input the publish form would refuse, naming the problem', function (
         'repeatEnds' => RepeatEnds::OnDate,
         'repeatUntil' => '2026-10-01',
     ], 'last date'],
-    'neither source URL nor organiser contact' => [
-        ['sourceUrl' => null, 'organiserContact' => null],
-        'source URL or an organiser contact',
+    'no source URL, organiser contact or website' => [
+        ['sourceUrl' => null, 'organiserContact' => null, 'organiserWebsite' => null],
+        'Add a source URL, an organiser contact or a website.',
     ],
-    'whitespace-only source and contact' => [
-        ['sourceUrl' => '  ', 'organiserContact' => ' '],
-        'source URL or an organiser contact',
+    'whitespace-only source, contact and website' => [
+        ['sourceUrl' => '  ', 'organiserContact' => ' ', 'organiserWebsite' => '   '],
+        'Add a source URL, an organiser contact or a website.',
     ],
 ]);
+
+it('accepts an organiser website as the only way to check the event', function () {
+    $data = validEventData([
+        'organiserContact' => null,
+        'sourceUrl' => null,
+        'organiserWebsite' => 'https://club.example/events',
+    ]);
+
+    expect($data->organiserWebsite)->toBe('https://club.example/events');
+});
+
+it('writes contact_public and organiser_website to the event attributes', function () {
+    $attributes = validEventData([
+        'organiserWebsite' => 'https://club.example/events',
+        'contactPublic' => false,
+    ])->toAttributes();
+
+    expect($attributes['contact_public'])->toBeFalse()
+        ->and($attributes['organiser_website'])->toBe('https://club.example/events');
+});
+
+it('defaults to a public contact and no website', function () {
+    $attributes = validEventData()->toAttributes();
+
+    expect($attributes['contact_public'])->toBeTrue()
+        ->and($attributes['organiser_website'])->toBeNull();
+});
+
+it('maps the website and contact choice from the form state', function () {
+    $data = PublishableEventData::fromForm([
+        'title' => 'Harvest Supper',
+        'description' => 'Two courses and a raffle.',
+        'category_id' => 1,
+        'venue_id' => 1,
+        'start_date' => '2026-10-23',
+        'start_time' => '19:30',
+        'organiser_website' => ' https://club.example/events ',
+        'contact_public' => false,
+    ]);
+
+    expect($data->organiserWebsite)->toBe('https://club.example/events')
+        ->and($data->contactPublic)->toBeFalse();
+});
