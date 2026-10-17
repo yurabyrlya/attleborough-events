@@ -12,11 +12,35 @@ use App\Models\EventDraft;
 use App\Models\EventOccurrence;
 use App\Models\User;
 use App\Models\Venue;
+use App\Publishing\Actions\ApproveDraft;
+use App\Review\Data\DraftData;
+use App\Review\DraftWriter;
 use Database\Seeders\CategorySeeder;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Livewire\livewire;
+
+/**
+ * Insert a minimal draft row directly, bypassing the model, inside a
+ * savepoint so a refused insert leaves the test transaction usable.
+ *
+ * @param  array<string, mixed>  $overrides
+ */
+function insertRawDraft(array $overrides): void
+{
+    DB::transaction(fn () => DB::table('event_drafts')->insert([
+        'reference' => 'WOA-AAAAAA',
+        'origin' => 'submission',
+        'extraction_method' => 'submission',
+        'title' => 'Raw draft',
+        'created_at' => now()->utc(),
+        'updated_at' => now()->utc(),
+        ...$overrides,
+    ]));
+}
 
 beforeEach(function () {
     freezeLondon('2026-10-16 12:00');
@@ -67,4 +91,63 @@ it('publishes manual entry through an approved manual draft linked to the event'
 
     expect(substr((string) $draftRow->t, 0, 19))->toBe('2026-10-16 11:00:00')
         ->and(substr((string) $eventRow->t, 0, 19))->toBe('2026-10-16 11:00:00');
+});
+
+it('rolls back the event, occurrence and draft when stamping the draft fails after publishing', function () {
+    actingAs($this->admin);
+
+    EventDraft::saving(function (EventDraft $draft): void {
+        if ($draft->review_status === ReviewStatus::Approved) {
+            throw new RuntimeException('Stamp failed');
+        }
+    });
+
+    expect(fn () => livewire(CreateEvent::class)->fillForm($this->form)->call('create'))
+        ->toThrow(RuntimeException::class, 'Stamp failed');
+
+    expect(Event::count())->toBe(0)
+        ->and(EventOccurrence::count())->toBe(0)
+        ->and(EventDraft::count())->toBe(0);
+});
+
+it('does not mass-assign review state', function () {
+    $draft = new EventDraft([
+        'review_status' => 'approved',
+        'reference' => 'X',
+        'event_id' => 1,
+        'title' => 'T',
+    ]);
+
+    expect($draft->title)->toBe('T')
+        ->and($draft->review_status)->toBe(ReviewStatus::PendingReview)
+        ->and($draft->reference)->toBeNull()
+        ->and($draft->event_id)->toBeNull();
+});
+
+it('refuses an approved draft without an event at the database', function () {
+    expect(fn () => insertRawDraft(['review_status' => 'approved', 'event_id' => null]))
+        ->toThrow(QueryException::class, 'event_drafts_approved_has_event');
+});
+
+it('refuses a reject reason on a draft that is not rejected at the database', function () {
+    expect(fn () => insertRawDraft(['review_status' => 'pending_review', 'reject_reason' => 'spam']))
+        ->toThrow(QueryException::class, 'event_drafts_reject_reason_only_when_rejected');
+});
+
+it('refuses a quality score above 100 at the database', function () {
+    expect(fn () => insertRawDraft(['quality_score' => 101]))
+        ->toThrow(QueryException::class, 'event_drafts_quality_score_check');
+});
+
+it('refuses approval by anyone but the admin and writes nothing', function () {
+    $draft = app(DraftWriter::class)->create(DraftData::fromManualForm($this->form));
+    $intruder = User::factory()->create(['email' => 'someone@example.test']);
+
+    expect(fn () => app(ApproveDraft::class)($draft, $intruder))
+        ->toThrow(AuthorizationException::class);
+
+    expect($draft->fresh()->review_status)->toBe(ReviewStatus::PendingReview)
+        ->and($draft->fresh()->reviewed_by)->toBeNull()
+        ->and(Event::count())->toBe(0)
+        ->and(EventOccurrence::count())->toBe(0);
 });
