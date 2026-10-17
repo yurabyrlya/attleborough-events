@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet 
+   title="XSL_formatting" type="text/xsl" href="/publisher/xslt/rsshelp.xsl"
+ ?>
+<rss version="2.0">
+  <channel>
+    <title>Attleborough Baptist Church, Norfolk</title>
+    <link>https://www.attleborough.church</link>
+    <description>Latest events from Attleborough Baptist Church, Norfolk</description>
+    <copyright>2026, Attleborough Baptist Church, Norfolk</copyright>
+    <language>en</language>
+    <RSSURI>https://www.attleborough.church/calendar/rss.xml?days=150</RSSURI>
+    <generator>Hubb, www.hubb.digital</generator>
+    <ttl>1440</ttl>
+    <item>
+      <title>2026-10-18 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936475</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 18 October 2026 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 18 Oct 2026 09:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-10-18 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834457</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 18 October 2026 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 18 Oct 2026 17:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-10-20 10:00 - Warm Welcome</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5935804</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Tuesday, 20 October 2026 at 10:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Tue, 20 Oct 2026 09:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-10-22 14:00 - Bible Study &amp; Prayer</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936230</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Thursday, 22 October 2026 at 14:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Thu, 22 Oct 2026 13:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-10-25 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936476</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 25 October 2026 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 25 Oct 2026 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-10-25 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834458</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 25 October 2026 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 25 Oct 2026 18:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-10-27 10:00 - Warm Welcome</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5935805</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Tuesday, 27 October 2026 at 10:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Tue, 27 Oct 2026 10:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-10-29 14:00 - Bible Study &amp; Prayer</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936231</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Thursday, 29 October 2026 at 14:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Thu, 29 Oct 2026 14:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-10-31 10:00 - Women's Creative Club</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5954098</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Saturday, 31 October 2026 at 10:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; We invite women in Attleborough and surroundings to join our Creative Club every month on the last Saturday for crafting. Mothers, daughters and grandmothers are all welcome to learn and make new things or bring their own crafts along. The important thing is to enjoy the morning doing something relaxing (or challenging) and to meet with old friends or make new ones. We provide the materials and refreshments at no cost. Come along, we'd love to have you!&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sat, 31 Oct 2026 10:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-11-01 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936477</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 1 November 2026 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 01 Nov 2026 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-11-01 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834459</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 1 November 2026 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 01 Nov 2026 18:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-11-03 10:00 - Warm Welcome</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5935806</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Tuesday, 3 November 2026 at 10:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Tue, 03 Nov 2026 10:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-11-05 14:00 - Bible Study &amp; Prayer</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936232</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Thursday, 5 November 2026 at 14:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Thu, 05 Nov 2026 14:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-11-08 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936478</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 8 November 2026 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 08 Nov 2026 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-11-08 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834460</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 8 November 2026 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 08 Nov 2026 18:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-11-10 10:00 - Warm Welcome</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5935807</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Tuesday, 10 November 2026 at 10:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Tue, 10 Nov 2026 10:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-11-12 14:00 - Bible Study &amp; Prayer</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936233</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Thursday, 12 November 2026 at 14:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Thu, 12 Nov 2026 14:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-11-15 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936479</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 15 November 2026 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 15 Nov 2026 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-11-15 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834461</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 15 November 2026 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 15 Nov 2026 18:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-11-17 10:00 - Warm Welcome</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5935808</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Tuesday, 17 November 2026 at 10:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Tue, 17 Nov 2026 10:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-11-19 14:00 - Bible Study &amp; Prayer</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936234</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Thursday, 19 November 2026 at 14:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Thu, 19 Nov 2026 14:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-11-22 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936480</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 22 November 2026 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 22 Nov 2026 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-11-22 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834462</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 22 November 2026 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 22 Nov 2026 18:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-11-24 10:00 - Warm Welcome</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5935809</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Tuesday, 24 November 2026 at 10:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Tue, 24 Nov 2026 10:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-11-26 14:00 - Bible Study &amp; Prayer</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936235</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Thursday, 26 November 2026 at 14:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Thu, 26 Nov 2026 14:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-11-28 10:00 - Women's Creative Club</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5954100</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Saturday, 28 November 2026 at 10:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; We invite women in Attleborough and surroundings to join our Creative Club every month on the last Saturday for crafting. Mothers, daughters and grandmothers are all welcome to learn and make new things or bring their own crafts along. The important thing is to enjoy the morning doing something relaxing (or challenging) and to meet with old friends or make new ones. We provide the materials and refreshments at no cost. Come along, we'd love to have you!&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sat, 28 Nov 2026 10:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-11-29 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936481</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 29 November 2026 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 29 Nov 2026 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-11-29 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834463</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 29 November 2026 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 29 Nov 2026 18:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-12-01 10:00 - Warm Welcome</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5935810</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Tuesday, 1 December 2026 at 10:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Tue, 01 Dec 2026 10:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-12-03 14:00 - Bible Study &amp; Prayer</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936236</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Thursday, 3 December 2026 at 14:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Thu, 03 Dec 2026 14:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-12-06 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936482</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 6 December 2026 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 06 Dec 2026 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-12-06 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834464</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 6 December 2026 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 06 Dec 2026 18:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-12-08 10:00 - Warm Welcome</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5935811</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Tuesday, 8 December 2026 at 10:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Tue, 08 Dec 2026 10:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-12-10 14:00 - Bible Study &amp; Prayer</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936237</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Thursday, 10 December 2026 at 14:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Thu, 10 Dec 2026 14:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-12-13 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936483</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 13 December 2026 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 13 Dec 2026 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-12-13 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834465</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 13 December 2026 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 13 Dec 2026 18:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-12-15 10:00 - Warm Welcome</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5935812</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Tuesday, 15 December 2026 at 10:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Tue, 15 Dec 2026 10:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-12-20 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936484</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 20 December 2026 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 20 Dec 2026 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-12-20 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834466</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 20 December 2026 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 20 Dec 2026 18:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-12-27 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936485</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 27 December 2026 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 27 Dec 2026 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-12-27 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834467</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 27 December 2026 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 27 Dec 2026 18:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026-12-28 10:00 - Women's Creative Club</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5954101</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Monday, 28 December 2026 at 10:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; We invite women in Attleborough and surroundings to join our Creative Club every month on the last Saturday for crafting. Mothers, daughters and grandmothers are all welcome to learn and make new things or bring their own crafts along. The important thing is to enjoy the morning doing something relaxing (or challenging) and to meet with old friends or make new ones. We provide the materials and refreshments at no cost. Come along, we'd love to have you!&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Mon, 28 Dec 2026 10:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-01-03 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936486</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 3 January 2027 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 03 Jan 2027 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-01-03 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834468</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 3 January 2027 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 03 Jan 2027 18:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-01-10 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936487</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 10 January 2027 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 10 Jan 2027 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-01-10 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834469</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 10 January 2027 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 10 Jan 2027 18:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-01-17 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936488</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 17 January 2027 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 17 Jan 2027 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-01-17 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834470</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 17 January 2027 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 17 Jan 2027 18:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-01-24 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936489</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 24 January 2027 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 24 Jan 2027 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-01-24 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834471</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 24 January 2027 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 24 Jan 2027 18:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-01-31 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936490</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 31 January 2027 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 31 Jan 2027 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-01-31 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834472</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 31 January 2027 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 31 Jan 2027 18:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-02-07 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936491</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 7 February 2027 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 07 Feb 2027 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-02-07 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834473</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 7 February 2027 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 07 Feb 2027 18:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-02-14 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936492</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 14 February 2027 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 14 Feb 2027 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-02-14 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834474</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 14 February 2027 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 14 Feb 2027 18:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-02-21 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936493</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 21 February 2027 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 21 Feb 2027 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-02-21 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834475</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 21 February 2027 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 21 Feb 2027 18:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-02-28 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936494</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 28 February 2027 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 28 Feb 2027 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-02-28 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834476</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 28 February 2027 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 28 Feb 2027 18:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-03-07 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936495</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 7 March 2027 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 07 Mar 2027 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-03-07 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834477</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 7 March 2027 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 07 Mar 2027 18:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-03-14 10:30 - Service</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5936496</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 14 March 2027 at 10:30&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; &lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 14 Mar 2027 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>2027-03-14 18:00 - Evening Bible School</title>
+      <link>https://www.attleborough.church/Calendar/Month.aspx?show_event=5834478</link>
+      <description>&lt;b&gt;Time:&lt;/b&gt; Sunday, 14 March 2027 at 18:00&lt;br /&gt;&lt;b&gt;Details:&lt;/b&gt; Working through the Bible book by book over two years, using animated video followed by teaching and discussion. Hot drinks and a bun served.&lt;br /&gt;&lt;b&gt;Location:&lt;/b&gt; Church Building&lt;br /&gt;&lt;b&gt;Postcode:&lt;/b&gt; NR17 2HX</description>
+      <pubDate>Sun, 14 Mar 2027 18:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>

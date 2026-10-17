@@ -1,0 +1,39 @@
+{
+    "source": "attleborough-baptist-church",
+    "name": "Attleborough Baptist Church",
+    "files": [
+        {
+            "file": "2026-10-17-feed.xml",
+            "type": "feed",
+            "url": "https://www.attleborough.church/calendar/rss.xml?days=150",
+            "fetched_at": "2026-10-17T18:05:08Z",
+            "http_status": 200,
+            "headers": {
+                "content-type": "text/xml; charset=utf-8",
+                "etag": null,
+                "last-modified": null,
+                "cache-control": "private"
+            },
+            "robots_status": "allowed",
+            "robots_fetched_at": "2026-10-17T18:04:35Z",
+            "robots_rules": [
+                "User-agent: *",
+                "Crawl-delay: 10",
+                "Allow: /Admin/Resources/Folders/Calendar.ics",
+                "Disallow: /Admin/",
+                "Disallow: /User/",
+                "(no rule matches /calendar/rss.xml)"
+            ],
+            "sha256_raw": "ae085fc5c17ce51c45e3292aa93a0c37dc2fcfe1fdaafae2d2b7217c3eff3fe7",
+            "redactions": {
+                "email": 0,
+                "phone": 0,
+                "name": 0
+            },
+            "modified": false,
+            "events": 64,
+            "window": "2026-10-18 to 2027-03-14 (days=150), spans BST end Sun 25 Oct 2026",
+            "notes": "RSS 2.0 from the Hubb platform. Event start is in <title> as local 'YYYY-MM-DD HH:MM - Name' and in <description> 'Time: Sunday, 18 October 2026 at 10:30'; <pubDate> equals the event start in UTC (not used as the event date, EXT-05)."
+        }
+    ]
+}
