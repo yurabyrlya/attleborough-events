@@ -33,6 +33,14 @@ class Category extends Model
     }
 
     /**
+     * @return HasMany<CategoryMapping, $this>
+     */
+    public function mappings(): HasMany
+    {
+        return $this->hasMany(CategoryMapping::class);
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array

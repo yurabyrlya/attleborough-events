@@ -250,7 +250,8 @@ it('shows stored mappings and geofence terms on the Rules screen', function () {
 
     $page = livewire(Rules::class);
 
-    expect(array_values($page->get('data.category_mappings')))->toBe([
-        ['id' => CategoryMapping::sole()->id, 'source_value' => 'Quiz Night', 'category_id' => $this->community->id],
+    // The Select holds the category id as a string; SaveRules accepts both.
+    expect(array_values($page->get('data.category_mappings')))->toEqual([
+        ['id' => CategoryMapping::sole()->id, 'source_value' => 'Quiz Night', 'category_id' => (string) $this->community->id],
     ])->and($page->get('data.geofence.postcode_districts'))->toBe(['NR17']);
 });

@@ -4,6 +4,8 @@ namespace App\Filament\Pages;
 
 use App\Models\Category;
 use App\Models\CategoryKeywordRule;
+use App\Models\CategoryMapping;
+use App\Models\GeofenceTerm;
 use App\Models\User;
 use App\Review\Exceptions\RulesNotSaved;
 use App\Review\SaveRules;
@@ -14,9 +16,11 @@ use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
@@ -25,7 +29,8 @@ use UnitEnum;
 
 /**
  * The one Rules screen (ADM-04, research D16): the admin tunes how drafts
- * are categorised without a deploy. One "Save rules" action hands the whole
+ * are categorised without a deploy, across four tabs: Categories, Keyword
+ * rules, Category mappings and Geofence. One "Save rules" action hands the whole
  * form state to App\Review\SaveRules, which checks it and writes everything
  * in one transaction. This page never writes rows itself.
  *
@@ -145,6 +150,45 @@ class Rules extends Page
                                     ->addActionLabel('Add keyword rule')
                                     ->defaultItems(0),
                             ]),
+                        Tab::make('Category mappings')
+                            ->schema([
+                                Repeater::make('category_mappings')
+                                    ->hiddenLabel()
+                                    ->helperText("Used when a source labels its own events, e.g. 'Quiz Night' → Community. Sources arrive in a later phase.")
+                                    ->table([
+                                        TableColumn::make('Source value'),
+                                        TableColumn::make('Category'),
+                                    ])
+                                    ->schema([
+                                        Hidden::make('id'),
+                                        TextInput::make('source_value')
+                                            ->label('Source value')
+                                            ->required()
+                                            ->maxLength(SaveRules::SOURCE_VALUE_MAX_LENGTH),
+                                        Select::make('category_id')
+                                            ->label('Category')
+                                            ->options(fn (): array => Category::query()->orderBy('sort')->orderBy('id')->pluck('name', 'id')->all())
+                                            ->required(),
+                                    ])
+                                    ->reorderable(false)
+                                    ->addActionLabel('Add mapping')
+                                    ->defaultItems(0),
+                            ]),
+                        Tab::make('Geofence')
+                            ->schema([
+                                Group::make([
+                                    TagsInput::make('postcode_districts')
+                                        ->label('Postcode districts')
+                                        ->placeholder('Add a district, e.g. NR17')
+                                        ->splitKeys(['Tab', ','])
+                                        ->helperText('Used to keep regional listings local. Districts are saved in capitals without spaces.'),
+                                    TagsInput::make('place_names')
+                                        ->label('Place names')
+                                        ->placeholder('Add a town or village')
+                                        ->splitKeys(['Tab', ','])
+                                        ->helperText('Used to keep regional listings local.'),
+                                ])->statePath('geofence'),
+                            ]),
                     ]),
             ])
             ->statePath('data');
@@ -224,6 +268,27 @@ class Rules extends Page
                     'priority' => $rule->priority,
                 ])
                 ->all(),
+            'category_mappings' => CategoryMapping::query()
+                ->orderBy('id')
+                ->get()
+                ->map(fn (CategoryMapping $mapping): array => [
+                    'id' => $mapping->id,
+                    'source_value' => $mapping->source_value,
+                    'category_id' => $mapping->category_id,
+                ])
+                ->all(),
+            'geofence' => [
+                'postcode_districts' => self::geofenceValues(GeofenceTerm::POSTCODE_DISTRICT),
+                'place_names' => self::geofenceValues(GeofenceTerm::PLACE_NAME),
+            ],
         ]);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function geofenceValues(string $type): array
+    {
+        return GeofenceTerm::query()->where('type', $type)->orderBy('id')->pluck('value')->values()->all();
     }
 }
