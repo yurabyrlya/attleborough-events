@@ -28,8 +28,8 @@ See: .planning/PROJECT.md (updated 2026-10-16)
 ## Current Position
 
 Phase: 1 (Foundation & Published Calendar) — EXECUTING
-Plan: 13 of 13 in Phase 1 complete incl. gap closure rounds 1-2 — re-verification pending. Milestone plans: 13/15 complete
-Status: Gap closure executed — re-verifying Phase 1
+Plan: 13 of 13 in Phase 1 complete (incl. gap closure); automated verification passed (human_needed). Milestone plans: 13/15 complete
+Status: Human verification needed — run /gsd-verify-work 1 (9 items in 01-UAT.md); also /gsd-secure-phase 1 before completion
 Last activity: 2026-10-17 - Completed quick task 261017-e46: Set up a Filament custom theme so Tailwind classes work in admin views
 
 Progress: [█████████░] 87% of planned plans (13/15); phases complete: 0/5
