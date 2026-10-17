@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\Public\EventCalendarAndShareTest" file="tests/Feature/Public/EventCalendarAndShareTest.php" tests="12" assertions="39" errors="3" failures="4" skipped="0" time="1.519805">
+    <testcase name="it links each date to a prefilled Google Calendar template in UTC" file="tests/Feature/Public/EventCalendarAndShareTest.php::it links each date to a prefilled Google Calendar template in UTC" class="Tests\Feature\Public\EventCalendarAndShareTest" classname="Tests.Feature.Public.EventCalendarAndShareTest" assertions="13" time="0.870816"/>
+    <testcase name="it uses the expiry and a &quot;Finish time not given.&quot; line when there is no end" file="tests/Feature/Public/EventCalendarAndShareTest.php::it uses the expiry and a &quot;Finish time not given.&quot; line when there is no end" class="Tests\Feature\Public\EventCalendarAndShareTest" classname="Tests.Feature.Public.EventCalendarAndShareTest" assertions="3" time="0.064788"/>
+    <testcase name="it uses whole dates with an exclusive end for an all-day event" file="tests/Feature/Public/EventCalendarAndShareTest.php::it uses whole dates with an exclusive end for an all-day event" class="Tests\Feature\Public\EventCalendarAndShareTest" classname="Tests.Feature.Public.EventCalendarAndShareTest" assertions="2" time="0.061017"/>
+    <testcase name="it keeps UTC across the clock change and offers no add links for a cancelled date" file="tests/Feature/Public/EventCalendarAndShareTest.php::it keeps UTC across the clock change and offers no add links for a cancelled date" class="Tests\Feature\Public\EventCalendarAndShareTest" classname="Tests.Feature.Public.EventCalendarAndShareTest" assertions="7" time="0.114301"/>
+    <testcase name="it never puts the request host into the Google link" file="tests/Feature/Public/EventCalendarAndShareTest.php::it never puts the request host into the Google link" class="Tests\Feature\Public\EventCalendarAndShareTest" classname="Tests.Feature.Public.EventCalendarAndShareTest" assertions="4" time="0.055975"/>
+    <testcase name="it renders WhatsApp, Facebook and email share links and a link box without JavaScript" file="tests/Feature/Public/EventCalendarAndShareTest.php::it renders WhatsApp, Facebook and email share links and a link box without JavaScript" class="Tests\Feature\Public\EventCalendarAndShareTest" classname="Tests.Feature.Public.EventCalendarAndShareTest" assertions="2" time="0.077134">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">it renders WhatsApp, Facebook and email share links and a link box without JavaScriptExpecting null not to be null .
+at tests/Feature/Public/EventCalendarAndShareTest.php:191</failure>
+    </testcase>
+    <testcase name="it starts the share text with &quot;Cancelled: &quot; when the event is cancelled" file="tests/Feature/Public/EventCalendarAndShareTest.php::it starts the share text with &quot;Cancelled: &quot; when the event is cancelled" class="Tests\Feature\Public\EventCalendarAndShareTest" classname="Tests.Feature.Public.EventCalendarAndShareTest" assertions="1" time="0.074280">
+      <error type="Error">it starts the share text with "Cancelled: " when the event is cancelledError: Call to a member function getAttribute() on null
+at tests/Feature/Public/EventCalendarAndShareTest.php:228</error>
+    </testcase>
+    <testcase name="it leaves the date out of the share text when no date is upcoming" file="tests/Feature/Public/EventCalendarAndShareTest.php::it leaves the date out of the share text when no date is upcoming" class="Tests\Feature\Public\EventCalendarAndShareTest" classname="Tests.Feature.Public.EventCalendarAndShareTest" assertions="1" time="0.042262">
+      <error type="Error">it leaves the date out of the share text when no date is upcomingError: Call to a member function getAttribute() on null
+at tests/Feature/Public/EventCalendarAndShareTest.php:236</error>
+    </testcase>
+    <testcase name="it ships the native share and copy buttons hidden, with a polite status region and no inline handlers" file="tests/Feature/Public/EventCalendarAndShareTest.php::it ships the native share and copy buttons hidden, with a polite status region and no inline handlers" class="Tests\Feature\Public\EventCalendarAndShareTest" classname="Tests.Feature.Public.EventCalendarAndShareTest" assertions="2" time="0.042025">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">it ships the native share and copy buttons hidden, with a polite status region and no inline handlersExpecting null not to be null .
+at tests/Feature/Public/EventCalendarAndShareTest.php:248</failure>
+    </testcase>
+    <testcase name="it never puts the request host into a share link" file="tests/Feature/Public/EventCalendarAndShareTest.php::it never puts the request host into a share link" class="Tests\Feature\Public\EventCalendarAndShareTest" classname="Tests.Feature.Public.EventCalendarAndShareTest" assertions="2" time="0.043307">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">it never puts the request host into a share linkFailed asserting that actual size 0 matches expected size 3.
+at tests/Feature/Public/EventCalendarAndShareTest.php:277</failure>
+    </testcase>
+    <testcase name="it loads exactly one same-origin share module on the event page and still none on /" file="tests/Feature/Public/EventCalendarAndShareTest.php::it loads exactly one same-origin share module on the event page and still none on /" class="Tests\Feature\Public\EventCalendarAndShareTest" classname="Tests.Feature.Public.EventCalendarAndShareTest" assertions="2" time="0.046607">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">it loads exactly one same-origin share module on the event page and still none on /Failed asserting that actual size 0 matches expected size 1.
+at tests/Feature/Public/EventCalendarAndShareTest.php:296</failure>
+    </testcase>
+    <testcase name="it keeps the share module first-party, dependency-free and plainly worded" file="tests/Feature/Public/EventCalendarAndShareTest.php::it keeps the share module first-party, dependency-free and plainly worded" class="Tests\Feature\Public\EventCalendarAndShareTest" classname="Tests.Feature.Public.EventCalendarAndShareTest" assertions="0" time="0.027294">
+      <error type="ErrorException">it keeps the share module first-party, dependency-free and plainly wordedErrorException: file_get_contents(/Users/iuribirlea/code/LEARNINGS/AI/attleborough-events/resources/js/share.js): Failed to open stream: No such file or directory
+at vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+at tests/Feature/Public/EventCalendarAndShareTest.php:315</error>
+    </testcase>
+  </testsuite>
+</testsuites>
