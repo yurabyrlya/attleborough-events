@@ -201,6 +201,16 @@ final class UatFixtures
     }
 
     /**
+     * Playwright role selector matching a case-insensitive substring of the
+     * accessible name, for controls whose name also holds a count badge
+     * (the "Review queue 2" sidebar link, the "Rejected 0" table tab).
+     */
+    public static function roleContaining(string $role, string $name): string
+    {
+        return sprintf('internal:role=%s[name=%si]', $role, self::quote($name));
+    }
+
+    /**
      * Playwright label selector (case-insensitive substring, so a required
      * field's "Title*" matches "Title").
      */

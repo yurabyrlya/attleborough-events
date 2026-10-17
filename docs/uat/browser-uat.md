@@ -201,6 +201,37 @@ Expected:
 
 Public effect: none. Nothing appears on `/` until the admin approves the draft (F12).
 
+## F12. Review queue, edit-and-approve, Approve & next
+
+Start with at least two pending submissions from F11, one sent with **Somewhere else** ("The Old Barn") and "Every Tuesday for four weeks" in **Does it repeat?**, dated on a Tuesday.
+
+1. Sidebar **Review → Review queue**: its badge shows the pending count. The list opens on the **Pending** tab (tabs: Pending, Rejected, Approved, All, each with a count), soonest event first. A typed venue reads "The Old Barn (not confirmed)"; a category with no match reads "Other (check)".
+2. Click the barn draft's row → review page (`/admin/event-drafts/<id>/review`). Read:
+   - **Summary**: Quality band (High / Medium / Low) and score, **What to check** with reasons such as "Venue not recognised: 'The Old Barn'" and "Organiser says it repeats ('Every Tuesday for four weeks') but no repeat rule is set".
+   - **Why this category**: "Chosen by organiser" (or a keyword rule, see F14).
+   - **Before you can publish** lists the blockers ("Pick or create a venue.", "The organiser says it repeats…"); **Approve & next (A)** is disabled while there are any.
+   - **Raw content** opens "What the organiser sent" (escaped text); **Close**.
+3. **Edit (E)** → "Edit draft: …". Next to **Venue** click **Create new venue**: the dialog is pre-filled with the organiser's name, address and postcode (town Attleborough); **Create**. Then **Repeats** → "Weekly on Tuesday", **Ends** → "After a number of times", **Number of times** 4. Click **Save & approve** (no dialog: saving and publishing happen in one step and roll back together if something blocks).
+4. Expected: "Published", and the page opens the **next** pending draft's review page (or the list with "You've reached the end of the queue" after the last one).
+5. Keyboard (on a review page, shortcuts on): **A** then **Enter** publishes and opens the next draft ("Publish" has the focus in the "Publish this event?" dialog); **S** or **J** skips; **K** goes back; **?** opens "Keyboard shortcuts"; **R** opens "Reject this draft?", and typing "ask" in the note triggers nothing; on a draft with blockers, **A** says "Can't approve yet" with the reason. Untick **Keyboard shortcuts (…)** at the top, reload: it stays off and S does nothing; tick it again.
+
+Selectors: the sidebar link and tabs carry their count in the accessible name, so match a substring (`getByRole('link', { name: /Review queue/ })`); `getByRole('link', { name: 'Edit (E)' })`, `getByRole('button', { name: 'Create new venue' })`, `#form.repeats`, `getByRole('radio', { name: 'After a number of times' })`, `#form.repeat_count`, `getByRole('button', { name: 'Save & approve' })`. Dialogs are `.fi-modal-open`.
+
+Public effect: the barn series shows on `/` as four dated cards (Tue 27 Oct, 3, 10, 17 Nov in the automated run) at "The Old Barn"; the skipped and rejected drafts show nothing.
+
+## F13. Bulk approve and bulk reject
+
+On **Review queue → Pending**, with at least one publishable draft, one Low-quality draft (typed venue, "Not sure" category, no end time, a repeat in words) and, where available, one with parse errors:
+
+1. Tick the header checkbox ("Select/deselect all items for bulk actions.") → **Bulk actions** → **Approve selected** → "Approve the selected drafts?" ("Drafts with problems are skipped and listed afterwards.") → **Approve**.
+   Expected: a notification "Approved 1 of 3. The rest were skipped:" with one line per reason, e.g. "1 skipped: Low quality", "1 skipped: has parse errors" (others: "possible duplicate", "no confirmed venue", "repeat rule not set", "already reviewed"). Nothing is skipped silently: the counts add up to the drafts not approved.
+2. Tick two drafts → **Bulk actions** → **Reject selected** → "Reject the selected drafts?" → **Reason (optional)** Spam → **Reject drafts**. Expected: "Drafts rejected"; they leave Pending and appear under the **Rejected** tab.
+3. Open one rejected draft → **Reopen** → "Reopen this draft?" → **Reopen**. Expected: "Draft reopened"; it is back on **Pending**.
+
+Bulk menu items are `role=menuitem` (`getByRole('menuitem', { name: 'Approve selected' })`). There is no delete anywhere: rejected drafts are purged on schedule (spam after 30 days, others after 90).
+
+Public effect: only the approved draft appears on `/`. Rejected and skipped drafts never do.
+
 ## Cleanup
 
 - Hide the UAT events (`Hide from calendar`) or remove them from the local database if they would confuse later work. Never remove real data.
