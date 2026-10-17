@@ -43,16 +43,18 @@ Expected:
 - Norfolk-green accent; the active chip is filled with a ✓ tick (not colour alone); chips are at least 24×24px.
 - Date headings ("Today", "Friday 30 October") use `<time datetime>`; a cancelled date shows the word **Cancelled**.
 - No horizontal overflow, **0 scripts** on `/`, dark background in dark mode, readable text in both themes.
-- Also measure where the first event heading starts (`main h2` top) against the viewport height (UX check, see baseline).
+- Only the **When** chips are open; **Category** and **Show only** sit under a closed **More filters** disclosure (a native `details`/`summary`, at least 24×24px with the visible focus ring, opens with click, Enter or Space).
+- On 375×812 the first event heading (`main h2`) starts above 812px, so the first day is visible without scrolling.
 
 ## F2. Filters without JavaScript
 
 The public calendar loads no scripts, so walking the chips in a normal browser is equivalent to JS off (the integrated browser cannot open a JS-disabled context). Confirm `document.scripts.length === 0` on each page.
 
-Click in order: **This weekend → Community → Free → Family-friendly → Today → This week → All upcoming**. After each click record the URL, the number of `main article h3 a` cards, `meta[name=robots]` and any empty-state text.
+Click in order: **This weekend → More filters (the summary) → Community → Free → Family-friendly → Today → This week → All upcoming**. After each click record the URL, the number of `main article h3 a` cards, `meta[name=robots]` and any empty-state text.
 
 Expected:
 - Each chip is a plain link; filters combine, e.g. `/?when=weekend&category=community&free=1&family=1`.
+- **More filters** is a `details`/`summary` (not a link) and is closed on `/` and on When-only URLs such as `/?when=weekend`. After choosing Community, Free or Family-friendly the next page renders it already open with the active chip ticked. Still no scripts.
 - Clicking an active chip removes only that filter.
 - Every filtered URL has `noindex, follow`; the page title and a "Showing: Community · Free · Family-friendly" line reflect the filters.
 - No matches → "No events match these filters. Try removing one, or **see everything coming up.**" (link to `/`).
@@ -194,7 +196,6 @@ Found in the first run; none blocks Phase 1. Treat them as known until fixed:
 
 | Area | Issue |
 |---|---|
-| Public (phone) | Filter chips fill more than the first screen; the first event heading starts at 828px on an 812px viewport. |
 | Public (phone) | Card category icon takes about a quarter of the width, so titles and venues wrap early. |
 | Admin, event form | Occurrences table doesn't refresh after **Save** (shows old times until reload). |
 | Admin, event form | Read-only Repeats dropdown shows "Weekly on Friday" for unsupported rules (misreports the stored rule). |

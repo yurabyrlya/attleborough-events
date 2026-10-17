@@ -122,6 +122,46 @@ it('keys chip styles to aria-current and marks active chips with a check icon', 
     expect($active)->toBe(2); // All upcoming + Music
 });
 
+it('keeps the When chips visible and folds Category and Show only into a closed More filters disclosure', function (string $uri) {
+    $document = lookDocument((string) get($uri)->assertOk()->getContent());
+    $nav = $document->querySelector('nav[aria-label="Filter events"]');
+    $disclosures = $nav?->querySelectorAll('details');
+
+    expect($disclosures?->length)->toBe(1);
+
+    $details = $disclosures->item(0);
+    $summary = $details->firstElementChild;
+
+    expect($details->hasAttribute('open'))->toBeFalse()
+        ->and($summary?->tagName)->toBe('SUMMARY')
+        ->and(lookText($summary))->toContain('More filters')
+        ->and(lookClasses($summary))->toContain('tap-target')
+        ->and($nav->querySelector('[aria-labelledby="chips-when"]')?->closest('details'))->toBeNull()
+        ->and($details->querySelector('[aria-labelledby="chips-category"]'))->not->toBeNull()
+        ->and($details->querySelector('[aria-labelledby="chips-only"]'))->not->toBeNull();
+})->with(['/', '/?when=weekend']);
+
+it('renders the More filters disclosure open while a category, Free or Family-friendly filter is active', function (string $uri, string $activeLabel) {
+    $document = lookDocument((string) get($uri)->assertOk()->getContent());
+    $details = $document->querySelector('nav[aria-label="Filter events"] details');
+
+    expect($details?->hasAttribute('open'))->toBeTrue();
+
+    $activeChips = array_map(
+        lookText(...),
+        array_filter(
+            iterator_to_array($details->querySelectorAll('a')),
+            fn (Element $chip): bool => $chip->getAttribute('aria-current') === 'true',
+        ),
+    );
+
+    expect($activeChips)->toContain($activeLabel);
+})->with([
+    'category' => ['/?category=music', 'Music'],
+    'free' => ['/?free=1', 'Free'],
+    'family' => ['/?family=1', 'Family-friendly'],
+]);
+
 it('shows one decorative category icon per card, picked from the slug allow-list', function () {
     lookEvent('music', ['title' => 'Brass Band']);
     lookEvent('food-drink', ['title' => 'Cake Sale'], '2026-10-31 20:00');
