@@ -12,7 +12,7 @@ The build starts with a local-dev public calendar fed by admin manual entry, wit
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation & Published Calendar** - Local-dev mobile-first calendar (CI on PostgreSQL) fed by admin manual entry, with recurrence, detail pages, add-to-calendar and share
+- [x] **Phase 1: Foundation & Published Calendar** - Local-dev mobile-first calendar (CI on PostgreSQL) fed by admin manual entry, with recurrence, detail pages, add-to-calendar and share (completed 2026-10-17)
 - [ ] **Phase 2: Draft Model, Review Queue & Submissions** - Organiser submissions become drafts that the admin triages in a fast review queue; source research completed
 - [ ] **Phase 3: Ingestion Backbone, ICS & Change/Duplicate Handling** - Polite scheduled fetching of ICS sources producing new/update/cancellation drafts with duplicate warnings and source health
 - [ ] **Phase 4: Extraction Ladder, Geofence & Live Sources** - TEC, JSON-LD, selector and RSS rungs, geofence and test run; P0 sources producing drafts in production
@@ -124,7 +124,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Published Calendar | 13/13 | In Progress (gap closure) | - |
+| 1. Foundation & Published Calendar | 13/13 | Complete    | 2026-10-17 |
 | 2. Draft Model, Review Queue & Submissions | 0/TBD | Not started | - |
 | 3. Ingestion Backbone, ICS & Change/Duplicate Handling | 0/TBD | Not started | - |
 | 4. Extraction Ladder, Geofence & Live Sources | 0/TBD | Not started | - |
@@ -140,11 +140,11 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 ## Backlog
 
-### Phase 999.1: Follow-up — Phase 01 deferred UAT follow-up: Tests 8, 9 (BACKLOG)
+### Phase 999.1: Follow-up — Phase 01 deferred UAT follow-up: Tests 8, 9 (RESOLVED 2026-10-17)
 
 **Goal:** Resolve the UAT checkpoints deferred during Phase 01 verification
 **Source phase:** 01
 **Deferred at:** 2026-10-17 during /gsd-verify-work 1 session completion
 **Follow-ups:**
-- [ ] Test 8: Acknowledge the 5 insufficient_spec backstops (row-lock serialisation x2, heartbeat upsert, share.js re-entry, ZWJ excerpt cut) or add concurrency tests (deferred 2026-10-17)
-- [ ] Test 9: Review the 4 flagged prohibitions (accept, or add Pest arch/composer.json enforcement tests); owner: "do it at the end once we finish all phases" (deferred 2026-10-17)
+- [x] Test 8: Acknowledge the 5 insufficient_spec backstops (row-lock serialisation x2, heartbeat upsert, share.js re-entry, ZWJ excerpt cut) or add concurrency tests (deferred 2026-10-17) — owner accepted all 5 as-is 2026-10-17
+- [x] Test 9: Review the 4 flagged prohibitions (accept, or add Pest arch/composer.json enforcement tests); owner: "do it at the end once we finish all phases" (deferred 2026-10-17) — owner accepted all 4 as-is 2026-10-17

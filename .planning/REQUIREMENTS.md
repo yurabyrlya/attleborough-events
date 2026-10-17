@@ -8,25 +8,25 @@
 
 ### Public Calendar (CAL)
 
-- [ ] **CAL-01**: Visitor sees published, non-expired event occurrences ordered by start time and grouped under date headings, on a mobile-first list layout
-- [ ] **CAL-02**: Visitor can filter by Today / This weekend / This week (Europe/London; weekend = upcoming Sat 00:00-Sun 23:59, or the current weekend on Sat/Sun; week = today to Sunday 23:59). Multi-day events appear in every window they overlap
-- [ ] **CAL-03**: Visitor can filter by category
-- [ ] **CAL-04**: Visitor can filter to free events only
-- [ ] **CAL-05**: Visitor can filter to family-friendly events (a flag independent of the primary category)
-- [ ] **CAL-06**: Filters work as plain query-string links without JavaScript, and filter URLs are `noindex`
-- [ ] **CAL-07**: Each card shows title, date/time, venue, short description, category, price (Free / Paid / text), source or organiser, and a text "Cancelled" badge when applicable
-- [ ] **CAL-08**: A recurring series shows one entry per upcoming occurrence within a rolling 90-day horizon
+- [x] **CAL-01**: Visitor sees published, non-expired event occurrences ordered by start time and grouped under date headings, on a mobile-first list layout
+- [x] **CAL-02**: Visitor can filter by Today / This weekend / This week (Europe/London; weekend = upcoming Sat 00:00-Sun 23:59, or the current weekend on Sat/Sun; week = today to Sunday 23:59). Multi-day events appear in every window they overlap
+- [x] **CAL-03**: Visitor can filter by category
+- [x] **CAL-04**: Visitor can filter to free events only
+- [x] **CAL-05**: Visitor can filter to family-friendly events (a flag independent of the primary category)
+- [x] **CAL-06**: Filters work as plain query-string links without JavaScript, and filter URLs are `noindex`
+- [x] **CAL-07**: Each card shows title, date/time, venue, short description, category, price (Free / Paid / text), source or organiser, and a text "Cancelled" badge when applicable
+- [x] **CAL-08**: A recurring series shows one entry per upcoming occurrence within a rolling 90-day horizon
 - [ ] **CAL-09**: Public pages meet WCAG 2.2 AA (contrast, keyboard access, 24x24px targets, `<time datetime>`)
 
 ### Event Detail, Sharing & SEO (EVT)
 
-- [ ] **EVT-01**: Visitor can open an event page showing date/time, venue/address, organiser contact, source attribution with link, and the description (submissions/manual: full; discovered: excerpt of up to 200 characters plus "Read more at {source}")
-- [ ] **EVT-02**: Event pages have readable slug URLs plus title, meta description, canonical and Open Graph tags
-- [ ] **EVT-03**: Event pages include Schema.org `Event` JSON-LD (one per upcoming occurrence, capped at about 10, with `eventStatus`)
+- [x] **EVT-01**: Visitor can open an event page showing date/time, venue/address, organiser contact, source attribution with link, and the description (submissions/manual: full; discovered: excerpt of up to 200 characters plus "Read more at {source}")
+- [x] **EVT-02**: Event pages have readable slug URLs plus title, meta description, canonical and Open Graph tags
+- [x] **EVT-03**: Event pages include Schema.org `Event` JSON-LD (one per upcoming occurrence, capped at about 10, with `eventStatus`)
 - [ ] **EVT-04**: `sitemap.xml` lists upcoming published events
 - [ ] **EVT-05**: Expired event pages still load (200) with an "ended" banner, leave the sitemap, become `noindex` after 30 days, and return 410 after 12 months or when hidden/rejected as wrong; merged duplicates 301 to the kept event
-- [ ] **EVT-06**: Visitor can add an occurrence to their calendar via `.ics` download (stable UID) or a Google Calendar link
-- [ ] **EVT-07**: Visitor can share an event via the Web Share API, with WhatsApp / Facebook / email / copy-link fallbacks
+- [x] **EVT-06**: Visitor can add an occurrence to their calendar via `.ics` download (stable UID) or a Google Calendar link
+- [x] **EVT-07**: Visitor can share an event via the Web Share API, with WhatsApp / Facebook / email / copy-link fallbacks
 - [ ] **EVT-08**: Visitor can report a problem with an event from its page (opens the contact form prefilled with the event reference)
 
 ### Outbound Feeds (FEED)
@@ -57,9 +57,9 @@
 
 ### Administration (ADM)
 
-- [ ] **ADM-01**: Admin can log in to a Filament admin panel (single admin account; no public accounts)
-- [ ] **ADM-02**: Admin can create an event manually, with simple recurrence (weekly, nth weekday of month) and a source note. It is published with origin `manual` and the admin recorded as approver
-- [ ] **ADM-03**: Admin can edit, hide, unhide and cancel published events and individual occurrences. Occurrence status set by the admin survives occurrence regeneration
+- [x] **ADM-01**: Admin can log in to a Filament admin panel (single admin account; no public accounts)
+- [x] **ADM-02**: Admin can create an event manually, with simple recurrence (weekly, nth weekday of month) and a source note. It is published with origin `manual` and the admin recorded as approver
+- [x] **ADM-03**: Admin can edit, hide, unhide and cancel published events and individual occurrences. Occurrence status set by the admin survives occurrence regeneration
 - [ ] **ADM-04**: Admin can manage categories and a single Rules screen covering category mappings, title keyword rules, and geofence districts / place names
 - [ ] **ADM-05**: Admin sees dashboard counts per period: sources checked, source failures, drafts created / approved / rejected / duplicates, and approval rate per source
 - [ ] **ADM-06**: Admin can search events and drafts
@@ -102,8 +102,8 @@
 
 ### Recurrence & Time (REC)
 
-- [ ] **REC-01**: A scheduled job materialises occurrences over a rolling 90-day horizon, upserting by recurrence key and preserving admin-set occurrence status
-- [ ] **REC-02**: Multi-day events are one occurrence spanning several days. All-day events expire at end of day, and events with no end time expire 3 hours after start
+- [x] **REC-01**: A scheduled job materialises occurrences over a rolling 90-day horizon, upserting by recurrence key and preserving admin-set occurrence status
+- [x] **REC-02**: Multi-day events are one occurrence spanning several days. All-day events expire at end of day, and events with no end time expire 3 hours after start
 
 ### Privacy & Compliance (LEG)
 
@@ -114,11 +114,11 @@
 
 ### Platform & Operations (OPS)
 
-- [ ] **OPS-01**: Project runs on Laravel 13, PHP 8.4+ (Composer floor 8.4), PostgreSQL 18 and Filament 5, with Pest, Larastan, Pint and GitHub Actions CI running tests on PostgreSQL
+- [x] **OPS-01**: Project runs on Laravel 13, PHP 8.4+ (Composer floor 8.4), PostgreSQL 18 and Filament 5, with Pest, Larastan, Pint and GitHub Actions CI running tests on PostgreSQL
 - [ ] **OPS-01b**: Production runs PHP 8.5 (split from OPS-01, scope change 2026-10-16; delivered with the Phase 5 deploy)
 - [ ] **OPS-02**: Site is deployed to a low-cost VPS with HTTPS, supervised queue workers, cron scheduler and zero-downtime deploys from GitHub Actions
 - [ ] **OPS-03**: Nightly database backups go to off-site storage, and a restore drill has been performed before launch
-- [ ] **OPS-04**: Admin can see scheduler heartbeat and failed jobs. Logs are rotated (local app; app-level config)
+- [x] **OPS-04**: Admin can see scheduler heartbeat and failed jobs. Logs are rotated (local app; app-level config)
 - [ ] **OPS-04b**: In production the queue worker runs under systemd, production `.env` sets daily 14-day logs, the ops drill passes and `ops:health` is HEALTHY within 7 minutes of a deploy (split from OPS-04, scope change 2026-10-16)
 
 ### Source Research (RES)
@@ -133,17 +133,20 @@
 Deferred. Tracked but not in the current roadmap.
 
 ### Discovery
+
 - **DISC-01**: Visitor can search events by title
 - **DISC-02**: Visitor can filter by custom date range
 - **DISC-03**: Visitor can browse venue pages and filter by village
 - **DISC-04**: Third-party sites can embed a calendar widget
 
 ### Engagement
+
 - **ENG-01**: Organiser receives an email when their submission is approved
 - **ENG-02**: Visitor can subscribe to an email digest (PECR-compliant)
 - **ENG-03**: Visitor can filter by structured accessibility features
 
 ### Admin & Ingestion
+
 - **ADM2-01**: Admin can merge two published events
 - **ADM2-02**: Admin can use LLM assistance to pre-fill a draft from a URL, text or poster (extractor, not publisher)
 - **ADM2-03**: Multiple admins / moderator roles
@@ -172,22 +175,22 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CAL-01 | Phase 1 | Pending |
-| CAL-02 | Phase 1 | Pending |
-| CAL-03 | Phase 1 | Pending |
-| CAL-04 | Phase 1 | Pending |
-| CAL-05 | Phase 1 | Pending |
-| CAL-06 | Phase 1 | Pending |
-| CAL-07 | Phase 1 | Pending |
-| CAL-08 | Phase 1 | Pending |
+| CAL-01 | Phase 1 | Complete |
+| CAL-02 | Phase 1 | Complete |
+| CAL-03 | Phase 1 | Complete |
+| CAL-04 | Phase 1 | Complete |
+| CAL-05 | Phase 1 | Complete |
+| CAL-06 | Phase 1 | Complete |
+| CAL-07 | Phase 1 | Complete |
+| CAL-08 | Phase 1 | Complete |
 | CAL-09 | Phase 5 | Pending |
-| EVT-01 | Phase 1 | Pending |
-| EVT-02 | Phase 1 | Pending |
-| EVT-03 | Phase 1 | Pending |
+| EVT-01 | Phase 1 | Complete |
+| EVT-02 | Phase 1 | Complete |
+| EVT-03 | Phase 1 | Complete |
 | EVT-04 | Phase 5 | Pending |
 | EVT-05 | Phase 5 | Pending |
-| EVT-06 | Phase 1 | Pending |
-| EVT-07 | Phase 1 | Pending |
+| EVT-06 | Phase 1 | Complete |
+| EVT-07 | Phase 1 | Complete |
 | EVT-08 | Phase 5 | Pending |
 | FEED-01 | Phase 5 | Pending |
 | FEED-02 | Phase 5 | Pending |
@@ -206,9 +209,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | REV-09 | Phase 2 | Pending |
 | REV-10 | Phase 2 | Pending |
 | REV-11 | Phase 2 | Pending |
-| ADM-01 | Phase 1 | Pending |
-| ADM-02 | Phase 1 | Pending |
-| ADM-03 | Phase 1 | Pending |
+| ADM-01 | Phase 1 | Complete |
+| ADM-02 | Phase 1 | Complete |
+| ADM-03 | Phase 1 | Complete |
 | ADM-04 | Phase 2 | Pending |
 | ADM-05 | Phase 5 | Pending |
 | ADM-06 | Phase 2 | Pending |
@@ -239,16 +242,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PIPE-07 | Phase 3 | Pending |
 | PIPE-08 | Phase 3 | Pending |
 | PIPE-09 | Phase 3 | Pending |
-| REC-01 | Phase 1 | Pending |
-| REC-02 | Phase 1 | Pending |
+| REC-01 | Phase 1 | Complete |
+| REC-02 | Phase 1 | Complete |
 | LEG-01 | Phase 5 | Pending |
 | LEG-02 | Phase 5 | Pending |
 | LEG-03 | Phase 5 | Pending |
 | LEG-04 | Phase 3 | Pending |
-| OPS-01 | Phase 1 | Pending |
+| OPS-01 | Phase 1 | Complete |
 | OPS-02 | Phase 5 | Pending |
 | OPS-03 | Phase 5 | Pending |
-| OPS-04 | Phase 1 | Pending |
+| OPS-04 | Phase 1 | Complete |
 | OPS-01b | Phase 5 | Pending |
 | OPS-04b | Phase 5 | Pending |
 | RES-01 | Phase 2 | Pending |

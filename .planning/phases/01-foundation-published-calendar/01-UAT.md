@@ -3,7 +3,7 @@ status: complete
 phase: 01-foundation-published-calendar
 source: [01-VERIFICATION.md]
 started: 2026-10-17T10:06:11Z
-updated: 2026-10-17T11:23:19.893Z
+updated: 2026-10-17T12:52:46Z
 ---
 
 > Browser flows used for this UAT are documented in `docs/uat/browser-uat.md` (F0–F10). Re-run them for future phases and regressions.
@@ -52,22 +52,22 @@ result: pass — laptop parts: event page shows dates with per-date .ics + Googl
 ### 8. Acknowledge insufficient_spec backstop truths: (a) edit / sync / status row-lock serialisation (01-04, 01-05); (b) heartbeat upsert under overlapping runs (01-09); (c) share.js re-entry and AbortError (01-10, covered by the share item); (d) accepted ZWJ-emoji split at the 140-character excerpt cut (01-06)
 expected: Owner accepts each, or asks for a concurrency test
 why_human: Concurrency or accepted limits with no deterministic test
-result: skipped
-reason: "Deferred follow-up: owner will review the backstops at the end once all phases are finished"
+result: pass
+reason: "Owner accepted all 5 backstops as-is, no concurrency tests requested (yurabyrlya, 2026-10-17T12:52:46Z); was deferred to backlog 999.1"
 
 ### 9. Review 4 flagged prohibitions (1 judgment-tier, 3 test-tier with no enforcement test). See the Prohibitions table
 expected: Accept the verifier's manual check or add enforcement tests (e.g. a Pest arch / composer.json assertion)
 why_human: Unverified prohibitions; the verifier's check is not authoritative
-result: skipped
-reason: "Deferred follow-up: skip as I do it at the end once we finish all phases"
+result: pass
+reason: "Owner accepted the verifier's manual check of all 4 prohibitions (yurabyrlya, 2026-10-17T12:52:46Z); was deferred to backlog 999.1"
 
 ## Summary
 
 total: 9
-passed: 7
+passed: 9
 issues: 0
 pending: 0
-skipped: 2
+skipped: 0
 blocked: 0
 
 ## Gaps
@@ -83,6 +83,8 @@ None blocking. Minor UX findings from the browser walkthrough (2026-10-17), cand
 - Demo data (owner): First Demo Event has '5£', 'town center' and a Source URL pointing at /admin/events/create
 
 ## Deferred Follow-Ups
+
+Resolved 2026-10-17: the owner accepted both items (tests 8 and 9 now pass); backlog Phase 999.1 closed.
 
 ```yaml
 - test: 8
