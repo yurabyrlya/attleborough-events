@@ -20,10 +20,10 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-10-16)
+See: .planning/PROJECT.md (updated 2026-10-17)
 
 **Core value:** Residents can open one trustworthy, up-to-date calendar on their phone and see what's on in Attleborough. Nothing reaches it without admin approval.
-**Current focus:** Phase 1 — Foundation & Published Calendar
+**Current focus:** Phase 2 — Draft Model, Review Queue & Submissions
 
 ## Current Position
 
@@ -32,7 +32,7 @@ Plan: Not started
 Status: Ready to plan
 Last activity: 2026-10-17 — Phase 1 complete, transitioned to Phase 02
 
-Progress: [██░░░░░░░░] 20% of planned plans (13/15); phases complete: 0/5
+Progress: [█████████████████░░░] 13/15 plans (87%); phases complete: 1/5
 
 ## Performance Metrics
 
@@ -83,6 +83,8 @@ Recent decisions affecting current work:
 - [Roadmap]: TEC is the verified platform adapter; no Squarespace `?format=` endpoints (robots-disallowed)
 - [Scope]: Infra/domain deferred to Phase 5; Phase 1 is local-dev only. (2026-10-16: 01-02/01-03 moved to 05-01/05-02; OPS-02 to Phase 5; OPS-01b/OPS-04b split out for production.)
 - [Testing]: Browser UAT flows (F0–F10) live in docs/uat/browser-uat.md; every phase runs them before sign-off and adds flows for new UI
+- [Phase 1]: Complete 2026-10-17. Verification passed (168/173 + owner-accepted backstops and prohibitions); security verified (0 open); UI review 17/24 with top 3 fixed (261017-hp9); open advisory review items WR-15, IN-09..16 in 01-REVIEW-DISPOSITION.md
+- [Testing]: Browser suite runs in CI; tests/Pest.php forgets scoped instances after each in-process request; use Uat::settleFields() after filling Livewire forms
 
 ### Pending Todos
 
@@ -91,7 +93,6 @@ None yet.
 ### Blockers/Concerns
 
 - [Phase 5]: Domain registration + VPS deferred (name decided: whatsonattleborough.co.uk; .co.uk availability unconfirmed)
-- [Phase 1]: DST boundary on 25 Oct 2026 is imminent. Include DST fixtures in the occurrence/window tests from the start
 - [Phase 2→3]: Local source inventory is unknown (automated search was blocked). Owner URL collection is on the critical path for Phase 3
 - [Phase 5]: Umami Cloud UK GDPR data region / DPA unverified (fallback: Plausible)
 - [Phase 3]: Crawling needs a real User-Agent contact/about URL; until Phase 5 is live use a config placeholder (e.g. CRAWLER_CONTACT_URL in config/site.php / .env) and swap in the live URL at launch
@@ -115,6 +116,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-16T21:17:40.408Z
-Stopped at: Phase 1 complete, ready to plan Phase 02
-Resume file: .planning/phases/02-draft-model-review-queue-submissions/02-CONTEXT.md
+Last session: 2026-10-17
+Stopped at: Phase 1 complete, ready to plan Phase 02 (02-CONTEXT.md already exists)
+Resume file: None

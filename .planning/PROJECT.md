@@ -21,22 +21,21 @@ Residents can open one trustworthy, up-to-date calendar on their phone and see w
 
 ### Validated
 
-(None yet - ship to validate)
+- ✓ Public mobile-first calendar of published, non-expired event occurrences with Today / This weekend / This week, category, Free and family-friendly filters (no-JS links, noindex filter URLs) — Phase 1
+- ✓ Admin manual event entry (Filament, single admin, writes only via `App\Publishing\Actions`, hide / cancel / per-date status) — Phase 1
 
 ### Active
 
-- [ ] Public mobile-first calendar of published, non-expired event occurrences with Today / This weekend / This week and category filters
-- [ ] Event detail pages with source attribution, SEO metadata, Schema.org `Event` JSON-LD and sitemap
+- [ ] Event detail pages with source attribution, SEO metadata, Schema.org `Event` JSON-LD and sitemap (Phase 1 shipped the page, SEO metadata, JSON-LD, .ics / Google Calendar and share; source attribution and sitemap remain)
 - [ ] Source Registry with test run / run now, health tracking and robots-aware polite fetching
 - [ ] Deterministic extraction ladder: ICS (with recurrence), RSS/Atom, platform adapters (The Events Calendar, Squarespace), Schema.org JSON-LD, per-source CSS selectors
 - [ ] Unified draft model: everything incoming becomes a draft (new / update / cancellation) with a rule-based quality score and reasons
 - [ ] Filament review queue: approve, edit, reject, mark duplicate, apply updates, confirm cancellations, bulk actions
 - [ ] Duplicate detection (external ID, URL, fuzzy title + date + venue) with admin making the final decision
 - [ ] Update and cancellation handling, including missing-item detection
-- [ ] Recurring and multi-day events (series approval, 90-day occurrence horizon)
+- [ ] Recurring and multi-day events (series approval, 90-day occurrence horizon) (Phase 1 shipped admin-entered weekly/monthly series via sabre/vobject, multi-day and all-day expiry, daily sync; series approval for imported drafts remains)
 - [ ] Location geofence for regional sources
 - [ ] Deterministic category assignment (source default, mapping, keyword rules)
-- [ ] Admin manual event entry
 - [ ] Public organiser submission form with spam protection
 - [ ] Source run logs and admin dashboard counts
 - [ ] Privacy notice, takedown contact and cookieless analytics
@@ -75,14 +74,18 @@ Residents can open one trustworthy, up-to-date calendar on their phone and see w
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| No LLM in the MVP; deterministic extraction ladder | Reproducible, testable, cheap; avoids fabricated dates and turning review into fact-checking | - Pending |
+| No LLM in the MVP; deterministic extraction ladder | Reproducible, testable, cheap; avoids fabricated dates and turning review into fact-checking | ✓ Holds after Phase 1 (no AI runtime in composer `require`; extraction ladder still to build in Phase 3) |
 | Unified draft model; `events` only holds reviewed events; expiry derived | Removes v1.0's overlapping status models | - Pending |
 | Admin manual entry instead of Facebook automation | Facebook policy; covers posters too | - Pending |
 | Rule-based quality score with visible reasons | Explainable to the reviewer | - Pending |
-| Database queue, no Redis; cheapest VPS hosting | Low volume; minimal cost and ops | - Pending |
+| Database queue, no Redis; cheapest VPS hosting | Low volume; minimal cost and ops | ✓ Database queue, cache and session work locally with heartbeats and a System health page (Phase 1); VPS in Phase 5 |
 | Full v1.1 Definition of Done before launch | Owner preference over a lean launch | - Pending |
 | Revised spec kept as `docs/product-specification.md` v1.1 | Single baseline for planning | - Pending |
-| Laravel Boost as a dev-only tool (MCP + AI guidelines for coding agents) | Learning project built with AI-assisted development; Boost improves agent output. Never a production dependency, so no LLM in the product | - Pending |
+| Laravel Boost as a dev-only tool (MCP + AI guidelines for coding agents) | Learning project built with AI-assisted development; Boost improves agent output. Never a production dependency, so no LLM in the product | ✓ Good (require-dev only; project rules in `.ai/rules`) |
+| Phase 1 is local-dev only; domain, VPS and deploy moved to Phase 5 | Ship the published model and admin first without infra cost | ✓ Phase 1 complete locally (2026-10-17) |
+| sabre/vobject is the only recurrence engine; occurrences upserted on (event, local date) | Correct DST handling; admin cancellations survive regeneration | ✓ Good (DST fixtures 25 Oct 2026 / 28 Mar 2027 pass) |
+| One-off ↔ repeating switches are refused (WR-06) | iCalendar UIDs must never change for subscribers | ✓ Accepted by owner; workaround is hide + create new |
+| Browser UAT flows F0–F10 automated with Pest browser tests in CI | Every phase signs off with the same flows; catches UI regressions | ✓ Green on PHP 8.4 and 8.5 |
 
 ## Evolution
 
@@ -102,4 +105,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-10-16 after initialization*
+*Last updated: 2026-10-17 after Phase 1*
