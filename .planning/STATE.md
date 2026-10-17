@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 02
 current_phase_name: Draft Model, Review Queue & Submissions
 status: executing
-stopped_at: Completed 02-06-PLAN.md
-last_updated: "2026-10-17T19:34:13.980Z"
+stopped_at: Completed 02-07-PLAN.md
+last_updated: "2026-10-17T19:47:42.972Z"
 last_activity: 2026-10-17
-last_activity_desc: Completed 02-06 (RejectDraft with optional D-11 reason + note, ReopenDraft, EventDraft MassPrunable 30/90-day retention, daily model:prune 03:40 London)
-state_head: 90d8b40f9c5309bf3f6654a3d1aac6209dbcb257
+last_activity_desc: "Completed 02-07 (Rules screen /admin/rules: Categories + Keyword rules tabs, SaveRules with refusals judged against the submitted state, CategoryAssigner keyword link)"
+state_head: 5dbf69f8a56d82aa7f12c8c0d9b1adaa69a2ba59
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 31
-  completed_plans: 19
+  completed_plans: 20
   percent: 20
 ---
 
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 02 (Draft Model, Review Queue & Submissions) — EXECUTING
-Plan: 6 of 16 complete (02-01 to 02-06 done; wave 3 in progress with 02-07 to 02-10)
+Plan: 7 of 16 complete (02-01 to 02-07 done; wave 3 in progress with 02-08 to 02-10)
 Status: Ready to execute
-Last activity: 2026-10-17 — Completed 02-06 (RejectReason enum with D-11 presets; RejectDraft / ReopenDraft admin-only locked transitions; EventDraft MassPrunable deletes rejected drafts after 30 days for spam, 90 otherwise; daily model:prune at 03:40 Europe/London; no email on any decision)
+Last activity: 2026-10-17 — Completed 02-07 (category_keyword_rules + CategoryAssigner link 3 by priority then id, whole-word NFC match; SaveRules admin-only, collect-all refusals inside one locked transaction, slugs fixed on create; Filament Rules page with Categories and Keyword rules tabs; PIPE-03/ADM-04 finish in 02-11)
 
-Progress: 19/31 plans ([██░░░░░░░░] 20%); phase 2: 6/16; phases complete: 1/5
+Progress: 20/31 plans ([██░░░░░░░░] 20%); phase 2: 7/16; phases complete: 1/5
 
 ## Performance Metrics
 
@@ -75,6 +75,7 @@ Progress: 19/31 plans ([██░░░░░░░░] 20%); phase 2: 6/16; pha
 | Phase 02 P04 | 6min | 2 tasks | 10 files |
 | Phase 02 P05 | 10min | 3 tasks | 14 files |
 | Phase 02 P06 | 8min | 2 tasks | 8 files |
+| Phase 02 P07 | 8min | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -106,6 +107,10 @@ Recent decisions affecting current work:
 - [Phase 02]: 02-05: Public pages load per-page first-party JS from their own head stack (submit.js on /submit only); the layout loads only app.css
 - [Phase 02]: 02-06: Rejecting overwrites review_notes with the trimmed note (or null); Reopen keeps review_notes
 - [Phase 02]: 02-06: A rejection with no reason is retained as non-spam (90 days); prunable() only matches rejected rows with reviewed_at set
+- [Phase 02]: SaveRules sections are optional: a state without 'categories' or 'keyword_rules' leaves that table untouched (02-11 adds mappings/geofence sections)
+- [Phase 02]: Rules refusals are evaluated inside the transaction after locking categories FOR UPDATE; order upsert categories -> sync keyword rules -> delete removed categories
+- [Phase 02]: Keywords stored NFC/whitespace-collapsed with case kept; matching and duplicate checks use CategoryAssigner::normalise(); new rows inserted in submitted order so earlier rows win ties
+- [Phase 02]: A draft uses a category via category_id OR submitted_category_id; new categories default to icon heroicon-o-tag
 
 ### Pending Todos
 
@@ -139,6 +144,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-17T19:34:13.635Z
-Stopped at: Completed 02-06-PLAN.md
+Last session: 2026-10-17T19:47:42.604Z
+Stopped at: Completed 02-07-PLAN.md
 Resume file: None
