@@ -98,11 +98,23 @@ it('persists price, family-friendly, organiser and source note', function () {
 });
 
 it('persists nothing when occurrence generation throws', function () {
-    // A timed event with no start time makes EventTiming throw inside the transaction.
-    $data = publishableData(['startTime' => null, 'allDay' => false]);
+    // The DTO is valid; the failure is injected AFTER the event row is saved
+    // inside PublishEvent's transaction: clearing start_time on the in-memory
+    // model makes EventTiming throw during occurrence generation, so this
+    // proves the rollback. The "timed event without a start time" input case
+    // is covered by tests/Unit/Publishing/PublishableEventDataTest.php (01-12).
+    $data = publishableData();
+    $saved = false;
+
+    Event::saved(function (Event $event) use (&$saved): void {
+        $saved = true;
+        $event->start_time = null;
+    });
 
     expect(fn () => app(PublishEvent::class)($data, $this->admin, EventOrigin::Manual))
         ->toThrow(InvalidArgumentException::class);
+
+    expect($saved)->toBeTrue();
 
     expect(Event::count())->toBe(0)
         ->and(EventOccurrence::count())->toBe(0);

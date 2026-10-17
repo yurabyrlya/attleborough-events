@@ -134,13 +134,23 @@ it('never turns a non-http source URL into a link', function () {
 });
 
 it('leaves no label or empty element for blank optional fields and falls back to "Listed by"', function () {
-    contentPublish($this->base, [
-        'organiserName' => null,
-        'organiserContact' => null,
-        'sourceUrl' => null,
-        'sourceNote' => null,
-        'priceText' => null,
-    ]);
+    // An unattributed event can only exist as a stored row (01-12's DTO requires a
+    // source URL or contact); the page must still fall back to "Listed by".
+    makeOccurrence([
+        'title' => 'Quiz Night',
+        'slug' => 'quiz-night',
+        'description' => 'General knowledge quiz, teams of up to six.',
+        'category_id' => $this->base['categoryId'],
+        'venue_id' => $this->base['venueId'],
+        'start_date' => '2026-10-23',
+        'start_time' => '19:30:00',
+        'end_time' => '22:00:00',
+        'organiser_name' => null,
+        'organiser_contact' => null,
+        'source_url' => null,
+        'source_note' => null,
+        'price_text' => null,
+    ], '2026-10-23 19:30', '2026-10-23 22:00');
 
     $main = contentMain(get('/events/quiz-night')->assertOk());
     $text = contentText($main);

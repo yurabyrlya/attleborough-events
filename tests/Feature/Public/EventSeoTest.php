@@ -31,6 +31,7 @@ beforeEach(function () {
         'startDate' => '2026-10-23',
         'startTime' => '19:30:00',
         'endTime' => '22:00:00',
+        'organiserContact' => 'organiser@example.test',
     ];
     $this->appUrl = rtrim((string) config('app.url'), '/');
 });
@@ -93,7 +94,9 @@ it('writes one meta description from the next date, the venue and the descriptio
 });
 
 it('falls back to the site tagline when the description is empty', function () {
-    seoPublish($this->base, ['title' => '!!!', 'description' => " \n "]);
+    $event = seoPublish($this->base, ['title' => '!!!']);
+    // 01-12's DTO refuses blank descriptions; the page must still handle a stored one (importers, SQL).
+    Event::query()->whereKey($event->id)->update(['description' => " \n "]);
 
     $document = seoHead(get('/events/event')->assertOk());
 
