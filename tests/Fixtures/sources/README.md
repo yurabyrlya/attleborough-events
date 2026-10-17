@@ -64,6 +64,25 @@ tests/Fixtures/sources/
 - Check robots.txt first and record the rule lines. Never bypass a bot wall, CAPTCHA, login, robots disallow or ToS prohibition: no challenge solvers, no browser User-Agent, no copied cookies.
 - `curl -sS -D headers.txt -o body.raw -A "$UA" "$URL"`. Keep `body.raw` outside the repo; hash it (`shasum -a 256 body.raw`) before any change.
 - If a local security gateway answers instead of the site (its own block page or redirect, TLS interception error), record "no observation (local gateway)", not "blocked by site".
+- Some hosts block corporate or datacenter IPs but serve residential ones (the Town Council, D-26). Record the network in the manifest (`"network": "residential"`).
+- A page the owner saved from a browser (for a site that challenges our crawler, D-25) gets `"capture": "hand"` in its manifest entry, the URL it was saved from, and the save date. It goes through the same redaction.
+
+## How to run at home (`ops/probe-sources.sh`)
+
+The script does everything in "Capturing" for you: robots.txt first, `Crawl-delay` honoured (across runs for long delays, using `~/.cache/whatson-probe`), our identifying User-Agent, a few requests per host, raw bytes saved with D-14 names, and a manifest entry appended for each file. It never saves a challenge page (HTTP 403/429/503, `cf-mitigated`, CAPTCHA markers); it records `blocked` instead.
+
+```bash
+ops/probe-sources.sh                      # every target in the script
+ops/probe-sources.sh attleborough-primary-school ticketsource   # only these
+```
+
+1. Run it from a normal home connection, not a VPN or the office network, and read the summary it prints: `saved`, `exists`, `deferred` (Crawl-delay: run again after the printed time), `skipped` (robots disallows), `missing` (404 and similar), `blocked`.
+2. A `blocked` result is final for that run. Don't change the User-Agent, use a browser's cookies or try a proxy. Tell the agent instead (D-25 lists the legitimate routes).
+3. **Redact before commit.** Read every saved file, apply the "Redaction" rules below, then in its manifest entry set `events`, `redactions` and `modified`, and replace the `UNREVIEWED` note.
+4. Run `./vendor/bin/pest --testsuite=Unit tests/Unit/Fixtures/SourceFixturesHaveNoPersonalDataTest.php`. It fails on any personal email or phone number left behind, and on a file missing from its manifest.
+5. Commit the files and manifests the script listed, or hand them to the agent.
+
+To try a new source, add a line to `TARGETS` in the script: slug, base URL, listing paths, and an optional sitemap keyword.
 
 ## Redaction
 
