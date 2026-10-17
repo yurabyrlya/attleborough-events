@@ -166,11 +166,12 @@ final readonly class PublishableEventData
      * Form state for an existing event: its attributes plus the Repeats/Ends
      * fields recovered from the stored recurrence_rule.
      *
-     * A stored rule the form cannot represent (WR-09) falls back to the
-     * "Does not repeat" / "Never" state instead of throwing. That state is
-     * display-only: EditEvent makes the form read-only and refuses to save,
-     * and UpdatePublishedEvent refuses the edit, so it can never overwrite
-     * the stored rule.
+     * A stored rule the form cannot represent exactly (round trip, WR-10;
+     * see editableRecurrence()) falls back to the "Does not repeat" /
+     * "Never" state instead of throwing or showing the start date's weekday.
+     * That state is display-only: EditEvent makes the form read-only and
+     * refuses to save, and UpdatePublishedEvent refuses the edit, so it can
+     * never overwrite the stored rule.
      *
      * @return array<string, mixed>
      */
@@ -180,9 +181,27 @@ final readonly class PublishableEventData
         $attributes['start_date'] = $event->start_date->format('Y-m-d');
         $attributes['end_date'] = $event->end_date?->format('Y-m-d');
 
-        $recurrence = ManualRecurrence::tryFromRrule($event->recurrence_rule, $event->all_day) ?? new ManualRecurrence;
+        $recurrence = self::editableRecurrence($event) ?? new ManualRecurrence;
 
         return array_merge($attributes, $recurrence->toFormState());
+    }
+
+    /**
+     * The event's stored rule as a recurrence the form can edit, or null
+     * when it does not round-trip exactly for the event's own start date and
+     * all_day (WR-10). One-off events give "Does not repeat". The single
+     * check behind UpdatePublishedEvent::canEdit(), fromEvent() and the
+     * events table's Repeats label, so they cannot disagree.
+     */
+    public static function editableRecurrence(Event $event): ?ManualRecurrence
+    {
+        $start = CarbonImmutable::createFromFormat('!Y-m-d', $event->start_date->format('Y-m-d'), $event->timezone);
+
+        if (! $start instanceof CarbonImmutable) {
+            return null;
+        }
+
+        return ManualRecurrence::tryFromStoredRule($event->recurrence_rule, $start, $event->all_day);
     }
 
     public function recurrence(): ManualRecurrence

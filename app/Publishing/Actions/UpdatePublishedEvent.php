@@ -2,7 +2,6 @@
 
 namespace App\Publishing\Actions;
 
-use App\Calendar\ManualRecurrence;
 use App\Calendar\OccurrenceGenerator;
 use App\Models\Event;
 use App\Models\User;
@@ -29,11 +28,15 @@ use InvalidArgumentException;
  * UID never changes. Switching between repeating patterns is allowed. The
  * admin's workaround is to hide the event and create a new one.
  *
- * Also refuses any edit to an event whose stored recurrence_rule
- * ManualRecurrence::tryFromRrule() cannot represent (WR-09), so no caller
- * (a forged Livewire save, a future job) can overwrite a rule the form only
- * shows as "Does not repeat". Hide and cancel still work through
- * ChangeEventStatus.
+ * Also refuses any edit to an event whose stored recurrence_rule does not
+ * round-trip exactly through ManualRecurrence for the event's own start
+ * date and all_day (WR-09, tightened by WR-10; see
+ * PublishableEventData::editableRecurrence()). Otherwise the next save would
+ * rewrite the days to the start date's weekday and sync would delete the
+ * old dates, including admin cancellations and the UIDs residents imported.
+ * So no caller (a forged Livewire save, a future job) can overwrite a rule
+ * the form only shows as "Does not repeat". Hide and cancel still work
+ * through ChangeEventStatus.
  *
  * Status changes (hide/cancel/reinstate) are separate actions (plan 01-05).
  */
@@ -83,12 +86,13 @@ final class UpdatePublishedEvent
     }
 
     /**
-     * Whether the event's stored recurrence rule is one the edit form can
-     * represent (WR-09). One-off events always can.
+     * Whether the edit form can represent the event's stored recurrence rule
+     * exactly, i.e. it round-trips for the event's start date (WR-09, WR-10).
+     * One-off events always can.
      */
     public static function canEdit(Event $event): bool
     {
         return $event->recurrence_rule === null
-            || ManualRecurrence::tryFromRrule($event->recurrence_rule, $event->all_day) !== null;
+            || PublishableEventData::editableRecurrence($event) !== null;
     }
 }

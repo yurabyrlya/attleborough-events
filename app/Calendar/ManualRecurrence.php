@@ -139,6 +139,37 @@ final readonly class ManualRecurrence
     }
 
     /**
+     * The recurrence for a stored rule, or null when the form cannot edit it.
+     *
+     * A rule is editable only if rebuilding it for this start date gives
+     * exactly the stored rule (WR-10); anything else would be rewritten by
+     * the next save (e.g. BYDAY=MO on a Friday start becomes BYDAY=FR) and
+     * sync would delete the old dates. A null rule is "Does not repeat".
+     *
+     * @param  CarbonImmutable  $startLocal  The series' first date, in Europe/London
+     */
+    public static function tryFromStoredRule(?string $rrule, CarbonImmutable $startLocal, bool $allDay): ?self
+    {
+        if ($rrule === null) {
+            return new self;
+        }
+
+        $parsed = self::tryFromRrule($rrule, $allDay);
+
+        if ($parsed === null || ! $parsed->isValidFor($startLocal)) {
+            return null;
+        }
+
+        try {
+            $rebuilt = $parsed->toRrule($startLocal, $allDay);
+        } catch (InvalidArgumentException) {
+            return null;
+        }
+
+        return $rebuilt === $rrule ? $parsed : null;
+    }
+
+    /**
      * The Repeats options offered for a start date, value => label.
      *
      * Nth weekday is offered when n <= 4; last weekday when start + 7 days
