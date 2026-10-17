@@ -108,6 +108,40 @@ final class LondonFormatter
     }
 
     /**
+     * A stored LOCAL wall-clock schedule (drafts, events) as UK text, never
+     * converted: "Sat 24 Oct, 7:30pm", "Sat 24 Oct, all day",
+     * "Sat 24 Oct, time missing"; the year is added outside the current
+     * London year, as in shortDate(). Null date gives "Date missing".
+     */
+    public static function wallClock(?CarbonImmutable $date, ?string $time, bool $allDay, ?CarbonImmutable $now = null): string
+    {
+        if ($date === null) {
+            return 'Date missing';
+        }
+
+        $local = CarbonImmutable::createFromFormat('!Y-m-d', $date->format('Y-m-d'), self::TZ);
+
+        if (! $local instanceof CarbonImmutable) {
+            return 'Date missing';
+        }
+
+        $year = self::local($now ?? CarbonImmutable::now())->year;
+        $day = $local->year === $year ? $local->format('D j M') : $local->format('D j M Y');
+
+        if ($allDay) {
+            return $day.', all day';
+        }
+
+        $clock = $time === null ? false : CarbonImmutable::createFromFormat('!H:i:s', strlen($time) === 5 ? $time.':00' : $time, self::TZ);
+
+        if (! $clock instanceof CarbonImmutable) {
+            return $day.', time missing';
+        }
+
+        return $day.', '.str_replace(':00', '', $clock->format('g:ia'));
+    }
+
+    /**
      * "7:30pm" / "7pm".
      */
     public static function time(CarbonImmutable $instant): string

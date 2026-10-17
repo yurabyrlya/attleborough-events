@@ -112,10 +112,11 @@ it('returns null after the last and before the first', function () {
 });
 
 it('returns the following pending draft from a just-approved draft', function () {
-    app(ApproveDraft::class)($this->d24NoTime, $this->admin);
+    app(ApproveDraft::class)($this->d24Midnight, $this->admin);
 
-    expect($this->queue->next($this->d24NoTime->refresh())?->id)->toBe($this->d24Midnight->id)
-        ->and($this->queue->previous($this->d24NoTime)?->id)->toBe($this->d23Later->id);
+    expect($this->queue->query()->pluck('id')->all())->not->toContain($this->d24Midnight->id)
+        ->and($this->queue->next($this->d24Midnight->refresh())?->id)->toBe($this->d24Evening->id)
+        ->and($this->queue->previous($this->d24Midnight)?->id)->toBe($this->d24NoTime->id);
 });
 
 it('gives the same id sequence in the table default order, query() and a next() walk', function () {
