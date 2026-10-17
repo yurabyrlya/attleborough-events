@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 02
 current_phase_name: Draft Model, Review Queue & Submissions
 status: executing
-stopped_at: Completed 02-15-PLAN.md
-last_updated: "2026-10-17T21:16:18.033Z"
+stopped_at: Completed 02-16-PLAN.md
+last_updated: "2026-10-17T21:33:03.153Z"
 last_activity: 2026-10-17
-last_activity_desc: "Completed 02-15 (Approve & next: next-draft redirects, Edit/Skip/Previous/help actions, guarded A/E/R/S/J/K/? shortcuts with a remembered toggle; REV-10 complete)"
-state_head: e389101a01f78cd7716e74ff1de9c937bef7a480
+last_activity_desc: "Completed 02-16 (browser UAT F11-F14 in the runbook and automated; F3 manual-draft check; full browser suite 33/33 green three runs)"
+state_head: dab9909c05defc80da6d6275cb232d1f9c6a9f82
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 31
-  completed_plans: 28
+  completed_plans: 29
   percent: 20
 ---
 
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 02 (Draft Model, Review Queue & Submissions) — EXECUTING
-Plan: 15 of 16 complete (02-01 to 02-15 done; next — 02-16)
-Status: Ready to execute
-Last activity: 2026-10-17 — Completed 02-15 (Approve & next review page: approve/reject/skip open the next pending draft in D-09 order; guarded single-key shortcuts A/E/R/S/J/K/? with visible hints, aria-keyshortcuts, help dialog and a remembered off switch; proven in a real browser; REV-10 complete)
+Plan: 16 of 16 complete (02-01 to 02-16 done; phase ready for verification)
+Status: All plans complete — ready for /gsd-verify-work
+Last activity: 2026-10-17 — Completed 02-16 (browser UAT runbook F11 submit, F12 review/edit-and-approve/Approve & next, F13 bulk approve/reject/reopen, F14 Rules; automated in tests/Browser offline with a faked Turnstile verifier; F3 asserts the approved manual draft; full browser suite 33/33 green three runs, Unit+Feature 990/990)
 
-Progress: 27/31 plans ([██░░░░░░░░] 20%); phase 2: 14/16; phases complete: 1/5
+Progress: 29/31 plans ([██░░░░░░░░] 20%); phase 2: 16/16; phases complete: 1/5
 
 ## Performance Metrics
 
@@ -84,6 +84,7 @@ Progress: 27/31 plans ([██░░░░░░░░] 20%); phase 2: 14/16; ph
 | Phase 02 P13 | 8min | 2 tasks | 5 files |
 | Phase 02 P14 | 9min | 2 tasks | 8 files |
 | Phase 02 P15 | 10min | 2 tasks | 7 files |
+| Phase 02 P16 | 14min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -141,6 +142,8 @@ Recent decisions affecting current work:
 - [Phase 02]: 02-14: Save & approve = DraftWriter::update + ApproveDraft in one DB::transaction; blockers roll back edits, form keeps typed values
 - [Phase 02]: 02-15: Publish is autofocused in the approve dialog so A then Enter publishes (D-10); Filament confirmation modals put 'Keep as is' first
 - [Phase 02]: 02-15: Single-key review shortcuts use one guarded Alpine keydown handler (inputs, dialogs, modifiers, repeat) with a localStorage 'woa-shortcuts' toggle, never Filament keyBindings()
+- [Phase 02]: 02-16: F14 proves 'Other can't be removed' through the UI guard (no Delete on the Other row); the visible 'Rules not saved' refusal is checked with a category in use
+- [Phase 02]: 02-16: browser tests stay offline with no Turnstile site key plus a container-bound passing TurnstileVerifier (UatFixtures::fakeTurnstile)
 
 ### Pending Todos
 
@@ -174,6 +177,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-17T21:16:17.650Z
-Stopped at: Completed 02-15-PLAN.md
+Last session: 2026-10-17T21:33:02.748Z
+Stopped at: Completed 02-16-PLAN.md
 Resume file: None
