@@ -96,6 +96,9 @@ final class ReviewActions
             ->modalHeading('Publish this event?')
             ->modalDescription('It goes on the public calendar straight away.')
             ->modalSubmitActionLabel('Publish')
+            // Focus "Publish" when the dialog opens, so the keyboard flow is
+            // A then Enter (D-10); Escape or "Keep as is" backs out.
+            ->modalSubmitAction(fn (Action $action): Action => $action->extraAttributes(['autofocus' => true]))
             ->modalCancelActionLabel(self::KEEP_LABEL)
             ->action(function (EventDraft $record, Component $livewire): void {
                 $published = self::run(fn (User $actor) => app(ApproveDraft::class)($record, $actor), 'Published', $livewire);

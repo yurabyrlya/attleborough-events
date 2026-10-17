@@ -47,6 +47,7 @@
     >
         <label class="inline-flex items-center gap-3 text-sm">
             <input
+                id="woa-shortcuts-toggle"
                 type="checkbox"
                 class="fi-checkbox-input"
                 x-model="enabled"
