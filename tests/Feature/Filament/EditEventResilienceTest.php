@@ -247,3 +247,14 @@ it('keeps the events list closed to anyone but the admin', function () {
     actingAs($intruder);
     get('/admin/events')->assertForbidden();
 });
+
+it('labels Repeats in the events table with the same round-trip check as the edit page', function () {
+    $monday = ($this->stored)('FREQ=WEEKLY;BYDAY=MO', ['title' => 'Imported Yoga Monday']);
+    $weekly = ($this->weekly)();
+    $oneOff = ($this->stored)('FREQ=DAILY', ['title' => 'One-off Talk', 'recurrence_rule' => null]);
+
+    livewire(ListEvents::class)
+        ->assertTableColumnStateSet('repeats', 'Repeats', $monday)
+        ->assertTableColumnStateSet('repeats', 'Weekly on Friday', $weekly)
+        ->assertTableColumnStateSet('repeats', 'One-off', $oneOff);
+});

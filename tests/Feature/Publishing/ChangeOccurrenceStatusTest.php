@@ -140,3 +140,17 @@ it('logs one info entry with ids, from, to and user_id only', function () {
             'user_id' => $this->admin->id,
         ]);
 });
+
+it('does not let occurrence status or its audit be mass-assigned', function () {
+    $occurrence = new EventOccurrence;
+
+    expect($occurrence->isFillable('status'))->toBeFalse()
+        ->and($occurrence->isFillable('status_changed_at'))->toBeFalse()
+        ->and($occurrence->isFillable('status_changed_by'))->toBeFalse()
+        ->and($occurrence->isFillable('starts_at'))->toBeTrue();
+
+    $forged = new EventOccurrence(['event_id' => 1, 'status' => 'cancelled']);
+
+    expect($forged->status)->toBe(OccurrenceStatus::Scheduled)
+        ->and($forged->getAttributes()['status'])->toBe('scheduled');
+});
