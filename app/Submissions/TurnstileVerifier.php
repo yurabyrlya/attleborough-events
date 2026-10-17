@@ -64,6 +64,12 @@ class TurnstileVerifier
             return $codes === [] ? ['invalid-input-response'] : $codes;
         }
 
+        // Cloudflare's testing keys answer without action or a real hostname;
+        // trust them for local development only, never in production.
+        if (($body['metadata']['result_with_testing_key'] ?? false) === true && ! app()->isProduction()) {
+            return [];
+        }
+
         if (($body['action'] ?? null) !== config('services.turnstile.action', 'submit')) {
             return ['action-mismatch'];
         }

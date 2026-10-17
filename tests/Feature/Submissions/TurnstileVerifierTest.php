@@ -130,3 +130,17 @@ it('sends a 2048-character token to Cloudflare', function () {
 
     Http::assertSentCount(1);
 });
+
+it('accepts Cloudflare\'s testing-key answer outside production, which carries no action', function () {
+    fakeSiteverify(['success' => true, 'hostname' => 'example.com', 'error-codes' => [], 'metadata' => ['result_with_testing_key' => true]]);
+    config()->set('services.turnstile.hostnames', ['whatsonattleborough.co.uk']);
+
+    expect(app(TurnstileVerifier::class)->verify('XXXX.DUMMY.TOKEN.XXXX', '127.0.0.1'))->toBe([]);
+});
+
+it('refuses a testing-key answer in production', function () {
+    app()->detectEnvironment(fn (): string => 'production');
+    fakeSiteverify(['success' => true, 'hostname' => 'example.com', 'error-codes' => [], 'metadata' => ['result_with_testing_key' => true]]);
+
+    expect(app(TurnstileVerifier::class)->verify('XXXX.DUMMY.TOKEN.XXXX', '203.0.113.7'))->toBe(['action-mismatch']);
+});
