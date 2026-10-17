@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 02
 current_phase_name: Draft Model, Review Queue & Submissions
 status: executing
-stopped_at: Completed 02-09-PLAN.md
-last_updated: "2026-10-17T20:06:57.206Z"
+stopped_at: Completed 02-10-PLAN.md
+last_updated: "2026-10-17T20:17:28.212Z"
 last_activity: 2026-10-17
 last_activity_desc: "Completed 02-07 (Rules screen /admin/rules: Categories + Keyword rules tabs, SaveRules with refusals judged against the submitted state, CategoryAssigner keyword link)"
-state_head: 1eb2bbfcac7660a29aff7af4dfb542fd69e65778
+state_head: 03158105fbec38755afc226dd3bb15d18046492f
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 31
-  completed_plans: 22
+  completed_plans: 23
   percent: 20
 ---
 
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 02 (Draft Model, Review Queue & Submissions) — EXECUTING
-Plan: 9 of 16 complete (02-01 to 02-09 done; wave 3 in progress with 02-10)
+Plan: 10 of 16 complete (02-01 to 02-10 done; wave 3 complete)
 Status: Ready to execute
-Last activity: 2026-10-17 — Completed 02-09 (spam defence on /submit: required-presence honeypot, encrypted single-use timing token 3 s–120 min, in-house fail-closed TurnstileVerifier checking success/action/hostname, Turnstile script on /submit only when a site key is set, noscript email route, production resting mode; SUB-04 finishes with the 02-10 rate limit)
+Last activity: 2026-10-17 — Completed 02-10 (per-IP rate limit on POST /submit: 5/hour + 10/day via the 'submissions' limiter, branded 429 page; D-17 Turnstile exception in AGENTS.md and .ai/guidelines/attleborough.md; Turnstile test keys in .env.example; System health 'Submission spam check' fails in production without keys; SUB-04 complete)
 
-Progress: 22/31 plans ([██░░░░░░░░] 20%); phase 2: 9/16; phases complete: 1/5
+Progress: 23/31 plans ([██░░░░░░░░] 20%); phase 2: 10/16; phases complete: 1/5
 
 ## Performance Metrics
 
@@ -78,6 +78,7 @@ Progress: 22/31 plans ([██░░░░░░░░] 20%); phase 2: 9/16; pha
 | Phase 02 P07 | 8min | 3 tasks | 11 files |
 | Phase 02 P08 | 5min | 2 tasks | 8 files |
 | Phase 02 P09 | 8min | 3 tasks | 14 files |
+| Phase 02 P10 | 5min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -120,6 +121,8 @@ Recent decisions affecting current work:
 - [Phase 02]: 02-09: a filled honeypot skips field rules (rules() returns []) so bots always get the silent thank-you
 - [Phase 02]: 02-09: visible spam refusals go on the 'form' error key, shown in #form-check by the submit button
 - [Phase 02]: 02-09: resting = production with empty Turnstile site key or secret; elsewhere a missing secret fails closed via the verifier
+- [Phase 02]: 02-10: submissions limiter keys are ip:{address}:hour / :day — identical by() keys in one named limiter share (and double-hit) a counter
+- [Phase 02]: 02-10: HealthReport::spamCheck() reuses StoreSubmissionRequest::formIsResting(); phpunit.xml pins TURNSTILE_* empty so a local .env can't leak into tests
 
 ### Pending Todos
 
@@ -153,6 +156,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-17T20:06:56.859Z
-Stopped at: Completed 02-09-PLAN.md
+Last session: 2026-10-17T20:17:27.834Z
+Stopped at: Completed 02-10-PLAN.md
 Resume file: None
