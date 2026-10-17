@@ -7,14 +7,16 @@ use App\Enums\PriceType;
 use App\Enums\RepeatEnds;
 use App\Enums\RepeatPattern;
 use App\Models\Event;
+use App\Models\EventDraft;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Throwable;
 
 /**
- * Everything needed to publish an event, independent of where it came from
- * (Filament manual entry now; approved drafts in Phase 2).
+ * Everything needed to publish an event, independent of where it came from.
+ * Since Phase 2 every event is published from an approved draft
+ * (fromDraft(); manual entry is a manual draft approved at once, D-07).
  */
 final readonly class PublishableEventData
 {
@@ -159,6 +161,70 @@ final readonly class PublishableEventData
             repeatEnds: RepeatEnds::from((string) ($data['repeat_ends'] ?? RepeatEnds::Never->value)),
             repeatUntil: self::nullableDate($data['repeat_until'] ?? null),
             repeatCount: self::nullableInt($data['repeat_count'] ?? null),
+        );
+    }
+
+    /**
+     * The publishable data for an approved draft (ApproveDraft).
+     *
+     * Throws InvalidArgumentException with a plain-English message when the
+     * draft lacks what publishing needs (no category, no venue, no start
+     * date, a repeat rule the form cannot represent, or any constructor
+     * invariant); ApproveDraft turns it into a DraftNotPublishable blocker.
+     * The stored rule must round-trip exactly for the draft's own start date
+     * and all_day (WR-10), so the event gets exactly the draft's rule.
+     *
+     * @throws InvalidArgumentException
+     */
+    public static function fromDraft(EventDraft $draft): self
+    {
+        if ($draft->category_id === null) {
+            throw new InvalidArgumentException('Pick a category.');
+        }
+
+        if ($draft->venue_id === null) {
+            throw new InvalidArgumentException('Pick or create a venue.');
+        }
+
+        if ($draft->start_date === null) {
+            throw new InvalidArgumentException('Add a start date.');
+        }
+
+        $startDate = $draft->start_date->format('Y-m-d');
+        $startLocal = CarbonImmutable::createFromFormat('!Y-m-d H:i:s', $startDate.' '.($draft->start_time ?? '00:00:00'), $draft->timezone);
+
+        if (! $startLocal instanceof CarbonImmutable) {
+            throw new InvalidArgumentException("Invalid start [{$startDate} {$draft->start_time}].");
+        }
+
+        $recurrence = ManualRecurrence::tryFromStoredRule($draft->recurrence_rule, $startLocal, $draft->all_day);
+
+        if ($recurrence === null) {
+            throw new InvalidArgumentException("This repeat rule can't be published from the form.");
+        }
+
+        return new self(
+            title: trim($draft->title),
+            description: trim((string) $draft->description),
+            categoryId: $draft->category_id,
+            venueId: $draft->venue_id,
+            startDate: $startDate,
+            startTime: $draft->all_day ? null : $draft->start_time,
+            endDate: $draft->end_date?->format('Y-m-d'),
+            endTime: $draft->all_day ? null : $draft->end_time,
+            allDay: $draft->all_day,
+            familyFriendly: $draft->family_friendly,
+            priceType: $draft->price_type,
+            priceText: self::nullableString($draft->price_text),
+            organiserName: self::nullableString($draft->organiser_name),
+            organiserContact: self::nullableString($draft->organiser_contact),
+            sourceUrl: self::nullableString($draft->source_url),
+            sourceNote: self::nullableString($draft->source_note),
+            timezone: $draft->timezone,
+            repeats: $recurrence->pattern,
+            repeatEnds: $recurrence->ends,
+            repeatUntil: $recurrence->untilDate,
+            repeatCount: $recurrence->count,
         );
     }
 
