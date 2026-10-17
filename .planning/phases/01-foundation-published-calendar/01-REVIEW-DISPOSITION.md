@@ -1,6 +1,6 @@
 ---
 phase: 01
-review: 01-REVIEW.md
+review: 01-REVIEW.md (incremental re-review since f332b0a; earlier rows from the full review at f332b0a)
 titles: json
 findings:
   - id: WR-10
@@ -95,28 +95,73 @@ findings:
     severity: warning
     disposition: fixed
     title: "The edit page (the only place status actions live) crashes for any recurrence rule `ManualRecurrence` does not emit"
-open: 13
-total: 23
-recorded: 2026-10-17T09:33:32.563Z
+  - id: WR-12
+    severity: warning
+    disposition: fixed
+    title: "The \"live\" failed-jobs badge depends on an undocumented Filament event, and no test shows the badge changing"
+  - id: WR-13
+    severity: warning
+    disposition: fixed
+    title: "`Uat::settleFields()` never checks its last re-fill, so it can throw even when the field settled"
+  - id: WR-14
+    severity: warning
+    disposition: fixed
+    title: "The Livewire fill race was fixed in F0 only; F3 and F6 still fill without settling"
+  - id: WR-15
+    severity: warning
+    disposition: open
+    title: "The read-only \"Custom rule\" form shows a field that only applies to one-off events and hides the series' end"
+  - id: IN-12
+    severity: info
+    disposition: open
+    title: "Only 404, 500 and 503 are branded; other errors still show the framework's unbranded pages"
+  - id: IN-13
+    severity: info
+    disposition: open
+    title: "The round-trip check is repeated per render, and the events table re-derives the start date"
+  - id: IN-14
+    severity: info
+    disposition: open
+    title: "The F3 submit click targets an auto-generated Filament id"
+  - id: IN-15
+    severity: info
+    disposition: open
+    title: "The \"first result above the fold\" check measures the day heading, not the first event"
+  - id: IN-16
+    severity: info
+    disposition: open
+    title: "The branded 500 page is only tested as a view render, not through the exception handler"
+open: 9
+total: 32
+recorded: 2026-10-17T12:44:38.000Z
 ---
 
 # Phase 01: Code Review Disposition
 
 | Finding | Severity | Disposition | Source |
 |---------|----------|-------------|--------|
-| WR-10 | warning | fixed | gap plan 01-15; confirmed by verifier round 3 (2026-10-17) |
-| WR-11 | warning | fixed | gap plan 01-15; confirmed by verifier round 3 (2026-10-17) |
-| IN-01 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) |
-| IN-02 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) |
-| IN-03 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) |
-| IN-04 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) |
-| IN-05 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) |
-| IN-06 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) |
-| IN-07 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) |
-| IN-08 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) |
-| IN-09 | info | open | - |
-| IN-10 | info | open | - |
-| IN-11 | info | open | - |
+| WR-10 | warning | fixed | gap plan 01-15; confirmed by verifier round 3 (2026-10-17) (not in the current review) |
+| WR-11 | warning | fixed | gap plan 01-15; confirmed by verifier round 3 (2026-10-17) (not in the current review) |
+| IN-01 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) (not in the current review) |
+| IN-02 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) (not in the current review) |
+| IN-03 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) (not in the current review) |
+| IN-04 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) (not in the current review) |
+| IN-05 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) (not in the current review) |
+| IN-06 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) (not in the current review) |
+| IN-07 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) (not in the current review) |
+| IN-08 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) (not in the current review) |
+| IN-09 | info | open | (not in the current review) |
+| IN-10 | info | open | (not in the current review) |
+| IN-11 | info | open | (not in the current review) |
+| WR-12 | warning | fixed | e1edcb3: F10 asserts badge 2→1→none; browser harness forgets scoped instances per request; live behaviour confirmed on artisan serve (2026-10-17) |
+| WR-13 | warning | fixed | e1edcb3 (2026-10-17) |
+| WR-14 | warning | fixed | e1edcb3 (2026-10-17) |
+| WR-15 | warning | open | - |
+| IN-12 | info | open | - |
+| IN-13 | info | open | - |
+| IN-14 | info | open | - |
+| IN-15 | info | open | - |
+| IN-16 | info | open | - |
 | CR-01 | critical | fixed | gap plan 01-11; confirmed by re-review 2026-10-17 (not in the current review) |
 | WR-01 | warning | fixed | gap plan 01-12; confirmed by re-review 2026-10-17 (not in the current review) |
 | WR-02 | warning | fixed | gap plan 01-12; confirmed by re-review 2026-10-17 (not in the current review) |

@@ -1,287 +1,217 @@
 ---
 phase: 01-foundation-published-calendar
-reviewed: 2026-10-17T09:40:00Z
-depth: deep
-files_reviewed: 46
+reviewed: 2026-10-17T13:31:50+01:00
+depth: standard
+review_kind: incremental
+diff_base: f332b0a
+files_reviewed: 34
 files_reviewed_list:
-  - .env.example
-  - .github/workflows/ci.yml
-  - AGENTS.md
-  - app/Calendar/Export/OccurrenceUid.php
+  - app/Calendar/CalendarFilters.php
   - app/Calendar/ManualRecurrence.php
+  - app/Filament/Pages/SystemHealth.php
+  - app/Filament/Resources/Events/Actions/StatusActions.php
   - app/Filament/Resources/Events/Pages/EditEvent.php
+  - app/Filament/Resources/Events/RelationManagers/OccurrencesRelationManager.php
   - app/Filament/Resources/Events/Schemas/EventForm.php
   - app/Filament/Resources/Events/Tables/EventsTable.php
-  - app/Http/Controllers/EventController.php
-  - app/Http/Controllers/OccurrenceIcsController.php
-  - app/Models/Event.php
-  - app/Models/User.php
-  - app/Providers/AppServiceProvider.php
-  - app/Providers/Filament/AdminPanelProvider.php
-  - app/Publishing/Actions/ChangeEventStatus.php
-  - app/Publishing/Actions/ChangeOccurrenceStatus.php
-  - app/Publishing/Actions/PublishEvent.php
+  - app/Models/EventOccurrence.php
   - app/Publishing/Actions/UpdatePublishedEvent.php
-  - app/Publishing/AdminGate.php
   - app/Publishing/Data/PublishableEventData.php
-  - app/Support/LondonFormatter.php
-  - ops/check-public-assets.sh
-  - resources/css/filament/admin/theme.css
+  - resources/views/calendar/partials/filter-chips.blade.php
+  - resources/views/calendar/partials/remove-chip.blade.php
+  - resources/views/errors/404.blade.php
+  - resources/views/errors/500.blade.php
+  - resources/views/errors/503.blade.php
+  - resources/views/errors/layout.blade.php
+  - resources/views/events/partials/dates.blade.php
+  - tests/Browser/AdminCreateEventTest.php
+  - tests/Browser/AdminEditEventTest.php
+  - tests/Browser/EventPageTest.php
+  - tests/Browser/PublicCalendarTest.php
+  - tests/Browser/SystemHealthTest.php
+  - tests/Browser/UatFixtures.php
   - tests/Feature/Filament/EditEventResilienceTest.php
-  - tests/Feature/Filament/EditRepeatTypeTest.php
+  - tests/Feature/Filament/EditEventTest.php
   - tests/Feature/Filament/StatusActionsTest.php
-  - tests/Feature/Ops/AdminThemeTest.php
+  - tests/Feature/Ops/FailedJobsTest.php
+  - tests/Feature/Public/ErrorPagesTest.php
   - tests/Feature/Public/EventCalendarAndShareTest.php
-  - tests/Feature/Public/EventJsonLdTest.php
-  - tests/Feature/Public/EventPageContentTest.php
-  - tests/Feature/Public/EventPageTracerTest.php
-  - tests/Feature/Public/EventSeoTest.php
-  - tests/Feature/Public/EventSlugRedirectTest.php
-  - tests/Feature/Public/HostHeaderAssetsTest.php
-  - tests/Feature/Public/OccurrenceCardTest.php
-  - tests/Feature/Public/SlugRedirectCachingTest.php
-  - tests/Feature/Publishing/ChangeEventStatusTest.php
+  - tests/Feature/Public/PublicLookTest.php
   - tests/Feature/Publishing/ChangeOccurrenceStatusTest.php
-  - tests/Feature/Publishing/OccurrenceUidStabilityTest.php
-  - tests/Feature/Publishing/PublishEventTest.php
-  - tests/Feature/Publishing/UpdatePublishedEventTest.php
-  - tests/Feature/Status/StatusSurvivesRegenerationTest.php
+  - tests/Pest.php
   - tests/Unit/Calendar/ManualRecurrenceTest.php
-  - tests/Unit/Ops/EnvExampleTest.php
-  - tests/Unit/Publishing/PublishableEventDataTest.php
-  - vite.config.js
 findings:
   critical: 0
-  warning: 2
-  info: 11
-  total: 13
+  warning: 4
+  info: 5
+  total: 9
 status: issues_found
 ---
 
-# Phase 1: Code Review Report (re-review after gap closure)
+# Phase 01: Code Review Report (incremental re-review)
 
-**Reviewed:** 2026-10-17T09:40:00Z
-**Depth:** deep
-**Files Reviewed:** 46 (changed since `acf5f40`), plus the unchanged call-chain context they depend on
+**Reviewed:** 2026-10-17T13:31:50+01:00
+**Depth:** standard
+**Files Reviewed:** 34
 **Status:** issues_found
+**Scope:** `git diff f332b0a HEAD` for the 34 listed files. This is an **incremental** re-review. The previous full review (CR-01, WR-01..WR-11, IN-01..IN-11) is still in git at commit `f332b0a`, and its findings are tracked in `01-REVIEW-DISPOSITION.md`. New finding IDs continue from those numbers (WR-12+, IN-12+), so no ID is reused.
 
 ## Summary
 
-**Scope.** I reviewed `git diff acf5f40..HEAD`, limited to app/, config/, database/, resources/, routes/, tests/, ops/, `.github/workflows/ci.yml`, vite.config.js, package.json, composer.json, .env.example and AGENTS.md. That covers:
+The delta has four parts: the WR-10/WR-11 fixes, quick task 261017-gac (filters disclosure, Occurrences refresh, honest Repeats display, explicit dialog buttons, live failed-jobs badge), quick task 261017-hp9 (branded error pages, remove-chips, date rows), and the Pest browser flows F0–F10 with `Uat::settleFields()`.
 
-- gap plans 01-11, 01-14, 01-12 and 01-13;
-- the quick-task admin theme (15d2172, b7e8527);
-- the spacing fix b52a928. Its inline style was replaced by `class="grid gap-6"` in b7e8527, so the net diff in `resources/views` is empty.
+What I checked and found sound:
+- **WR-10 round-trip.** `ManualRecurrence::tryFromStoredRule()` parses the rule, checks the pattern fits the start date, rebuilds it and requires an exact string match. `PublishableEventData::editableRecurrence()` is the single check behind `UpdatePublishedEvent::canEdit()`, `fromEvent()`, `EventForm::hasUneditableRule()` and the events-table label. `UpdatePublishedEvent` re-checks it on the locked row before writing. I traced the timed and all-day UNTIL forms, zero-padded COUNT, empty-string rules and DST-day UNTIL values. Every non-emitted shape is refused, and nothing reached a write.
+- **WR-11.** `status` was removed from `EventOccurrence` fillable. No app code mass-assigns it. Tests use `forceCreate` or factories, which are unguarded.
+- **Escaping and injection.** The Callout description is rendered with `{{ }}` in `filament/support`'s `callout.blade.php`, and a test covers it. The new Blade only uses `{{ }}`. Chip hrefs are root-relative and built from `CalendarFilters::queryWith()`, which only passes through whitelisted keys.
+- **CR-01 not regressed.** The error layout's `@vite` goes through the same `Vite::createAssetPathsUsing` root-relative resolver. `php artisan down --render` pre-renders in console with the same provider. If a 500 view throws, Laravel's `renderHttpException` catches it and falls back to the generic page, so the manifest guard does not create an unrenderable 500.
+- **Refresh events.** `refresh-sidebar` is the event `Filament\Livewire\Sidebar` listens for (v5.10.2). The panel uses sidebar navigation, not `topNavigation()`. `afterSave()` only runs after a successful `handleRecordUpdate()`.
 
-There are no changes in config/, database/, routes/, package.json or composer.json in this range.
+The remaining issues are about quality and test reliability, not correctness:
+- The live badge depends on an undocumented Filament event, and no test shows the badge actually changes.
+- The browser fill-settle helper has an off-by-one and is only used in F0.
+- The read-only "Custom rule" form still shows a one-off-only field and hides the series' end.
+- A few info-level gaps.
 
-**Context files.** To trace call chains I also read these unchanged files:
-
-- `StatusActions`
-- `PublicOccurrenceQuery` (pagination path)
-- `OccurrenceGenerator`
-- `OccurrenceUid`
-- `resources/views/layouts/app.blade.php`
-- the events migration
-- the built `public/build` manifest and theme CSS
-- the full `ops/check-public-assets.sh`
-
-**Quality gates (run locally, PHP 8.4.12).** `vendor/bin/pest` reports 465 passed / 2732 assertions, with 1 harness warning that the runner does not detail. `phpstan` reports 0 errors and `pint --test` passes.
-
-**Prior findings.** CR-01 and WR-01..WR-09 are all fixed, each with targeted regression tests. Specifically:
-
-- URL generation no longer reads the Host header.
-- Every publishing write goes through one `AdminGate`.
-- The DTO enforces the invariants the earlier review listed.
-- The one-off↔series switch and unsupported rules are refused on the locked row.
-- Slug redirects revalidate.
-- CI runs an 8.4 + 8.5 matrix.
-
-**Admin Vite theme.** It does not leak onto public pages:
-
-- `@vite` in the public layout requests only `resources/css/app.css` (plus `share.js` on event pages).
-- The built manifest gives the `app.css` entry no imports.
-- The theme CSS contains only `data:` `url()`s and no deny-listed hosts, so the CI asset gates still pass.
-
-**New findings: two warnings.**
-
-- **WR-10.** The WR-09 "can this rule be edited?" test (`UpdatePublishedEvent::canEdit`) only checks the RRULE's shape, not that it round-trips. A stored rule whose BYDAY disagrees with the start date opens as editable, and any save silently rewrites the schedule to a different weekday. I confirmed this by running the code.
-- **WR-11.** The WR-07 mass-assignment fix was applied to `Event` but not to its sibling `EventOccurrence`, which still lists `status` as fillable.
-
-**Info.** IN-01..IN-08 carry forward unchanged; IN-02 gains one more hard-coded instance. Three new info items are added (IN-09..IN-11).
-
-### Prior finding status
-
-| ID | Status | Evidence |
-|----|--------|----------|
-| CR-01 | **Fixed** | `app/Providers/AppServiceProvider.php:42-56`: `URL::forceRootUrl(config('app.url'))`, `forceScheme('https')` only for https app URLs, and `Vite::createAssetPathsUsing` returns root-relative `/build/...`. Pagination was already root-relative (`PublicOccurrenceQuery.php:62` `withPath(route(..., absolute: false))`). Canonical, og and share URLs come from config. Tests: `HostHeaderAssetsTest` ("keeps the calendar page free of a spoofed Host…", "keeps the event page free of a spoofed Host…", "builds generic redirects such as the admin login from app.url…"). These run with `withVite()` against the fixture manifest and a genuinely spoofed absolute URI. There is also a live probe at `ops/check-public-assets.sh:102-106`. `trustHosts()` is deliberately not used, which is acceptable now that no URL comes from Host; revisit in Phase 5. |
-| WR-01 | **Fixed** | `app/Publishing/AdminGate.php` (single rule). `PublishEvent.php:45` authorizes before the transaction, as do `UpdatePublishedEvent.php:59`, `ChangeEventStatus.php:36` and `ChangeOccurrenceStatus.php:37`. `User::canAccessPanel` delegates to `AdminGate::allows`. No other `events`/`event_occurrences` writer exists outside `App\Publishing` apart from the system `OccurrenceGenerator::sync` (grep-verified). Tests: `PublishEventTest` "refuses an approver who is not the admin and writes nothing", "matches the admin email case-insensitively when publishing", "refuses everyone… when ADMIN_EMAIL is empty"; `EditEventResilienceTest` "keeps the events list closed to anyone but the admin". |
-| WR-02 | **Fixed** (residual gaps → IN-09) | `PublishableEventData.php:54, 67-130`: non-blank title/description; round-trip-checked start, end and last dates; `HH:MM[:SS]` times; start time required unless all-day; end ≥ start; last date ≥ start; source URL or contact required. Test: `PublishableEventDataTest` "rejects input the publish form would refuse, naming the problem" (dataset) plus the accept cases. |
-| WR-03 | **Fixed** | `ManualRecurrence.php:60` (constructor), `:202` (`untilValue`), `:221` (`untilToLocalDate`) and `:235-252` (`parseExact` round-trip). Tests: `ManualRecurrenceTest` "refuses an impossible until date instead of overflowing it", "keeps a real until date such as 28 Feb 2026 as London end of day", "rejects a stored UNTIL that is not a real date". |
-| WR-04 | **Fixed** | `EventController.php:36,46` and `OccurrenceIcsController.php:31` send `Cache-Control: no-cache, private` on the 301. Tests: `SlugRedirectCachingTest` (old slug, uppercase slug, old-slug .ics, rename-back with no loop). |
-| WR-05 | **Fixed** | `LondonFormatter.php:105-107` treats an end exactly at London midnight as exclusive for timed events too. This also fixes timed multi-day events with no end time, which previously showed one day too many. Tests: `OccurrenceCardTest` "shows a timed occurrence that ends exactly at midnight as a single day" and "still shows an overnight occurrence that ends after midnight as running into the next day". |
-| WR-06 | **Fixed** (via the refusal option) | `UpdatePublishedEvent.php:70-71` refuses one-off↔series on the locked row. The form mirrors this (`EventForm.php` `repeats` select is disabled for one-off events, and "Does not repeat" is removed for series). The contract is documented in `OccurrenceUid.php` and AGENTS.md. Tests: `OccurrenceUidStabilityTest` (5 cases, real .ics UID lines); `EditRepeatTypeTest` (3); `UpdatePublishedEventTest` "refuses to make a series "Does not repeat"…". See WR-10 for a related path that still rewrites a series' days. |
-| WR-07 | **Fixed for `Event`** (sibling gap → WR-11) | `Event.php:55-60` drops `status`, `origin`, `approved_by` and `approved_at` from `#[Fillable]`. `PublishEvent.php:48-54` writes them with `forceFill`. Test: `PublishEventTest` "does not let publishing state or approval data be mass-assigned on Event". |
-| WR-08 | **Fixed** | `.github/workflows/ci.yml:16-21,47`: matrix `['8.4','8.5']`, `fail-fast: false`, job name includes the PHP version. |
-| WR-09 | **Fixed** (round-trip gap → WR-10) | `EditEvent.php:40-94,112-121`: a `#[Locked]` `$recurrenceEditable` flag, a read-only form, no Save action, a persistent warning, and a `Halt` in both `beforeValidate` and `handleRecordUpdate`. `UpdatePublishedEvent.php:65` re-checks on the locked row. `PublishableEventData::fromEvent` (`:183`) uses `tryFromRrule`. `EventsTable.php:56` adds the status actions as record actions. Tests: `EditEventResilienceTest` (read-only page, forced save refused, hide from header, action-level refusal, table hide/cancel, Show on calendar visibility). |
+There are no blockers.
 
 ## Warnings
 
-### WR-10: `canEdit()` accepts stored rules that do not round-trip, so saving an unrelated edit silently changes a series' days
+### WR-12: The "live" failed-jobs badge depends on an undocumented Filament event, and no test shows the badge changing
 
-**File:** `app/Publishing/Actions/UpdatePublishedEvent.php:89-93`; `app/Filament/Resources/Events/Pages/EditEvent.php:51`; `app/Calendar/ManualRecurrence.php:100-121`; display at `app/Filament/Resources/Events/Tables/EventsTable.php:71`
+**File:** `app/Filament/Pages/SystemHealth.php:43, 162, 178, 205-211`. Tests: `tests/Feature/Ops/FailedJobsTest.php:62, 85, 105`, `tests/Browser/SystemHealthTest.php:47-60`
+**Issue:** The gac deliverable "live failed-jobs badge" is implemented by dispatching the string `'refresh-sidebar'`. That event name is an internal `#[On]` listener on `Filament\Livewire\Sidebar`. It is not public API, and Filament can rename it in a minor release. There is also a sibling `refresh-topbar` for `topNavigation()` panels, which this code ignores.
 
-**Issue:** WR-09's guard treats a rule as editable when `ManualRecurrence::tryFromRrule()` can parse its shape. `fromRrule()` keeps only the pattern kind (weekly / nth / last) and discards the BYDAY weekday and ordinal. Saving then rebuilds the rule from `start_date`. So any stored rule whose BYDAY disagrees with the start date is reported as editable: the page shows no warning, Save is available, and the form displays the start date's weekday rather than the stored one. The first save of *any* field rewrites the schedule. I ran the code with a start date of Fri 23 Oct 2026:
+The tests do not prove the feature works end to end:
+- The feature tests only assert `assertDispatched('refresh-sidebar')`. That passes even if no component listens for the event, or if the re-rendered sidebar shows a cached count.
+- The F10 browser flow asserts the badge shows `2` before any action. After Retry and Delete it never checks that the badge went to `1` and then disappeared.
 
-```
-FREQ=WEEKLY;BYDAY=MO                         => editable, resave: FREQ=WEEKLY;BYDAY=FR
-FREQ=MONTHLY;BYDAY=2TU                       => editable, resave: FREQ=MONTHLY;BYDAY=4FR
-FREQ=WEEKLY;BYDAY=FR;UNTIL=20270101T120000Z  => editable, resave: ...;UNTIL=20270101T235959Z
-FREQ=WEEKLY;BYDAY=FR;UNTIL=20270101 (timed)  => editable, resave: ...;UNTIL=20270101T235959Z
-FREQ=MONTHLY;BYDAY=-1FR (4th Fri start)      => editable, but the pattern does not fit -> the select
-                                                holds a value outside its options; Save fails validation
-```
-
-These are exactly the sources WR-09 was about: a Phase 2/3 importer, a manual SQL fix, or an older rule. After a title-only edit to the Monday series:
-
-- `OccurrenceGenerator::sync` deletes every future Monday row, including admin-cancelled rows with their audit data (see IN-05);
-- it inserts Fridays instead;
-- every Monday `.ics` UID disappears.
-
-None of this is visible to the admin, and the WR-06 "UIDs never change" contract is broken by a path the new guard was meant to close. The events table makes the problem worse by labelling the Monday rule "Weekly on Friday" (`EventsTable.php:71`).
-
-**Fix:** Make `canEdit()` require an exact round-trip against the stored rule (and reuse it for the table label):
-
+So a Filament upgrade, or a switch to top navigation, would silently bring back the stale badge that quick task gac fixed, and CI would stay green.
+**Fix:** Assert the observable result, and dispatch both events (or wrap the name in one documented helper):
 ```php
-public static function canEdit(Event $event): bool
+// SystemHealthTest.php (F10), after the Retry confirmation:
+$page->waitForText('Sent back to the queue')
+    ->assertSeeIn('a:has-text("System health") .fi-badge', '1');
+// ...after Delete:
+$page->waitForText('No failed jobs')
+    ->assertNotPresent('a:has-text("System health") .fi-badge');
+
+// SystemHealth.php
+private function refreshNavigationBadge(): void
 {
-    if ($event->recurrence_rule === null) {
-        return true;
+    // Filament internals: Sidebar listens for refresh-sidebar, Topbar for refresh-topbar.
+    $this->dispatch('refresh-sidebar');
+    $this->dispatch('refresh-topbar');
+}
+```
+You could also add a feature test that mounts `Filament\Livewire\Sidebar`, deletes the failed row, dispatches `refresh-sidebar`, and asserts the badge text is gone. That pins the coupling to the Filament version.
+
+### WR-13: `Uat::settleFields()` never checks its last re-fill, so it can throw even when the field settled
+
+**File:** `tests/Browser/UatFixtures.php:97-118`
+**Issue:** Each loop iteration does three things: wait, read the values, and re-fill any stale inputs. On the last iteration (`$attempt === $attempts - 1`) the helper re-fills the stale inputs and then leaves the loop and throws `RuntimeException('Livewire kept resetting: …')` without reading them again. A re-fill that worked on the 5th try is reported as a failure. With 5 attempts, only 4 re-fills are ever verified. The helper exists to remove flakiness (commit 26e3f7d), so this off-by-one adds it back in the slow-CI case it targets. Also, `$stale` is only defined inside the loop: with `$attempts <= 0` the `throw` line reads an undefined variable, and `implode()` gets `null`, which is a `TypeError`.
+**Fix:**
+```php
+public static function settleFields(mixed $page, array $valuesById, int $attempts = 5): mixed
+{
+    $stale = $valuesById;
+
+    for ($attempt = 0; $attempt <= $attempts; $attempt++) {
+        $page->wait(0.2);
+
+        $stale = array_filter($valuesById, fn (string $value, string $id): bool =>
+            $page->script('() => document.getElementById('.json_encode($id).')?.value') !== $value,
+            ARRAY_FILTER_USE_BOTH);
+
+        if ($stale === []) {
+            return $page;
+        }
+
+        if ($attempt < $attempts) {
+            foreach ($stale as $id => $value) {
+                $page->fill('[id="'.$id.'"]', $value);
+            }
+        }
     }
 
-    $recurrence = ManualRecurrence::tryFromRrule($event->recurrence_rule, $event->all_day);
-    $start = CarbonImmutable::createFromFormat('!Y-m-d', $event->start_date->format('Y-m-d'), $event->timezone);
-
-    if ($recurrence === null || ! $start instanceof CarbonImmutable || ! $recurrence->isValidFor($start)) {
-        return false;
-    }
-
-    try {
-        return $recurrence->toRrule($start, $event->all_day) === $event->recurrence_rule;
-    } catch (InvalidArgumentException) {
-        return false;
-    }
+    throw new RuntimeException('Livewire kept resetting: '.implode(', ', array_keys($stale)));
 }
 ```
 
-Add `EditEventResilienceTest` dataset rows for `FREQ=WEEKLY;BYDAY=MO`, `FREQ=MONTHLY;BYDAY=2TU`, `FREQ=MONTHLY;BYDAY=-1FR` and a timed rule with a non-23:59:59 UNTIL, all on a Friday-23-Oct start. Each must open read-only and refuse a forced save.
+### WR-14: The Livewire fill race was fixed in F0 only; F3 and F6 still fill without settling
 
-### WR-11: `EventOccurrence` still allows mass assignment of `status` (WR-07 applied to `Event` only)
+**File:** `tests/Browser/AdminCreateEventTest.php:63-67, 72-74, 94-96`, `tests/Browser/AdminEditEventTest.php:119`
+**Issue:** Commit 26e3f7d found the cause of the F0 flake: about 10ms after Playwright fills an input, a pending wire:model effect (`_x_forceModelUpdate`) can write the stale server value back. Nothing about that is specific to the login form. Any Filament form filled just after Livewire boots, or just after a round trip, has the same exposure. Two flows still fill with no settle:
+- F3 fills `Title` and `Description` straight after `visit('/admin/events/create')`. It also fills start/end time right after the date-picker round trip, and `price_text`, `organiser_name` and `organiser_contact` right after the venue select's round trip.
+- F6 fills `form.start_time` right after a `confirmAction` round trip.
 
-**File:** `app/Models/EventOccurrence.php:30`
+A reset there makes the save fail validation, or save a different value. F4's `->sole()` lookup by title and the `storedOccurrences` assertions would then fail intermittently. The flake was fixed in one test, not in the pattern.
+**Fix:** Route every Filament form fill through the helper, for example a `Uat::fillSettled($page, ['form.title' => 'UAT Quiz Night', 'form.description' => '…'])` that fills and then calls `settleFields()`. At least run `settleFields()` over all the F3 fields before clicking Create, and over `form.start_time` in F6 before "Save changes".
 
-**Issue:** `#[Fillable(['event_id', 'recurrence_key', 'starts_at', 'ends_at', 'expires_at', 'status'])]`. WR-07's reasoning ("writes go only through `App\Publishing\Actions`"; the state machine sits in `ChangeOccurrenceStatus`) applies equally here. Any future `$occurrence->update(['status' => 'scheduled'])`, a relation-manager `EditAction`/`CreateAction` falling back to default record handling, or `->fill($request->validated())` would bypass the transition check, the `FOR UPDATE` locking order and the `status_changed_by/at` audit. Nothing needs `status` to be fillable:
+### WR-15: The read-only "Custom rule" form shows a field that only applies to one-off events and hides the series' end
 
-- `OccurrenceGenerator::sync` writes through `EventOccurrence::upsert()`, which goes to the query builder and ignores `$fillable`.
-- `ChangeOccurrenceStatus` uses `forceFill`.
-- Factories are unguarded.
+**File:** `app/Filament/Resources/Events/Pages/EditEvent.php:63`, `app/Filament/Resources/Events/Schemas/EventForm.php:84-90, 156-165, 187-192, 304-313`
+**Issue:** For an uneditable rule, `mutateFormDataBeforeFill()` sets `repeats` to `EventForm::CUSTOM_RULE_OPTION` (`'custom'`). That is not a `RepeatPattern`, so `EventForm::repeats()` maps it to `RepeatPattern::None` (`tryFrom(...) ?? None`). Every visibility rule in the form then treats the series as a one-off:
+- **End date** shows for a repeating event, empty and with the helper "Only for events that run over several days". Its `hidden()` is `repeats !== None`.
+- **Ends**, **Last date**, **Number of times** and **Next dates** are all hidden. Their `visible()` is `repeats !== None`.
 
-**Fix:** Remove `status` (and, ideally, all columns written only by `OccurrenceGenerator`'s upsert) from the attribute:
-
+The gac goal was an "honest Repeats display". Instead, the admin sees one-off fields and gets no plain-English end date or count. The only signal is the raw RRULE in the Callout (for example `UNTIL=20270101T120000Z`), which the single non-technical admin cannot read. Nothing is written, because the form is disabled and the save is refused twice. It is still a misleading view of a live series.
+**Fix:** Treat the custom value as "repeating" for visibility, and hide fields that cannot be shown truthfully:
 ```php
-#[Fillable(['event_id', 'recurrence_key', 'starts_at', 'ends_at', 'expires_at'])]
-```
+private static function isCustomRule(Get $get): bool
+{
+    return $get('repeats') === self::CUSTOM_RULE_OPTION;
+}
 
-Extend the `PublishEventTest` mass-assignment test (or add an architecture test) to assert `! (new EventOccurrence)->isFillable('status')`.
+// end_date
+->hidden(fn (Get $get): bool => self::isCustomRule($get) || self::repeats($get) !== RepeatPattern::None)
+```
+Ideally, also show the next stored dates in the Callout. `RecurrenceExpander::instanceDates()` already accepts the stored `Event`, and the Occurrences table on the same page has them. That way the admin can see what the rule does without decoding the RRULE.
 
 ## Info
 
-### IN-01: `Carbon::parse` still used, contrary to the stated "no Carbon::parse" rule (carried forward, unchanged)
+### IN-12: Only 404, 500 and 503 are branded; other errors still show the framework's unbranded pages
 
-**File:** `app/Calendar/Export/OccurrenceIcs.php:54, 96`; `app/Jobs/OpsDrillJob.php:29`
-**Issue:** These are unchanged since the previous review. The inputs are self-generated, so this is not exploitable, but it breaks the letter of the invariant.
-**Fix:** Use `createFromFormat(...)`. In `lastModified()`, return `max($stamps)` with no format/parse round trip.
+**File:** `resources/views/errors/` (only `404`, `500`, `503`, `layout`)
+**Issue:** Laravel looks up `errors::{code}` first, then `errors::{4xx|5xx}`, then its own views. These cases still get unbranded pages with no "See what's on" link:
+- `403`: a signed-in non-admin hitting `/admin`.
+- `401`, `419`, `429`: the framework's `errors::minimal` pages.
+- `405`: for example `POST /`, since there is no `4xx` fallback. This gets Symfony's generic "Whoops" page.
 
-### IN-02: The calendar timezone is hard-coded beside `config('calendar.timezone')` (carried forward, slightly worsened)
+Also, `resources/views/errors/layout.blade.php` now shadows the framework's `errors::layout`. That is harmless today because every framework error view extends `errors::minimal`, but a name like `errors/branded.blade.php` would avoid the collision.
+**Fix:** Add `resources/views/errors/4xx.blade.php` and `5xx.blade.php` that extend `errors.layout` with generic copy, and extend `ErrorPagesTest` to cover `403` and `405`.
 
-**File:** `app/Support/LondonFormatter.php:13`, `app/Calendar/ManualRecurrence.php:31` (now also used by the new `localDate()` at `:235-237`), `app/Models/Event.php:70`, `app/Filament/Resources/Events/Tables/EventsTable.php:32`, `app/Filament/Resources/Events/RelationManagers/OccurrencesRelationManager.php:39`, `routes/console.php:17`, `app/Publishing/Data/PublishableEventData.php:41`
-**Issue:** The two date checks now use different zones:
+### IN-13: The round-trip check is repeated per render, and the events table re-derives the start date
 
-- `PublishableEventData::isRealDate()` (`:120`) validates in `$this->timezone`.
-- `ManualRecurrence::localDate()` validates and encodes UNTIL in the hard-coded `Europe/London`.
+**File:** `app/Filament/Resources/Events/Tables/EventsTable.php:70-76`, `app/Filament/Resources/Events/Schemas/EventForm.php:119-134, 296-302`
+**Issue:**
+- `repeatsLabel()` calls `PublishableEventData::editableRecurrence()`, which builds the London start date, and then builds the same `CarbonImmutable` again for `label()`.
+- `hasUneditableRule()` runs the full `canEdit()` (regex parse, options and rebuild) separately in the Callout `visible()`, the Select `options()` and the Select `helperText()`. It also repeats the `recurrence_rule !== null` test that `canEdit()` already does.
 
-So a DTO built with any other zone (the constructor accepts any string) would have its UNTIL computed in a different zone from its DTSTART. Separately, an invalid zone string is caught by the blanket `catch (Throwable)` and reported as "Invalid start date", which is misleading.
-**Fix:** Use a single source of zone truth (a `CalendarZone::NAME` constant or config). Validate `timezone` explicitly in the DTO, or remove it as a constructor parameter.
+The single-check intent is good. This is just duplicated work and duplicated date logic that could drift.
+**Fix:** Add a `PublishableEventData::repeatsLabel(Event): ?string`, or have `editableRecurrence()` return the start date too. Have `hasUneditableRule()` read the page's locked `$recurrenceEditable` where it is available.
 
-### IN-03: Failed-job retention is duplicated; the config key is unused (carried forward, unchanged)
+### IN-14: The F3 submit click targets an auto-generated Filament id
 
-**File:** `routes/console.php:33`, `config/ops.php:25`
-**Issue:** `--hours=720` is hard-coded, and `ops.failed_jobs_retention_hours` is never read.
-**Fix:** `Schedule::command('queue:prune-failed', ['--hours' => (int) config('ops.failed_jobs_retention_hours')])->daily();`
+**File:** `tests/Browser/AdminCreateEventTest.php:97`
+**Issue:** `->click('[id="key-bindings-1"]')` relies on the order in which Filament generates key-binding ids. Adding any action with a keyboard shortcut, or upgrading Filament, can point it at another button or break it. Every other click in the suite uses the accessible-name selectors in `Uat::role()`.
+**Fix:** `->click(Uat::role('button', 'Create'))`.
 
-### IN-04: The release directory name is published on every public page (carried forward, unchanged)
+### IN-15: The "first result above the fold" check measures the day heading, not the first event
 
-**File:** `resources/views/layouts/app.blade.php:6`
-**Issue:** `<meta name="x-release" content="{{ basename(base_path()) }}">`.
-**Fix:** Emit it to admins only, behind an env flag, or as a header on `/up`.
+**File:** `tests/Browser/PublicCalendarTest.php:151-159`
+**Issue:** The test title promises the first result is above the fold, but it checks that the top of the first `main h2` (the day heading) is below 812px. A heading at y=800 passes even when the whole first card is off-screen. That card is what the UI-review fix 2 was meant to keep visible.
+**Fix:** Measure the first card instead:
+`document.querySelector('main article h3').getBoundingClientRect().bottom < 812`.
 
-### IN-05: The occurrence generator hard-deletes future rows that carry admin-set status and audit data (carried forward; now reachable via WR-10)
+### IN-16: The branded 500 page is only tested as a view render, not through the exception handler
 
-**File:** `app/Calendar/OccurrenceGenerator.php:52-55`
-**Issue:** The code is unchanged. WR-10 adds a silent trigger for this deletion: a title-only save of a non-round-tripping rule.
-**Fix:** Mark orphaned future rows as hidden/orphaned instead of deleting them, or record this as an accepted exception.
-
-### IN-06: SEQUENCE and LAST-MODIFIED change on every daily sync even when nothing changed (carried forward, unchanged)
-
-**File:** `app/Calendar/OccurrenceGenerator.php:46-50`, `app/Calendar/Export/OccurrenceIcs.php:88-97`
-**Issue:** Eloquent `upsert()` always bumps `updated_at`.
-**Fix:** Upsert via `DB::table()` and supply `created_at` explicitly, or derive SEQUENCE from a content hash.
-
-### IN-07: The Retry action ignores the `queue:retry` exit code (carried forward, unchanged)
-
-**File:** `app/Filament/Pages/SystemHealth.php:151`
-**Issue:** `forget()` (`:161`) checks the exit code but `retry()` does not.
-**Fix:** `if (Artisan::call('queue:retry', ['id' => [$uuid]]) !== 0) { $this->notifyAlreadyHandled(); return; }`
-
-### IN-08: Ops and CI hard-coding and supply-chain hygiene (carried forward, unchanged; line numbers moved)
-
-**File:** `ops/check-event-page.sh:20`; `.github/workflows/ci.yml:43, 45, 54`
-**Issue:** `UID_DOMAIN` is still hard-coded. The actions are still pinned to mutable tags (`@v7`, `@v2`), and the new matrix runs each of them twice.
-**Fix:** `UID_DOMAIN="${UID_DOMAIN:-@whatsonattleborough.co.uk}"`, and pin the actions to commit SHAs.
-
-### IN-09: `PublishableEventData` says it "mirrors the form's rules" but skips lengths, URL format and the equal-times rule (new)
-
-**File:** `app/Publishing/Data/PublishableEventData.php:46-53, 67-130` vs `app/Filament/Resources/Events/Schemas/EventForm.php` (title max 255, description max 5000, price_text max 60, organiser max 255, `source_url` `->url()` max 2048, source_note max 500, end time ≠ start time on the same day)
-**Issue:** The Phase 2 (non-Filament) path can pass these inputs, with these results:
-
-| Input | Result |
-|-------|--------|
-| Title or organiser contact over 255 chars | Rejected only by PostgreSQL as a generic `QueryException` mid-transaction, with no clear message |
-| A 50 KB description | Stored and rendered |
-| `source_url = 'javascript:…'` | Stored; `SafeLinks` stops it rendering as a link, so not exploitable today |
-| `end_time === start_time` | Becomes a 24-hour event (`EventTiming.php:64`), which the form refuses |
-
-**Fix:** Add `mb_strlen` caps matching the form, `filter_var($sourceUrl, FILTER_VALIDATE_URL)` with an http/https scheme check, and the same-day equal-times refusal. Alternatively, correct the docblock to say which rules are form-only.
-
-### IN-10: Asset tests and gates cannot tell the public stylesheet from the new admin theme (new)
-
-**File:** `tests/Fixtures/public/build/manifest.json` (no `resources/css/filament/admin/theme.css` entry, no font assets); `ops/check-public-assets.sh:118-127`; `.github/workflows/ci.yml` size gate (`app-*.css` only)
-**Issue:** Today the public layout cannot pull in the 680 KB Filament theme: `@vite` requests only `app.css`, and the real manifest gives it no imports. But nothing would catch a regression:
-
-- the fixture manifest no longer matches the real build;
-- `check-public-assets.sh` only asserts "exactly one stylesheet under `/build/assets/*.css`", which `theme-*.css` would also satisfy.
-
-The new `AdminThemeTest` checks the wiring by string matching on `vite.config.js` and does not render a Vite tag.
-**Fix:** Add the theme entry to the fixture manifest. Assert in `NoThirdPartyAssetsTest`/`HostHeaderAssetsTest` that `/` does not reference `theme-`. Make the ops script require that the stylesheet path matches `/build/assets/app-*.css`.
-
-### IN-11: `forceRootUrl(app.url)` makes absolute links point at `localhost:8000` when the app is opened via another host; the provider comment overstates LAN support (new)
-
-**File:** `app/Providers/AppServiceProvider.php:27-56`
-**Issue:** The docblock says the root-relative Vite tags "still load when the owner opens the local app from a phone via the LAN IP". That is true for assets and for root-relative public links. But every `route()`/`url()` absolute URL is now pinned to `APP_URL=http://localhost:8000`, including Filament's post-login redirect, panel navigation, canonical/og/share links and any future signed URLs (whose signatures are validated against the real request URL). Opening the admin from a phone, or via a Herd `.test` host, therefore redirects to the device's own localhost. This is intended production behaviour; it only affects local development.
-**Fix:** Correct the comment, or document "set APP_URL to the LAN/Herd URL when testing on another device" in README/.env.example.
+**File:** `tests/Feature/Public/ErrorPagesTest.php:65-80`
+**Issue:** The 500 and 503 tests call `view('errors.500', ['exception' => …])->render()` directly. In production, `Handler::prepareResponse()` wraps the original exception in `HttpException(500, $e->getMessage(), $e)` and passes that to the view. Nothing tests that real route (debug off, an uncaught exception, the branded page, no message), so a later edit that echoes `$exception->getMessage()` would only be caught by the direct-render assertion's fake exception.
+**Fix:** Add a test-only route that throws `new RuntimeException('SQLSTATE secret')`. Call it with `config(['app.debug' => false])` and assert the 500 status, the branded heading, and that `SQLSTATE` is missing from the HTML.
 
 ---
 
-_Reviewed: 2026-10-17T09:40:00Z_
+_Reviewed: 2026-10-17T13:31:50+01:00_
 _Reviewer: the agent (gsd-code-reviewer)_
-_Depth: deep_
+_Depth: standard (incremental, diff base f332b0a)_
