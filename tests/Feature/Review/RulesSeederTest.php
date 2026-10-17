@@ -26,7 +26,7 @@ it('seeds the starter keyword rules and geofence defaults', function () {
         ->and(CategoryKeywordRule::where('keyword', 'beer festival')->sole()->category_id)->toBe(($this->category)('food-drink')->id)
         ->and(CategoryKeywordRule::where('keyword', 'exhibition')->sole()->category_id)->toBe(($this->category)('arts-culture')->id)
         ->and(GeofenceTerm::where('type', GeofenceTerm::POSTCODE_DISTRICT)->orderBy('id')->pluck('value')->all())->toBe(['NR17', 'NR16', 'NR18', 'IP24'])
-        ->and(GeofenceTerm::where('type', GeofenceTerm::PLACE_NAME)->pluck('value')->all())->toBe(['Attleborough']);
+        ->and(GeofenceTerm::where('type', GeofenceTerm::PLACE_NAME)->orderBy('id')->pluck('value')->all())->toBe(['Attleborough', 'Besthorpe', 'Great Ellingham', 'Rockland St Peter', 'Old Buckenham', 'Morley', 'Deopham', 'Snetterton', 'Wymondham']);
 });
 
 it('gives the same row counts when run twice', function () {
@@ -58,19 +58,19 @@ it('treats a keyword or place name the admin re-cased as already there', functio
 
     expect(($this->counts)())->toBe($before)
         ->and(CategoryKeywordRule::whereRaw('lower(keyword) = ?', ['quiz'])->sole()->keyword)->toBe('Quiz')
-        ->and(GeofenceTerm::where('type', GeofenceTerm::PLACE_NAME)->sole()->value)->toBe('ATTLEBOROUGH');
+        ->and(GeofenceTerm::whereRaw('lower(value) = ?', ['attleborough'])->sole()->value)->toBe('ATTLEBOROUGH');
 });
 
 it('re-creates a deleted default only when missing and leaves admin additions alone', function () {
     $this->seed(RulesSeeder::class);
     GeofenceTerm::where('value', 'IP24')->delete();
-    GeofenceTerm::create(['type' => GeofenceTerm::PLACE_NAME, 'value' => 'Old Buckenham']);
+    GeofenceTerm::create(['type' => GeofenceTerm::PLACE_NAME, 'value' => 'Banham']);
 
     $this->seed(RulesSeeder::class);
 
     expect(GeofenceTerm::where('value', 'IP24')->count())->toBe(1)
-        ->and(GeofenceTerm::where('value', 'Old Buckenham')->count())->toBe(1)
-        ->and(GeofenceTerm::count())->toBe(6);
+        ->and(GeofenceTerm::where('value', 'Banham')->count())->toBe(1)
+        ->and(GeofenceTerm::count())->toBe(14);
 });
 
 it('skips the rules of a category the admin removed', function () {
@@ -85,7 +85,7 @@ it('skips the rules of a category the admin removed', function () {
 it('is called by the DatabaseSeeder after the categories', function () {
     $this->seed(DatabaseSeeder::class);
 
-    expect(CategoryKeywordRule::count())->toBe(29)->and(GeofenceTerm::count())->toBe(5);
+    expect(CategoryKeywordRule::count())->toBe(29)->and(GeofenceTerm::count())->toBe(13);
 });
 
 it('lets the seeded rules pick a category for a typical title', function () {

@@ -43,7 +43,17 @@ class RulesSeeder extends Seeder
     public const POSTCODE_DISTRICTS = ['NR17', 'NR16', 'NR18', 'IP24'];
 
     /** @var list<string> */
-    public const PLACE_NAMES = ['Attleborough'];
+    public const PLACE_NAMES = [
+        'Attleborough',
+        'Besthorpe',
+        'Great Ellingham',
+        'Rockland St Peter',
+        'Old Buckenham',
+        'Morley',
+        'Deopham',
+        'Snetterton',
+        'Wymondham',
+    ];
 
     public function run(): void
     {
