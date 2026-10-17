@@ -110,3 +110,33 @@ it('stores a typed venue when the organiser picks Somewhere else', function () {
         ->and($draft->venue_address)->toBe('Church Street, Attleborough')
         ->and($draft->venue_postcode)->toBe('NR17 2AH');
 });
+
+it('loads the venue reveal script from /submit only', function () {
+    $form = (string) file_get_contents(resource_path('views/submit/create.blade.php'));
+    $layout = (string) file_get_contents(resource_path('views/layouts/app.blade.php'));
+    $script = (string) file_get_contents(resource_path('js/submit.js'));
+
+    expect($form)->toContain("@vite('resources/js/submit.js')")
+        ->and($layout)->not->toContain('submit.js')
+        ->and((string) file_get_contents(base_path('vite.config.js')))->toContain("'resources/js/submit.js'")
+        ->and($script)->toContain('[data-venue-picker]')
+        ->and($script)->toContain('[data-venue-other]')
+        ->and($script)->not->toContain('innerHTML');
+});
+
+dataset('public pages', [
+    'calendar' => ['/'],
+    'submit form' => ['/submit'],
+    'privacy notice' => ['/privacy'],
+]);
+
+it('links every public page footer to the form and the privacy notice', function (string $path) {
+    $response = get($path)->assertOk();
+
+    assertLink($response, '/submit', 'Add your event');
+    assertLink($response, '/privacy', 'Privacy');
+
+    expect((string) $response->getContent())
+        ->toMatch('#<footer\b.*<a href="/submit" class="[^"]*tap-target[^"]*">Add your event</a>.*</footer>#s')
+        ->toMatch('#<footer\b.*<a href="/privacy" class="[^"]*tap-target[^"]*">Privacy</a>.*</footer>#s');
+})->with('public pages');
