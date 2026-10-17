@@ -89,3 +89,17 @@ it('labels a pattern in plain British English', function () {
     expect((new ManualRecurrence(RepeatPattern::MonthlyLast))->label(london('2026-10-30')))->toBe('Monthly on the last Friday')
         ->and((new ManualRecurrence(RepeatPattern::Weekly))->label(london('2026-10-30')))->toBe('Weekly on Friday');
 });
+
+it('refuses an impossible until date instead of overflowing it', function (string $until) {
+    new ManualRecurrence(RepeatPattern::Weekly, RepeatEnds::OnDate, untilDate: $until);
+})->with(['month 13' => '2026-13-45', '30 February' => '2026-02-30'])->throws(InvalidArgumentException::class);
+
+it('keeps a real until date such as 28 Feb 2026 as London end of day', function () {
+    $recurrence = new ManualRecurrence(RepeatPattern::Weekly, RepeatEnds::OnDate, untilDate: '2026-02-28');
+
+    expect($recurrence->toRrule(london('2026-01-02'), false))->toBe('FREQ=WEEKLY;BYDAY=FR;UNTIL=20260228T235959Z');
+});
+
+it('rejects a stored UNTIL that is not a real date', function () {
+    ManualRecurrence::fromRrule('FREQ=WEEKLY;BYDAY=FR;UNTIL=20261345', false);
+})->throws(InvalidArgumentException::class);
