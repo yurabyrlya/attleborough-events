@@ -14,7 +14,9 @@ use Illuminate\Http\Response;
  * GET /events/{slug}/{Y-m-d}.ics (EVT-06): one date as an iCalendar file.
  * Read-only; built per request from the occurrence row. Same slug rules as
  * the event page: hidden → 404, old or uppercase slug → 301 to the current
- * slug's .ics URL for the same date.
+ * slug's .ics URL for the same date. The redirect carries the same
+ * Cache-Control "no-cache, private" as the event page redirect (WR-04), so
+ * a rename back can never leave a browser looping on a cached 301.
  */
 final class OccurrenceIcsController
 {
@@ -25,8 +27,10 @@ final class OccurrenceIcsController
         $event = EventController::resolve($slug);
 
         if ($slug !== $event->slug) {
-            return redirect()->away(PublicUrl::to(route('events.ics', ['slug' => $event->slug, 'key' => $key], false)), 301);
+            return redirect()->away(PublicUrl::to(route('events.ics', ['slug' => $event->slug, 'key' => $key], false)), 301)
+                ->header('Cache-Control', EventController::REDIRECT_CACHE_CONTROL);
         }
+
         $occurrence = $this->query->findListedOccurrence($event, $key);
 
         abort_if($occurrence === null, 404);

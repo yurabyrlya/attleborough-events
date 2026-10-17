@@ -21,9 +21,20 @@ use Illuminate\Http\Request;
  * is not byte-equal to the current slug (old or uppercase) answers 301 to
  * the canonical URL, built from the database slug and config('app.url')
  * only; the query string is dropped (T-01-61).
+ *
+ * The 301 carries Cache-Control "no-cache, private" (WR-04, T-01-73): search
+ * engines still see a permanent redirect, but a browser revalidates instead
+ * of replaying it from cache. A slug can become current again (rename back,
+ * see EventSlugger), and a cached redirect would then loop forever; a
+ * max-age cap would only shorten that window, revalidation closes it.
  */
 final class EventController
 {
+    /**
+     * Cache-Control for slug redirects (event page and .ics), WR-04.
+     */
+    public const REDIRECT_CACHE_CONTROL = 'no-cache, private';
+
     public function __construct(private PublicOccurrenceQuery $query) {}
 
     public function __invoke(Request $request, string $slug): View|RedirectResponse
@@ -31,7 +42,8 @@ final class EventController
         $event = self::resolve($slug);
 
         if ($slug !== $event->slug) {
-            return redirect()->away(PublicUrl::event($event), 301);
+            return redirect()->away(PublicUrl::event($event), 301)
+                ->header('Cache-Control', self::REDIRECT_CACHE_CONTROL);
         }
 
         $now = CarbonImmutable::now();

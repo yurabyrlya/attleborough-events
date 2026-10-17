@@ -54,6 +54,7 @@ final class LondonFormatter
      * Card time:
      *  - timed: "Sat 14 Nov, 7:30pm" / "Sat 14 Nov, 7pm"
      *  - timed, ends on a later day: "Sat 31 Oct, 7pm until Sun 1 Nov"
+     *  - timed, ends at midnight: "Sat 31 Oct, 7pm"
      *  - all-day: "All day"
      *  - all-day over several days: "All day until Sun 1 Nov"
      */
@@ -88,8 +89,11 @@ final class LondonFormatter
     }
 
     /**
-     * The last local calendar day the occurrence covers. All-day ends are
-     * exclusive (next local midnight), so step back one second.
+     * The last local calendar day the occurrence covers. An end exactly at
+     * local midnight is exclusive, so step back one second: always for
+     * all-day ends (next local midnight), and for timed ends at 00:00:00
+     * London (WR-05: 19:00-00:00 is one evening, not two days). A timed end
+     * after midnight (00:30) still counts the next day.
      */
     private static function lastDay(EventOccurrence $occurrence): ?CarbonImmutable
     {
@@ -98,8 +102,9 @@ final class LondonFormatter
         }
 
         $end = self::local($occurrence->ends_at);
+        $exclusive = $occurrence->event->all_day || $end->equalTo($end->startOfDay());
 
-        return $occurrence->event->all_day ? $end->subSecond()->startOfDay() : $end->startOfDay();
+        return $exclusive ? $end->subSecond()->startOfDay() : $end->startOfDay();
     }
 
     /**
