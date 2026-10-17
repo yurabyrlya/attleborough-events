@@ -1,20 +1,16 @@
 ---
-status: testing
+status: complete
 phase: 01-foundation-published-calendar
 source: [01-VERIFICATION.md]
 started: 2026-10-17T10:06:11Z
-updated: 2026-10-17T10:35:50Z
+updated: 2026-10-17T11:23:19.893Z
 ---
 
 > Browser flows used for this UAT are documented in `docs/uat/browser-uat.md` (F0–F10). Re-run them for future phases and regressions.
 
 ## Current Test
 
-number: 7
-name: Share and add-to-calendar on a real phone (remaining part)
-expected: |
-  Native share sheet opens; .ics imports into iOS/Android calendar at the right time; Google link opens a prefilled event
-awaiting: user response (then items 8 and 9: owner acceptance)
+[testing complete]
 
 ## Tests
 
@@ -51,25 +47,27 @@ result: pass: with schedule:work + queue:work, scheduler OK in ~1 min, HEALTHY w
 ### 7. Share and add-to-calendar (01-10): laptop at localhost: Share… (cancel, then share), Copy link, open the .ics in the calendar app, open the Google link. Phone at the LAN IP: fallbacks open WhatsApp / Facebook / email, .ics imports on iOS and Android. Firefox / no-JS: fallbacks show, with no dead button
 expected: As in 01-10 PLAN. Times are correct after 25 Oct. Assets and the .ics link load from the LAN IP (root-relative). Note (review IN-11): shared / canonical URLs are built from APP_URL, so they read http://localhost:8000/… unless APP_URL is set to the LAN address for the phone test. That is by design, not a defect
 why_human: Native share sheets, calendar apps, Google's undocumented template URL
-result: partial — laptop parts pass: event page shows dates with per-date .ics + Google links (none on the cancelled date), .ics valid (stable UID 2-2026-10-30@whatsonattleborough.co.uk, UTC DTSTART, STATUS:CANCELLED for the cancelled date), Google dates 20261030T200000Z/…T220000Z, WhatsApp/Facebook/Email links, Copy link announces 'Link copied.', Share… correctly hidden where navigator.share is absent. STILL PENDING (needs a real phone): native share sheet, .ics import into iOS/Android calendars, opening the Google link. Note: shared links use APP_URL (localhost).
+result: pass — laptop parts: event page shows dates with per-date .ics + Google links (none on the cancelled date), .ics valid (stable UID 2-2026-10-30@whatsonattleborough.co.uk, UTC DTSTART, STATUS:CANCELLED for the cancelled date), Google dates 20261030T200000Z/…T220000Z, WhatsApp/Facebook/Email links, Copy link announces 'Link copied.', Share… correctly hidden where navigator.share is absent. Phone (owner, 2026-10-17, LAN http://192.168.1.20:8001 with APP_URL set to the LAN address): .ics imports at the right time, Google link opens a prefilled event, WhatsApp/Facebook/Email fallbacks work. Native share / clipboard need a secure context (HTTPS), so over LAN http the Share… button is correctly hidden; re-check on HTTPS in Phase 5.
 
 ### 8. Acknowledge insufficient_spec backstop truths: (a) edit / sync / status row-lock serialisation (01-04, 01-05); (b) heartbeat upsert under overlapping runs (01-09); (c) share.js re-entry and AbortError (01-10, covered by the share item); (d) accepted ZWJ-emoji split at the 140-character excerpt cut (01-06)
 expected: Owner accepts each, or asks for a concurrency test
 why_human: Concurrency or accepted limits with no deterministic test
-result: [pending]
+result: skipped
+reason: "Owner skipped on 2026-10-17 (backstops neither accepted nor given a test yet)"
 
 ### 9. Review 4 flagged prohibitions (1 judgment-tier, 3 test-tier with no enforcement test). See the Prohibitions table
 expected: Accept the verifier's manual check or add enforcement tests (e.g. a Pest arch / composer.json assertion)
 why_human: Unverified prohibitions; the verifier's check is not authoritative
-result: [pending]
+result: skipped
+reason: "Deferred follow-up: skip as I do it at the end once we finish all phases"
 
 ## Summary
 
 total: 9
-passed: 6
+passed: 7
 issues: 0
-pending: 3
-skipped: 0
+pending: 0
+skipped: 2
 blocked: 0
 
 ## Gaps
@@ -83,3 +81,11 @@ None blocking. Minor UX findings from the browser walkthrough (2026-10-17), cand
 - Admin: System health badge stays stale until reload; failed-job Reason shows absolute path — badge FIXED by quick 261017-gac (absolute path still open; Retry/Delete dialogs still Cancel/Confirm)
 - Admin: not branded (Filament amber, not Norfolk green); 'Date key' column is internal jargon; all-day shown as '00:00' in the events list; 24h times in admin vs 7:30pm public
 - Demo data (owner): First Demo Event has '5£', 'town center' and a Source URL pointing at /admin/events/create
+
+## Deferred Follow-Ups
+
+```yaml
+- test: 9
+  idea: "skip as I do it at the end once we finish all phases"
+  deferred_at: 2026-10-17
+```
