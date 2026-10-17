@@ -120,6 +120,33 @@ it('requires confirmation for every event and occurrence status action', functio
         ->and($eventActions->merge($occurrenceActions)->every->isConfirmationRequired())->toBeTrue();
 });
 
+it('names the action on every confirmation button and dismisses with Keep as is', function () {
+    $labels = fn (array $actions): array => collect($actions)
+        ->mapWithKeys(fn ($action): array => [$action->getName() => [$action->getModalSubmitActionLabel(), $action->getModalCancelActionLabel()]])
+        ->all();
+
+    expect($labels(StatusActions::forEvent()))->toBe([
+        'hide' => ['Hide event', 'Keep as is'],
+        'unhide' => ['Show event', 'Keep as is'],
+        'cancel' => ['Cancel event', 'Keep as is'],
+        'reinstate' => ['Reinstate event', 'Keep as is'],
+    ])->and($labels(StatusActions::forOccurrence()))->toBe([
+        'cancel' => ['Cancel date', 'Keep as is'],
+        'hide' => ['Hide date', 'Keep as is'],
+        'restore' => ['Restore date', 'Keep as is'],
+    ]);
+});
+
+it('cancels a scheduled row from the Occurrences table and says so', function () {
+    $row = ($this->rows)()->first();
+
+    ($this->occurrencesTable)()
+        ->callAction(TestAction::make('cancel')->table($row))
+        ->assertNotified('Date cancelled');
+
+    expect($row->fresh()->status)->toBe(OccurrenceStatus::Cancelled);
+});
+
 it('changes nothing when a hidden action is called', function () {
     // A crafted Livewire call: Filament refuses to run an action whose visible() is false.
     ($this->editPage)()

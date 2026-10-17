@@ -96,17 +96,17 @@ Expected: rule `FREQ=MONTHLY;BYDAY=-1FR;UNTIL=20270331T225959Z`; one occurrence 
 
 Open the event's edit page. The **Occurrences** table is a lazy relation manager: scroll to the bottom and wait about 2 seconds (reload if it doesn't appear).
 
-1. On the 25 Dec row click **Cancel this date** → dialog "Cancel this date?" / "This date stays on the public calendar with a "Cancelled" label until it has passed." → **Confirm**. Expected: status "Cancelled", action becomes **Restore this date**; public card shows **Cancelled**.
-2. On 27 Nov click **Hide this date** → "This date disappears from the public calendar. You can restore it at any time." → Confirm. Expected: "Hidden"; date gone from `/`.
-3. **Restore this date** on 27 Nov → "This date goes back on the public calendar without a "Cancelled" label." Expected: "Scheduled"; back on `/`.
+1. On the 25 Dec row click **Cancel this date** → dialog "Cancel this date?" / "This date stays on the public calendar with a "Cancelled" label until it has passed." → **Cancel date**. Expected: toast "Date cancelled"; status "Cancelled", action becomes **Restore this date**; public card shows **Cancelled**.
+2. On 27 Nov click **Hide this date** → "This date disappears from the public calendar. You can restore it at any time." → **Hide date**. Expected: toast "Date hidden"; "Hidden"; date gone from `/`.
+3. **Restore this date** on 27 Nov → "This date goes back on the public calendar without a "Cancelled" label." → **Restore date**. Expected: toast "Date restored"; "Scheduled"; back on `/`.
 
-Dialogs are `role=alertdialog`; confirm with `getByRole('button', { name: 'Confirm' })`.
+Dialogs are `role=alertdialog`; confirm with `getByRole('button', { name: 'Cancel date' })` (or `'Hide date'` / `'Restore date'`). The dismiss button is **Keep as is**; no dialog has a button called "Confirm" or "Cancel".
 
 ## F6. Edit only the time; statuses survive
 
 On the edit page change Start time 19:30 → 20:00, click **Save**.
 
-Expected: "Saved"; preview shows "Fri 30 Oct, 8pm" (":00" dropped); in the database all occurrences move to 20:00Z and the cancelled 25 Dec stays cancelled; `/` shows 8pm. Reload the page and check the Occurrences table shows 20:00.
+Expected: "Saved"; preview shows "Fri 30 Oct, 8pm" (":00" dropped); in the database all occurrences move to 20:00Z and the cancelled 25 Dec stays cancelled; `/` shows 8pm. Without reloading, the Occurrences table shows 20:00.
 
 Also check WR-06 on a series: the Repeats dropdown does **not** offer "Does not repeat", and the helper text reads "To stop it repeating, set a last date or hide it." On a one-off event the Repeats field is locked at "Does not repeat" with helper text about hiding it and creating a new repeating event.
 
@@ -120,6 +120,8 @@ On `/admin/events`, use the row actions for the UAT event, checking `/` after ea
 | Show on calendar | "Its dates go back on the public calendar as they were before." | Published | dates back |
 | Mark as cancelled | "The event stays on the public calendar with a "Cancelled" label until its dates have passed." | Cancelled · only **Reinstate** | every date labelled Cancelled |
 | Reinstate | "…Dates you cancelled one by one stay cancelled." | Published | only the individually cancelled date still says Cancelled |
+
+Each dialog's submit button names the action (**Hide event**, **Show event**, **Cancel event**, **Reinstate event**) and the dismiss button is **Keep as is**.
 
 Expected: success notifications ("Event shown on the calendar", "Event marked as cancelled", "Event reinstated"); `getByRole('button', { name: /delete/i })` count is 0 everywhere. Repeat Hide/Cancel once from the edit page header.
 
@@ -136,7 +138,7 @@ php artisan tinker --execute 'DB::table("events")->where("title","UAT Quiz Night
 
 Expected for each rule:
 - Events list Repeats column shows the generic "Repeats".
-- Edit page: notification "This event's repeat rule can't be edited here. You can still hide or cancel it."; fields disabled (`getByRole('textbox', { name: /Title/ }).isDisabled()` is true); **no Save** button; header still has **Hide from calendar** and **Mark as cancelled**.
+- Edit page: notification "This event's repeat rule can't be edited here. You can still hide or cancel it."; fields disabled (`getByRole('textbox', { name: /Title/ }).isDisabled()` is true); the disabled Repeats select reads "Custom rule (can't be edited here)" (never "Weekly on Friday"); an inline warning callout "This repeat rule can't be edited here" in the Repeats section shows "Stored rule: <the rule>."; **no Save** button; header still has **Hide from calendar** and **Mark as cancelled**.
 - After restoring, occurrences and statuses are unchanged (re-run the F4 tinker query).
 
 ## F9. Event page, add to calendar and sharing
@@ -166,7 +168,7 @@ Expected: `Content-Type: text/calendar`, `Content-Disposition: attachment`, `UID
 2. Start the workers in the background: `php artisan schedule:work` and `php artisan queue:work database --sleep=1`.
 3. Within about a minute `php artisan ops:health` shows `scheduler: OK`. The queue heartbeat runs every 5 minutes.
 4. `php artisan ops:drill --fail-for=60` twice. `php artisan ops:drill --status` shows `failed=2`. Reload the page: 2 rows (time, `OpsDrillJob`, queue, first error line, **Retry** / **Delete**) and a badge on "System health".
-5. After the 60 seconds have passed: **Retry** row 1 (dialog "Send this job back to the queue…", notification "Sent back to the queue"), **Delete** row 2 ("This removes the record of the failure. It cannot be undone.", "Failed job deleted"). Expected: "No failed jobs"; `ops:drill --status` shows `failed=0` with a fresh `last_success`.
+5. After the 60 seconds have passed: **Retry** row 1 (dialog "Send this job back to the queue…", notification "Sent back to the queue"), **Delete** row 2 ("This removes the record of the failure. It cannot be undone.", "Failed job deleted"). Expected: without reloading, the "System health" badge drops from 2 to 1 after Retry and disappears after Delete; "No failed jobs"; `ops:drill --status` shows `failed=0` with a fresh `last_success`.
 6. `ops:health` prints **HEALTHY** within 6 minutes; the page shows all three cards OK.
 7. **Stop both workers** (kill by PID) and delete any temp logs.
 
@@ -192,18 +194,14 @@ The selectors above are the ones a browser test would use. Turning them into aut
 
 ## Known-issues baseline (2026-10-17)
 
-Found in the first run; none blocks Phase 1. Treat them as known until fixed:
+Found in the first run; none blocks Phase 1. Treat them as known until fixed. Five items were fixed on 2026-10-17 in quick task 261017-gac (filter chips above the fold, Occurrences refresh after Save, honest read-only Repeats with an inline callout, explicit dialog buttons, live failed-jobs badge) and are no longer listed:
 
 | Area | Issue |
 |---|---|
 | Public (phone) | Card category icon takes about a quarter of the width, so titles and venues wrap early. |
-| Admin, event form | Occurrences table doesn't refresh after **Save** (shows old times until reload). |
-| Admin, event form | Read-only Repeats dropdown shows "Weekly on Friday" for unsupported rules (misreports the stored rule). |
-| Admin, event form | The unsupported-rule warning is a dismissible notification, not an inline banner. |
 | Admin, event form | "Next dates" says "No upcoming dates" before a last date is entered; the 3-date cap isn't labelled. |
-| Admin, dialogs | "Cancel this date?" uses **Cancel** / **Confirm**, where Cancel means keep the date (and has default focus). |
-| Admin, Occurrences | "Date key" column shows the internal recurrence key; no success notification for per-date actions. |
+| Admin, Occurrences | "Date key" column shows the internal recurrence key. |
 | Admin, events list | All-day events show "00:00"; 24-hour times in admin vs "7:30pm" on the public site. |
 | Admin, look | Not branded: Filament amber instead of Norfolk green. |
-| Admin, System health | Failed-jobs badge stays stale until reload; Reason shows the full server file path. |
+| Admin, System health | Reason shows the full server file path. |
 | Admin, narrow screens | Events table needs sideways scrolling; Repeats column and actions are off-screen. |

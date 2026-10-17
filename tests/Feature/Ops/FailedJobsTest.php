@@ -58,7 +58,8 @@ it('runs the drill end to end: fails into failed_jobs, is listed, retried after 
 
     livewire(SystemHealth::class)
         ->callAction(TestAction::make('retry')->table($failed))
-        ->assertNotified('Sent back to the queue');
+        ->assertNotified('Sent back to the queue')
+        ->assertDispatched('refresh-sidebar');
 
     expect(FailedJob::count())->toBe(0)
         ->and(DB::table('jobs')->count())->toBe(1);
@@ -80,9 +81,11 @@ it('deletes a failed job through the Delete action and logs only the uuid and ad
 
     livewire(SystemHealth::class)
         ->callAction(TestAction::make('delete')->table($failed))
-        ->assertNotified('Failed job deleted');
+        ->assertNotified('Failed job deleted')
+        ->assertDispatched('refresh-sidebar');
 
     expect(FailedJob::count())->toBe(0)
+        ->and(SystemHealth::getNavigationBadge())->toBeNull()
         ->and(DB::table('jobs')->count())->toBe(0);
 
     $warning = $this->warnings->firstWhere('message', 'ops: failed job deleted');
@@ -98,7 +101,8 @@ it('tells the admin a job was already handled when Retry or Delete runs on a row
     DB::table('failed_jobs')->where('id', $stale->id)->delete();
 
     $page->callAction(TestAction::make($action)->table($stale))
-        ->assertNotified(ALREADY_HANDLED);
+        ->assertNotified(ALREADY_HANDLED)
+        ->assertDispatched('refresh-sidebar');
 
     expect(DB::table('failed_jobs')->pluck('id')->all())->toBe([$other])
         ->and(DB::table('jobs')->count())->toBe(0)

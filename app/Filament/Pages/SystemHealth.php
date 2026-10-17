@@ -35,6 +35,13 @@ class SystemHealth extends Page implements HasTable
 
     private const ALREADY_HANDLED = 'This job was already retried or deleted. Refresh the page.';
 
+    /**
+     * Filament's Sidebar listens for this and re-renders the navigation, which
+     * recomputes getNavigationBadge() from the database. Chosen over a page
+     * redirect so the toast and the table state survive.
+     */
+    private const REFRESH_NAVIGATION_EVENT = 'refresh-sidebar';
+
     protected string $view = 'filament.pages.system-health';
 
     protected static ?string $title = 'System health';
@@ -152,6 +159,7 @@ class SystemHealth extends Page implements HasTable
         Log::warning('ops: failed job retried', ['uuid' => $uuid, 'admin_id' => auth()->id()]);
 
         Notification::make()->success()->title('Sent back to the queue')->send();
+        $this->refreshNavigationBadge();
     }
 
     private function forget(FailedJob $record): void
@@ -167,6 +175,7 @@ class SystemHealth extends Page implements HasTable
         Log::warning('ops: failed job deleted', ['uuid' => $uuid, 'admin_id' => auth()->id()]);
 
         Notification::make()->success()->title('Failed job deleted')->send();
+        $this->refreshNavigationBadge();
     }
 
     /**
@@ -186,8 +195,18 @@ class SystemHealth extends Page implements HasTable
         return is_string($uuid) ? $uuid : null;
     }
 
+    /**
+     * The count may have changed even when this click found the row gone
+     * (another tab or the CLI handled it), so every path refreshes the badge.
+     */
     private function notifyAlreadyHandled(): void
     {
         Notification::make()->danger()->title(self::ALREADY_HANDLED)->send();
+        $this->refreshNavigationBadge();
+    }
+
+    private function refreshNavigationBadge(): void
+    {
+        $this->dispatch(self::REFRESH_NAVIGATION_EVENT);
     }
 }

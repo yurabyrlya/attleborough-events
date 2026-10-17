@@ -20,10 +20,14 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
  * Anti-Pattern 7): visibility asks the enum's canTransitionTo(), every action
  * asks for confirmation, and each closure only delegates to a domain action in
  * App\Publishing\Actions. Nothing here writes a model. Copy is plain British
- * English and never jokey about cancellations (D-05).
+ * English and never jokey about cancellations (D-05). Dialog buttons name the
+ * action ("Cancel date", "Hide event") and the dismiss button reads "Keep as
+ * is", so "Cancel" never means "keep".
  */
 final class StatusActions
 {
+    private const KEEP_LABEL = 'Keep as is';
+
     private const EVENT_CONFLICT = 'This event changed in the meantime. Refresh the page and try again.';
 
     private const OCCURRENCE_CONFLICT = 'This date changed in the meantime. Refresh the page and try again.';
@@ -45,6 +49,7 @@ final class StatusActions
                 heading: 'Hide this event?',
                 description: 'All of its dates disappear from the public calendar. You can show it again at any time.',
                 successTitle: 'Event hidden',
+                submitLabel: 'Hide event',
             ),
             self::eventAction(
                 name: 'unhide',
@@ -55,6 +60,7 @@ final class StatusActions
                 heading: 'Show this event on the calendar?',
                 description: 'Its dates go back on the public calendar as they were before.',
                 successTitle: 'Event shown on the calendar',
+                submitLabel: 'Show event',
             ),
             self::eventAction(
                 name: 'cancel',
@@ -65,6 +71,7 @@ final class StatusActions
                 heading: 'Mark this event as cancelled?',
                 description: 'The event stays on the public calendar with a "Cancelled" label until its dates have passed.',
                 successTitle: 'Event marked as cancelled',
+                submitLabel: 'Cancel event',
             ),
             self::eventAction(
                 name: 'reinstate',
@@ -75,6 +82,7 @@ final class StatusActions
                 heading: 'Reinstate this event?',
                 description: 'The "Cancelled" label is removed. Dates you cancelled one by one stay cancelled.',
                 successTitle: 'Event reinstated',
+                submitLabel: 'Reinstate event',
             ),
         ];
     }
@@ -95,6 +103,7 @@ final class StatusActions
                 heading: 'Cancel this date?',
                 description: 'This date stays on the public calendar with a "Cancelled" label until it has passed.',
                 successTitle: 'Date cancelled',
+                submitLabel: 'Cancel date',
             ),
             self::occurrenceAction(
                 name: 'hide',
@@ -104,6 +113,7 @@ final class StatusActions
                 heading: 'Hide this date?',
                 description: 'This date disappears from the public calendar. You can restore it at any time.',
                 successTitle: 'Date hidden',
+                submitLabel: 'Hide date',
             ),
             self::occurrenceAction(
                 name: 'restore',
@@ -113,6 +123,7 @@ final class StatusActions
                 heading: 'Restore this date?',
                 description: 'This date goes back on the public calendar without a "Cancelled" label.',
                 successTitle: 'Date restored',
+                submitLabel: 'Restore date',
             ),
         ];
     }
@@ -131,6 +142,7 @@ final class StatusActions
         string $heading,
         string $description,
         string $successTitle,
+        string $submitLabel,
     ): Action {
         return Action::make($name)
             ->label($label)
@@ -139,6 +151,8 @@ final class StatusActions
             ->requiresConfirmation()
             ->modalHeading($heading)
             ->modalDescription($description)
+            ->modalSubmitActionLabel($submitLabel)
+            ->modalCancelActionLabel(self::KEEP_LABEL)
             ->action(fn (Event $record) => self::run(fn (User $actor) => app(ChangeEventStatus::class)($record, $to, $actor), $successTitle, self::EVENT_CONFLICT))
             // Re-read (never write) the page's record so the header shows the
             // actions for the new status.
@@ -153,6 +167,7 @@ final class StatusActions
         string $heading,
         string $description,
         string $successTitle,
+        string $submitLabel,
     ): Action {
         return Action::make($name)
             ->label($label)
@@ -161,6 +176,8 @@ final class StatusActions
             ->requiresConfirmation()
             ->modalHeading($heading)
             ->modalDescription($description)
+            ->modalSubmitActionLabel($submitLabel)
+            ->modalCancelActionLabel(self::KEEP_LABEL)
             ->action(fn (EventOccurrence $record) => self::run(fn (User $actor) => app(ChangeOccurrenceStatus::class)($record, $to, $actor), $successTitle, self::OCCURRENCE_CONFLICT));
     }
 
