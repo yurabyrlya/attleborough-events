@@ -14,8 +14,8 @@ use Illuminate\Support\Facades\DB;
 /**
  * The ONLY writer of event_drafts field data.
  *
- * Every write runs derive(), so derived state (category now; quality score
- * from 02-08) can never drift from the fields it is derived from.
+ * Every write runs derive(), so derived state (category and quality score)
+ * can never drift from the fields it is derived from.
  *
  * create() deliberately has no AdminGate check: public submissions are
  * anonymous (02-05). update() is reached only from admin pages and actions
@@ -25,7 +25,11 @@ use Illuminate\Support\Facades\DB;
  */
 final class DraftWriter
 {
-    public function __construct(private CategoryAssigner $categories) {}
+    public function __construct(
+        private CategoryAssigner $categories,
+        private VenueMatcher $venues,
+        private QualityScorer $quality,
+    ) {}
 
     public function create(DraftData $data): EventDraft
     {
@@ -89,8 +93,14 @@ final class DraftWriter
     }
 
     /**
-     * Derived state, recomputed on every write. For now the category
-     * (CategoryAssigner's PIPE-03 chain); 02-08 adds quality scoring.
+     * Derived state, recomputed on every write: the category
+     * (CategoryAssigner's PIPE-03 chain), then the quality score, band and
+     * reasons (QualityScorer, PIPE-04), so fixing the venue or adding an end
+     * time during review lifts the score on save.
+     *
+     * A venue counts as recognised when venue_id is set or the typed name,
+     * alias or postcode exactly matches a known venue. Matching is read-only:
+     * venue_id is set only by the organiser's or admin's pick (D-05, D-21).
      */
     private function derive(EventDraft $draft, DraftData $data): void
     {
@@ -100,6 +110,17 @@ final class DraftWriter
             'category_id' => $decision->categoryId,
             'category_reason' => $decision->reason,
             'category_flagged' => $decision->flagged,
+        ]);
+
+        $venueRecognised = $draft->venue_id !== null
+            || $this->venues->exact($draft->venue_name, $draft->venue_postcode) !== null;
+
+        $result = $this->quality->score($draft, $venueRecognised, $decision->flagged);
+
+        $draft->forceFill([
+            'quality_score' => $result->score,
+            'quality_band' => $result->band,
+            'quality_reasons' => $result->reasons,
         ]);
     }
 }
