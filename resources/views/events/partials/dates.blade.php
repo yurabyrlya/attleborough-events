@@ -1,8 +1,11 @@
 @php
     /**
      * Dates list (EVT-01, EVT-06). A series shows "Upcoming dates", a one-off
-     * "When". Cancelled dates say so as text and get no add links; every
-     * other date offers the .ics download and a Google Calendar link.
+     * "When". Each date sits on its own line, with an indented row under it
+     * so the add links clearly belong to that date (UI review fix 3):
+     * "Apple / Outlook (.ics)" and "Google Calendar", each with a screen-reader
+     * " for {date}" suffix. Cancelled dates say "Cancelled" as text in that
+     * row and get no add links.
      *
      * @var \App\Support\EventPageData $page
      */
@@ -12,16 +15,18 @@
     @if ($page->dates === [])
         <p class="mt-2 text-muted">No upcoming dates.</p>
     @else
-        <ul class="dates mt-2 flex flex-col gap-2">
+        <ul class="dates mt-2 flex flex-col gap-3">
             @foreach ($page->dates as $date)
-                <li class="flex flex-wrap items-center gap-x-3">
+                <li class="flex flex-col">
                     <time datetime="{{ $date['datetimeIso'] }}" class="font-medium text-ink">{{ $date['timeLabel'] }}</time>
-                    @if ($date['isCancelled'])
-                        <strong class="text-cancel">Cancelled</strong>
-                    @else
-                        <a href="{{ $date['icsPath'] }}" rel="nofollow" class="tap-target text-accent underline underline-offset-2">Add to calendar (.ics)<span class="sr-only"> for {{ $date['timeLabel'] }}</span></a>
-                        <a href="{{ $date['googleUrl'] }}" rel="nofollow noopener" class="tap-target text-accent underline underline-offset-2">Google Calendar<span class="sr-only"> for {{ $date['timeLabel'] }}</span></a>
-                    @endif
+                    <div class="flex flex-wrap items-center gap-x-4 pl-4">
+                        @if ($date['isCancelled'])
+                            <strong class="text-cancel">Cancelled</strong>
+                        @else
+                            <a href="{{ $date['icsPath'] }}" rel="nofollow" class="tap-target text-accent underline underline-offset-2">Apple / Outlook (.ics)<span class="sr-only"> for {{ $date['timeLabel'] }}</span></a>
+                            <a href="{{ $date['googleUrl'] }}" rel="nofollow noopener" class="tap-target text-accent underline underline-offset-2">Google Calendar<span class="sr-only"> for {{ $date['timeLabel'] }}</span></a>
+                        @endif
+                    </div>
                 </li>
             @endforeach
         </ul>

@@ -35,11 +35,11 @@ it('F9: shows the event page with calendar links, a cancelled date and the share
         ->assertSee('Listed by What\'s On Attleborough.')
         ->assertSeeIn('#share-heading', 'Share this event')
         // Accessible names include the date, so screen reader users can tell the links apart.
-        ->assertPresent(Uat::role('link', 'Add to calendar (.ics) for Fri 30 Oct, 7:30pm'))
+        ->assertPresent(Uat::role('link', 'Apple / Outlook (.ics) for Fri 30 Oct, 7:30pm'))
         ->assertAttributeContains(Uat::role('link', 'Google Calendar for Fri 30 Oct, 7:30pm'), 'href', 'dates=20261030T193000Z%2F20261030T220000Z')
         ->assertSeeIn('li:has(time[datetime^="2026-11-27"])', 'Cancelled')
         ->assertNotPresent('li:has(time[datetime^="2026-11-27"]) a')
-        ->assertNotPresent(Uat::role('link', 'Add to calendar (.ics) for Fri 27 Nov, 7:30pm'))
+        ->assertNotPresent(Uat::role('link', 'Apple / Outlook (.ics) for Fri 27 Nov, 7:30pm'))
         ->assertPresent(Uat::role('link', 'WhatsApp'))
         ->assertPresent(Uat::role('link', 'Facebook'))
         ->assertPresent(Uat::role('link', 'Email'))

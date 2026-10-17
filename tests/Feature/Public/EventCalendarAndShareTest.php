@@ -155,6 +155,31 @@ it('keeps UTC across the clock change and offers no add links for a cancelled da
         ->and($item[0] ?? '')->not->toContain('.ics');
 });
 
+it('puts each date on its own line with an indented row of two labelled add links', function () {
+    shareTestPublish($this->base);
+
+    $document = shareTestDocument(get('/events/quiz-night')->assertOk());
+    $children = iterator_to_array($document->querySelectorAll('ul.dates > li:first-child > *'));
+
+    expect($children)->toHaveCount(2)
+        ->and($children[0]->tagName)->toBe('TIME')
+        ->and($children[0]->getAttribute('datetime'))->toBe('2026-10-23T19:30:00+01:00');
+
+    $links = iterator_to_array($children[1]->querySelectorAll('a'));
+    $text = fn (Element $a): string => trim((string) preg_replace('/\s+/', ' ', (string) $a->textContent));
+
+    expect($links)->toHaveCount(2)
+        ->and($children[1]->querySelectorAll('li')->length)->toBe(0)
+        ->and($text($links[0]))->toBe('Apple / Outlook (.ics) for Fri 23 Oct, 7:30pm')
+        ->and((string) $links[0]->getAttribute('href'))->toEndWith('.ics')
+        ->and($text($links[1]))->toBe('Google Calendar for Fri 23 Oct, 7:30pm')
+        ->and((string) $links[1]->getAttribute('href'))->toStartWith('https://calendar.google.com/');
+
+    foreach ($links as $link) {
+        expect((string) $link->getAttribute('class'))->toContain('tap-target');
+    }
+});
+
 it('never puts the request host into the Google link', function () {
     shareTestPublish($this->base);
 

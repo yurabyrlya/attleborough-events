@@ -44,18 +44,19 @@ Expected:
 - Date headings ("Today", "Friday 30 October") use `<time datetime>`; a cancelled date shows the word **Cancelled**.
 - No horizontal overflow, **0 scripts** on `/`, dark background in dark mode, readable text in both themes.
 - Only the **When** chips are open; **Category** and **Show only** sit under a closed **More filters** disclosure (a native `details`/`summary`, at least 24×24px with the visible focus ring, opens with click, Enter or Space).
-- On 375×812 the first event heading (`main h2`) starts above 812px, so the first day is visible without scrolling.
+- On 375×812 the first event heading (`main h2`) starts above 812px, so the first day is visible without scrolling. The same holds with a filter active (`/?category=community`, `/?free=1`): the disclosure stays closed with **More filters (1)** and a **Filtering by** row of removable chips sits above it.
 
 ## F2. Filters without JavaScript
 
 The public calendar loads no scripts, so walking the chips in a normal browser is equivalent to JS off (the integrated browser cannot open a JS-disabled context). Confirm `document.scripts.length === 0` on each page.
 
-Click in order: **This weekend → More filters (the summary) → Community → Free → Family-friendly → Today → This week → All upcoming**. After each click record the URL, the number of `main article h3 a` cards, `meta[name=robots]` and any empty-state text.
+Click in order: **This weekend → More filters (the summary) → Community → More filters → Free → More filters → Family-friendly → Today → This week → All upcoming → Remove filter: Family-friendly**. The disclosure is closed again after every reload, so reopen the summary before each Category or Show only pick. After each click record the URL, the number of `main article h3 a` cards, `meta[name=robots]` and any empty-state text.
 
 Expected:
 - Each chip is a plain link; filters combine, e.g. `/?when=weekend&category=community&free=1&family=1`.
-- **More filters** is a `details`/`summary` (not a link) and is closed on `/` and on When-only URLs such as `/?when=weekend`. After choosing Community, Free or Family-friendly the next page renders it already open with the active chip ticked. Still no scripts.
-- Clicking an active chip removes only that filter.
+- **More filters** is a `details`/`summary` (not a link) and is always closed when a page loads, with or without filters. With Category or Show only filters active its summary reads **More filters (N)**, and each active filter appears under **Filtering by** (outside the disclosure) as a chip whose accessible name is "Remove filter: …". Opening More filters shows the active chip ticked. Still no scripts.
+- Clicking a "Remove filter:" chip, or an active chip inside More filters, removes only that filter.
+- On 375×812, `/?category=community` still has the first `main h2` starting above 812px.
 - Every filtered URL has `noindex, follow`; the page title and a "Showing: Community · Free · Family-friendly" line reflect the filters.
 - No matches → "No events match these filters. Try removing one, or **see everything coming up.**" (link to `/`).
 
@@ -116,7 +117,7 @@ On `/admin/events`, use the row actions for the UAT event, checking `/` after ea
 
 | Action | Dialog text | Expected admin row | Expected public site |
 |---|---|---|---|
-| Hide from calendar | "All of its dates disappear from the public calendar…" | Hidden · only **Show on calendar** | event gone; `/events/<slug>` returns 404 |
+| Hide from calendar | "All of its dates disappear from the public calendar…" | Hidden · only **Show on calendar** | event gone; `/events/<slug>` returns the branded 404 (wordmark, "We can't find that page", a "See what's on" link to `/`, no scripts) |
 | Show on calendar | "Its dates go back on the public calendar as they were before." | Published | dates back |
 | Mark as cancelled | "The event stays on the public calendar with a "Cancelled" label until its dates have passed." | Cancelled · only **Reinstate** | every date labelled Cancelled |
 | Reinstate | "…Dates you cancelled one by one stay cancelled." | Published | only the individually cancelled date still says Cancelled |
@@ -146,7 +147,7 @@ Expected for each rule:
 Open `/events/<slug>` (phone width, light theme).
 
 Expected:
-- "← All events", title, category, price, "Upcoming dates" (each with "Add to calendar (.ics)" and "Google Calendar" links whose accessible names include the date), "Where" with full address, "About this event", "Who's running it" (organiser, contact link, attribution such as "Listed by What's On Attleborough."), "Share this event".
+- "← All events", title, category, price, "Upcoming dates" (each date on its own line, with an indented row under it holding "Apple / Outlook (.ics)" and "Google Calendar" links whose accessible names include the date), "Where" with full address, "About this event", "Who's running it" (organiser, contact link, attribution such as "Listed by What's On Attleborough."), "Share this event".
 - A cancelled date shows **Cancelled** and has **no** calendar links.
 - Scripts: one `application/ld+json` per upcoming date (max 10) plus `/build/assets/share-*.js`; nothing third-party.
 - Share block: WhatsApp, Facebook and Email are plain links; "Link to this event" read-only box; **Copy link** announces "Link copied." in a `role=status` region; **Share…** is hidden when `navigator.share` is unavailable.
@@ -161,6 +162,14 @@ curl -s -D - http://127.0.0.1:8000/events/<slug>/<Y-m-d>.ics
 Expected: `Content-Type: text/calendar`, `Content-Disposition: attachment`, `UID:<event_id>-<Y-m-d>@whatsonattleborough.co.uk` (or `<event_id>@…` for a one-off), UTC `DTSTART`/`DTEND`, escaped and folded `DESCRIPTION`/`LOCATION`; a cancelled date has `STATUS:CANCELLED`.
 
 **Phone-only (manual):** native share sheet, importing the `.ics` into iOS and Android calendars, opening the Google link. Shared and canonical links use `APP_URL`, so set it to the laptop's LAN address before testing from a phone.
+
+### Branded error pages
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:8000/events/no-such-thing
+```
+
+Expected: `404`. In the browser the page shows the wordmark, "We can't find that page", a "See what's on" link to `/`, and loads no scripts. `/?category=nonexistent` shows the same page without echoing the value. `php artisan down --render="errors::503"` shows the branded "We're updating the calendar" page; run `php artisan up` straight afterwards.
 
 ## F10. System health and ops drill
 
@@ -205,7 +214,8 @@ How they differ from the manual run:
 - The app is served in-process on the `attleborough_testing` database with `RefreshDatabase`. No `php artisan serve` is needed and the dev database is never touched, so the cleanup steps don't apply.
 - Time is frozen in Europe/London, and data is published through `PublishEvent` (`Tests\Browser\UatFixtures`). The date pickers are driven through their Year and Month controls, so the tests don't depend on the browser's real date.
 - Selectors are Playwright role and label locators (`UatFixtures::role('button', 'Hide event')`), as in the conventions above.
-- Still manual: the worker drill in F10 (`schedule:work`, `queue:work`, `ops:drill`), the `.ics` headers (covered by `tests/Feature/Public/EventCalendarAndShareTest.php`), and the phone-only checks in F9.
+- Still manual: the worker drill in F10 (`schedule:work`, `queue:work`, `ops:drill`), the `.ics` headers (covered by `tests/Feature/Public/EventCalendarAndShareTest.php`), the branded error pages (covered by `tests/Feature/Public/ErrorPagesTest.php`) and the phone-only checks in F9.
+- Since quick task 261017-hp9, `PublicCalendarTest.php` F2 reopens **More filters** after each reload and removes a filter with its "Remove filter:" chip, and also checks a filtered page on 375×812 stays above the fold; `EventPageTest.php` F9 uses the "Apple / Outlook (.ics) for …" link name.
 
 Run them:
 
@@ -219,7 +229,7 @@ CI runs them in a separate "Browser UAT" step after the Unit and Feature suites.
 
 ## Known-issues baseline (2026-10-17)
 
-Found in the first run; none blocks Phase 1. Treat them as known until fixed. Five items were fixed on 2026-10-17 in quick task 261017-gac (filter chips above the fold, Occurrences refresh after Save, honest read-only Repeats with an inline callout, explicit dialog buttons, live failed-jobs badge) and are no longer listed:
+Found in the first run; none blocks Phase 1. Treat them as known until fixed. Five items were fixed on 2026-10-17 in quick task 261017-gac (filter chips above the fold, Occurrences refresh after Save, honest read-only Repeats with an inline callout, explicit dialog buttons, live failed-jobs badge) and are no longer listed. Three Phase 1 UI-review items (branded error pages, filtered views above the fold, event-page date links) were fixed on 2026-10-17 in quick task 261017-hp9; none of them was a row here:
 
 | Area | Issue |
 |---|---|
