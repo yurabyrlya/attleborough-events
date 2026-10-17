@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 02
 current_phase_name: Draft Model, Review Queue & Submissions
 status: executing
-stopped_at: Completed 02-11-PLAN.md
-last_updated: "2026-10-17T20:26:08.690Z"
+stopped_at: Completed 02-12-PLAN.md
+last_updated: "2026-10-17T20:39:35.135Z"
 last_activity: 2026-10-17
 last_activity_desc: "Completed 02-11 (Rules screen: Category mappings + Geofence tabs, mapping link in CategoryAssigner, RulesSeeder)"
-state_head: 0e14a2c0561d9410c6cc16b6d14068695dacfeb5
+state_head: 6d498492de321e91dfe2d00190f8046a5ee282bf
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 31
-  completed_plans: 24
+  completed_plans: 25
   percent: 20
 ---
 
@@ -28,9 +28,9 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 02 (Draft Model, Review Queue & Submissions) — EXECUTING
-Plan: 11 of 16 complete (02-01 to 02-11 done; wave 4 in progress — 02-12 next)
+Plan: 12 of 16 complete (02-01 to 02-12 done; wave 4 in progress — 02-13 next)
 Status: Ready to execute
-Last activity: 2026-10-17 — Completed 02-11 (Rules screen complete: Category mappings + Geofence tabs; CategoryMapping is PIPE-03 link 2 "Mapped from '…'"; geofence_terms with NR17-style districts and place names; RulesSeeder create-only defaults wired into DatabaseSeeder; ADM-04 and PIPE-03 complete)
+Last activity: 2026-10-17 — Completed 02-12 (Review queue: EventDraftResource list + review page with full REV-01 detail, approve/reject/reopen/raw content via Publishing actions, ReviewQueue one D-09 sort key for table and next/previous, global search on drafts and events; REV-01 and ADM-06 complete)
 
 Progress: 24/31 plans ([██░░░░░░░░] 20%); phase 2: 11/16; phases complete: 1/5
 
@@ -80,6 +80,7 @@ Progress: 24/31 plans ([██░░░░░░░░] 20%); phase 2: 11/16; ph
 | Phase 02 P09 | 8min | 3 tasks | 14 files |
 | Phase 02 P10 | 5min | 2 tasks | 10 files |
 | Phase 02 P11 | 6min | 2 tasks | 12 files |
+| Phase 02 P12 | 10min | 3 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -127,6 +128,9 @@ Recent decisions affecting current work:
 - [Phase 02]: 02-11: Category mappings are PIPE-03 link 2 (first mapping by id, normalised equality, reason "Mapped from '{value as given}'"); Phase 3 adds category_mappings.source_id and widens the key
 - [Phase 02]: 02-11: Geofence terms stored in geofence_terms (type postcode_district|place_name); districts upper-case without spaces matching ^[A-Z]{1,2}[0-9][0-9A-Z]?$; enforcement Phase 4
 - [Phase 02]: 02-11: RulesSeeder is create-only (case-insensitive firstOrCreate), so re-seeding never reverts admin edits; deleted defaults return on the next seed
+- [Phase 02]: 02-12: ReviewQueue next()/previous() keyset compares the shared SORT_KEY against a subquery over the current draft's row, so table order and queue navigation cannot disagree (null time before 00:00)
+- [Phase 02]: 02-12: Review page action visibility follows a per-page status snapshot (shownStatus), so a stale click reports 'This draft was already reviewed' instead of being silently dropped
+- [Phase 02]: 02-12: EventDraftResource and EventResource canAccess() use the AdminGate rule; global search covers drafts (title, reference, organiser, typed venue) and events (title, organiser)
 
 ### Pending Todos
 
@@ -160,6 +164,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-17T20:26:08.296Z
-Stopped at: Completed 02-11-PLAN.md
+Last session: 2026-10-17T20:39:34.735Z
+Stopped at: Completed 02-12-PLAN.md
 Resume file: None
