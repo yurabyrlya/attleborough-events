@@ -36,9 +36,9 @@
 
 ### Organiser Submission (SUB)
 
-- [ ] **SUB-01**: Organiser can submit an event with title, start date/time, optional end, venue/address, description, category, price, organiser name, contact email or website, optional original link, free-text "repeats" field and a consent checkbox linking to the privacy notice
-- [ ] **SUB-02**: A valid submission creates a `pending_review` draft (origin `submission`) that is not public, and the organiser sees a "will be reviewed" confirmation
-- [ ] **SUB-03**: A submission missing date or venue (or another required field) shows validation errors and creates no draft
+- [x] **SUB-01**: Organiser can submit an event with title, start date/time, optional end, venue/address, description, category, price, organiser name, contact email or website, optional original link, free-text "repeats" field and a consent checkbox linking to the privacy notice
+- [x] **SUB-02**: A valid submission creates a `pending_review` draft (origin `submission`) that is not public, and the organiser sees a "will be reviewed" confirmation
+- [x] **SUB-03**: A submission missing date or venue (or another required field) shows validation errors and creates no draft
 - [ ] **SUB-04**: The form is protected by a honeypot, per-IP rate limiting and Cloudflare Turnstile
 
 ### Review Queue (REV)
@@ -194,9 +194,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EVT-08 | Phase 5 | Pending |
 | FEED-01 | Phase 5 | Pending |
 | FEED-02 | Phase 5 | Pending |
-| SUB-01 | Phase 2 | Pending |
-| SUB-02 | Phase 2 | Pending |
-| SUB-03 | Phase 2 | Pending |
+| SUB-01 | Phase 2 | Complete |
+| SUB-02 | Phase 2 | Complete |
+| SUB-03 | Phase 2 | Complete |
 | SUB-04 | Phase 2 | Pending |
 | REV-01 | Phase 2 | Pending |
 | REV-02 | Phase 2 | Complete |
