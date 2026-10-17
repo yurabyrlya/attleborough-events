@@ -6,6 +6,7 @@ use App\Enums\RepeatEnds;
 use App\Enums\RepeatPattern;
 use Carbon\CarbonImmutable;
 use InvalidArgumentException;
+use Throwable;
 
 /**
  * Form state <-> RRULE for the admin's simple recurrence choices.
@@ -54,8 +55,10 @@ final readonly class ManualRecurrence
             return;
         }
 
-        if ($ends === RepeatEnds::OnDate && ($untilDate === null || preg_match('/^\d{4}-\d{2}-\d{2}$/', $untilDate) !== 1)) {
-            throw new InvalidArgumentException('A series that ends on a date needs that date (Y-m-d).');
+        // Round-trip checked so '2026-02-30' or '2026-13-45' is refused rather
+        // than overflowing into a later date (WR-03).
+        if ($ends === RepeatEnds::OnDate && ($untilDate === null || self::localDate($untilDate) === null)) {
+            throw new InvalidArgumentException('A series that ends on a date needs that date (a real Y-m-d date).');
         }
 
         if ($ends === RepeatEnds::AfterCount && ($count === null || $count < 1 || $count > self::MAX_COUNT)) {
@@ -181,9 +184,9 @@ final readonly class ManualRecurrence
 
     private function untilValue(bool $allDay): string
     {
-        $until = CarbonImmutable::createFromFormat('!Y-m-d', (string) $this->untilDate, self::TIMEZONE);
+        $until = self::localDate((string) $this->untilDate);
 
-        if (! $until instanceof CarbonImmutable) {
+        if ($until === null) {
             throw new InvalidArgumentException("Invalid until date [{$this->untilDate}].");
         }
 
@@ -192,16 +195,45 @@ final readonly class ManualRecurrence
             : $until->endOfDay()->startOfSecond()->utc()->format('Ymd\THis\Z');
     }
 
+    /**
+     * A stored UNTIL back to its London date. Both shapes are round-trip
+     * checked, so an impossible value such as 20261345 is rejected instead of
+     * overflowing (WR-03).
+     */
     private static function untilToLocalDate(string $until): string
     {
-        $value = strlen($until) === 8
-            ? CarbonImmutable::createFromFormat('!Ymd', $until, self::TIMEZONE)
-            : CarbonImmutable::createFromFormat('Ymd\THis\Z', $until, 'UTC')?->setTimezone(self::TIMEZONE);
+        $format = strlen($until) === 8 ? '!Ymd' : 'Ymd\THis\Z';
+        $value = self::parseExact($format, $until, strlen($until) === 8 ? self::TIMEZONE : 'UTC');
 
-        if (! $value instanceof CarbonImmutable) {
+        if ($value === null) {
             throw new InvalidArgumentException("Invalid UNTIL [{$until}].");
         }
 
-        return $value->format('Y-m-d');
+        return $value->setTimezone(self::TIMEZONE)->format('Y-m-d');
+    }
+
+    /**
+     * A real Y-m-d calendar date in Europe/London, or null. Carbon overflows
+     * impossible dates (2026-02-30 becomes 2 March), so the parsed value must
+     * format back to exactly the input.
+     */
+    private static function localDate(string $value): ?CarbonImmutable
+    {
+        return self::parseExact('!Y-m-d', $value, self::TIMEZONE);
+    }
+
+    private static function parseExact(string $format, string $value, string $timezone): ?CarbonImmutable
+    {
+        try {
+            $parsed = CarbonImmutable::createFromFormat($format, $value, $timezone);
+        } catch (Throwable) {
+            return null;
+        }
+
+        if (! $parsed instanceof CarbonImmutable || $parsed->format(ltrim($format, '!')) !== $value) {
+            return null;
+        }
+
+        return $parsed;
     }
 }

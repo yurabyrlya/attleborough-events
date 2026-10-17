@@ -10,6 +10,7 @@ use App\Models\Event;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Throwable;
 
 /**
  * Everything needed to publish an event, independent of where it came from
@@ -17,6 +18,9 @@ use InvalidArgumentException;
  */
 final readonly class PublishableEventData
 {
+    /** HH:MM or HH:MM:SS, 00:00 to 23:59:59. */
+    private const TIME_PATTERN = '/^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/';
+
     public function __construct(
         public string $title,
         public string $description,
@@ -41,7 +45,14 @@ final readonly class PublishableEventData
         public ?int $repeatCount = null,
     ) {
         // Validated here, not only in the form: Phase 2's approval path does
-        // not go through Filament (T-01-17).
+        // not go through Filament (T-01-17, WR-02). Mirrors the form's rules:
+        // non-blank title and description; real Y-m-d start, end and last
+        // dates (round-trip checked, so 2026-02-30 fails); HH:MM[:SS] times;
+        // a start time unless all-day; end date and last date not before the
+        // start date; a source URL or an organiser contact. Then the
+        // recurrence must be single-day and fit the start date.
+        $this->assertValid();
+
         if ($this->isRecurring()) {
             if ($this->endDate !== null && $this->endDate !== $this->startDate) {
                 throw new InvalidArgumentException("Repeating events can't span several days.");
@@ -51,6 +62,70 @@ final readonly class PublishableEventData
                 throw new InvalidArgumentException("The repeat option [{$this->repeats->value}] does not fit the start date {$this->startDate}.");
             }
         }
+    }
+
+    private function assertValid(): void
+    {
+        if (trim($this->title) === '') {
+            throw new InvalidArgumentException('An event needs a title.');
+        }
+
+        if (trim($this->description) === '') {
+            throw new InvalidArgumentException('An event needs a description.');
+        }
+
+        if (! self::isRealDate($this->startDate, $this->timezone)) {
+            throw new InvalidArgumentException("Invalid start date [{$this->startDate}].");
+        }
+
+        if ($this->endDate !== null && ! self::isRealDate($this->endDate, $this->timezone)) {
+            throw new InvalidArgumentException("Invalid end date [{$this->endDate}].");
+        }
+
+        if ($this->repeatUntil !== null && ! self::isRealDate($this->repeatUntil, $this->timezone)) {
+            throw new InvalidArgumentException("Invalid last date [{$this->repeatUntil}].");
+        }
+
+        if ($this->startTime !== null && preg_match(self::TIME_PATTERN, $this->startTime) !== 1) {
+            throw new InvalidArgumentException("Invalid start time [{$this->startTime}].");
+        }
+
+        if ($this->endTime !== null && preg_match(self::TIME_PATTERN, $this->endTime) !== 1) {
+            throw new InvalidArgumentException("Invalid end time [{$this->endTime}].");
+        }
+
+        if (! $this->allDay && $this->startTime === null) {
+            throw new InvalidArgumentException('A timed event needs a start time.');
+        }
+
+        // Real Y-m-d strings compare correctly as strings.
+        if ($this->endDate !== null && $this->endDate < $this->startDate) {
+            throw new InvalidArgumentException('The end date cannot be before the start date.');
+        }
+
+        if ($this->isRecurring() && $this->repeatEnds === RepeatEnds::OnDate
+            && $this->repeatUntil !== null && $this->repeatUntil < $this->startDate) {
+            throw new InvalidArgumentException('The last date cannot be before the start date.');
+        }
+
+        if (self::nullableString($this->sourceUrl) === null && self::nullableString($this->organiserContact) === null) {
+            throw new InvalidArgumentException('Add a source URL or an organiser contact.');
+        }
+    }
+
+    /**
+     * A real calendar date: Carbon overflows impossible dates (2026-02-30
+     * becomes 2 March), so the parsed value must format back to the input.
+     */
+    private static function isRealDate(string $value, string $timezone): bool
+    {
+        try {
+            $date = CarbonImmutable::createFromFormat('!Y-m-d', $value, $timezone);
+        } catch (Throwable) {
+            return false;
+        }
+
+        return $date instanceof CarbonImmutable && $date->format('Y-m-d') === $value;
     }
 
     /**
