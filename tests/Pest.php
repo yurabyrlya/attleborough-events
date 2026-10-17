@@ -34,6 +34,19 @@ pest()->extend(TestCase::class)
     ->in('Unit');
 
 /*
+ * Browser UAT flows (docs/uat/browser-uat.md) driven by Playwright through
+ * pestphp/pest-plugin-browser. The app is served in-process, so time travel,
+ * RefreshDatabase and actingAs() apply to the browser's requests. Uses the
+ * built assets in public/build (run `npm run build` first).
+ */
+pest()->extend(TestCase::class)
+    ->use(RefreshDatabase::class)
+    ->beforeEach(function () {
+        Http::preventStrayRequests();
+    })
+    ->in('Browser');
+
+/*
 |--------------------------------------------------------------------------
 | Calendar fixtures
 |--------------------------------------------------------------------------

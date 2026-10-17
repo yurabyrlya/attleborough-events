@@ -1,0 +1,131 @@
+<?php
+
+namespace Tests\Browser;
+
+use App\Enums\EventOrigin;
+use App\Enums\PriceType;
+use App\Enums\RepeatEnds;
+use App\Enums\RepeatPattern;
+use App\Models\Category;
+use App\Models\Event;
+use App\Models\User;
+use App\Models\Venue;
+use App\Publishing\Actions\PublishEvent;
+use App\Publishing\Data\PublishableEventData;
+use Database\Seeders\CategorySeeder;
+use RuntimeException;
+
+/**
+ * Shared fixtures and selectors for the browser UAT flows
+ * (docs/uat/browser-uat.md). Test data is prefixed "UAT".
+ */
+final class UatFixtures
+{
+    public const PASSWORD = 'uat-password';
+
+    public static function admin(): User
+    {
+        return User::factory()->create([
+            'email' => config('app.admin_email'),
+            'password' => self::PASSWORD,
+        ]);
+    }
+
+    /**
+     * The real category list (reference data), as on the live site.
+     */
+    public static function seedCategories(): void
+    {
+        (new CategorySeeder)->run();
+    }
+
+    public static function category(string $slug): Category
+    {
+        return Category::query()->where('slug', $slug)->firstOrFail();
+    }
+
+    public static function venue(): Venue
+    {
+        return Venue::query()->first() ?? Venue::factory()->create(['name' => 'UAT Town Hall']);
+    }
+
+    /**
+     * Publish an event through the real write path (PublishEvent).
+     *
+     * @param  array<string, mixed>  $overrides  PublishableEventData arguments
+     */
+    public static function publish(User $admin, array $overrides = []): Event
+    {
+        return app(PublishEvent::class)(new PublishableEventData(...array_merge([
+            'title' => 'UAT Event',
+            'description' => 'A UAT test event.',
+            'categoryId' => self::category('community')->id,
+            'venueId' => self::venue()->id,
+            'startDate' => '2026-10-30',
+            'startTime' => '19:30:00',
+            'organiserContact' => 'uat@example.test',
+        ], $overrides)), $admin, EventOrigin::Manual);
+    }
+
+    /**
+     * "UAT Quiz Night": monthly on the last Friday from Fri 30 Oct 2026
+     * until 31 Mar 2027, 7:30pm to 10pm (the F3 series).
+     */
+    public static function quizNight(User $admin): Event
+    {
+        return self::publish($admin, [
+            'title' => 'UAT Quiz Night',
+            'description' => 'Monthly pub quiz. Teams of up to six.',
+            'endTime' => '22:00:00',
+            'priceType' => PriceType::Paid,
+            'priceText' => '£2 per person',
+            'organiserName' => 'The Griffin',
+            'organiserContact' => 'quiz@example.test',
+            'repeats' => RepeatPattern::MonthlyLast,
+            'repeatEnds' => RepeatEnds::OnDate,
+            'repeatUntil' => '2027-03-31',
+        ]);
+    }
+
+    /**
+     * Wait until a JavaScript expression in the page is truthy (for state
+     * that is not visible text, e.g. <select> options after a Livewire
+     * round trip).
+     */
+    public static function waitUntil(mixed $page, string $expression, float $timeoutSeconds = 5.0): mixed
+    {
+        $deadline = microtime(true) + $timeoutSeconds;
+
+        while (! $page->script('() => Boolean('.$expression.')')) {
+            if (microtime(true) > $deadline) {
+                throw new RuntimeException("Timed out waiting for: {$expression}");
+            }
+
+            $page->wait(0.1);
+        }
+
+        return $page;
+    }
+
+    /**
+     * Playwright role selector with an exact, case-sensitive accessible name.
+     */
+    public static function role(string $role, string $name): string
+    {
+        return sprintf('internal:role=%s[name=%ss]', $role, self::quote($name));
+    }
+
+    /**
+     * Playwright label selector (case-insensitive substring, so a required
+     * field's "Title*" matches "Title").
+     */
+    public static function label(string $text): string
+    {
+        return sprintf('internal:label=%si', self::quote($text));
+    }
+
+    private static function quote(string $value): string
+    {
+        return (string) json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+}

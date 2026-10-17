@@ -2,7 +2,7 @@
 
 Repeatable browser checks for the public site and the Filament admin. Run them at the end of every phase, before signing off `/gsd-verify-work`, and after any change to public views, the event form, status actions or ops pages.
 
-They were first run on 2026-10-17 for Phase 1 (results: `.planning/phases/01-foundation-published-calendar/01-UAT.md`). Each flow lists the steps, the selectors used and the expected result, so a person, an agent with browser tools (Playwright), or a future automated browser test can follow it exactly.
+They were first run on 2026-10-17 for Phase 1 (results: `.planning/phases/01-foundation-published-calendar/01-UAT.md`). Each flow lists the steps, the selectors used and the expected result, so a person or an agent with browser tools (Playwright) can follow it exactly. The automated version is `vendor/bin/pest --testsuite=Browser` (see [Automating these flows](#automating-these-flows)).
 
 ## Conventions
 
@@ -190,7 +190,32 @@ When a phase adds or changes UI, add a flow here in the same shape (steps, selec
 
 ### Automating these flows
 
-The selectors above are the ones a browser test would use. Turning them into automated tests needs a browser-test dependency (e.g. `pestphp/pest-plugin-browser` or `@playwright/test`), which needs the owner's approval first (project rule: no dependency changes without approval).
+F0–F10 are automated as Pest browser tests in [`tests/Browser`](../../tests/Browser) (`pestphp/pest-plugin-browser`, driving Playwright Chromium). Approved by the owner on 2026-10-17.
+
+| File | Flows |
+|---|---|
+| `PublicCalendarTest.php` | F1 (desktop; phone light and dark), F2 |
+| `AdminCreateEventTest.php` | F0 log in, F3 + F4 |
+| `AdminEditEventTest.php` | F5, F6 (including WR-06), F7 (table and edit page header), F8 |
+| `EventPageTest.php` | F9 (page, calendar links, share block, Copy link) |
+| `SystemHealthTest.php` | F10 page: stale workers, failed-jobs badge, Retry / Delete |
+
+How they differ from the manual run:
+
+- The app is served in-process on the `attleborough_testing` database with `RefreshDatabase`. No `php artisan serve` is needed and the dev database is never touched, so the cleanup steps don't apply.
+- Time is frozen in Europe/London, and data is published through `PublishEvent` (`Tests\Browser\UatFixtures`). The date pickers are driven through their Year and Month controls, so the tests don't depend on the browser's real date.
+- Selectors are Playwright role and label locators (`UatFixtures::role('button', 'Hide event')`), as in the conventions above.
+- Still manual: the worker drill in F10 (`schedule:work`, `queue:work`, `ops:drill`), the `.ics` headers (covered by `tests/Feature/Public/EventCalendarAndShareTest.php`), and the phone-only checks in F9.
+
+Run them:
+
+```bash
+npm ci --ignore-scripts && npx playwright install chromium   # once
+npm run build                                                # tests use public/build
+vendor/bin/pest --testsuite=Browser
+```
+
+CI runs them in a separate "Browser UAT" step after the Unit and Feature suites. A failing test saves a screenshot to `tests/Browser/Screenshots/` (git-ignored). When a flow changes, update its test together with this runbook.
 
 ## Known-issues baseline (2026-10-17)
 
