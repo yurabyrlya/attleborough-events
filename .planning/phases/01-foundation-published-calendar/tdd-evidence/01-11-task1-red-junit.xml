@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="4" assertions="7" errors="0" failures="4" skipped="0" time="0.902283">
+    <testsuite name="Tests\Feature\Public\HostHeaderAssetsTest" file="tests/Feature/Public/HostHeaderAssetsTest.php" tests="3" assertions="6" errors="0" failures="3" skipped="0" time="0.887331">
+      <testcase name="it keeps the calendar page free of a spoofed Host and links the stylesheet root-relative" file="tests/Feature/Public/HostHeaderAssetsTest.php::it keeps the calendar page free of a spoofed Host and links the stylesheet root-relative" class="Tests\Feature\Public\HostHeaderAssetsTest" classname="Tests.Feature.Public.HostHeaderAssetsTest" assertions="2" time="0.764357">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it keeps the calendar page free of a spoofed Host and links the stylesheet root-relativeExpecting '&lt;!DOCTYPE html&gt;&lt;html lang="…tml&gt;' not to contain 'evil.example'.
+at tests/Feature/Public/HostHeaderAssetsTest.php:61</failure>
+      </testcase>
+      <testcase name="it keeps the event page free of a spoofed Host and loads the share module root-relative" file="tests/Feature/Public/HostHeaderAssetsTest.php::it keeps the event page free of a spoofed Host and loads the share module root-relative" class="Tests\Feature\Public\HostHeaderAssetsTest" classname="Tests.Feature.Public.HostHeaderAssetsTest" assertions="2" time="0.075307">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it keeps the event page free of a spoofed Host and loads the share module root-relativeExpecting '&lt;!DOCTYPE html&gt;&lt;html lang="…tml&gt;' not to contain 'evil.example'.
+at tests/Feature/Public/HostHeaderAssetsTest.php:73</failure>
+      </testcase>
+      <testcase name="it builds generic redirects such as the admin login from app.url, not the Host header" file="tests/Feature/Public/HostHeaderAssetsTest.php::it builds generic redirects such as the admin login from app.url, not the Host header" class="Tests\Feature\Public\HostHeaderAssetsTest" classname="Tests.Feature.Public.HostHeaderAssetsTest" assertions="2" time="0.047667">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it builds generic redirects such as the admin login from app.url, not the Host headerFailed asserting that 'http://evil.example/admin/login' starts with "http://localhost:8000".
+at tests/Feature/Public/HostHeaderAssetsTest.php:84</failure>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Unit\Ops\EnvExampleTest" file="tests/Unit/Ops/EnvExampleTest.php" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="0.014952">
+      <testcase name="it turns the Laravel Boost browser logger off in .env.example" file="tests/Unit/Ops/EnvExampleTest.php::it turns the Laravel Boost browser logger off in .env.example" class="Tests\Unit\Ops\EnvExampleTest" classname="Tests.Unit.Ops.EnvExampleTest" assertions="1" time="0.014952">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it turns the Laravel Boost browser logger off in .env.exampleFailed asserting that an array contains 'BOOST_BROWSER_LOGS_WATCHER=false'.
+at tests/Unit/Ops/EnvExampleTest.php:12</failure>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>
