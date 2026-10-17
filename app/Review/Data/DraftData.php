@@ -21,6 +21,12 @@ use Carbon\CarbonImmutable;
 final readonly class DraftData
 {
     /**
+     * Submission keys that never go into raw_payload: the consent tick (kept
+     * as consented_at) and the spam-defence fields (02-09).
+     */
+    private const NOT_IN_RAW_PAYLOAD = ['consent', 'fax_number', 'form_token', 'cf-turnstile-response'];
+
+    /**
      * @param  array<string, mixed>|null  $rawPayload
      */
     public function __construct(
@@ -92,6 +98,67 @@ final readonly class DraftData
             sourceUrl: $publishable->sourceUrl,
             sourceNote: $publishable->sourceNote,
         );
+    }
+
+    /**
+     * A public submission (SUB-01), from StoreSubmissionRequest::validated().
+     *
+     * The schedule is stored as the organiser's London wall-clock values,
+     * exactly as typed (H:i becomes H:i:00); nothing is converted to UTC.
+     * "Does it repeat?" stays free text: the admin turns it into a rule at
+     * review (D-06), so recurrenceRule is always null here. Contact details
+     * are private unless the organiser ticked "Show my contact publicly".
+     * raw_payload keeps what was sent, minus the consent tick and the spam
+     * fields (02-09), for the reviewer.
+     *
+     * @param  array<string, mixed>  $validated
+     */
+    public static function fromSubmission(array $validated): self
+    {
+        $venueChoice = (string) ($validated['venue_choice'] ?? '');
+        $knownVenue = ctype_digit($venueChoice);
+        $categoryChoice = (string) ($validated['category_choice'] ?? '');
+        $allDay = (bool) ($validated['all_day'] ?? false);
+
+        return new self(
+            origin: EventOrigin::Submission,
+            extractionMethod: ExtractionMethod::Submission,
+            title: (string) $validated['title'],
+            description: self::nullableString($validated['description'] ?? null),
+            preferredCategoryId: ctype_digit($categoryChoice) ? (int) $categoryChoice : null,
+            venueId: $knownVenue ? (int) $venueChoice : null,
+            venueName: $knownVenue ? null : self::nullableString($validated['venue_name'] ?? null),
+            venueAddress: $knownVenue ? null : self::nullableString($validated['venue_address'] ?? null),
+            venuePostcode: $knownVenue ? null : self::nullableString($validated['venue_postcode'] ?? null),
+            timezone: (string) config('calendar.timezone', 'Europe/London'),
+            allDay: $allDay,
+            startDate: self::nullableString($validated['start_date'] ?? null),
+            startTime: $allDay ? null : self::wallClockTime($validated['start_time'] ?? null),
+            endDate: self::nullableString($validated['end_date'] ?? null),
+            endTime: $allDay ? null : self::wallClockTime($validated['end_time'] ?? null),
+            recurrenceRule: null,
+            repeatsText: self::nullableString($validated['repeats_text'] ?? null),
+            familyFriendly: (bool) ($validated['family_friendly'] ?? false),
+            priceType: PriceType::tryFrom((string) ($validated['price_type'] ?? '')) ?? PriceType::Unknown,
+            priceText: self::nullableString($validated['price_text'] ?? null),
+            organiserName: self::nullableString($validated['organiser_name'] ?? null),
+            organiserContact: self::nullableString($validated['organiser_email'] ?? null),
+            organiserWebsite: self::nullableString($validated['organiser_website'] ?? null),
+            contactPublic: (bool) ($validated['contact_public'] ?? false),
+            sourceUrl: self::nullableString($validated['source_url'] ?? null),
+            rawPayload: array_diff_key($validated, array_flip(self::NOT_IN_RAW_PAYLOAD)),
+            consentedAt: CarbonImmutable::now()->utc(),
+        );
+    }
+
+    /**
+     * A validated H:i as the time column's H:i:s, unchanged otherwise.
+     */
+    private static function wallClockTime(mixed $value): ?string
+    {
+        $value = self::nullableString($value);
+
+        return $value === null ? null : $value.':00';
     }
 
     /**

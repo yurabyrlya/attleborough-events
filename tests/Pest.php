@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\Category;
 use App\Models\Event;
 use App\Models\EventOccurrence;
+use App\Models\Venue;
 use Carbon\CarbonImmutable;
 use Dom\HTMLDocument;
 use Illuminate\Foundation\Http\Events\RequestHandled;
@@ -64,6 +66,47 @@ pest()->extend(TestCase::class)
 function freezeLondon(string $localDateTime): void
 {
     test()->travelTo(CarbonImmutable::parse($localDateTime, 'Europe/London'));
+}
+
+/**
+ * A complete, valid POST body for the public /submit form (SUB-01), dated
+ * ten days after the frozen London "today". Unless overridden, it picks a
+ * new known venue (factory) and the first category by sort order (seed
+ * CategorySeeder first, or one is made). 02-09 extends it with the
+ * spam-defence fields.
+ *
+ * @param  array<string, mixed>  $overrides
+ * @return array<string, mixed>
+ */
+function validSubmission(array $overrides = []): array
+{
+    $defaults = [
+        'title' => 'Spring Craft Fair',
+        'description' => 'Local makers selling cards, candles and knitwear. Tea and cake in the side room.',
+        'category_choice' => array_key_exists('category_choice', $overrides)
+            ? null
+            : (string) (Category::query()->orderBy('sort')->value('id') ?? Category::factory()->create()->id),
+        'start_date' => CarbonImmutable::now('Europe/London')->addDays(10)->toDateString(),
+        'start_time' => '10:00',
+        'end_date' => '',
+        'end_time' => '15:00',
+        'repeats_text' => '',
+        'venue_choice' => array_key_exists('venue_choice', $overrides)
+            ? null
+            : (string) Venue::factory()->create()->id,
+        'venue_name' => '',
+        'venue_address' => '',
+        'venue_postcode' => '',
+        'price_type' => 'free',
+        'price_text' => '',
+        'organiser_name' => 'Attleborough Makers',
+        'organiser_email' => 'makers@example.org',
+        'organiser_website' => '',
+        'source_url' => '',
+        'consent' => '1',
+    ];
+
+    return array_merge($defaults, $overrides);
 }
 
 /**
