@@ -23,7 +23,6 @@ Decimal phases appear between their surrounding integers in numeric order.
 ### Phase 1: Foundation & Published Calendar
 
 **Goal**: Residents can open a mobile-first calendar on the local app and browse admin-entered events (including recurring ones), open event pages, add them to their calendar and share them
-**Mode:** mvp
 **Depends on**: Nothing (first phase)
 **Requirements**: OPS-01, OPS-04, CAL-01, CAL-02, CAL-03, CAL-04, CAL-05, CAL-06, CAL-07, CAL-08, EVT-01, EVT-02, EVT-03, EVT-06, EVT-07, REC-01, REC-02, ADM-01, ADM-02, ADM-03
 **Success Criteria** (what must be TRUE):
