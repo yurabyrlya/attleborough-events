@@ -47,7 +47,10 @@ return [
     |
     */
 
-    'encrypt' => env('SESSION_ENCRYPT', false),
+    // D-04 (review CR-01): on by default. A failed /submit flashes the
+    // organiser's name, email and website into the session, which must not
+    // sit in the database as plaintext.
+    'encrypt' => env('SESSION_ENCRYPT', true),
 
     /*
     |--------------------------------------------------------------------------

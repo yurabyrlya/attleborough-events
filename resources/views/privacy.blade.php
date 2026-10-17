@@ -36,7 +36,7 @@
         <h2>Spam protection</h2>
         <p>The form uses Cloudflare Turnstile to check that a person, not a bot, is sending it. Turnstile processes technical data about your browser and connection to do this. See <a href="https://www.cloudflare.com/turnstile-privacy-policy/" rel="noopener">Cloudflare's Turnstile privacy policy</a>.</p>
         <p>To stop the form being flooded, we count how many times it is sent from each internet (IP) address. The IP address is held in that count for up to 24 hours and is not stored with your submission.</p>
-        <p>The site also sets a session cookie so the form can be sent securely.</p>
+        <p>The site also sets a session cookie so the form can be sent securely. The session doesn't record your IP address or browser. If something in the form needs correcting, what you typed is kept in your session, encrypted, so you don't have to type it again. A session ends after two hours without activity.</p>
 
         <h2>How long we keep it</h2>
         <ul>

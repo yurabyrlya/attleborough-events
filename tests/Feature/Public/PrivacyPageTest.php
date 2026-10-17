@@ -22,6 +22,7 @@ it('explains what is collected, shown and kept, at /privacy', function () {
         ->assertSee('Turnstile')
         ->assertSee('24 hours')
         ->assertSee('is not stored with your submission')
+        ->assertSee("The session doesn't record your IP address or browser.", false)
         ->assertSee('href="https://www.cloudflare.com/turnstile-privacy-policy/"', false)
         ->assertSee('Last updated 17 October 2026')
         ->assertDontSee('no cookies')

@@ -2,9 +2,12 @@
 
 namespace App\Providers;
 
+use App\Support\PrivacyDatabaseSessionHandler;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -26,6 +29,25 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->pinUrlsToAppUrl();
         $this->configureRateLimiting();
+        $this->keepIpAddressesOutOfSessions();
+    }
+
+    /**
+     * D-04 (review CR-01): the "database" session driver stores no IP
+     * address or user agent, so /privacy's promise that the IP is only held
+     * in the rate-limit count stays true. Replacing the built-in driver
+     * (rather than adding a new name) means an environment that still says
+     * SESSION_DRIVER=database can't fall back to Laravel's handler. The
+     * session payload itself is encrypted (config session.encrypt).
+     */
+    private function keepIpAddressesOutOfSessions(): void
+    {
+        Session::extend('database', fn (Application $app): PrivacyDatabaseSessionHandler => new PrivacyDatabaseSessionHandler(
+            $app->make('db')->connection(config('session.connection')),
+            (string) config('session.table'),
+            (int) config('session.lifetime'),
+            $app,
+        ));
     }
 
     /**
