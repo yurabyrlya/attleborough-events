@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="8" assertions="31" errors="0" failures="4" skipped="0" time="4.385156">
+    <testsuite name="Tests\Feature\Publishing\OccurrenceUidStabilityTest" file="tests/Feature/Publishing/OccurrenceUidStabilityTest.php" tests="5" assertions="13" errors="0" failures="2" skipped="0" time="0.930463">
+      <testcase name="it keeps a one-off event's UID when its start time is edited" file="tests/Feature/Publishing/OccurrenceUidStabilityTest.php::it keeps a one-off event's UID when its start time is edited" class="Tests\Feature\Publishing\OccurrenceUidStabilityTest" classname="Tests.Feature.Publishing.OccurrenceUidStabilityTest" assertions="4" time="0.706534"/>
+      <testcase name="it refuses to turn a one-off event into a repeating one and changes nothing" file="tests/Feature/Publishing/OccurrenceUidStabilityTest.php::it refuses to turn a one-off event into a repeating one and changes nothing" class="Tests\Feature\Publishing\OccurrenceUidStabilityTest" classname="Tests.Feature.Publishing.OccurrenceUidStabilityTest" assertions="2" time="0.076047">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it refuses to turn a one-off event into a repeating one and changes nothingException [InvalidArgumentException] not thrown.
+at tests/Feature/Publishing/OccurrenceUidStabilityTest.php:80</failure>
+      </testcase>
+      <testcase name="it keeps a series instance's UID when the series start time is edited" file="tests/Feature/Publishing/OccurrenceUidStabilityTest.php::it keeps a series instance's UID when the series start time is edited" class="Tests\Feature\Publishing\OccurrenceUidStabilityTest" classname="Tests.Feature.Publishing.OccurrenceUidStabilityTest" assertions="4" time="0.058188"/>
+      <testcase name="it refuses to turn a series into a one-off event and changes nothing" file="tests/Feature/Publishing/OccurrenceUidStabilityTest.php::it refuses to turn a series into a one-off event and changes nothing" class="Tests\Feature\Publishing\OccurrenceUidStabilityTest" classname="Tests.Feature.Publishing.OccurrenceUidStabilityTest" assertions="2" time="0.045863">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it refuses to turn a series into a one-off event and changes nothingException [InvalidArgumentException] not thrown.
+at tests/Feature/Publishing/OccurrenceUidStabilityTest.php:103</failure>
+      </testcase>
+      <testcase name="it still allows switching between repeating patterns" file="tests/Feature/Publishing/OccurrenceUidStabilityTest.php::it still allows switching between repeating patterns" class="Tests\Feature\Publishing\OccurrenceUidStabilityTest" classname="Tests.Feature.Publishing.OccurrenceUidStabilityTest" assertions="1" time="0.043831"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\Filament\EditRepeatTypeTest" file="tests/Feature/Filament/EditRepeatTypeTest.php" tests="3" assertions="18" errors="0" failures="2" skipped="0" time="3.454693">
+      <testcase name="it offers a one-off event only &quot;Does not repeat&quot; and explains how to make a repeating event" file="tests/Feature/Filament/EditRepeatTypeTest.php::it offers a one-off event only &quot;Does not repeat&quot; and explains how to make a repeating event" class="Tests\Feature\Filament\EditRepeatTypeTest" classname="Tests.Feature.Filament.EditRepeatTypeTest" assertions="3" time="2.840160">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it offers a one-off event only "Does not repeat" and explains how to make a repeating eventFailed asserting that a field with the name [repeats] and provided configuration exists on the form with the name [form] on the [App\Filament\Resources\Events\Pages\EditEvent] component.
+Failed asserting that false is true.
+at vendor/filament/forms/src/Testing/TestsForms.php:218
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/EditRepeatTypeTest.php:44</failure>
+      </testcase>
+      <testcase name="it does not offer &quot;Does not repeat&quot; for a series and explains how to end it" file="tests/Feature/Filament/EditRepeatTypeTest.php::it does not offer &quot;Does not repeat&quot; for a series and explains how to end it" class="Tests\Feature\Filament\EditRepeatTypeTest" classname="Tests.Feature.Filament.EditRepeatTypeTest" assertions="3" time="0.385560">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">it does not offer "Does not repeat" for a series and explains how to end itFailed asserting that a field with the name [repeats] and provided configuration exists on the form with the name [form] on the [App\Filament\Resources\Events\Pages\EditEvent] component.
+Failed asserting that false is true.
+at vendor/filament/forms/src/Testing/TestsForms.php:218
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/EditRepeatTypeTest.php:55</failure>
+      </testcase>
+      <testcase name="it still offers &quot;Does not repeat&quot; and weekly on the create page" file="tests/Feature/Filament/EditRepeatTypeTest.php::it still offers &quot;Does not repeat&quot; and weekly on the create page" class="Tests\Feature\Filament\EditRepeatTypeTest" classname="Tests.Feature.Filament.EditRepeatTypeTest" assertions="12" time="0.228973"/>
+    </testsuite>
+  </testsuite>
+</testsuites>
