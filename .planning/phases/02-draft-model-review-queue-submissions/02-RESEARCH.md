@@ -756,23 +756,25 @@ it('creates a pending submission draft and shows the reference', function () {
 | A10 | Rate-limit thresholds (5/hour, 10/day per IP) and timing token (3 s min, 120 min max) | Patterns 7, Don't Hand-Roll | Low: config |
 | A11 | Filament `createOptionAction(fn (Action $a) => $a->fillForm(...))` to pre-fill "Create new venue" from draft text | Pattern 1/D-05 UI | Medium: confirm with Boost `search-docs` before coding |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **No-JS submitters vs Turnstile.**
+All six were resolved on 2026-10-17: Q1-Q5 by the owner's planning decisions D-17..D-21 in 02-CONTEXT.md, Q6 by the STATE.md "[Phase 5]" trusted-proxies concern. Each item below names its resolution.
+
+1. **No-JS submitters vs Turnstile.** RESOLVED by D-18: a `<noscript>` "email us instead" notice on /submit.
    - What we know: Turnstile needs JS; CONTEXT wants public pages usable without JS.
    - What's unclear: whether the owner accepts "email us instead" as the no-JS route.
    - Recommendation: plan the `<noscript>` fallback and confirm it in the plan's first checkpoint.
-2. **Third-party script exception wording + privacy text for Turnstile.**
+2. **Third-party script exception wording + privacy text for Turnstile.** RESOLVED by D-17: Turnstile allowed on /submit only, rule exception in AGENTS.md, extended NoThirdPartyAssetsTest, in-house verifier, privacy page mentions Turnstile.
    - What we know: SUB-04 requires Turnstile; AGENTS.md bans third-party scripts; PITFALLS M10 flags Turnstile storage as unverified.
    - Recommendation: owner approves a one-line AGENTS.md exception ("Turnstile on /submit only"). The interim `/privacy` page names Cloudflare Turnstile as a spam check that processes technical data (IP, browser signals) under legitimate interests and links Cloudflare's Turnstile Privacy Addendum (`https://www.cloudflare.com/turnstile-privacy-policy/`, linked from the Turnstile docs index [CITED: developers.cloudflare.com/turnstile]). It must not claim "no cookies" until verified.
-3. **What "source" means in REV-09 before a `sources` table exists.**
+3. **What "source" means in REV-09 before a `sources` table exists.** RESOLVED by D-20: "source" means origin until Phase 3.
    - Recommendation: in Phase 2 the "Source" filter is the `origin` (Public submission / Manual entry) and the source panel shows origin + `source_url` host. Phase 3 adds `source_id` and switches the filter. Record this so the verifier doesn't fail SC2.
-4. **Bulk approve and suggested (not confirmed) venues.**
+4. **Bulk approve and suggested (not confirmed) venues.** RESOLVED by D-21: only a confirmed `venue_id` counts; a suggestion alone makes bulk approve skip the draft with that reason.
    - What we know: D-05 pre-selects the suggestion; bulk skips "unresolved venues".
    - Recommendation: only a stored `venue_id` counts as resolved. An exact-match suggestion still needs one click on the review page. Confirm with the owner if bulk throughput matters.
-5. **`organiser_website` column on `events`.**
+5. **`organiser_website` column on `events`.** RESOLVED by D-19: add `events.contact_public` (default true) and `events.organiser_website`.
    - Recommendation: add it (Pattern 1). The alternative (folding the website into `source_url`) mixes "where we found it" with "who runs it" and blocks D-03's "website always public, email optional" rule. Costly-reversibility decision, so state it in the plan.
-6. **Trusted proxies.** Not needed for local Phase 2; add a Phase 5 concern to STATE.md (Pitfall 8).
+6. **Trusted proxies.** RESOLVED: recorded as the STATE.md "[Phase 5]" trusted-proxies concern. Not needed for local Phase 2; add a Phase 5 concern to STATE.md (Pitfall 8).
 
 ## Environment Availability
 

@@ -54,7 +54,7 @@ Not in this phase:
 - **D-19:** **Add `events.contact_public` (default true) and `events.organiser_website`.** Event pages and calendar cards show organiser contact only when `contact_public` is true. Phase 1 events keep their current output. — **Reversibility:** costly (published privacy promise, D-03).
 - **D-20:** **REV-09's "source" filter means origin** (submission / manual entry) until Phase 3 adds a `sources` table.
 - **D-21:** **Bulk approve treats a venue as resolved only when the draft has a confirmed `venue_id`.** A suggested match alone makes bulk approve skip the draft (with that reason).
-- **D-22:** **No UI-SPEC for Phase 2.** Plan against Phase 1's brand decisions (Phase 1 D-05..D-08), the public-site rules in AGENTS.md, and the Phase 1 UI review findings (`01-UI-REVIEW.md`).
+- **D-22 [informational]:** **No UI-SPEC for Phase 2.** Plan against Phase 1's brand decisions (Phase 1 D-05..D-08), the public-site rules in AGENTS.md, and the Phase 1 UI review findings (`01-UI-REVIEW.md`).
 
 ### Carried forward (do not re-ask)
 - Brand "What's On Attleborough", domain `whatsonattleborough.co.uk`, `hello@` contact, and the friendly-noticeboard voice with British English (Phase 1 D-01, D-02, D-04, D-05).

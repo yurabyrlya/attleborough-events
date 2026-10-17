@@ -61,7 +61,39 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. The admin can work through the queue on an "Approve & next" page with keyboard shortcuts, and can bulk approve and bulk reject. Bulk approve visibly skips drafts with parse errors, duplicate warnings or Low quality.
   5. `docs/research/event-sources.md` lists verified local sources with priority P0-P3, platform, extraction method, robots status and legal basis. TEC endpoints, dated RSS feeds and JSON-LD presence are verified live, and fixture samples are saved for every P0/P1 source.
 
-**Plans**: TBD
+**Plans**: 16 plans
+
+Plans:
+**Wave 1**
+- [ ] 02-01-PLAN.md — Tracer: manual entry through a draft + ApproveDraft choke point, event_drafts schema (wave 1)
+- [ ] 02-02-PLAN.md — Source research: two-list event-sources.md, live ladder probes, owner URL hand-off, redacted P0/P1 fixtures (wave 1)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 02-03-PLAN.md — Approval contract: blockers, bulk skip keys, DST series, category endpoints, choke-point arch test (wave 2)
+- [ ] 02-04-PLAN.md — Organiser contact choice: events.contact_public / organiser_website, admin form, public pages (wave 2)
+- [ ] 02-05-PLAN.md — Public /submit form, validation, /privacy, venue reveal, footer links (wave 2)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+- [ ] 02-06-PLAN.md — Reject / reopen and the 30/90-day rejected-draft purge (wave 3)
+- [ ] 02-07-PLAN.md — Keyword rules in the category chain + Rules screen (categories, keyword rules) (wave 3)
+- [ ] 02-08-PLAN.md — Quality score/band/reasons and venue matching (wave 3)
+- [ ] 02-09-PLAN.md — Spam defence: honeypot, timing token, Turnstile (fail closed), third-party guard (wave 3)
+- [ ] 02-10-PLAN.md — Per-IP rate limit + 429 page, D-17 rule text, test keys, spam-check health entry (wave 3)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+- [ ] 02-11-PLAN.md — Rules screen: category mappings, geofence terms, RulesSeeder (wave 4)
+- [ ] 02-12-PLAN.md — Review queue: draft detail, approve/reject/reopen, ordering + next/previous, global search (wave 4)
+
+**Wave 5** *(blocked on Wave 4 completion)*
+- [ ] 02-13-PLAN.md — Queue tabs, filters, columns, bulk approve (named skips) / bulk reject (wave 5)
+- [ ] 02-14-PLAN.md — Edit-and-approve (shared form sections, venue confirm/create, repeats translation) (wave 5)
+
+**Wave 6** *(blocked on Wave 5 completion)*
+- [ ] 02-15-PLAN.md — "Approve & next" with guarded keyboard shortcuts (wave 6)
+
+**Wave 7** *(blocked on Wave 6 completion)*
+- [ ] 02-16-PLAN.md — Browser UAT flows F11-F14 in the runbook, automated in tests/Browser (wave 7)
+
 **UI hint**: yes
 
 ### Phase 3: Ingestion Backbone, ICS & Change/Duplicate Handling
@@ -124,7 +156,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Published Calendar | 13/13 | Complete    | 2026-10-17 |
-| 2. Draft Model, Review Queue & Submissions | 0/TBD | Not started | - |
+| 2. Draft Model, Review Queue & Submissions | 0/16 | Planned | - |
 | 3. Ingestion Backbone, ICS & Change/Duplicate Handling | 0/TBD | Not started | - |
 | 4. Extraction Ladder, Geofence & Live Sources | 0/TBD | Not started | - |
 | 5. Launch Readiness | 0/2+ | Not started | - |
