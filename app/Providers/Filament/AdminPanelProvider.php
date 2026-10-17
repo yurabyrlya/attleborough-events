@@ -32,6 +32,7 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
+            ->viteTheme('resources/css/filament/admin/theme.css')
             // No web font and no third-party host: the panel CSS falls back to
             // ui-sans-serif, system-ui, sans-serif (OPS-04 / PITFALLS M10).
             ->font('system-ui', provider: LocalFontProvider::class)

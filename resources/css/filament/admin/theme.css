@@ -1,0 +1,9 @@
+/*
+ * Filament admin panel theme (Vite entry). The vendor theme already imports
+ * Tailwind, so do not import tailwindcss or resources/css/app.css here
+ * (app.css wipes the default palette Filament's colours rely on).
+ */
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
