@@ -93,7 +93,17 @@ it('F3 + F4: creates a monthly series that the public calendar lists date by dat
         ->click(Uat::role('radio', 'Paid'))
         ->fill('[id="form.price_text"]', '£2 per person')
         ->fill('[id="form.organiser_name"]', 'The Griffin')
-        ->fill('[id="form.organiser_contact"]', 'quiz@example.test')
+        ->fill('[id="form.organiser_contact"]', 'quiz@example.test');
+
+    Uat::settleFields($page, [
+        'form.title' => 'UAT Quiz Night',
+        'form.description' => 'Monthly pub quiz. Teams of up to six.',
+        'form.start_time' => '19:30',
+        'form.end_time' => '22:00',
+        'form.price_text' => '£2 per person',
+        'form.organiser_name' => 'The Griffin',
+        'form.organiser_contact' => 'quiz@example.test',
+    ])
         ->click('[id="key-bindings-1"]')
         ->waitForText('Created')
         ->assertPathIs('/admin/events')

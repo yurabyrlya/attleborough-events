@@ -4,6 +4,7 @@ use App\Models\Event;
 use App\Models\EventOccurrence;
 use Carbon\CarbonImmutable;
 use Dom\HTMLDocument;
+use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Testing\TestResponse;
@@ -38,11 +39,16 @@ pest()->extend(TestCase::class)
  * pestphp/pest-plugin-browser. The app is served in-process, so time travel,
  * RefreshDatabase and actingAs() apply to the browser's requests. Uses the
  * built assets in public/build (run `npm run build` first).
+ *
+ * The in-process server reuses one container, so scoped singletons (e.g.
+ * Filament's NavigationManager and its badges) would otherwise outlive a
+ * request. Forget them after each one, as PHP-FPM and Octane effectively do.
  */
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
     ->beforeEach(function () {
         Http::preventStrayRequests();
+        $this->app['events']->listen(RequestHandled::class, fn () => app()->forgetScopedInstances());
     })
     ->in('Browser');
 

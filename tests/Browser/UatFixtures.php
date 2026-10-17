@@ -96,7 +96,10 @@ final class UatFixtures
      */
     public static function settleFields(mixed $page, array $valuesById, int $attempts = 5): mixed
     {
-        for ($attempt = 0; $attempt < $attempts; $attempt++) {
+        $attempts = max(1, $attempts);
+        $stale = $valuesById;
+
+        for ($attempt = 1; $attempt <= $attempts; $attempt++) {
             $page->wait(0.2);
 
             $stale = array_filter(
@@ -107,6 +110,10 @@ final class UatFixtures
 
             if ($stale === []) {
                 return $page;
+            }
+
+            if ($attempt === $attempts) {
+                break;
             }
 
             foreach ($stale as $id => $value) {

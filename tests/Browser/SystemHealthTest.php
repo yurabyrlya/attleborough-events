@@ -33,6 +33,18 @@ it('F10: shows stale workers in words', function () {
         ->assertNoJavaScriptErrors();
 });
 
+/**
+ * JS expression: the System health sidebar badge shows $count (null = no badge).
+ */
+function failedJobsBadgeIs(?string $count): string
+{
+    $badge = '[...document.querySelectorAll(".fi-sidebar-item")].find((i) => i.textContent.includes("System health"))?.querySelector(".fi-sidebar-item-badge-ctn")';
+
+    return $count === null
+        ? '!'.$badge
+        : '('.$badge.'?.textContent.trim() === '.json_encode($count).')';
+}
+
 it('F10: retries and deletes failed jobs from the page', function () {
     OpsFixtures::beatAgo(Heartbeat::SCHEDULER, 10);
     OpsFixtures::beatAgo(Heartbeat::QUEUE, 10, ['latency_seconds' => 1]);
@@ -51,6 +63,8 @@ it('F10: retries and deletes failed jobs from the page', function () {
         ->waitForText('Send this job back to the queue. The worker runs it again within a few seconds.')
         ->click(Uat::role('button', 'Confirm'))
         ->waitForText('Sent back to the queue');
+    // The sidebar badge follows the count without a reload (refresh-sidebar).
+    Uat::waitUntil($page, failedJobsBadgeIs('1'));
 
     $page->click('tr:has-text("Drill failure two") >> '.Uat::role('button', 'Delete'))
         ->waitForText('This removes the record of the failure. It cannot be undone.')
@@ -58,6 +72,7 @@ it('F10: retries and deletes failed jobs from the page', function () {
         ->waitForText('Failed job deleted')
         ->waitForText('No failed jobs')
         ->assertNoJavaScriptErrors();
+    Uat::waitUntil($page, failedJobsBadgeIs(null));
 
     expect(DB::table('failed_jobs')->count())->toBe(0)
         ->and(DB::table('jobs')->count())->toBe(1);

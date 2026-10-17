@@ -116,7 +116,8 @@ it('F6: moves every date when only the time changes and keeps date statuses', fu
         ->not->toContain('Does not repeat');
     $page->assertSee('To stop it repeating, set a last date or hide it.');
 
-    $page->fill('[id="form.start_time"]', '20:00')
+    $page->fill('[id="form.start_time"]', '20:00');
+    Uat::settleFields($page, ['form.start_time' => '20:00'])
         ->click(Uat::role('button', 'Save changes'))
         ->waitForText('Saved')
         ->waitForText('Fri 30 Oct, 8pm')
