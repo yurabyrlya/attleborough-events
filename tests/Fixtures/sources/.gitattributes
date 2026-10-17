@@ -1,0 +1,6 @@
+# Fixtures are the raw bytes as fetched (D-14, sha256_raw in manifest.json):
+# never normalise line endings (ICS uses CRLF by RFC 5545; some feeds do too).
+*.ics -text
+*.json -text
+*.html -text
+*.xml -text

@@ -17,6 +17,7 @@ tests/Fixtures/sources/
 - `{YYYY-MM-DD}`: the capture date (UTC).
 - `{type}`: what the file is, so two captures of one source on one day never collide: `ical`, `feed`, `tec-p1`, `tec-p2` (one file per page of one TEC date window, all pages captured), `jsonld` (the HTML page holding the JSON-LD), `events-page` (server-rendered HTML for selectors), `wide` suffix for a second, wider window (e.g. `2026-10-17-ical-wide.ics`).
 - Prefer a window that spans a DST change (Sun 25 Oct 2026, Sun 28 Mar 2027).
+- `tests/Fixtures/sources/.gitattributes` marks `*.ics`, `*.json`, `*.html` and `*.xml` as `-text`, so the repo-wide `* text=auto eol=lf` never rewrites CRLF line endings. An unredacted fixture must hash to its `sha256_raw`.
 
 ## manifest.json
 
