@@ -44,12 +44,11 @@ function repeatsOptions(mixed $page): array
 }
 
 it('F0: logs the admin in to the panel', function () {
-    // Livewire only records wire:model input once booted; filling earlier is
-    // lost on the next re-render (seen on a cold CI runner).
-    visit('/admin/login')
-        ->waitForEvent('networkidle')
+    $page = visit('/admin/login')
         ->fill(Uat::label('Email address'), $this->admin->email)
-        ->fill('[id="form.password"]', Uat::PASSWORD)
+        ->fill('[id="form.password"]', Uat::PASSWORD);
+
+    Uat::settleFields($page, ['form.email' => $this->admin->email, 'form.password' => Uat::PASSWORD])
         ->click(Uat::role('button', 'Sign in'))
         ->waitForText('Dashboard')
         ->assertPathIs('/admin')
