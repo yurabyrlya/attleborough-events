@@ -5,6 +5,7 @@ namespace App\Publishing\Actions;
 use App\Enums\EventStatus;
 use App\Models\Event;
 use App\Models\User;
+use App\Publishing\AdminGate;
 use App\Publishing\Exceptions\InvalidStatusTransition;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -31,7 +32,8 @@ final class ChangeEventStatus
      */
     public function __invoke(Event $event, EventStatus $to, User $actor): Event
     {
-        $this->authorize($actor);
+        // Defence in depth beside the panel gate (T-01-30).
+        AdminGate::authorize($actor, 'Only the admin can change event status.');
 
         [$changed, $from] = DB::transaction(function () use ($event, $to, $actor): array {
             $locked = Event::query()->whereKey($event->id)->lockForUpdate()->firstOrFail();
@@ -57,17 +59,5 @@ final class ChangeEventStatus
         ]);
 
         return $changed->refresh();
-    }
-
-    /**
-     * Defence in depth beside the panel gate (T-01-30).
-     */
-    private function authorize(User $actor): void
-    {
-        $adminEmail = config('app.admin_email');
-
-        if (! is_string($adminEmail) || $adminEmail === '' || strcasecmp($actor->email, $adminEmail) !== 0) {
-            throw new AuthorizationException('Only the admin can change event status.');
-        }
     }
 }

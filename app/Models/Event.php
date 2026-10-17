@@ -46,15 +46,17 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property CarbonImmutable|null $status_changed_at
  * @property int|null $status_changed_by
  *
- * status after publish, status_changed_at and status_changed_by are written
- * only by App\Publishing\Actions\ChangeEventStatus (audit columns are never
- * fillable).
+ * Publishing-state and audit columns are never fillable: status, origin,
+ * approved_by and approved_at are written only via forceFill by
+ * App\Publishing\Actions\PublishEvent (WR-07); status after publish,
+ * status_changed_at and status_changed_by only via forceFill by
+ * App\Publishing\Actions\ChangeEventStatus.
  */
 #[Fillable([
     'title', 'slug', 'description', 'category_id', 'venue_id', 'family_friendly',
     'price_type', 'price_text', 'organiser_name', 'organiser_contact', 'source_url',
     'source_note', 'timezone', 'all_day', 'start_date', 'start_time', 'end_date',
-    'end_time', 'recurrence_rule', 'status', 'origin', 'approved_by', 'approved_at',
+    'end_time', 'recurrence_rule',
 ])]
 class Event extends Model
 {

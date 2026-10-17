@@ -6,6 +6,7 @@ use App\Enums\OccurrenceStatus;
 use App\Models\Event;
 use App\Models\EventOccurrence;
 use App\Models\User;
+use App\Publishing\AdminGate;
 use App\Publishing\Exceptions\InvalidStatusTransition;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -32,7 +33,8 @@ final class ChangeOccurrenceStatus
      */
     public function __invoke(EventOccurrence $occurrence, OccurrenceStatus $to, User $actor): EventOccurrence
     {
-        $this->authorize($actor);
+        // Defence in depth beside the panel gate (T-01-30).
+        AdminGate::authorize($actor, 'Only the admin can change occurrence status.');
 
         [$changed, $from] = DB::transaction(function () use ($occurrence, $to, $actor): array {
             Event::query()->whereKey($occurrence->event_id)->lockForUpdate()->firstOrFail();
@@ -61,17 +63,5 @@ final class ChangeOccurrenceStatus
         ]);
 
         return $changed->refresh();
-    }
-
-    /**
-     * Defence in depth beside the panel gate (T-01-30).
-     */
-    private function authorize(User $actor): void
-    {
-        $adminEmail = config('app.admin_email');
-
-        if (! is_string($adminEmail) || $adminEmail === '' || strcasecmp($actor->email, $adminEmail) !== 0) {
-            throw new AuthorizationException('Only the admin can change occurrence status.');
-        }
     }
 }

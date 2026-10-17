@@ -5,6 +5,7 @@ namespace App\Publishing\Actions;
 use App\Calendar\OccurrenceGenerator;
 use App\Models\Event;
 use App\Models\User;
+use App\Publishing\AdminGate;
 use App\Publishing\Data\PublishableEventData;
 use App\Publishing\EventSlugger;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -34,7 +35,8 @@ final class UpdatePublishedEvent
      */
     public function __invoke(Event $event, PublishableEventData $data, User $editor): Event
     {
-        $this->authorize($editor);
+        // Defence in depth beside the panel gate (T-01-20).
+        AdminGate::authorize($editor, 'Only the admin can edit events.');
 
         return DB::transaction(function () use ($event, $data): Event {
             $locked = Event::query()->whereKey($event->id)->lockForUpdate()->firstOrFail();
@@ -48,17 +50,5 @@ final class UpdatePublishedEvent
 
             return $locked->refresh();
         });
-    }
-
-    /**
-     * Defence in depth beside the panel gate (T-01-20).
-     */
-    private function authorize(User $editor): void
-    {
-        $adminEmail = config('app.admin_email');
-
-        if (! is_string($adminEmail) || $adminEmail === '' || strcasecmp($editor->email, $adminEmail) !== 0) {
-            throw new AuthorizationException('Only the admin can edit events.');
-        }
     }
 }

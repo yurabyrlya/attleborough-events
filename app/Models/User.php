@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Publishing\AdminGate;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -21,14 +22,11 @@ class User extends Authenticatable implements FilamentUser
 
     /**
      * Single-admin panel (ADM-01): only the configured ADMIN_EMAIL may enter.
+     * The rule lives once, in App\Publishing\AdminGate.
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        $adminEmail = config('app.admin_email');
-
-        return is_string($adminEmail)
-            && $adminEmail !== ''
-            && strcasecmp($this->email, $adminEmail) === 0;
+        return AdminGate::allows($this);
     }
 
     /**

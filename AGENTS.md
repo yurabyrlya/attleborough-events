@@ -55,7 +55,7 @@ These rules are specific to "What's On Attleborough" (repo `attleborough-events`
 - Actions are `Filament\Actions\*`. Table action tests use `Filament\Actions\Testing\TestAction::make('name')->table($record)`.
 - Enums implement `Filament\Support\Contracts\HasLabel` (and `HasColor` for statuses).
 - Resources live in `app/Filament/Resources/{Plural}/` with `Schemas/` and `Tables/` subfolders.
-- Panel access: single admin, `User::canAccessPanel()` checks `config('app.admin_email')`. No registration or password reset.
+- Panel access: single admin. `User::canAccessPanel()` delegates to `App\Publishing\AdminGate::allows()`, the one case-insensitive ADMIN_EMAIL rule, which PublishEvent, UpdatePublishedEvent, ChangeEventStatus and ChangeOccurrenceStatus also enforce via `AdminGate::authorize()`. No registration or password reset.
 
 ## Public site
 
