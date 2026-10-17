@@ -232,6 +232,14 @@ class EventForm
                         TextInput::make('organiser_contact')
                             ->label('Organiser contact')
                             ->maxLength(255),
+                        TextInput::make('organiser_website')
+                            ->label('Organiser website')
+                            ->url()
+                            ->maxLength(2048),
+                        Toggle::make('contact_public')
+                            ->label('Show contact publicly')
+                            ->helperText("Turn off to keep the organiser's email or phone for admin use only.")
+                            ->default(true),
                         TextInput::make('source_url')
                             ->label('Source URL')
                             ->url()

@@ -100,5 +100,25 @@ it('creates an all-day multi-day event with price, family-friendly and source no
         ->and($event->price_text)->toBe('Free entry')
         ->and($event->organiser_name)->toBe('Attleborough Lions')
         ->and($event->source_note)->toBe('Flyer at the town hall')
-        ->and(EventOccurrence::where('event_id', $event->id)->count())->toBe(1);
+        ->and(EventOccurrence::where('event_id', $event->id)->count())->toBe(1)
+        // D-03: admin entry shows the contact publicly unless turned off.
+        ->and($event->contact_public)->toBeTrue()
+        ->and($event->organiser_website)->toBeNull();
+});
+
+it('stores contact_public false and the organiser website when the admin sets them', function () {
+    livewire(CreateEvent::class)
+        ->fillForm([
+            ...$this->base,
+            'organiser_website' => 'https://club.example/events',
+            'contact_public' => false,
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $event = Event::sole();
+
+    expect($event->contact_public)->toBeFalse()
+        ->and($event->organiser_website)->toBe('https://club.example/events')
+        ->and(DB::selectOne('select contact_public from events')->contact_public)->toBeFalse();
 });

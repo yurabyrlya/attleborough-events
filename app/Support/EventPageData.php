@@ -64,7 +64,8 @@ final readonly class EventPageData
         $first = $dates->first();
         $prefix = $isCancelled ? 'Cancelled: ' : '';
         $venue = $event->venue;
-        $contact = self::blankToNull($event->organiser_contact);
+        // D-03 (T-02-11): the contact reaches residents only with consent.
+        $contact = $event->contact_public ? self::blankToNull($event->organiser_contact) : null;
         $source = SafeLinks::http($event->source_url);
 
         return new self(

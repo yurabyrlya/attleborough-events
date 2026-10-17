@@ -37,7 +37,9 @@ final readonly class OccurrenceCardData
         $event = $occurrence->event;
         $source = SafeLinks::http($event->source_url);
         $sourceUrl = $source['url'] ?? null;
-        $contact = $sourceUrl === null ? self::blankToNull($event->organiser_contact) : null;
+        // Source URL first; the contact is the fallback only when the
+        // organiser agreed to show it (contact_public, D-03 / T-02-11).
+        $contact = $sourceUrl === null && $event->contact_public ? self::blankToNull($event->organiser_contact) : null;
 
         return new self(
             title: $event->title,

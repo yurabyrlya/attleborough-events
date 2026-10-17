@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\DraftKind;
 use App\Enums\EventOrigin;
 use App\Enums\EventStatus;
 use App\Enums\PriceType;
@@ -30,6 +31,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string|null $price_text
  * @property string|null $organiser_name
  * @property string|null $organiser_contact
+ * @property string|null $organiser_website
+ * @property bool $contact_public
  * @property string|null $source_url
  * @property string|null $source_note
  * @property string $timezone
@@ -54,8 +57,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  */
 #[Fillable([
     'title', 'slug', 'description', 'category_id', 'venue_id', 'family_friendly',
-    'price_type', 'price_text', 'organiser_name', 'organiser_contact', 'source_url',
-    'source_note', 'timezone', 'all_day', 'start_date', 'start_time', 'end_date',
+    'price_type', 'price_text', 'organiser_name', 'organiser_contact', 'organiser_website',
+    'contact_public', 'source_url', 'source_note', 'timezone', 'all_day', 'start_date', 'start_time', 'end_date',
     'end_time', 'recurrence_rule',
 ])]
 class Event extends Model
@@ -71,7 +74,19 @@ class Event extends Model
         'family_friendly' => false,
         'all_day' => false,
         'price_type' => 'unknown',
+        // D-19: Phase 1 events and admin entry show the contact publicly.
+        'contact_public' => true,
     ];
+
+    /**
+     * The approved "new event" draft this event was published from (D-07).
+     *
+     * @return HasOne<EventDraft, $this>
+     */
+    public function draft(): HasOne
+    {
+        return $this->hasOne(EventDraft::class)->where('kind', DraftKind::New);
+    }
 
     /**
      * @return HasMany<EventOccurrence, $this>
@@ -144,6 +159,7 @@ class Event extends Model
         return [
             'family_friendly' => 'boolean',
             'all_day' => 'boolean',
+            'contact_public' => 'boolean',
             'price_type' => PriceType::class,
             'status' => EventStatus::class,
             'origin' => EventOrigin::class,

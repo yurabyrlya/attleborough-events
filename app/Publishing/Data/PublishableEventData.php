@@ -38,6 +38,10 @@ final readonly class PublishableEventData
         public ?string $priceText = null,
         public ?string $organiserName = null,
         public ?string $organiserContact = null,
+        public ?string $organiserWebsite = null,
+        // D-03: whether residents may see organiserContact. Admin entry
+        // defaults to true; submissions arrive false and keep it.
+        public bool $contactPublic = true,
         public ?string $sourceUrl = null,
         public ?string $sourceNote = null,
         public string $timezone = 'Europe/London',
@@ -154,6 +158,8 @@ final readonly class PublishableEventData
             priceText: self::nullableString($data['price_text'] ?? null),
             organiserName: self::nullableString($data['organiser_name'] ?? null),
             organiserContact: self::nullableString($data['organiser_contact'] ?? null),
+            organiserWebsite: self::nullableString($data['organiser_website'] ?? null),
+            contactPublic: (bool) ($data['contact_public'] ?? true),
             sourceUrl: self::nullableString($data['source_url'] ?? null),
             sourceNote: self::nullableString($data['source_note'] ?? null),
             timezone: (string) config('calendar.timezone', 'Europe/London'),
@@ -218,6 +224,9 @@ final readonly class PublishableEventData
             priceText: self::nullableString($draft->price_text),
             organiserName: self::nullableString($draft->organiser_name),
             organiserContact: self::nullableString($draft->organiser_contact),
+            // D-03: the organiser's visibility choice is carried to the event.
+            organiserWebsite: self::nullableString($draft->organiser_website),
+            contactPublic: $draft->contact_public,
             sourceUrl: self::nullableString($draft->source_url),
             sourceNote: self::nullableString($draft->source_note),
             timezone: $draft->timezone,
@@ -246,6 +255,8 @@ final readonly class PublishableEventData
         $attributes = $event->attributesToArray();
         $attributes['start_date'] = $event->start_date->format('Y-m-d');
         $attributes['end_date'] = $event->end_date?->format('Y-m-d');
+        $attributes['organiser_website'] = $event->organiser_website;
+        $attributes['contact_public'] = $event->contact_public;
 
         $recurrence = self::editableRecurrence($event) ?? new ManualRecurrence;
 
@@ -309,6 +320,8 @@ final readonly class PublishableEventData
             'price_text' => $this->priceText,
             'organiser_name' => $this->organiserName,
             'organiser_contact' => $this->organiserContact,
+            'organiser_website' => $this->organiserWebsite,
+            'contact_public' => $this->contactPublic,
             'source_url' => $this->sourceUrl,
             'source_note' => $this->sourceNote,
             'timezone' => $this->timezone,
