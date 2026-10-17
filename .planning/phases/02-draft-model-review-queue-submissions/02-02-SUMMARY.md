@@ -223,3 +223,61 @@ None. The "pending" items in the doc are owner follow-ups, not code stubs.
 - All 5 commits (`3e33854`, `1b46b57`, `bec30bd`, `ddbed75`, `28ec652`) are ancestors of HEAD.
 - Committed fixture blobs hash to the manifest's `sha256_raw`.
 - `./vendor/bin/pest --testsuite=Unit` passed (125 tests).
+
+## Post-completion owner decisions (2026-10-17 evening, D-23..D-26)
+
+After the plan closed, the owner recorded D-23..D-26 in `02-CONTEXT.md`, then revised D-25 and D-26 after probing from a home network. The follow-up below applies them. RES-01..03 stay complete; the inventory, fixtures and tooling grew.
+
+**Inventory now** (`docs/research/event-sources.md`):
+
+- **List 1: 10 sources**
+  - P0: Attleborough Baptist Church (ICS + dated RSS), Attleborough Town Council (TEC REST + iCal, the first local TEC install)
+  - P1: Attleborough Academy (ICS, written permission held by the owner, D-24), Attleborough Heritage Group (server-rendered selectors, D-23), Attleborough Primary School (method unknown; fixtures pending behind `Crawl-delay: 12000`)
+  - P2: Visit Norfolk and Visit Wymondham (JSON-LD, geofenced, D-23)
+  - P3: Attleborough Players, Attleborough Summer Carnival, Banham Zoo (legally cleared under D-23, no deterministic method, so manual entry)
+- **List 2: 9 sources**
+  - Bot wall: Breckland Council, Norfolk County Council, Norfolk Museums, TicketSource. They challenge our honest User-Agent on the corporate network and the home network alike (D-25 routes only: official feeds/APIs, Cloudflare Verified Bots in Phase 5, allowlisting, hand-captured fixtures).
+  - Facebook; Snetterton (JS-rendered); Attleborough Town FC (robots-disallowed; its home games come through the Town Council feed); Eastern Daily Press and Eventbrite (ToS-prohibited).
+- **Excluded:** Attleborough u3a (HTTPS fails from both networks; HTTP serves an empty holding page).
+
+**Fixtures added** (all P0/P1 List 1 sources except Attleborough Primary):
+
+- `tests/Fixtures/sources/attleborough-town-council/2026-10-17-tec-p1.json`, `2026-10-17-tec-p2.json` (both pages of 19 Oct – 22 Nov, 72 events) and `2026-10-17-ical.ics` (30 events).
+  - Captured from the home network.
+  - **Redacted:** two private individuals' names (in titles, slugs, URLs and organiser records) and every organiser email and phone number. 26 emails, 17 phones and 66 name occurrences in the REST pages; 8 emails and 9 names in the ICS.
+  - JSON re-encoded, ICS re-folded at 75 octets, `modified: true`, `sha256_raw` of the originals.
+- `tests/Fixtures/sources/attleborough-academy/2026-10-17-ical.ics`: 59 events, spans both DST changes. No personal data found, unmodified. UIDs are unstable (row number + request time).
+- `tests/Fixtures/sources/attleborough-heritage-group/2026-10-17-events-page.html`: one event, no personal data, unmodified.
+
+**New files:**
+
+- `ops/probe-sources.sh`: bash + curl, honest User-Agent. It checks the path against robots.txt (own group or `*`, longest match), honours `Crawl-delay` across runs, saves D-14 names with manifest entries and sha256, and records `blocked` for challenges without saving them. `bash -n` passes; shellcheck isn't installed here. A live test run gave: Town Council "exists", Primary "deferred until 23:05", Breckland and TicketSource "blocked".
+- `tests/Fixtures/sources/README.md`: new "How to run at home" section, plus `capture: hand` and `network` manifest fields.
+- `docs/research/town-council-feed-request.md`: a courtesy and contingency email to the Town Clerk. It asks for an explicit yes to listing public events, and for crawler allowlisting if the production datacenter IP is blocked.
+
+**Findings worth knowing:**
+
+- **Town Council terms of use** (https://attleboroughtc.org.uk/terms-of-use) contain standard copyright wording that materials "may not be copied, reproduced, republished … or distributed". They say nothing about automated access, and the site advertises its own iCal feed. I recorded it as `factual_extract_only` under the owner's D-26 decision, with legal risk "medium until the clerk confirms". The email asks for that confirmation.
+- **Town Council production risk:** its LiteSpeed check blocked the corporate IP but not the residential one, so a Hetzner datacenter IP may be blocked. The clerk email is the contingency.
+- **Organiser data:** the Town Council REST and ICS feeds expose organisers' private names, Gmail addresses and mobile numbers. Phase 3 must never copy organiser contact fields to public pages.
+
+**Process deviation:**
+
+- The live test run of `ops/probe-sources.sh` fetched `https://www.attleboroughprimary.org/robots.txt` about 35 minutes after my earlier homepage request. The earlier request had gone to the bare domain and redirected to `www`, and the script's per-host state didn't know about it, so the robots.txt request fell inside that host's `Crawl-delay: 12000`. No page was fetched (the script deferred the calendar request). The script now caches robots.txt for 24 h, so it won't happen again.
+
+**Follow-up commits:**
+
+1. `fbfff6d` test(02-02): P1 fixtures for Attleborough Academy (ICS) and Heritage Group (events page)
+2. `1f253b3` test(02-02): P0 TEC fixtures for Attleborough Town Council (first local TEC install)
+3. `9745ce8` feat(02-02): polite source probe script for re-checks and new sources
+4. `915bbd4` docs(02-02): courtesy/contingency email draft to the Town Clerk
+5. `ef33b01` docs(02-02): apply owner decisions D-23..D-26 to the source inventory
+
+**Still with the owner:**
+
+1. Run `ops/probe-sources.sh attleborough-primary-school` after 23:05 BST, then read and redact the capture before committing (or hand it to the agent).
+2. Optionally send the courtesy email to the Town Clerk.
+3. Local URLs for the empty categories (St Mary's, Connaught Hall, Rosecroft, Rotary/Lions, businesses and farms, pubs and venues, other local TEC sites, Facebook-only groups).
+4. Optionally pursue a D-25 route for TicketSource, e.g. ask local organisers about the organiser API.
+
+Post-completion checks: privacy test 18/18 green, full Unit suite 125/125 green. The committed fixture blobs match their manifests (`sha256_raw` for unmodified files, valid JSON and ICS after redaction).

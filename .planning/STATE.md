@@ -100,7 +100,7 @@ None yet.
 ### Blockers/Concerns
 
 - [Phase 5]: Domain registration + VPS deferred (name decided: whatsonattleborough.co.uk; .co.uk availability unconfirmed)
-- [Phase 2→3]: Inventory verified (02-02): one List 1 source (Attleborough Baptist Church, P0, ICS + dated RSS, fixtures saved). Still open with the owner: local URLs for empty categories, 8 permission asks, home-network check of 5 bot walls (see docs/research/event-sources.md "Owner hand-off"). Phase 3 can start on ICS/dated RSS; TEC and JSON-LD have no cleared local source yet
+- [Phase 2→3]: Inventory verified (02-02 + owner decisions D-23..D-26): List 1 has 10 sources (P0: Baptist Church ICS/RSS, Town Council TEC; P1: Academy ICS, Heritage Group selectors, Primary pending Crawl-delay) with redacted fixtures; 4 Cloudflare sites stay List 2 (D-25 routes). Open with the owner: Primary capture via ops/probe-sources.sh, optional clerk email (Town Council may block the Hetzner datacenter IP), local URLs for empty categories
 - [Phase 5]: Umami Cloud UK GDPR data region / DPA unverified (fallback: Plausible)
 - [Phase 5]: Configure trusted proxies (Caddy / Cloudflare) so per-IP rate limiting on /submit and Turnstile hostname/remoteip checks see the real client IP (Phase 2 research)
 - [Phase 3]: Crawling needs a real User-Agent contact/about URL; until Phase 5 is live use a config placeholder (e.g. CRAWLER_CONTACT_URL in config/site.php / .env) and swap in the live URL at launch
