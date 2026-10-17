@@ -1,6 +1,7 @@
 <?php
 
 use App\Jobs\QueueHeartbeat;
+use App\Models\EventDraft;
 use App\Models\Heartbeat;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -14,6 +15,15 @@ Artisan::command('inspire', function () {
 // 01:00-02:00 DST transition hour (REC-01).
 Schedule::command('calendar:sync-occurrences')
     ->dailyAt('03:10')
+    ->timezone('Europe/London')
+    ->withoutOverlapping();
+
+// Rejected-draft retention (D-12, published on /privacy): hard-delete
+// rejected drafts 30 days after rejection for spam, 90 days otherwise (see
+// EventDraft::prunable()). Pending and approved drafts are never pruned.
+// 03:40 London avoids the 01:00-02:00 DST transition hour.
+Schedule::command('model:prune', ['--model' => [EventDraft::class]])
+    ->dailyAt('03:40')
     ->timezone('Europe/London')
     ->withoutOverlapping();
 

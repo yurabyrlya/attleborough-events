@@ -7,12 +7,14 @@ use App\Enums\EventOrigin;
 use App\Enums\ExtractionMethod;
 use App\Enums\PriceType;
 use App\Enums\QualityBand;
+use App\Enums\RejectReason;
 use App\Enums\ReviewStatus;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\EventDraft;
 use App\Models\Venue;
 use App\Review\ReferenceCode;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -152,6 +154,19 @@ class EventDraftFactory extends Factory
     public function duplicateOf(Event $event): static
     {
         return $this->state(['duplicate_of_event_id' => $event->id]);
+    }
+
+    /**
+     * Rejected at the given instant (stored UTC), with no reviewer: the
+     * shape the retention prune works on (D-12).
+     */
+    public function rejected(RejectReason $reason, CarbonImmutable $at): static
+    {
+        return $this->state([
+            'review_status' => ReviewStatus::Rejected,
+            'reject_reason' => $reason,
+            'reviewed_at' => $at->utc(),
+        ]);
     }
 
     /**

@@ -7,11 +7,14 @@ use App\Enums\EventOrigin;
 use App\Enums\ExtractionMethod;
 use App\Enums\PriceType;
 use App\Enums\QualityBand;
+use App\Enums\RejectReason;
 use App\Enums\ReviewStatus;
 use Carbon\CarbonImmutable;
 use Database\Factories\EventDraftFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -21,8 +24,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * every schedule and venue field may be empty (D-01).
  *
  * Field data is written only by App\Review\DraftWriter; review state only by
- * the review actions in App\Publishing\Actions (ApproveDraft, later
- * RejectDraft / ReopenDraft).
+ * the review actions in App\Publishing\Actions (ApproveDraft, RejectDraft,
+ * ReopenDraft).
  *
  * @property int $id
  * @property string $reference
@@ -67,7 +70,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property QualityBand|null $quality_band
  * @property list<string> $quality_reasons
  * @property list<string> $parse_errors
- * @property string|null $reject_reason
+ * @property RejectReason|null $reject_reason
  * @property string|null $review_notes
  * @property int|null $reviewed_by
  * @property CarbonImmutable|null $reviewed_at
@@ -92,6 +95,8 @@ class EventDraft extends Model
 {
     /** @use HasFactory<EventDraftFactory> */
     use HasFactory;
+
+    use MassPrunable;
 
     /**
      * Mirrors the migration defaults.
@@ -165,6 +170,38 @@ class EventDraft extends Model
     }
 
     /**
+     * Retention for rejected drafts (D-12, published on /privacy): hard-delete
+     * a rejected draft review.retention_days.spam days after rejection when
+     * the reason is spam, review.retention_days.default days otherwise.
+     * Run daily by `model:prune` (routes/console.php).
+     *
+     * One-way: purged personal data cannot be recovered. Only rejected drafts
+     * are ever matched; pending and approved drafts (the audit trail behind
+     * published events) are never pruned. Cutoffs are UTC instants compared
+     * with the UTC reviewed_at column.
+     *
+     * @return Builder<self>
+     */
+    public function prunable(): Builder
+    {
+        $now = CarbonImmutable::now()->utc();
+        $spamCutoff = $now->subDays((int) config('review.retention_days.spam'));
+        $defaultCutoff = $now->subDays((int) config('review.retention_days.default'));
+
+        return static::query()
+            ->where('review_status', ReviewStatus::Rejected)
+            ->whereNotNull('reviewed_at')
+            ->where(function (Builder $query) use ($spamCutoff, $defaultCutoff): void {
+                $query
+                    ->where(function (Builder $spam) use ($spamCutoff): void {
+                        $spam->where('reject_reason', RejectReason::Spam)
+                            ->where('reviewed_at', '<', $spamCutoff);
+                    })
+                    ->orWhere('reviewed_at', '<', $defaultCutoff);
+            });
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array
@@ -186,6 +223,7 @@ class EventDraft extends Model
             'quality_band' => QualityBand::class,
             'quality_reasons' => 'array',
             'parse_errors' => 'array',
+            'reject_reason' => RejectReason::class,
             'raw_payload' => 'array',
             'consented_at' => 'immutable_datetime',
             'reviewed_at' => 'immutable_datetime',
