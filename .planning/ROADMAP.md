@@ -99,7 +99,6 @@ Plans:
 ### Phase 3: Ingestion Backbone, ICS & Change/Duplicate Handling
 
 **Goal**: The admin can register ICS sources that are fetched politely on a schedule. Each run turns new, changed, cancelled and missing items into the right drafts with duplicate warnings, and source health is visible. Nothing published is ever lost to a source failure.
-**Mode:** mvp
 **Depends on**: Phase 2
 **Requirements**: SRC-01, SRC-03, SRC-04, SRC-05, SRC-06, SRC-07, SRC-08, SRC-09, EXT-01, EXT-07, PIPE-01, PIPE-05, PIPE-06, PIPE-07, PIPE-08, PIPE-09, REV-05, REV-06, REV-07, LEG-04
 **Success Criteria** (what must be TRUE):
