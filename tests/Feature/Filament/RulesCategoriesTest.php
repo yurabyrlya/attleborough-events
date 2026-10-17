@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Review\Exceptions\RulesNotSaved;
 use App\Review\SaveRules;
 use Database\Seeders\CategorySeeder;
+use Filament\Actions\Testing\TestAction;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
@@ -195,6 +196,17 @@ it('renames a category from the Rules screen and keeps its slug', function () {
         ->assertNotified('Rules saved');
 
     expect($music->refresh())->name->toBe('Music & Gigs')->slug->toBe('music');
+});
+
+it('shows no delete button on the Other row', function () {
+    actingAs($this->admin);
+    $page = livewire(Rules::class);
+    $categories = collect($page->get('data.categories'));
+    $otherKey = $categories->search(fn (array $row): bool => $row['slug'] === 'other');
+    $musicKey = $categories->search(fn (array $row): bool => $row['slug'] === 'music');
+
+    $page->assertActionHidden(TestAction::make('delete')->schemaComponent('categories', 'form')->arguments(['item' => $otherKey]))
+        ->assertActionVisible(TestAction::make('delete')->schemaComponent('categories', 'form')->arguments(['item' => $musicKey]));
 });
 
 it('tells the admin why a save was refused on the Rules screen', function () {

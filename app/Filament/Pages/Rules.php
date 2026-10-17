@@ -73,6 +73,46 @@ class Rules extends Page
             ->components([
                 Tabs::make('Rules')
                     ->tabs([
+                        Tab::make('Categories')
+                            ->schema([
+                                Repeater::make('categories')
+                                    ->hiddenLabel()
+                                    ->helperText('New categories use the generic icon on the public site. Slugs never change because links use them.')
+                                    ->table([
+                                        TableColumn::make('Name'),
+                                        TableColumn::make('Slug'),
+                                        TableColumn::make('Icon'),
+                                        TableColumn::make('Sort'),
+                                    ])
+                                    ->schema([
+                                        Hidden::make('id'),
+                                        TextInput::make('name')
+                                            ->label('Name')
+                                            ->required()
+                                            ->maxLength(SaveRules::CATEGORY_NAME_MAX_LENGTH),
+                                        TextInput::make('slug')
+                                            ->label('Slug')
+                                            ->placeholder('Set from the name')
+                                            ->disabled()
+                                            ->dehydrated(false),
+                                        TextInput::make('icon')
+                                            ->label('Icon')
+                                            ->placeholder(SaveRules::DEFAULT_ICON)
+                                            ->maxLength(100),
+                                        TextInput::make('sort')
+                                            ->label('Sort')
+                                            ->integer()
+                                            ->minValue(0)
+                                            ->maxValue(SaveRules::SORT_MAX)
+                                            ->required(),
+                                    ])
+                                    ->deleteAction(fn (Action $action): Action => $action->hidden(
+                                        fn (array $arguments, Repeater $component): bool => self::isOtherRow($component, $arguments),
+                                    ))
+                                    ->reorderable(false)
+                                    ->addActionLabel('Add category')
+                                    ->defaultItems(0),
+                            ]),
                         Tab::make('Keyword rules')
                             ->schema([
                                 Repeater::make('keyword_rules')
@@ -145,9 +185,34 @@ class Rules extends Page
         $this->fillFromDatabase();
     }
 
+    /**
+     * The Other row has no delete button (SaveRules refuses it anyway).
+     *
+     * @param  array<string, mixed>  $arguments
+     */
+    private static function isOtherRow(Repeater $component, array $arguments): bool
+    {
+        $items = $component->getRawState();
+        $key = $arguments['item'] ?? null;
+
+        return is_array($items) && is_string($key) && (($items[$key]['slug'] ?? null) === 'other');
+    }
+
     private function fillFromDatabase(): void
     {
         $this->form->fill([
+            'categories' => Category::query()
+                ->orderBy('sort')
+                ->orderBy('id')
+                ->get()
+                ->map(fn (Category $category): array => [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'slug' => $category->slug,
+                    'icon' => $category->icon,
+                    'sort' => $category->sort,
+                ])
+                ->all(),
             'keyword_rules' => CategoryKeywordRule::query()
                 ->orderBy('priority')
                 ->orderBy('id')

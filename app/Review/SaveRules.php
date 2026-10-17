@@ -4,23 +4,36 @@ namespace App\Review;
 
 use App\Models\Category;
 use App\Models\CategoryKeywordRule;
+use App\Models\Event;
+use App\Models\EventDraft;
 use App\Models\User;
 use App\Publishing\AdminGate;
 use App\Review\Exceptions\RulesNotSaved;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Normalizer;
 
 /**
  * The one writer behind the Rules screen's "Save rules" (ADM-04).
  *
- * Admin-only. Takes the whole submitted state, checks it against itself
- * (never against the rows already stored), collects every problem and
- * refuses before writing anything; otherwise syncs every section in one
- * transaction. A section missing from the state is left untouched.
+ * Admin-only. Takes the whole submitted state and judges it against itself:
+ * a category is "removed" when it is missing from the submitted list, and
+ * its keyword rules are counted in the submitted keyword list, so removing a
+ * category together with its rules in one save works. Every problem is
+ * collected and the save refused before anything is written; otherwise
+ * every section is synced in one transaction, in this order: upsert
+ * categories → sync keyword rules → delete removed categories. The FK
+ * restrictOnDelete on events/drafts/rules stays the backstop. A section
+ * missing from the state is left untouched.
  *
- * Sections: 'keyword_rules' (rows: id?, keyword, category_id, priority).
+ * Sections:
+ * - 'categories' (rows: id?, name, icon?, sort). Slugs are made from the
+ *   name on create (unique, -2/-3 on collision) and never change, because
+ *   public filter URLs use them. 'other' can't be removed.
+ * - 'keyword_rules' (rows: id?, keyword, category_id, priority).
  */
 final class SaveRules
 {
@@ -31,6 +44,13 @@ final class SaveRules
     public const PRIORITY_MAX = 1000;
 
     public const DEFAULT_PRIORITY = 100;
+
+    public const CATEGORY_NAME_MAX_LENGTH = 60;
+
+    public const SORT_MAX = 9999;
+
+    /** The generic icon new categories get when none is given. */
+    public const DEFAULT_ICON = 'heroicon-o-tag';
 
     /**
      * @param  array<string, mixed>  $state
@@ -43,38 +63,207 @@ final class SaveRules
         // Defence in depth beside the panel gate (T-02-16).
         AdminGate::authorize($actor, 'Only the admin can change rules.');
 
+        $categories = array_key_exists('categories', $state)
+            ? $this->categoryRows($state['categories'])
+            : null;
+
         $keywordRules = array_key_exists('keyword_rules', $state)
             ? $this->keywordRows($state['keyword_rules'])
             : null;
 
-        $problems = $keywordRules === null ? [] : $this->keywordProblems($keywordRules);
+        DB::transaction(function () use ($categories, $keywordRules): void {
+            // Lock first, so the checks and the writes see the same rows.
+            $stored = Category::query()->lockForUpdate()->orderBy('id')->get()->keyBy('id');
 
-        if ($problems !== []) {
-            throw new RulesNotSaved(array_values(array_unique($problems)));
-        }
+            $removed = $categories === null
+                ? collect()
+                : $stored->reject(fn (Category $category): bool => in_array($category->id, array_column($categories, 'id'), true));
 
-        DB::transaction(function () use ($keywordRules): void {
+            $problems = [
+                ...($categories === null ? [] : $this->categoryProblems($categories, $removed, $keywordRules)),
+                ...($keywordRules === null ? [] : $this->keywordProblems($keywordRules, $stored->keys()->all())),
+            ];
+
+            if ($problems !== []) {
+                throw new RulesNotSaved(array_values(array_unique($problems)));
+            }
+
+            if ($categories !== null) {
+                $this->upsertCategories($categories, $stored);
+            }
+
             if ($keywordRules !== null) {
                 $this->syncKeywordRules($keywordRules);
             }
+
+            if ($removed->isNotEmpty()) {
+                Category::query()->whereKey($removed->keys()->all())->delete();
+            }
         });
 
-        // Counts only: never the keywords themselves.
+        // Counts only: never names or keywords.
         Log::info('rules saved', [
             'user_id' => $actor->id,
+            'categories' => $categories === null ? null : count($categories),
             'keyword_rules' => $keywordRules === null ? null : count($keywordRules),
         ]);
     }
 
     /**
-     * The trimmed, NFC, single-spaced form a keyword is stored in. Case is
-     * kept for display; comparisons use CategoryAssigner::normalise().
+     * The trimmed, NFC, single-spaced form keywords and category names are
+     * stored in. Case is kept for display; keyword comparisons use
+     * CategoryAssigner::normalise().
      */
-    public static function cleanKeyword(string $keyword): string
+    public static function cleanText(string $value): string
     {
-        $normalised = Normalizer::normalize($keyword, Normalizer::FORM_C);
+        $normalised = Normalizer::normalize($value, Normalizer::FORM_C);
 
-        return trim((string) preg_replace('/\s+/u', ' ', $normalised === false ? $keyword : $normalised));
+        return trim((string) preg_replace('/\s+/u', ' ', $normalised === false ? $value : $normalised));
+    }
+
+    /**
+     * @return list<array{id: int|null, name: string, icon: string|null, sort: int|null}>
+     */
+    private function categoryRows(mixed $rows): array
+    {
+        if (! is_array($rows)) {
+            return [];
+        }
+
+        $clean = [];
+
+        foreach ($rows as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $icon = is_string($row['icon'] ?? null) ? trim($row['icon']) : '';
+
+            $clean[] = [
+                'id' => self::positiveInt($row['id'] ?? null),
+                'name' => self::cleanText(is_scalar($row['name'] ?? null) ? (string) $row['name'] : ''),
+                'icon' => $icon === '' ? null : $icon,
+                'sort' => self::boundedInt($row['sort'] ?? null, 0, self::SORT_MAX, default: 0),
+            ];
+        }
+
+        return $clean;
+    }
+
+    /**
+     * @param  list<array{id: int|null, name: string, icon: string|null, sort: int|null}>  $rows
+     * @param  Collection<int, Category>  $removed  stored categories missing from the submitted list
+     * @param  list<array{id: int|null, keyword: string, category_id: int|null, priority: int|null}>|null  $keywordRules
+     * @return list<string>
+     */
+    private function categoryProblems(array $rows, Collection $removed, ?array $keywordRules): array
+    {
+        $problems = [];
+
+        foreach ($rows as $row) {
+            $name = $row['name'];
+
+            if ($name === '') {
+                $problems[] = 'Every category needs a name.';
+            } elseif (mb_strlen($name) > self::CATEGORY_NAME_MAX_LENGTH) {
+                $problems[] = "'{$name}' is longer than ".self::CATEGORY_NAME_MAX_LENGTH.' characters.';
+            }
+
+            $label = $name === '' ? 'A category' : "'{$name}'";
+
+            if ($row['icon'] !== null && preg_match('/^[a-z0-9]+(-[a-z0-9]+)*$/', $row['icon']) !== 1) {
+                $problems[] = "{$label} needs an icon name like ".self::DEFAULT_ICON.', or none.';
+            }
+
+            if ($row['sort'] === null) {
+                $problems[] = "{$label} needs a sort number from 0 to ".self::SORT_MAX.'.';
+            }
+        }
+
+        foreach ($removed as $category) {
+            if ($category->slug === 'other') {
+                $problems[] = "The Other category can't be removed.";
+
+                continue;
+            }
+
+            $events = Event::query()->where('category_id', $category->id)->count();
+            $drafts = EventDraft::query()
+                ->where(fn ($query) => $query->where('category_id', $category->id)->orWhere('submitted_category_id', $category->id))
+                ->count();
+
+            $uses = array_filter([
+                $events > 0 ? $events.' '.Str::plural('event', $events) : null,
+                $drafts > 0 ? $drafts.' '.Str::plural('draft', $drafts) : null,
+            ]);
+
+            if ($uses !== []) {
+                $problems[] = "'{$category->name}' is used by ".implode(' and ', $uses).'.';
+            }
+
+            $rules = $keywordRules === null
+                ? CategoryKeywordRule::query()->where('category_id', $category->id)->count()
+                : count(array_filter($keywordRules, fn (array $rule): bool => $rule['category_id'] === $category->id));
+
+            if ($rules > 0) {
+                $problems[] = "'{$category->name}' still has {$rules} ".Str::plural('keyword rule', $rules).'. Move or remove them first.';
+            }
+        }
+
+        return $problems;
+    }
+
+    /**
+     * Update kept categories (never their slug) and create new ones with a
+     * slug made from the name, unique against every stored slug (including
+     * ones about to be removed) and the ones made in this save.
+     *
+     * @param  list<array{id: int|null, name: string, icon: string|null, sort: int|null}>  $rows
+     * @param  Collection<int, Category>  $stored
+     */
+    private function upsertCategories(array $rows, Collection $stored): void
+    {
+        $taken = $stored->pluck('slug')->all();
+
+        foreach ($rows as $row) {
+            $category = $row['id'] === null ? null : $stored->get($row['id']);
+
+            if ($category !== null) {
+                $category->forceFill([
+                    'name' => $row['name'],
+                    'icon' => $row['icon'] ?? $category->icon,
+                    'sort' => $row['sort'],
+                ])->save();
+
+                continue;
+            }
+
+            $slug = self::uniqueSlug($row['name'], $taken);
+            $taken[] = $slug;
+
+            Category::query()->forceCreate([
+                'name' => $row['name'],
+                'slug' => $slug,
+                'icon' => $row['icon'] ?? self::DEFAULT_ICON,
+                'sort' => $row['sort'],
+            ]);
+        }
+    }
+
+    /**
+     * @param  list<string>  $taken
+     */
+    private static function uniqueSlug(string $name, array $taken): string
+    {
+        $base = Str::slug($name);
+        $base = $base === '' ? 'category' : $base;
+        $slug = $base;
+
+        for ($suffix = 2; in_array($slug, $taken, true); $suffix++) {
+            $slug = "{$base}-{$suffix}";
+        }
+
+        return $slug;
     }
 
     /**
@@ -95,9 +284,9 @@ final class SaveRules
 
             $clean[] = [
                 'id' => self::positiveInt($row['id'] ?? null),
-                'keyword' => self::cleanKeyword(is_scalar($row['keyword'] ?? null) ? (string) $row['keyword'] : ''),
+                'keyword' => self::cleanText(is_scalar($row['keyword'] ?? null) ? (string) $row['keyword'] : ''),
                 'category_id' => self::positiveInt($row['category_id'] ?? null),
-                'priority' => self::priority($row['priority'] ?? null),
+                'priority' => self::boundedInt($row['priority'] ?? null, self::PRIORITY_MIN, self::PRIORITY_MAX, default: self::DEFAULT_PRIORITY),
             ];
         }
 
@@ -106,12 +295,12 @@ final class SaveRules
 
     /**
      * @param  list<array{id: int|null, keyword: string, category_id: int|null, priority: int|null}>  $rows
+     * @param  list<int>  $categoryIds  every stored category (a removed one is refused on the category itself)
      * @return list<string>
      */
-    private function keywordProblems(array $rows): array
+    private function keywordProblems(array $rows, array $categoryIds): array
     {
         $problems = [];
-        $categoryIds = Category::query()->pluck('id')->all();
         $seen = [];
 
         foreach ($rows as $row) {
@@ -210,20 +399,20 @@ final class SaveRules
     }
 
     /**
-     * A blank priority takes the default; anything else must be a whole
-     * number in range, or null (a problem).
+     * A blank value takes the default; anything else must be a whole number
+     * in range, or null (a problem).
      */
-    private static function priority(mixed $value): ?int
+    private static function boundedInt(mixed $value, int $min, int $max, int $default): ?int
     {
         if ($value === null || $value === '') {
-            return self::DEFAULT_PRIORITY;
+            return $default;
         }
 
         if (is_string($value) && preg_match('/^\s*\d+\s*$/', $value) === 1) {
             $value = (int) trim($value);
         }
 
-        if (is_int($value) && $value >= self::PRIORITY_MIN && $value <= self::PRIORITY_MAX) {
+        if (is_int($value) && $value >= $min && $value <= $max) {
             return $value;
         }
 
