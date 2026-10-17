@@ -4,7 +4,7 @@
     /**
      * Event page (EVT-01, EVT-02). Renders only EventPageData fields, through
      * escaped echo. Every optional element renders only when its value is
-     * set. Plan 01-10 adds JSON-LD, the Google Calendar link and sharing.
+     * set. The head carries one Event JSON-LD script per listed date.
      *
      * @var \App\Support\EventPageData $page
      */
@@ -15,6 +15,8 @@
 
 @push('head')
     <link rel="canonical" href="{{ $page->canonicalUrl }}">
+    {{-- Event JSON-LD (EVT-03): an HtmlString from App\Seo\EventJsonLd, one script per listed date. --}}
+    {{ $page->jsonLd }}
 @endpush
 
 @push('og')

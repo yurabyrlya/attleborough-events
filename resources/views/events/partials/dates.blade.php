@@ -1,8 +1,8 @@
 @php
     /**
      * Dates list (EVT-01, EVT-06). A series shows "Upcoming dates", a one-off
-     * "When". Cancelled dates say so as text and get no add link. Plan 01-10
-     * adds the Google Calendar link beside the .ics link.
+     * "When". Cancelled dates say so as text and get no add links; every
+     * other date offers the .ics download and a Google Calendar link.
      *
      * @var \App\Support\EventPageData $page
      */
@@ -20,6 +20,7 @@
                         <strong class="text-cancel">Cancelled</strong>
                     @else
                         <a href="{{ $date['icsPath'] }}" rel="nofollow" class="tap-target text-accent underline underline-offset-2">Add to calendar (.ics)<span class="sr-only"> for {{ $date['timeLabel'] }}</span></a>
+                        <a href="{{ $date['googleUrl'] }}" rel="nofollow noopener" class="tap-target text-accent underline underline-offset-2">Google Calendar<span class="sr-only"> for {{ $date['timeLabel'] }}</span></a>
                     @endif
                 </li>
             @endforeach

@@ -2,20 +2,24 @@
 
 namespace App\Support;
 
+use App\Calendar\Export\GoogleCalendarLink;
 use App\Calendar\Export\OccurrenceIcs;
 use App\Calendar\UpcomingDates;
 use App\Enums\EventStatus;
 use App\Models\Event;
 use App\Models\EventOccurrence;
+use App\Seo\EventJsonLd;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\HtmlString;
 
 /**
  * Event page view model (EVT-01, EVT-02). The view renders only these
  * fields, through escaped echo. Blank strings are null everywhere, so an
  * optional field that is not set leaves no label and no element.
  *
- * Absolute URLs come from PublicUrl (config('app.url')) only. Plan 01-10
- * extends the date rows (Google Calendar link) and adds share data.
+ * Absolute URLs come from PublicUrl (config('app.url')) only. Each date
+ * row carries its .ics path and Google Calendar link (EVT-06); jsonLd holds
+ * one Event script per listed date (EVT-03).
  */
 final readonly class EventPageData
 {
@@ -23,7 +27,7 @@ final readonly class EventPageData
 
     /**
      * @param  list<string>  $venueLines
-     * @param  list<array{datetimeIso: string, timeLabel: string, isCancelled: bool, icsPath: string}>  $dates
+     * @param  list<array{datetimeIso: string, timeLabel: string, isCancelled: bool, icsPath: string, googleUrl: string}>  $dates
      */
     public function __construct(
         public string $title,
@@ -49,6 +53,7 @@ final readonly class EventPageData
         public bool $isSeries,
         public array $dates,
         public int $remaining,
+        public HtmlString $jsonLd,
     ) {}
 
     public static function make(Event $event, UpcomingDates $dates, CarbonImmutable $now): self
@@ -90,8 +95,10 @@ final readonly class EventPageData
                 'timeLabel' => LondonFormatter::cardTime($occurrence),
                 'isCancelled' => OccurrenceIcs::isCancelled($occurrence),
                 'icsPath' => PublicUrl::icsPath($occurrence),
+                'googleUrl' => GoogleCalendarLink::for($occurrence),
             ])->values()->all(),
             remaining: $dates->remaining,
+            jsonLd: EventJsonLd::scripts($event, $dates->occurrences),
         );
     }
 
