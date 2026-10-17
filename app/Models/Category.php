@@ -25,6 +25,14 @@ class Category extends Model
     }
 
     /**
+     * @return HasMany<CategoryKeywordRule, $this>
+     */
+    public function keywordRules(): HasMany
+    {
+        return $this->hasMany(CategoryKeywordRule::class);
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array

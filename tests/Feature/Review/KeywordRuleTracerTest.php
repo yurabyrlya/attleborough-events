@@ -58,10 +58,11 @@ it('keeps the Rules screen admin-only', function () {
     get('/admin/rules')->assertForbidden();
 });
 
-it('opens the Rules screen for the admin', function () {
+it('opens the Rules screen for the admin with the stored rules', function () {
     actingAs($this->admin);
+    CategoryKeywordRule::create(['keyword' => 'harvest supper', 'category_id' => $this->community->id, 'priority' => 20]);
 
-    get('/admin/rules')->assertOk()->assertSee('Keyword rules');
+    get('/admin/rules')->assertOk()->assertSee('Keyword rules')->assertSee('harvest supper');
 });
 
 it('refuses SaveRules from anyone but the admin and writes nothing', function () {
