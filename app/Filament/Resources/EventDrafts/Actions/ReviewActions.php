@@ -104,21 +104,11 @@ final class ReviewActions
             ->visible(fn (EventDraft $record, Component $livewire): bool => self::shownStatus($record, $livewire) === ReviewStatus::PendingReview)
             ->modalHeading('Reject this draft?')
             ->modalDescription('It leaves the queue and nothing is published. The organiser is not told. Rejected drafts are deleted after the retention period.')
-            ->schema([
-                Select::make('reject_reason')
-                    ->label('Reason (optional)')
-                    ->options(RejectReason::class)
-                    ->placeholder('No reason'),
-                Textarea::make('review_notes')
-                    ->label('Note (optional)')
-                    ->rows(3)
-                    ->maxLength(2000),
-            ])
+            ->schema(self::rejectFields())
             ->modalSubmitActionLabel('Reject draft')
             ->modalCancelActionLabel(self::KEEP_LABEL)
             ->action(function (EventDraft $record, array $data, Component $livewire): void {
-                $reason = self::rejectReason($data['reject_reason'] ?? null);
-                $note = is_string($data['review_notes'] ?? null) ? $data['review_notes'] : null;
+                [$reason, $note] = self::rejectInput($data);
 
                 $rejected = self::run(fn (User $actor) => app(RejectDraft::class)($record, $actor, $reason, $note), 'Draft rejected', $livewire);
 
@@ -170,6 +160,42 @@ final class ReviewActions
         return $record->origin === EventOrigin::Manual
             ? 'No raw content: entered by admin'
             : 'No raw content was kept';
+    }
+
+    /**
+     * The optional reason and note asked for by every reject dialog: the
+     * row action, the review page and bulk reject.
+     *
+     * @return list<Select|Textarea>
+     */
+    public static function rejectFields(): array
+    {
+        return [
+            Select::make('reject_reason')
+                ->label('Reason (optional)')
+                ->options(RejectReason::class)
+                ->placeholder('No reason'),
+            Textarea::make('review_notes')
+                ->label('Note (optional)')
+                ->rows(3)
+                ->maxLength(2000),
+        ];
+    }
+
+    /**
+     * The reason and note from a reject dialog's data.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array{0: ?RejectReason, 1: ?string}
+     */
+    public static function rejectInput(array $data): array
+    {
+        $note = $data['review_notes'] ?? null;
+
+        return [
+            self::rejectReason($data['reject_reason'] ?? null),
+            is_string($note) ? $note : null,
+        ];
     }
 
     private static function rejectReason(mixed $value): ?RejectReason

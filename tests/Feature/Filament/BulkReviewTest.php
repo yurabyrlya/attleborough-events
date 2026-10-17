@@ -183,9 +183,12 @@ it('lets every draft be selected and labels the bulk dialogs', function () {
         ->assertTableBulkActionExists('approveSelected')
         ->assertTableBulkActionExists('rejectSelected')
         ->mountTableBulkAction('approveSelected', [$low])
-        ->assertSee('Approve the selected drafts?')
-        ->assertSee('Drafts with problems are skipped and listed afterwards.')
-        ->assertSee('Keep as is');
+        ->assertMountedActionModalSee([
+            'Approve the selected drafts?',
+            'Drafts with problems are skipped and listed afterwards.',
+            'Approve',
+            'Keep as is',
+        ]);
 
     expect(livewire(ListEventDrafts::class)->instance()->getTable()->isRecordSelectable($low))->toBeTrue();
 });
