@@ -4,10 +4,10 @@ current_phase: 1
 current_phase_name: Foundation & Published Calendar
 status: verifying
 stopped_at: Phase 2 context gathered
-last_updated: "2026-10-17T09:58:25.799Z"
+last_updated: "2026-10-17T11:07:13.368Z"
 last_activity: 2026-10-17
 last_activity_desc: Scope change - infra deferred to Phase 5
-state_head: 7299fa4c008413c0781f85def88d8a48aa1ce7d2
+state_head: 25265bc9b0c3fc84202f5e1411aa4381b7b000c2
 progress:
   total_phases: 5
   completed_phases: 0
@@ -30,9 +30,9 @@ See: .planning/PROJECT.md (updated 2026-10-16)
 Phase: 1 (Foundation & Published Calendar) — EXECUTING
 Plan: 13 of 13 in Phase 1 complete (incl. gap closure); automated verification passed (human_needed). Milestone plans: 13/15 complete
 Status: Human verification needed — run /gsd-verify-work 1 (9 items in 01-UAT.md); also /gsd-secure-phase 1 before completion
-Last activity: 2026-10-17 - Completed quick task 261017-e46: Set up a Filament custom theme so Tailwind classes work in admin views
+Last activity: 2026-10-17 - Completed quick task 261017-gac: top UX fixes from browser UAT (mobile More filters, Occurrences refresh, honest Repeats display, explicit dialog buttons, live failed-jobs badge)
 
-Progress: [█████████░] 87% of planned plans (13/15); phases complete: 0/5
+Progress: [░░░░░░░░░░] 0% of planned plans (13/15); phases complete: 0/5
 
 ## Performance Metrics
 
@@ -102,6 +102,7 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 261017-e46 | Set up a Filament custom theme so Tailwind classes work in admin views | 2026-10-17 | b7e8527 | [261017-e46-set-up-a-filament-custom-theme-so-tailwi](./quick/261017-e46-set-up-a-filament-custom-theme-so-tailwi/) |
+| 261017-gac | Fix top UX findings from browser UAT: mobile More filters disclosure, Occurrences refresh after save, honest Repeats display for unsupported rules, explicit dialog buttons, live failed-jobs badge | 2026-10-17 | 25265bc | [261017-gac-fix-top-ux-findings-from-browser-uat-mob](./quick/261017-gac-fix-top-ux-findings-from-browser-uat-mob/) |
 
 ## Deferred Items
 
