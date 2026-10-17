@@ -23,23 +23,23 @@ Residents can open one trustworthy, up-to-date calendar on their phone and see w
 
 - ✓ Public mobile-first calendar of published, non-expired event occurrences with Today / This weekend / This week, category, Free and family-friendly filters (no-JS links, noindex filter URLs) — Phase 1
 - ✓ Admin manual event entry (Filament, single admin, writes only via `App\Publishing\Actions`, hide / cancel / per-date status) — Phase 1
+- ✓ Deterministic category assignment: organiser choice → source mapping → whole-word keyword rules → flagged Other, managed on one Rules screen with geofence terms — Phase 2
+- ✓ Public organiser submission form with spam protection (honeypot, single-use timing token, Cloudflare Turnstile on `/submit` only, per-IP rate limit, no-JS email route, interim privacy notice) — Phase 2
+- ✓ Source research: verified, prioritised inventory (`docs/research/source-inventory.md`, evidence in `event-sources.md`) with redacted P0/P1 fixtures (Attleborough Primary capture pending, owner override) — Phase 2
 
 ### Active
 
 - [ ] Event detail pages with source attribution, SEO metadata, Schema.org `Event` JSON-LD and sitemap (Phase 1 shipped the page, SEO metadata, JSON-LD, .ics / Google Calendar and share; source attribution and sitemap remain)
 - [ ] Source Registry with test run / run now, health tracking and robots-aware polite fetching
 - [ ] Deterministic extraction ladder: ICS (with recurrence), RSS/Atom, platform adapters (The Events Calendar, Squarespace), Schema.org JSON-LD, per-source CSS selectors
-- [ ] Unified draft model: everything incoming becomes a draft (new / update / cancellation) with a rule-based quality score and reasons
-- [ ] Filament review queue: approve, edit, reject, mark duplicate, apply updates, confirm cancellations, bulk actions
+- [ ] Unified draft model: everything incoming becomes a draft (new / update / cancellation) with a rule-based quality score and reasons (Phase 2 shipped `event_drafts` with quality band + reasons for new drafts from submissions and manual entry; update/cancellation drafts arrive with ingestion in Phase 3)
+- [ ] Filament review queue: approve, edit, reject, mark duplicate, apply updates, confirm cancellations, bulk actions (Phase 2 shipped approve / edit-and-approve / reject / reopen, Approve & next with keyboard shortcuts, bulk approve with named skips, bulk reject, tabs, filters, global search; duplicates, updates and cancellations remain)
 - [ ] Duplicate detection (external ID, URL, fuzzy title + date + venue) with admin making the final decision
 - [ ] Update and cancellation handling, including missing-item detection
 - [ ] Recurring and multi-day events (series approval, 90-day occurrence horizon) (Phase 1 shipped admin-entered weekly/monthly series via sabre/vobject, multi-day and all-day expiry, daily sync; series approval for imported drafts remains)
-- [ ] Location geofence for regional sources
-- [ ] Deterministic category assignment (source default, mapping, keyword rules)
-- [ ] Public organiser submission form with spam protection
+- [ ] Location geofence for regional sources (Phase 2 shipped the geofence terms on the Rules screen: NR17/NR16/NR18/IP24 and nine place names; applying them to regional sources remains)
 - [ ] Source run logs and admin dashboard counts
-- [ ] Privacy notice, takedown contact and cookieless analytics
-- [ ] Source research: verified, prioritised list of local sources (`docs/research/event-sources.md`) with parser fixtures
+- [ ] Privacy notice, takedown contact and cookieless analytics (Phase 2 shipped an interim `/privacy`; sessions keep no IP and are encrypted)
 
 ### Out of Scope
 
@@ -86,6 +86,10 @@ Residents can open one trustworthy, up-to-date calendar on their phone and see w
 | sabre/vobject is the only recurrence engine; occurrences upserted on (event, local date) | Correct DST handling; admin cancellations survive regeneration | ✓ Good (DST fixtures 25 Oct 2026 / 28 Mar 2027 pass) |
 | One-off ↔ repeating switches are refused (WR-06) | iCalendar UIDs must never change for subscribers | ✓ Accepted by owner; workaround is hide + create new |
 | Browser UAT flows F0–F10 automated with Pest browser tests in CI | Every phase signs off with the same flows; catches UI regressions | ✓ Green on PHP 8.4 and 8.5 |
+| Approval wraps the single write choke point: `ApproveDraft` → `PublishEvent`; manual entry is a manual draft approved in one transaction | One path to publication, admin and timestamps recorded on every event | ✓ Phase 2 (arch test: PublishEvent only inside App\\Publishing\\Actions) |
+| Turnstile is the single third-party script, on `/submit` only (D-17); in-house verifier fails closed | Spam protection without a package; every other public page stays third-party-free | ✓ Phase 2 (guard test) |
+| Organiser contact public only by choice (`contact_public`); sessions store no IP and are encrypted | Privacy notice must be true (D-03, review CR-01) | ✓ Phase 2 |
+| Sources: never bypass bot walls; ToS-unclear sources crawlable on owner decision; Cloudflare-walled sites via official routes or Verified Bots (Phase 5); Meta APIs not used for now | Honest, defensible crawling (D-23..D-26) | ✓ Inventory in docs/research/source-inventory.md |
 
 ## Evolution
 
@@ -105,4 +109,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-10-17 after Phase 1*
+*Last updated: 2026-10-17 after Phase 2*

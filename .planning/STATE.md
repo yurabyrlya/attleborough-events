@@ -23,7 +23,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-17)
 
 **Core value:** Residents can open one trustworthy, up-to-date calendar on their phone and see what's on in Attleborough. Nothing reaches it without admin approval.
-**Current focus:** Phase 2 — Draft Model, Review Queue & Submissions
+**Current focus:** Phase 3 — Ingestion Backbone, ICS & Change/Duplicate Handling
 
 ## Current Position
 
@@ -32,7 +32,7 @@ Plan: Not started
 Status: Ready to plan
 Last activity: 2026-10-17 — Phase 2 complete, transitioned to Phase 3
 
-Progress: 29/31 plans ([████░░░░░░] 40%); phase 2: 16/16; phases complete: 1/5
+Progress: [███████████████████░] 29/31 planned plans (94%); phases complete: 2/5
 
 ## Performance Metrics
 
@@ -101,6 +101,7 @@ Recent decisions affecting current work:
 - [Scope]: Infra/domain deferred to Phase 5; Phase 1 is local-dev only. (2026-10-16: 01-02/01-03 moved to 05-01/05-02; OPS-02 to Phase 5; OPS-01b/OPS-04b split out for production.)
 - [Testing]: Browser UAT flows (F0–F10) live in docs/uat/browser-uat.md; every phase runs them before sign-off and adds flows for new UI
 - [Phase 1]: Complete 2026-10-17. Verification passed (168/173 + owner-accepted backstops and prohibitions); security verified (0 open); UI review 17/24 with top 3 fixed (261017-hp9); open advisory review items WR-15, IN-09..16 in 01-REVIEW-DISPOSITION.md
+- [Phase 2]: Complete 2026-10-17. 16 plans; verification passed (owner override: Attleborough Primary fixture pending, capture before Phase 3 planning); security verified (45 threats, 0 open; T-02-24/T-02-29 production halves → Phase 5); code review CR-01/CR-02 fixed, 6 warnings deferred (02-REVIEW-DISPOSITION.md; WR-06 and WR-08 worth fixing before launch)
 - [Testing]: Browser suite runs in CI; tests/Pest.php forgets scoped instances after each in-process request; use Uat::settleFields() after filling Livewire forms
 - [Phase 02]: [02-01]: Manual entry is a manual draft approved at once through ApproveDraft (D-07); PublishEvent is called only by ApproveDraft
 - [Phase 02]: [02-01]: ApproveDraft logs via DB::afterCommit so nested approvals log only after the outermost commit; fromDraft blocks a missing start date
@@ -179,6 +180,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-17T21:33:02.748Z
-Stopped at: Phase 2 complete, ready to plan Phase 3
+Last session: 2026-10-17
+Stopped at: Phase 2 complete, ready to discuss/plan Phase 3 (capture the Attleborough Primary fixture first)
 Resume file: None
