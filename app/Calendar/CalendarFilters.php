@@ -114,7 +114,16 @@ final readonly class CalendarFilters
 
     public function hasAttributeFilters(): bool
     {
-        return $this->category !== null || $this->free || $this->family;
+        return $this->attributeFilterCount() > 0;
+    }
+
+    /**
+     * How many Category / Show only filters are active (0-3): the count on
+     * the closed "More filters" summary.
+     */
+    public function attributeFilterCount(): int
+    {
+        return (int) ($this->category !== null) + (int) $this->free + (int) $this->family;
     }
 
     public function hasAny(): bool

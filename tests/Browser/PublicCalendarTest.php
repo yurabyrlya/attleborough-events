@@ -95,19 +95,29 @@ it('F2: combines and removes filters with plain links', function () {
         ->assertAttribute('meta[name="robots"]', 'content', 'noindex, follow')
         ->assertTitleContains('This weekend');
 
-    // Category and Show only sit inside the native "More filters" <details>.
-    $page->click('More filters')
+    // Category and Show only sit inside the native "More filters" <details>,
+    // which stays closed after every reload (UI review fix 2): reopen it before
+    // each pick. Active filters show outside it as "Remove filter:" chips.
+    $more = 'nav[aria-label="Filter events"] summary';
+
+    $page->click($more)
         ->click(Uat::role('link', 'Community'))->waitForEvent('load')
         ->assertQueryStringHas('category', 'community')
         ->assertCount('main >> article', 1)
+        ->assertAttributeMissing('nav[aria-label="Filter events"] details', 'open')
+        ->assertSeeIn($more, 'More filters (1)')
+        ->assertVisible(Uat::role('link', 'Remove filter: Community'))
+        ->click($more)
         ->click(Uat::role('link', 'Free'))->waitForEvent('load')
         ->assertQueryStringHas('free', '1')
+        ->click($more)
         ->click(Uat::role('link', 'Family-friendly'))->waitForEvent('load')
         ->assertQueryStringHas('family', '1')
         ->assertQueryStringHas('when', 'weekend')
         ->assertQueryStringHas('category', 'community')
         ->assertCount('main >> article', 1)
         ->assertSee('UAT Family Fun Day')
+        ->assertSeeIn($more, 'More filters (3)')
         ->assertSeeIn('.filter-summary', 'Showing: This weekend · Community · Free · Family-friendly')
         ->assertScript('document.scripts.length', 0);
 
@@ -126,13 +136,24 @@ it('F2: combines and removes filters with plain links', function () {
         ->assertQueryStringHas('category', 'community')
         ->assertCount('main >> article', 1);
 
-    // Clicking an active chip removes only that filter.
-    $page->click(Uat::role('link', 'Family-friendly'))->waitForEvent('load')
+    // A "Remove filter:" chip removes only that filter.
+    $page->click(Uat::role('link', 'Remove filter: Family-friendly'))->waitForEvent('load')
         ->assertQueryStringMissing('family')
         ->assertQueryStringHas('free', '1')
         ->assertQueryStringHas('category', 'community')
         ->assertCount('main >> article', 1)
         ->assertAttribute('meta[name="robots"]', 'content', 'noindex, follow')
         ->assertScript('document.scripts.length', 0)
+        ->assertSeeIn('nav[aria-label="Filter events"] summary', 'More filters (2)')
         ->assertNoJavaScriptErrors();
 });
+
+it('F1/F2: keeps the first result above the fold on a phone while a filter is active', function (string $uri) {
+    $page = visit($uri)->resize(375, 812);
+
+    $page->assertAttributeMissing('nav[aria-label="Filter events"] details', 'open')
+        ->assertSeeIn('nav[aria-label="Filter events"] summary', 'More filters (1)')
+        ->assertNoJavaScriptErrors();
+
+    expect($page->script("() => document.querySelector('main h2').getBoundingClientRect().top"))->toBeLessThan(812);
+})->with(['/?category=community', '/?free=1']);

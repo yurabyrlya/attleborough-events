@@ -5,10 +5,11 @@
      * so the Host header never reaches the HTML (T-01-41).
      *
      * The When chips are always visible. Category and Show only sit inside a
-     * native <details> ("More filters") so the first event stays above the
-     * fold on a phone; it is plain HTML, so the page still loads no script.
-     * It renders open whenever a category, Free or Family-friendly filter is
-     * active, so the active chip is never hidden.
+     * native <details> ("More filters") that is always closed by default, at
+     * every width, so the first event stays above the fold on a phone (UI
+     * review fix 2). Active Category / Show only filters appear outside it
+     * under "Filtering by" as removable chips, and the summary shows their
+     * count. It is plain HTML, so the page still loads no script.
      *
      * @var \App\Calendar\CalendarFilters $filters
      * @var \Illuminate\Support\Collection<int, \App\Models\Category> $categories
@@ -22,8 +23,22 @@
             @include('calendar.partials.chip', ['href' => route('calendar', $filters->queryWith(['when' => $case->value]), absolute: false), 'label' => $case->label(), 'active' => $filters->when === $case])
         @endforeach
     </div>
-    <details class="group"@if ($filters->hasAttributeFilters()) open @endif>
-        <summary class="tap-target cursor-pointer list-none items-center gap-1 rounded-full border border-line px-4 text-ink hover:bg-accent-soft [&::-webkit-details-marker]:hidden">More filters<svg aria-hidden="true" focusable="false" class="size-4 shrink-0 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg></summary>
+    @if ($filters->hasAttributeFilters())
+        <div role="group" aria-labelledby="chips-active" class="flex flex-wrap items-center gap-2">
+            <span id="chips-active" class="text-sm font-semibold text-muted">Filtering by</span>
+            @if ($filters->category !== null)
+                @include('calendar.partials.remove-chip', ['href' => route('calendar', $filters->queryWith(['category' => null]), absolute: false), 'label' => $filters->category->name])
+            @endif
+            @if ($filters->free)
+                @include('calendar.partials.remove-chip', ['href' => route('calendar', $filters->queryWith(['free' => null]), absolute: false), 'label' => 'Free'])
+            @endif
+            @if ($filters->family)
+                @include('calendar.partials.remove-chip', ['href' => route('calendar', $filters->queryWith(['family' => null]), absolute: false), 'label' => 'Family-friendly'])
+            @endif
+        </div>
+    @endif
+    <details class="group">
+        <summary class="tap-target cursor-pointer list-none items-center gap-1 rounded-full border border-line px-4 text-ink hover:bg-accent-soft [&::-webkit-details-marker]:hidden">More filters @if ($filters->attributeFilterCount() > 0)({{ $filters->attributeFilterCount() }})@endif<svg aria-hidden="true" focusable="false" class="size-4 shrink-0 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg></summary>
         <div class="mt-3 flex flex-col gap-4">
             <div role="group" aria-labelledby="chips-category" class="flex flex-wrap items-center gap-2">
                 <span id="chips-category" class="w-full text-sm font-semibold text-muted">Category</span>

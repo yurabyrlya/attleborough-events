@@ -98,9 +98,12 @@ it('starts the body with a skip link to the single main#main', function () {
 
 it('keys chip styles to aria-current and marks active chips with a check icon', function () {
     $document = lookDocument((string) get('/?category=music')->assertOk()->getContent());
-    $chips = $document->querySelectorAll('nav[aria-label="Filter events"] a');
+    $chips = array_filter(
+        iterator_to_array($document->querySelectorAll('nav[aria-label="Filter events"] a')),
+        fn (Element $chip): bool => $chip->closest('[aria-labelledby="chips-active"]') === null, // remove chips are tested separately
+    );
 
-    expect($chips->length)->toBeGreaterThan(10);
+    expect(count($chips))->toBeGreaterThan(10);
 
     $active = 0;
 
@@ -134,19 +137,32 @@ it('keeps the When chips visible and folds Category and Show only into a closed 
 
     expect($details->hasAttribute('open'))->toBeFalse()
         ->and($summary?->tagName)->toBe('SUMMARY')
-        ->and(lookText($summary))->toContain('More filters')
+        ->and(lookText($summary))->toBe('More filters')
         ->and(lookClasses($summary))->toContain('tap-target')
         ->and($nav->querySelector('[aria-labelledby="chips-when"]')?->closest('details'))->toBeNull()
+        ->and($nav->querySelector('[aria-labelledby="chips-active"]'))->toBeNull()
         ->and($details->querySelector('[aria-labelledby="chips-category"]'))->not->toBeNull()
         ->and($details->querySelector('[aria-labelledby="chips-only"]'))->not->toBeNull();
 })->with(['/', '/?when=weekend']);
 
-it('renders the More filters disclosure open while a category, Free or Family-friendly filter is active', function (string $uri, string $activeLabel) {
+it('keeps More filters closed while a filter is active and shows it as a removable chip outside', function (string $uri, string $activeLabel) {
     $document = lookDocument((string) get($uri)->assertOk()->getContent());
-    $details = $document->querySelector('nav[aria-label="Filter events"] details');
+    $nav = $document->querySelector('nav[aria-label="Filter events"]');
+    $details = $nav?->querySelector('details');
+    $active = $nav?->querySelector('[aria-labelledby="chips-active"]');
+    $removers = $active?->querySelectorAll('a');
 
-    expect($details?->hasAttribute('open'))->toBeTrue();
+    expect($details?->hasAttribute('open'))->toBeFalse()
+        ->and(lookText($details?->firstElementChild))->toBe('More filters (1)')
+        ->and($active)->not->toBeNull()
+        ->and($active->closest('details'))->toBeNull()
+        ->and(lookText($document->getElementById('chips-active')))->toBe('Filtering by')
+        ->and($removers->length)->toBe(1)
+        ->and(lookText($removers->item(0)))->toBe('Remove filter: '.$activeLabel)
+        ->and(lookText($removers->item(0)->querySelector('.sr-only')))->toBe('Remove filter:')
+        ->and($removers->item(0)->getAttribute('href'))->toBe('/');
 
+    // The open panel still shows the state on the chip itself.
     $activeChips = array_map(
         lookText(...),
         array_filter(
@@ -161,6 +177,41 @@ it('renders the More filters disclosure open while a category, Free or Family-fr
     'free' => ['/?free=1', 'Free'],
     'family' => ['/?family=1', 'Family-friendly'],
 ]);
+
+it('counts every active secondary filter and lets each chip remove only itself', function () {
+    $document = lookDocument((string) get('/?when=weekend&category=music&free=1&family=1')->assertOk()->getContent());
+    $nav = $document->querySelector('nav[aria-label="Filter events"]');
+    $removers = iterator_to_array($nav?->querySelector('[aria-labelledby="chips-active"]')?->querySelectorAll('a') ?? []);
+
+    expect(lookText($nav?->querySelector('details summary')))->toBe('More filters (3)')
+        ->and($nav->querySelector('details')?->hasAttribute('open'))->toBeFalse()
+        ->and(array_map(lookText(...), $removers))->toBe([
+            'Remove filter: Music',
+            'Remove filter: Free',
+            'Remove filter: Family-friendly',
+        ]);
+
+    $queries = [];
+
+    foreach ($removers as $remover) {
+        $href = (string) $remover->getAttribute('href');
+        parse_str((string) parse_url($href, PHP_URL_QUERY), $query);
+        ksort($query);
+
+        expect($href)->toStartWith('/?')
+            ->and(lookClasses($remover))->toContain('tap-target')
+            ->and($remover->hasAttribute('aria-current'))->toBeFalse()
+            ->and($remover->querySelector('svg')?->getAttribute('aria-hidden'))->toBe('true');
+
+        $queries[] = $query;
+    }
+
+    expect($queries)->toBe([
+        ['family' => '1', 'free' => '1', 'when' => 'weekend'],
+        ['category' => 'music', 'family' => '1', 'when' => 'weekend'],
+        ['category' => 'music', 'free' => '1', 'when' => 'weekend'],
+    ]);
+});
 
 it('shows one decorative category icon per card, picked from the slug allow-list', function () {
     lookEvent('music', ['title' => 'Brass Band']);
