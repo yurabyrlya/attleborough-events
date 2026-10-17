@@ -44,32 +44,17 @@ function repeatsOptions(mixed $page): array
 }
 
 it('F0: logs the admin in to the panel', function () {
-    $page = visit('/admin/login')->waitForEvent('networkidle');
-    $probe = <<<'JS'
-() => {
-  window.__log = [['lw-at-probe', !!window.Livewire, performance.now()]];
-  const d = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
-  Object.defineProperty(HTMLInputElement.prototype, 'value', { configurable: true,
-    get() { return d.get.call(this); },
-    set(v) { if ((this.id || '').includes('password')) { window.__log.push(['set', this.id, String(v).length, performance.now(), new Error().stack.split('\n').slice(2, 9).join(' | ')]); } d.set.call(this, v); } });
-  new MutationObserver((ms) => ms.forEach((m) => { const t = m.target; if (m.type === 'childList' && [...m.removedNodes, ...m.addedNodes].some((n) => n.querySelector && (n.id === 'form.password' || n.querySelector('[id="form.password"]')))) { window.__log.push(['pw-node-replaced', performance.now()]); } if (m.type === 'attributes' && t.id === 'form.password') { window.__log.push(['attr', m.attributeName, t.getAttribute(m.attributeName), performance.now()]); } })).observe(document.body, { subtree: true, childList: true, attributes: true });
-  const f = window.fetch; window.fetch = (...a) => { window.__log.push(['fetch', String(a[0]).slice(-40), performance.now()]); return f(...a).then((r) => { window.__log.push(['fetch-done', r.status, performance.now()]); return r; }); };
-  ['livewire:init', 'livewire:initialized', 'alpine:init', 'alpine:initialized'].forEach((e) => document.addEventListener(e, () => window.__log.push([e, performance.now()])));
-  document.addEventListener('invalid', (e) => window.__log.push(['invalid', e.target.id, performance.now()]), true);
-  document.addEventListener('focusin', (e) => window.__log.push(['focus', e.target.id, performance.now()]), true);
-  return true;
-}
-JS;
-    $page->script($probe);
-    $page->fill(Uat::label('Email address'), $this->admin->email)
+    $page = visit('/admin/login')
+        ->fill(Uat::label('Email address'), $this->admin->email)
         ->fill('[id="form.password"]', Uat::PASSWORD);
-    $afterFill = $page->script('() => document.getElementById("form.password").value.length');
-    $page->click(Uat::role('button', 'Sign in'));
-    $page->wait(3);
-    $dump = $page->script('() => JSON.stringify({ log: window.__log || "page-navigated", url: location.href, pw: document.getElementById("form.password")?.value?.length, lw: !!window.Livewire })');
-    fwrite(STDERR, "\nF0DEBUG afterFill=".json_encode($afterFill)."\nF0DEBUG ".$dump."\n");
-    $page->waitForText('Dashboard')
-        ->assertPathIs('/admin');
+
+    Uat::settleFields($page, ['form.email' => $this->admin->email, 'form.password' => Uat::PASSWORD])
+        ->click(Uat::role('button', 'Sign in'))
+        ->waitForText('Dashboard')
+        ->assertPathIs('/admin')
+        ->assertPresent(Uat::role('link', 'Events'))
+        ->assertPresent(Uat::role('link', 'System health'))
+        ->assertNoJavaScriptErrors();
 });
 
 it('F3 + F4: creates a monthly series that the public calendar lists date by date', function () {

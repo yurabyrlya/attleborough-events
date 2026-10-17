@@ -88,6 +88,36 @@ final class UatFixtures
     }
 
     /**
+     * Let pending Livewire model updates flush, then re-fill any input they
+     * reset. Machine-speed fills can land just before a queued wire:model
+     * effect writes the stale server value back into the input.
+     *
+     * @param  array<string, string>  $valuesById  input id => expected value
+     */
+    public static function settleFields(mixed $page, array $valuesById, int $attempts = 5): mixed
+    {
+        for ($attempt = 0; $attempt < $attempts; $attempt++) {
+            $page->wait(0.2);
+
+            $stale = array_filter(
+                $valuesById,
+                fn (string $value, string $id): bool => $page->script('() => document.getElementById('.json_encode($id).')?.value') !== $value,
+                ARRAY_FILTER_USE_BOTH,
+            );
+
+            if ($stale === []) {
+                return $page;
+            }
+
+            foreach ($stale as $id => $value) {
+                $page->fill('[id="'.$id.'"]', $value);
+            }
+        }
+
+        throw new RuntimeException('Livewire kept resetting: '.implode(', ', array_keys($stale)));
+    }
+
+    /**
      * Wait until a JavaScript expression in the page is truthy (for state
      * that is not visible text, e.g. <select> options after a Livewire
      * round trip).

@@ -83,10 +83,10 @@ jobs:
         run: cp .env.example .env && php artisan key:generate
 
       - name: Pint
-        run: "true"
+        run: vendor/bin/pint --test
 
       - name: Larastan
-        run: "true"
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
 
       - name: Pest (PostgreSQL)
         run: vendor/bin/pest --ci --testsuite=Unit,Feature
