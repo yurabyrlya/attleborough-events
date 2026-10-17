@@ -31,7 +31,50 @@ dataset('emitted rules', [
         new ManualRecurrence(RepeatPattern::Weekly, RepeatEnds::OnDate, untilDate: '2026-12-27'),
         '2026-10-25', true, 'FREQ=WEEKLY;BYDAY=SU;UNTIL=20261227',
     ],
+    'weekly Friday, timed, until 1 Jan 2027 (GMT)' => [
+        new ManualRecurrence(RepeatPattern::Weekly, RepeatEnds::OnDate, untilDate: '2027-01-01'),
+        '2026-10-23', false, 'FREQ=WEEKLY;BYDAY=FR;UNTIL=20270101T235959Z',
+    ],
+    'weekly Sunday, timed, until 25 Oct 2026 (BST ends that day)' => [
+        new ManualRecurrence(RepeatPattern::Weekly, RepeatEnds::OnDate, untilDate: '2026-10-25'),
+        '2026-10-18', false, 'FREQ=WEEKLY;BYDAY=SU;UNTIL=20261025T235959Z',
+    ],
 ]);
+
+/*
+ * WR-10: stored rules that parse but would be rewritten by the next save,
+ * all checked against Fri 23 Oct 2026.
+ */
+dataset('non-round-tripping rules', [
+    'weekly Monday' => ['FREQ=WEEKLY;BYDAY=MO', false],
+    'second Tuesday' => ['FREQ=MONTHLY;BYDAY=2TU', false],
+    'last Friday (start is not a last Friday)' => ['FREQ=MONTHLY;BYDAY=-1FR', false],
+    'timed UNTIL at noon UTC' => ['FREQ=WEEKLY;BYDAY=FR;UNTIL=20270101T120000Z', false],
+    'DATE UNTIL on a timed event' => ['FREQ=WEEKLY;BYDAY=FR;UNTIL=20270101', false],
+    'zero-padded COUNT' => ['FREQ=WEEKLY;BYDAY=FR;COUNT=005', false],
+    'daily' => ['FREQ=DAILY', false],
+]);
+
+it('accepts every emitted RRULE as editable for its own start date', function (ManualRecurrence $recurrence, string $start, bool $allDay, string $rule) {
+    $parsed = ManualRecurrence::tryFromStoredRule($rule, london($start), $allDay);
+
+    expect($parsed)->not->toBeNull()
+        ->and($parsed->pattern)->toBe($recurrence->pattern)
+        ->and($parsed->ends)->toBe($recurrence->ends)
+        ->and($parsed->untilDate)->toBe($recurrence->untilDate)
+        ->and($parsed->count)->toBe($recurrence->count);
+})->with('emitted rules');
+
+it('rejects a stored rule that does not round-trip for the start date', function (string $rule, bool $allDay) {
+    expect(ManualRecurrence::tryFromStoredRule($rule, london('2026-10-23'), $allDay))->toBeNull();
+})->with('non-round-tripping rules');
+
+it('treats a null stored rule as "Does not repeat"', function () {
+    $parsed = ManualRecurrence::tryFromStoredRule(null, london('2026-10-23'), false);
+
+    expect($parsed)->not->toBeNull()
+        ->and($parsed->pattern)->toBe(RepeatPattern::None);
+});
 
 it('builds the RRULE for each supported pattern and ending', function (ManualRecurrence $recurrence, string $start, bool $allDay, string $rule) {
     expect($recurrence->toRrule(london($start), $allDay))->toBe($rule);

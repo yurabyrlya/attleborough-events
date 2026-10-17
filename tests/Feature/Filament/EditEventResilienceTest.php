@@ -1,14 +1,18 @@
 <?php
 
+use App\Calendar\OccurrenceGenerator;
 use App\Enums\EventOrigin;
 use App\Enums\EventStatus;
+use App\Enums\OccurrenceStatus;
 use App\Enums\RepeatPattern;
 use App\Filament\Resources\Events\Pages\EditEvent;
 use App\Filament\Resources\Events\Pages\ListEvents;
 use App\Models\Category;
 use App\Models\Event;
+use App\Models\EventOccurrence;
 use App\Models\User;
 use App\Models\Venue;
+use App\Publishing\Actions\ChangeOccurrenceStatus;
 use App\Publishing\Actions\PublishEvent;
 use App\Publishing\Actions\UpdatePublishedEvent;
 use App\Publishing\Data\PublishableEventData;
@@ -60,6 +64,13 @@ dataset('unsupported rules', [
     'daily' => 'FREQ=DAILY',
     'count above 999' => 'FREQ=WEEKLY;BYDAY=FR;COUNT=1000',
     'impossible until' => 'FREQ=WEEKLY;BYDAY=FR;UNTIL=20261345',
+    // WR-10 'non-round-tripping rules': they parse, but the next save would
+    // rewrite them for the Friday start date.
+    'weekly Monday on a Friday start' => 'FREQ=WEEKLY;BYDAY=MO',
+    'second Tuesday on a Friday start' => 'FREQ=MONTHLY;BYDAY=2TU',
+    'last Friday on a fourth-Friday start' => 'FREQ=MONTHLY;BYDAY=-1FR',
+    'timed UNTIL at noon UTC' => 'FREQ=WEEKLY;BYDAY=FR;UNTIL=20270101T120000Z',
+    'DATE UNTIL on a timed event' => 'FREQ=WEEKLY;BYDAY=FR;UNTIL=20270101',
 ]);
 
 it('opens the edit page read-only with a warning and no Save action', function (string $rule) {
@@ -128,6 +139,81 @@ it('refuses an edit in UpdatePublishedEvent itself when the stored rule is unsup
 
     expect($updated->start_time)->toStartWith('11:00');
 });
+
+it('refuses an edit in UpdatePublishedEvent when the stored rule does not round-trip', function (string $rule) {
+    $event = ($this->stored)($rule);
+
+    expect(fn () => app(UpdatePublishedEvent::class)($event, new PublishableEventData(...$this->base), $this->admin))
+        ->toThrow(InvalidArgumentException::class, UpdatePublishedEvent::UNSUPPORTED_RULE_REFUSED);
+
+    $fresh = $event->fresh();
+
+    expect($fresh->title)->toBe('Imported Yoga')
+        ->and($fresh->recurrence_rule)->toBe($rule);
+})->with([
+    'weekly Monday on a Friday start' => 'FREQ=WEEKLY;BYDAY=MO',
+    'second Tuesday on a Friday start' => 'FREQ=MONTHLY;BYDAY=2TU',
+]);
+
+it('keeps occurrences, an admin cancellation and the .ics UID when a save of a non-round-tripping rule is refused', function (string $rule, string $scheduledKey, string $cancelledKey) {
+    $event = ($this->stored)($rule);
+    app(OccurrenceGenerator::class)->sync($event);
+
+    $occurrences = fn () => EventOccurrence::query()
+        ->where('event_id', $event->id)
+        ->orderBy('recurrence_key')
+        ->get()
+        ->map(fn (EventOccurrence $o): array => [
+            'id' => $o->id,
+            'recurrence_key' => $o->recurrence_key,
+            'starts_at' => $o->starts_at->toIso8601String(),
+            'status' => $o->status->value,
+            'status_changed_by' => $o->status_changed_by,
+            'status_changed_at' => $o->status_changed_at?->toIso8601String(),
+        ])
+        ->all();
+
+    $keys = array_column($occurrences(), 'recurrence_key');
+    expect($keys)->toContain($scheduledKey)->toContain($cancelledKey);
+
+    $toCancel = EventOccurrence::query()->where('event_id', $event->id)->where('recurrence_key', $cancelledKey)->firstOrFail();
+    app(ChangeOccurrenceStatus::class)($toCancel, OccurrenceStatus::Cancelled, $this->admin);
+
+    $uidLine = function () use ($event, $scheduledKey): ?string {
+        $body = (string) get("/events/{$event->slug}/{$scheduledKey}.ics")->assertOk()->getContent();
+        preg_match('/^UID:.*$/m', $body, $m);
+
+        return isset($m[0]) ? rtrim($m[0], "\r") : null;
+    };
+
+    $before = $occurrences();
+    $uidBefore = $uidLine();
+
+    expect($uidBefore)->toBe("UID:{$event->id}-{$scheduledKey}@".config('site.domain'))
+        ->and(collect($before)->firstWhere('recurrence_key', $cancelledKey))
+        ->toMatchArray(['status' => OccurrenceStatus::Cancelled->value, 'status_changed_by' => $this->admin->id])
+        ->and(collect($before)->firstWhere('recurrence_key', $cancelledKey)['status_changed_at'])->not->toBeNull();
+
+    // (a) forced page save
+    livewire(EditEvent::class, ['record' => $event->getRouteKey()])
+        ->set('data.title', 'Forged Title')
+        ->call('save')
+        ->assertNotified(UNSUPPORTED_RULE_WARNING);
+
+    // (b) direct domain call
+    expect(fn () => app(UpdatePublishedEvent::class)($event->fresh(), new PublishableEventData(...$this->base), $this->admin))
+        ->toThrow(InvalidArgumentException::class, UpdatePublishedEvent::UNSUPPORTED_RULE_REFUSED);
+
+    $fresh = $event->fresh();
+
+    expect($occurrences())->toBe($before)
+        ->and($uidLine())->toBe($uidBefore)
+        ->and($fresh->title)->toBe('Imported Yoga')
+        ->and($fresh->recurrence_rule)->toBe($rule);
+})->with([
+    'weekly Monday' => ['FREQ=WEEKLY;BYDAY=MO', '2026-10-26', '2026-11-02'],
+    'second Tuesday' => ['FREQ=MONTHLY;BYDAY=2TU', '2026-11-10', '2026-12-08'],
+]);
 
 it('hides and cancels events from the events table', function () {
     $toHide = ($this->stored)('FREQ=DAILY', ['title' => 'Imported Yoga A']);

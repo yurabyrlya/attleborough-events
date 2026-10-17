@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="71" assertions="264" errors="14" failures="14" skipped="0" time="5.381573">
+    <testsuite name="Tests\Feature\Filament\EditEventResilienceTest" file="tests/Feature/Filament/EditEventResilienceTest.php" tests="33" assertions="216" errors="0" failures="14" skipped="0" time="4.832743">
+      <testsuite name="it opens the edit page read-only with a warning and no Save action" tests="8" assertions="66" errors="0" failures="5" skipped="0" time="1.775555">
+        <testcase name="it opens the edit page read-only with a warning and no Save action with data set &quot;dataset &quot;daily&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it opens the edit page read-only with a warning and no Save action with data set &quot;dataset &quot;daily&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="17" time="1.020349"/>
+        <testcase name="it opens the edit page read-only with a warning and no Save action with data set &quot;dataset &quot;count above 999&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it opens the edit page read-only with a warning and no Save action with data set &quot;dataset &quot;count above 999&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="17" time="0.076154"/>
+        <testcase name="it opens the edit page read-only with a warning and no Save action with data set &quot;dataset &quot;impossible until&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it opens the edit page read-only with a warning and no Save action with data set &quot;dataset &quot;impossible until&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="17" time="0.067349"/>
+        <testcase name="it opens the edit page read-only with a warning and no Save action with data set &quot;dataset &quot;weekly Monday on a Friday start&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it opens the edit page read-only with a warning and no Save action with data set &quot;dataset &quot;weekly Monday on a Friday start&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="3" time="0.320326">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it opens the edit page read-only with a warning and no Save action with data set "dataset "weekly Monday on a Friday start""A notification was not sent
+Failed asserting that null is not null.
+at vendor/filament/notifications/src/Notification.php:287
+at vendor/filament/notifications/src/Testing/TestsNotifications.php:20
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/EditEventResilienceTest.php:81</failure>
+        </testcase>
+        <testcase name="it opens the edit page read-only with a warning and no Save action with data set &quot;dataset &quot;second Tuesday on a Friday start&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it opens the edit page read-only with a warning and no Save action with data set &quot;dataset &quot;second Tuesday on a Friday start&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="3" time="0.089271">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it opens the edit page read-only with a warning and no Save action with data set "dataset "second Tuesday on a Friday start""A notification was not sent
+Failed asserting that null is not null.
+at vendor/filament/notifications/src/Notification.php:287
+at vendor/filament/notifications/src/Testing/TestsNotifications.php:20
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/EditEventResilienceTest.php:81</failure>
+        </testcase>
+        <testcase name="it opens the edit page read-only with a warning and no Save action with data set &quot;dataset &quot;last Friday on a fourth-Friday start&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it opens the edit page read-only with a warning and no Save action with data set &quot;dataset &quot;last Friday on a fourth-Friday start&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="3" time="0.077830">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it opens the edit page read-only with a warning and no Save action with data set "dataset "last Friday on a fourth-Friday start""A notification was not sent
+Failed asserting that null is not null.
+at vendor/filament/notifications/src/Notification.php:287
+at vendor/filament/notifications/src/Testing/TestsNotifications.php:20
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/EditEventResilienceTest.php:81</failure>
+        </testcase>
+        <testcase name="it opens the edit page read-only with a warning and no Save action with data set &quot;dataset &quot;timed UNTIL at noon UTC&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it opens the edit page read-only with a warning and no Save action with data set &quot;dataset &quot;timed UNTIL at noon UTC&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="3" time="0.068843">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it opens the edit page read-only with a warning and no Save action with data set "dataset "timed UNTIL at noon UTC""A notification was not sent
+Failed asserting that null is not null.
+at vendor/filament/notifications/src/Notification.php:287
+at vendor/filament/notifications/src/Testing/TestsNotifications.php:20
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/EditEventResilienceTest.php:81</failure>
+        </testcase>
+        <testcase name="it opens the edit page read-only with a warning and no Save action with data set &quot;dataset &quot;DATE UNTIL on a timed event&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it opens the edit page read-only with a warning and no Save action with data set &quot;dataset &quot;DATE UNTIL on a timed event&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="3" time="0.055434">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it opens the edit page read-only with a warning and no Save action with data set "dataset "DATE UNTIL on a timed event""A notification was not sent
+Failed asserting that null is not null.
+at vendor/filament/notifications/src/Notification.php:287
+at vendor/filament/notifications/src/Testing/TestsNotifications.php:20
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/EditEventResilienceTest.php:81</failure>
+        </testcase>
+      </testsuite>
+      <testsuite name="it refuses a forced save and leaves the stored event unchanged" tests="8" assertions="25" errors="0" failures="5" skipped="0" time="1.135219">
+        <testcase name="it refuses a forced save and leaves the stored event unchanged with data set &quot;dataset &quot;daily&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it refuses a forced save and leaves the stored event unchanged with data set &quot;dataset &quot;daily&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="5" time="0.124606"/>
+        <testcase name="it refuses a forced save and leaves the stored event unchanged with data set &quot;dataset &quot;count above 999&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it refuses a forced save and leaves the stored event unchanged with data set &quot;dataset &quot;count above 999&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="5" time="0.108468"/>
+        <testcase name="it refuses a forced save and leaves the stored event unchanged with data set &quot;dataset &quot;impossible until&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it refuses a forced save and leaves the stored event unchanged with data set &quot;dataset &quot;impossible until&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="5" time="0.132318"/>
+        <testcase name="it refuses a forced save and leaves the stored event unchanged with data set &quot;dataset &quot;weekly Monday on a Friday start&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it refuses a forced save and leaves the stored event unchanged with data set &quot;dataset &quot;weekly Monday on a Friday start&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="2" time="0.256764">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it refuses a forced save and leaves the stored event unchanged with data set "dataset "weekly Monday on a Friday start""A notification was not sent
+Failed asserting that null is not null.
+at vendor/filament/notifications/src/Notification.php:287
+at vendor/filament/notifications/src/Testing/TestsNotifications.php:20
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/EditEventResilienceTest.php:94</failure>
+        </testcase>
+        <testcase name="it refuses a forced save and leaves the stored event unchanged with data set &quot;dataset &quot;second Tuesday on a Friday start&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it refuses a forced save and leaves the stored event unchanged with data set &quot;dataset &quot;second Tuesday on a Friday start&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="2" time="0.140017">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it refuses a forced save and leaves the stored event unchanged with data set "dataset "second Tuesday on a Friday start""A notification was not sent
+Failed asserting that null is not null.
+at vendor/filament/notifications/src/Notification.php:287
+at vendor/filament/notifications/src/Testing/TestsNotifications.php:20
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/EditEventResilienceTest.php:94</failure>
+        </testcase>
+        <testcase name="it refuses a forced save and leaves the stored event unchanged with data set &quot;dataset &quot;last Friday on a fourth-Friday start&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it refuses a forced save and leaves the stored event unchanged with data set &quot;dataset &quot;last Friday on a fourth-Friday start&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="2" time="0.125129">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it refuses a forced save and leaves the stored event unchanged with data set "dataset "last Friday on a fourth-Friday start""A notification was not sent
+Failed asserting that null is not null.
+at vendor/filament/notifications/src/Notification.php:287
+at vendor/filament/notifications/src/Testing/TestsNotifications.php:20
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/EditEventResilienceTest.php:94</failure>
+        </testcase>
+        <testcase name="it refuses a forced save and leaves the stored event unchanged with data set &quot;dataset &quot;timed UNTIL at noon UTC&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it refuses a forced save and leaves the stored event unchanged with data set &quot;dataset &quot;timed UNTIL at noon UTC&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="2" time="0.122052">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it refuses a forced save and leaves the stored event unchanged with data set "dataset "timed UNTIL at noon UTC""A notification was not sent
+Failed asserting that null is not null.
+at vendor/filament/notifications/src/Notification.php:287
+at vendor/filament/notifications/src/Testing/TestsNotifications.php:20
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/EditEventResilienceTest.php:94</failure>
+        </testcase>
+        <testcase name="it refuses a forced save and leaves the stored event unchanged with data set &quot;dataset &quot;DATE UNTIL on a timed event&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it refuses a forced save and leaves the stored event unchanged with data set &quot;dataset &quot;DATE UNTIL on a timed event&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="2" time="0.125865">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it refuses a forced save and leaves the stored event unchanged with data set "dataset "DATE UNTIL on a timed event""A notification was not sent
+Failed asserting that null is not null.
+at vendor/filament/notifications/src/Notification.php:287
+at vendor/filament/notifications/src/Testing/TestsNotifications.php:20
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/EditEventResilienceTest.php:94</failure>
+        </testcase>
+      </testsuite>
+      <testsuite name="it still hides the event from the edit page header" tests="8" assertions="64" errors="0" failures="0" skipped="0" time="0.856440">
+        <testcase name="it still hides the event from the edit page header with data set &quot;dataset &quot;daily&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it still hides the event from the edit page header with data set &quot;dataset &quot;daily&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="8" time="0.134378"/>
+        <testcase name="it still hides the event from the edit page header with data set &quot;dataset &quot;count above 999&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it still hides the event from the edit page header with data set &quot;dataset &quot;count above 999&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="8" time="0.098050"/>
+        <testcase name="it still hides the event from the edit page header with data set &quot;dataset &quot;impossible until&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it still hides the event from the edit page header with data set &quot;dataset &quot;impossible until&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="8" time="0.103528"/>
+        <testcase name="it still hides the event from the edit page header with data set &quot;dataset &quot;weekly Monday on a Friday start&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it still hides the event from the edit page header with data set &quot;dataset &quot;weekly Monday on a Friday start&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="8" time="0.104419"/>
+        <testcase name="it still hides the event from the edit page header with data set &quot;dataset &quot;second Tuesday on a Friday start&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it still hides the event from the edit page header with data set &quot;dataset &quot;second Tuesday on a Friday start&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="8" time="0.108763"/>
+        <testcase name="it still hides the event from the edit page header with data set &quot;dataset &quot;last Friday on a fourth-Friday start&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it still hides the event from the edit page header with data set &quot;dataset &quot;last Friday on a fourth-Friday start&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="8" time="0.105975"/>
+        <testcase name="it still hides the event from the edit page header with data set &quot;dataset &quot;timed UNTIL at noon UTC&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it still hides the event from the edit page header with data set &quot;dataset &quot;timed UNTIL at noon UTC&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="8" time="0.103184"/>
+        <testcase name="it still hides the event from the edit page header with data set &quot;dataset &quot;DATE UNTIL on a timed event&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it still hides the event from the edit page header with data set &quot;dataset &quot;DATE UNTIL on a timed event&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="8" time="0.098143"/>
+      </testsuite>
+      <testcase name="it opens a supported weekly series with Repeats hydrated, Save present and no warning" file="tests/Feature/Filament/EditEventResilienceTest.php::it opens a supported weekly series with Repeats hydrated, Save present and no warning" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="10" time="0.075003"/>
+      <testcase name="it refuses an edit in UpdatePublishedEvent itself when the stored rule is unsupported" file="tests/Feature/Filament/EditEventResilienceTest.php::it refuses an edit in UpdatePublishedEvent itself when the stored rule is unsupported" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="5" time="0.052695"/>
+      <testsuite name="it refuses an edit in UpdatePublishedEvent when the stored rule does not round-trip" tests="2" assertions="2" errors="0" failures="2" skipped="0" time="0.080772">
+        <testcase name="it refuses an edit in UpdatePublishedEvent when the stored rule does not round-trip with data set &quot;dataset &quot;weekly Monday on a Friday start&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it refuses an edit in UpdatePublishedEvent when the stored rule does not round-trip with data set &quot;dataset &quot;weekly Monday on a Friday start&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="1" time="0.041638">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it refuses an edit in UpdatePublishedEvent when the stored rule does not round-trip with data set "dataset "weekly Monday on a Friday start""Exception [InvalidArgumentException] not thrown.
+at tests/Feature/Filament/EditEventResilienceTest.php:147</failure>
+        </testcase>
+        <testcase name="it refuses an edit in UpdatePublishedEvent when the stored rule does not round-trip with data set &quot;dataset &quot;second Tuesday on a Friday start&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it refuses an edit in UpdatePublishedEvent when the stored rule does not round-trip with data set &quot;dataset &quot;second Tuesday on a Friday start&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="1" time="0.039134">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it refuses an edit in UpdatePublishedEvent when the stored rule does not round-trip with data set "dataset "second Tuesday on a Friday start""Exception [InvalidArgumentException] not thrown.
+at tests/Feature/Filament/EditEventResilienceTest.php:147</failure>
+        </testcase>
+      </testsuite>
+      <testsuite name="it keeps occurrences, an admin cancellation and the .ics UID when a save of a non-round-tripping rule is refused" tests="2" assertions="22" errors="0" failures="2" skipped="0" time="0.454978">
+        <testcase name="it keeps occurrences, an admin cancellation and the .ics UID when a save of a non-round-tripping rule is refused with data set &quot;dataset &quot;weekly Monday&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it keeps occurrences, an admin cancellation and the .ics UID when a save of a non-round-tripping rule is refused with data set &quot;dataset &quot;weekly Monday&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="11" time="0.303947">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it keeps occurrences, an admin cancellation and the .ics UID when a save of a non-round-tripping rule is refused with data set "dataset "weekly Monday""A notification was not sent
+Failed asserting that null is not null.
+at vendor/filament/notifications/src/Notification.php:287
+at vendor/filament/notifications/src/Testing/TestsNotifications.php:20
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/EditEventResilienceTest.php:201</failure>
+        </testcase>
+        <testcase name="it keeps occurrences, an admin cancellation and the .ics UID when a save of a non-round-tripping rule is refused with data set &quot;dataset &quot;second Tuesday&quot;&quot;" file="tests/Feature/Filament/EditEventResilienceTest.php::it keeps occurrences, an admin cancellation and the .ics UID when a save of a non-round-tripping rule is refused with data set &quot;dataset &quot;second Tuesday&quot;&quot;" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="11" time="0.151031">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">it keeps occurrences, an admin cancellation and the .ics UID when a save of a non-round-tripping rule is refused with data set "dataset "second Tuesday""A notification was not sent
+Failed asserting that null is not null.
+at vendor/filament/notifications/src/Notification.php:287
+at vendor/filament/notifications/src/Testing/TestsNotifications.php:20
+at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+at vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+at tests/Feature/Filament/EditEventResilienceTest.php:201</failure>
+        </testcase>
+      </testsuite>
+      <testcase name="it hides and cancels events from the events table" file="tests/Feature/Filament/EditEventResilienceTest.php::it hides and cancels events from the events table" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="13" time="0.258063"/>
+      <testcase name="it offers Show on calendar in the table only for a hidden event" file="tests/Feature/Filament/EditEventResilienceTest.php::it offers Show on calendar in the table only for a hidden event" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="8" time="0.102212"/>
+      <testcase name="it keeps the events list closed to anyone but the admin" file="tests/Feature/Filament/EditEventResilienceTest.php::it keeps the events list closed to anyone but the admin" class="Tests\Feature\Filament\EditEventResilienceTest" classname="Tests.Feature.Filament.EditEventResilienceTest" assertions="1" time="0.041806"/>
+    </testsuite>
+    <testsuite name="Tests\Unit\Calendar\ManualRecurrenceTest" file="tests/Unit/Calendar/ManualRecurrenceTest.php" tests="38" assertions="48" errors="14" failures="0" skipped="0" time="0.548829">
+      <testsuite name="it accepts every emitted RRULE as editable for its own start date" tests="6" assertions="0" errors="6" failures="0" skipped="0" time="0.093434">
+        <testcase name="it accepts every emitted RRULE as editable for its own start date with data set &quot;dataset &quot;weekly, never ends&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it accepts every emitted RRULE as editable for its own start date with data set &quot;dataset &quot;weekly, never ends&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="0" time="0.028570">
+          <error type="Error">it accepts every emitted RRULE as editable for its own start date with data set "dataset "weekly, never ends""Error: Call to undefined method App\Calendar\ManualRecurrence::tryFromStoredRule()
+at tests/Unit/Calendar/ManualRecurrenceTest.php:59</error>
+        </testcase>
+        <testcase name="it accepts every emitted RRULE as editable for its own start date with data set &quot;dataset &quot;second Tuesday, 6 times&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it accepts every emitted RRULE as editable for its own start date with data set &quot;dataset &quot;second Tuesday, 6 times&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="0" time="0.013117">
+          <error type="Error">it accepts every emitted RRULE as editable for its own start date with data set "dataset "second Tuesday, 6 times""Error: Call to undefined method App\Calendar\ManualRecurrence::tryFromStoredRule()
+at tests/Unit/Calendar/ManualRecurrenceTest.php:59</error>
+        </testcase>
+        <testcase name="it accepts every emitted RRULE as editable for its own start date with data set &quot;dataset &quot;last Friday, timed, until 31 Mar 2027 (BST)&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it accepts every emitted RRULE as editable for its own start date with data set &quot;dataset &quot;last Friday, timed, until 31 Mar 2027 (BST)&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="0" time="0.013021">
+          <error type="Error">it accepts every emitted RRULE as editable for its own start date with data set "dataset "last Friday, timed, until 31 Mar 2027 (BST)""Error: Call to undefined method App\Calendar\ManualRecurrence::tryFromStoredRule()
+at tests/Unit/Calendar/ManualRecurrenceTest.php:59</error>
+        </testcase>
+        <testcase name="it accepts every emitted RRULE as editable for its own start date with data set &quot;dataset &quot;weekly all-day Sunday until 27 Dec 2026 (DATE form)&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it accepts every emitted RRULE as editable for its own start date with data set &quot;dataset &quot;weekly all-day Sunday until 27 Dec 2026 (DATE form)&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="0" time="0.012844">
+          <error type="Error">it accepts every emitted RRULE as editable for its own start date with data set "dataset "weekly all-day Sunday until 27 Dec 2026 (DATE form)""Error: Call to undefined method App\Calendar\ManualRecurrence::tryFromStoredRule()
+at tests/Unit/Calendar/ManualRecurrenceTest.php:59</error>
+        </testcase>
+        <testcase name="it accepts every emitted RRULE as editable for its own start date with data set &quot;dataset &quot;weekly Friday, timed, until 1 Jan 2027 (GMT)&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it accepts every emitted RRULE as editable for its own start date with data set &quot;dataset &quot;weekly Friday, timed, until 1 Jan 2027 (GMT)&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="0" time="0.012757">
+          <error type="Error">it accepts every emitted RRULE as editable for its own start date with data set "dataset "weekly Friday, timed, until 1 Jan 2027 (GMT)""Error: Call to undefined method App\Calendar\ManualRecurrence::tryFromStoredRule()
+at tests/Unit/Calendar/ManualRecurrenceTest.php:59</error>
+        </testcase>
+        <testcase name="it accepts every emitted RRULE as editable for its own start date with data set &quot;dataset &quot;weekly Sunday, timed, until 25 Oct 2026 (BST ends that day)&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it accepts every emitted RRULE as editable for its own start date with data set &quot;dataset &quot;weekly Sunday, timed, until 25 Oct 2026 (BST ends that day)&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="0" time="0.013124">
+          <error type="Error">it accepts every emitted RRULE as editable for its own start date with data set "dataset "weekly Sunday, timed, until 25 Oct 2026 (BST ends that day)""Error: Call to undefined method App\Calendar\ManualRecurrence::tryFromStoredRule()
+at tests/Unit/Calendar/ManualRecurrenceTest.php:59</error>
+        </testcase>
+      </testsuite>
+      <testsuite name="it rejects a stored rule that does not round-trip for the start date" tests="7" assertions="0" errors="7" failures="0" skipped="0" time="0.107876">
+        <testcase name="it rejects a stored rule that does not round-trip for the start date with data set &quot;dataset &quot;weekly Monday&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it rejects a stored rule that does not round-trip for the start date with data set &quot;dataset &quot;weekly Monday&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="0" time="0.020046">
+          <error type="Error">it rejects a stored rule that does not round-trip for the start date with data set "dataset "weekly Monday""Error: Call to undefined method App\Calendar\ManualRecurrence::tryFromStoredRule()
+at tests/Unit/Calendar/ManualRecurrenceTest.php:69</error>
+        </testcase>
+        <testcase name="it rejects a stored rule that does not round-trip for the start date with data set &quot;dataset &quot;second Tuesday&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it rejects a stored rule that does not round-trip for the start date with data set &quot;dataset &quot;second Tuesday&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="0" time="0.015879">
+          <error type="Error">it rejects a stored rule that does not round-trip for the start date with data set "dataset "second Tuesday""Error: Call to undefined method App\Calendar\ManualRecurrence::tryFromStoredRule()
+at tests/Unit/Calendar/ManualRecurrenceTest.php:69</error>
+        </testcase>
+        <testcase name="it rejects a stored rule that does not round-trip for the start date with data set &quot;dataset &quot;last Friday (start is not a last Friday)&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it rejects a stored rule that does not round-trip for the start date with data set &quot;dataset &quot;last Friday (start is not a last Friday)&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="0" time="0.017557">
+          <error type="Error">it rejects a stored rule that does not round-trip for the start date with data set "dataset "last Friday (start is not a last Friday)""Error: Call to undefined method App\Calendar\ManualRecurrence::tryFromStoredRule()
+at tests/Unit/Calendar/ManualRecurrenceTest.php:69</error>
+        </testcase>
+        <testcase name="it rejects a stored rule that does not round-trip for the start date with data set &quot;dataset &quot;timed UNTIL at noon UTC&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it rejects a stored rule that does not round-trip for the start date with data set &quot;dataset &quot;timed UNTIL at noon UTC&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="0" time="0.014437">
+          <error type="Error">it rejects a stored rule that does not round-trip for the start date with data set "dataset "timed UNTIL at noon UTC""Error: Call to undefined method App\Calendar\ManualRecurrence::tryFromStoredRule()
+at tests/Unit/Calendar/ManualRecurrenceTest.php:69</error>
+        </testcase>
+        <testcase name="it rejects a stored rule that does not round-trip for the start date with data set &quot;dataset &quot;DATE UNTIL on a timed event&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it rejects a stored rule that does not round-trip for the start date with data set &quot;dataset &quot;DATE UNTIL on a timed event&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="0" time="0.013130">
+          <error type="Error">it rejects a stored rule that does not round-trip for the start date with data set "dataset "DATE UNTIL on a timed event""Error: Call to undefined method App\Calendar\ManualRecurrence::tryFromStoredRule()
+at tests/Unit/Calendar/ManualRecurrenceTest.php:69</error>
+        </testcase>
+        <testcase name="it rejects a stored rule that does not round-trip for the start date with data set &quot;dataset &quot;zero-padded COUNT&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it rejects a stored rule that does not round-trip for the start date with data set &quot;dataset &quot;zero-padded COUNT&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="0" time="0.013596">
+          <error type="Error">it rejects a stored rule that does not round-trip for the start date with data set "dataset "zero-padded COUNT""Error: Call to undefined method App\Calendar\ManualRecurrence::tryFromStoredRule()
+at tests/Unit/Calendar/ManualRecurrenceTest.php:69</error>
+        </testcase>
+        <testcase name="it rejects a stored rule that does not round-trip for the start date with data set &quot;dataset &quot;daily&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it rejects a stored rule that does not round-trip for the start date with data set &quot;dataset &quot;daily&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="0" time="0.013230">
+          <error type="Error">it rejects a stored rule that does not round-trip for the start date with data set "dataset "daily""Error: Call to undefined method App\Calendar\ManualRecurrence::tryFromStoredRule()
+at tests/Unit/Calendar/ManualRecurrenceTest.php:69</error>
+        </testcase>
+      </testsuite>
+      <testcase name="it treats a null stored rule as &quot;Does not repeat&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it treats a null stored rule as &quot;Does not repeat&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="0" time="0.013411">
+        <error type="Error">it treats a null stored rule as "Does not repeat"Error: Call to undefined method App\Calendar\ManualRecurrence::tryFromStoredRule()
+at tests/Unit/Calendar/ManualRecurrenceTest.php:73</error>
+      </testcase>
+      <testsuite name="it builds the RRULE for each supported pattern and ending" tests="6" assertions="6" errors="0" failures="0" skipped="0" time="0.075595">
+        <testcase name="it builds the RRULE for each supported pattern and ending with data set &quot;dataset &quot;weekly, never ends&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it builds the RRULE for each supported pattern and ending with data set &quot;dataset &quot;weekly, never ends&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="1" time="0.012925"/>
+        <testcase name="it builds the RRULE for each supported pattern and ending with data set &quot;dataset &quot;second Tuesday, 6 times&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it builds the RRULE for each supported pattern and ending with data set &quot;dataset &quot;second Tuesday, 6 times&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="1" time="0.012332"/>
+        <testcase name="it builds the RRULE for each supported pattern and ending with data set &quot;dataset &quot;last Friday, timed, until 31 Mar 2027 (BST)&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it builds the RRULE for each supported pattern and ending with data set &quot;dataset &quot;last Friday, timed, until 31 Mar 2027 (BST)&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="1" time="0.012900"/>
+        <testcase name="it builds the RRULE for each supported pattern and ending with data set &quot;dataset &quot;weekly all-day Sunday until 27 Dec 2026 (DATE form)&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it builds the RRULE for each supported pattern and ending with data set &quot;dataset &quot;weekly all-day Sunday until 27 Dec 2026 (DATE form)&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="1" time="0.012841"/>
+        <testcase name="it builds the RRULE for each supported pattern and ending with data set &quot;dataset &quot;weekly Friday, timed, until 1 Jan 2027 (GMT)&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it builds the RRULE for each supported pattern and ending with data set &quot;dataset &quot;weekly Friday, timed, until 1 Jan 2027 (GMT)&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="1" time="0.012502"/>
+        <testcase name="it builds the RRULE for each supported pattern and ending with data set &quot;dataset &quot;weekly Sunday, timed, until 25 Oct 2026 (BST ends that day)&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it builds the RRULE for each supported pattern and ending with data set &quot;dataset &quot;weekly Sunday, timed, until 25 Oct 2026 (BST ends that day)&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="1" time="0.012096"/>
+      </testsuite>
+      <testsuite name="it round-trips every emitted RRULE back to the same pattern, ending, until date and count" tests="6" assertions="24" errors="0" failures="0" skipped="0" time="0.076833">
+        <testcase name="it round-trips every emitted RRULE back to the same pattern, ending, until date and count with data set &quot;dataset &quot;weekly, never ends&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it round-trips every emitted RRULE back to the same pattern, ending, until date and count with data set &quot;dataset &quot;weekly, never ends&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="4" time="0.013218"/>
+        <testcase name="it round-trips every emitted RRULE back to the same pattern, ending, until date and count with data set &quot;dataset &quot;second Tuesday, 6 times&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it round-trips every emitted RRULE back to the same pattern, ending, until date and count with data set &quot;dataset &quot;second Tuesday, 6 times&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="4" time="0.013008"/>
+        <testcase name="it round-trips every emitted RRULE back to the same pattern, ending, until date and count with data set &quot;dataset &quot;last Friday, timed, until 31 Mar 2027 (BST)&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it round-trips every emitted RRULE back to the same pattern, ending, until date and count with data set &quot;dataset &quot;last Friday, timed, until 31 Mar 2027 (BST)&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="4" time="0.012281"/>
+        <testcase name="it round-trips every emitted RRULE back to the same pattern, ending, until date and count with data set &quot;dataset &quot;weekly all-day Sunday until 27 Dec 2026 (DATE form)&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it round-trips every emitted RRULE back to the same pattern, ending, until date and count with data set &quot;dataset &quot;weekly all-day Sunday until 27 Dec 2026 (DATE form)&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="4" time="0.013287"/>
+        <testcase name="it round-trips every emitted RRULE back to the same pattern, ending, until date and count with data set &quot;dataset &quot;weekly Friday, timed, until 1 Jan 2027 (GMT)&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it round-trips every emitted RRULE back to the same pattern, ending, until date and count with data set &quot;dataset &quot;weekly Friday, timed, until 1 Jan 2027 (GMT)&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="4" time="0.012240"/>
+        <testcase name="it round-trips every emitted RRULE back to the same pattern, ending, until date and count with data set &quot;dataset &quot;weekly Sunday, timed, until 25 Oct 2026 (BST ends that day)&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it round-trips every emitted RRULE back to the same pattern, ending, until date and count with data set &quot;dataset &quot;weekly Sunday, timed, until 25 Oct 2026 (BST ends that day)&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="4" time="0.012800"/>
+      </testsuite>
+      <testcase name="it returns no rule for &quot;Does not repeat&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it returns no rule for &quot;Does not repeat&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="1" time="0.012246"/>
+      <testcase name="it rejects an RRULE shape it does not emit" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it rejects an RRULE shape it does not emit" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="1" time="0.032755"/>
+      <testcase name="it offers &quot;second Tuesday&quot; and no last option for Tue 8 Sep 2026" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it offers &quot;second Tuesday&quot; and no last option for Tue 8 Sep 2026" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="2" time="0.020590"/>
+      <testcase name="it offers &quot;last Thursday&quot; and no nth option for Thu 29 Oct 2026" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it offers &quot;last Thursday&quot; and no nth option for Thu 29 Oct 2026" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="2" time="0.012741"/>
+      <testcase name="it offers &quot;fourth Friday&quot; and no last option for Fri 23 Oct 2026" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it offers &quot;fourth Friday&quot; and no last option for Fri 23 Oct 2026" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="2" time="0.013531"/>
+      <testcase name="it treats an nth-weekday pattern as invalid for a fifth-weekday start date" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it treats an nth-weekday pattern as invalid for a fifth-weekday start date" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="2" time="0.013514"/>
+      <testcase name="it treats a last-weekday pattern as invalid when start + 7 days is in the same month" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it treats a last-weekday pattern as invalid when start + 7 days is in the same month" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="2" time="0.012780"/>
+      <testcase name="it labels a pattern in plain British English" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it labels a pattern in plain British English" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="2" time="0.012655"/>
+      <testsuite name="it refuses an impossible until date instead of overflowing it" tests="2" assertions="2" errors="0" failures="0" skipped="0" time="0.025987">
+        <testcase name="it refuses an impossible until date instead of overflowing it with data set &quot;dataset &quot;month 13&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it refuses an impossible until date instead of overflowing it with data set &quot;dataset &quot;month 13&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="1" time="0.013032"/>
+        <testcase name="it refuses an impossible until date instead of overflowing it with data set &quot;dataset &quot;30 February&quot;&quot;" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it refuses an impossible until date instead of overflowing it with data set &quot;dataset &quot;30 February&quot;&quot;" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="1" time="0.012956"/>
+      </testsuite>
+      <testcase name="it keeps a real until date such as 28 Feb 2026 as London end of day" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it keeps a real until date such as 28 Feb 2026 as London end of day" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="1" time="0.012404"/>
+      <testcase name="it rejects a stored UNTIL that is not a real date" file="tests/Unit/Calendar/ManualRecurrenceTest.php::it rejects a stored UNTIL that is not a real date" class="Tests\Unit\Calendar\ManualRecurrenceTest" classname="Tests.Unit.Calendar.ManualRecurrenceTest" assertions="1" time="0.012476"/>
+    </testsuite>
+  </testsuite>
+</testsuites>
