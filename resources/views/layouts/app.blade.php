@@ -43,6 +43,10 @@
 
         <footer class="border-t border-line py-6 text-sm text-muted">
             <p>{{ config('site.name') }}</p>
+            <ul class="flex flex-wrap gap-x-4">
+                <li><a href="{{ route('submit.create', absolute: false) }}" class="tap-target text-accent underline underline-offset-2">Add your event</a></li>
+                <li><a href="{{ route('privacy', absolute: false) }}" class="tap-target text-accent underline underline-offset-2">Privacy</a></li>
+            </ul>
             <p>Questions or corrections: <a href="mailto:{{ config('site.contact_email') }}" class="text-accent underline underline-offset-2">{{ config('site.contact_email') }}</a></p>
         </footer>
     </div>

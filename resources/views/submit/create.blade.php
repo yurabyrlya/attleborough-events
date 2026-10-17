@@ -38,6 +38,11 @@
 @section('title', 'Add your event')
 @section('description', "Send your Attleborough event to What's On Attleborough. We check every event before it goes on the calendar.")
 
+@push('head')
+    {{-- The only script on the page: the first-party venue reveal (D-01). The form works without it. --}}
+    @vite('resources/js/submit.js')
+@endpush
+
 @section('content')
     <h1 class="mt-6 text-2xl font-bold text-ink">Add your event</h1>
     <p class="mt-2 text-ink">Tell us about your event and we'll check it before it goes on the calendar.</p>
