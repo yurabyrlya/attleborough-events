@@ -14,7 +14,7 @@ use function Pest\Laravel\get;
 use function Pest\Livewire\livewire;
 
 /*
- * Tracer: Review queue → review page → Approve and publish → public calendar.
+ * Tracer: Review queue → review page → Approve & next → public calendar.
  */
 beforeEach(function () {
     freezeLondon('2026-10-20 10:00');

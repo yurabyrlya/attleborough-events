@@ -7,6 +7,7 @@ use App\Filament\Resources\EventDrafts\Actions\ReviewActions;
 use App\Filament\Resources\EventDrafts\EventDraftResource;
 use App\Models\EventDraft;
 use App\Review\DraftPublishability;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
 use Filament\Schemas\Schema;
@@ -16,6 +17,9 @@ use Illuminate\Contracts\Support\Htmlable;
  * One draft's review page (REV-01): what blocks publishing, then everything
  * the queue knows about the draft, with the review actions in the header.
  * Read-only: decisions go through ReviewActions to App\Publishing\Actions.
+ * It is also the "Approve & next" page (REV-10): each decision opens the
+ * next pending draft, and the view's guarded keyboard handler calls
+ * approveFromKeyboard() or mounts the other header actions.
  */
 class ReviewEventDraft extends Page
 {
@@ -79,6 +83,41 @@ class ReviewEventDraft extends Page
         }
 
         return app(DraftPublishability::class)->blockers($draft);
+    }
+
+    /**
+     * The keyboard "A" (D-10): a draft that can't be published gets a
+     * visible warning listing what blocks it; otherwise the approve
+     * confirmation opens and Enter publishes. ApproveDraft re-checks on the
+     * server either way. Does nothing once the draft is no longer pending.
+     */
+    public function approveFromKeyboard(): void
+    {
+        if ($this->shownStatus() !== ReviewStatus::PendingReview) {
+            return;
+        }
+
+        $blockers = app(DraftPublishability::class)->blockers($this->draft());
+
+        if ($blockers !== []) {
+            // Plain-text body: Filament escapes notification strings.
+            Notification::make()->warning()->title("Can't approve yet")->body(implode(' ', $blockers))->send();
+
+            return;
+        }
+
+        $this->mountAction('approve');
+    }
+
+    /**
+     * Where the keyboard "E" goes, or null when the draft is no longer
+     * pending (decided drafts aren't editable).
+     */
+    public function editUrl(): ?string
+    {
+        return $this->shownStatus() === ReviewStatus::PendingReview
+            ? EventDraftResource::getUrl('edit', ['record' => $this->draft()])
+            : null;
     }
 
     public function infolist(Schema $schema): Schema

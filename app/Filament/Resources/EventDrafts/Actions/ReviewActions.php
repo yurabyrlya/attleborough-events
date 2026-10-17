@@ -6,6 +6,7 @@ use App\Enums\EventOrigin;
 use App\Enums\RejectReason;
 use App\Enums\ReviewStatus;
 use App\Filament\Resources\EventDrafts\EventDraftResource;
+use App\Filament\Resources\EventDrafts\Pages\EditEventDraft;
 use App\Filament\Resources\EventDrafts\Pages\ReviewEventDraft;
 use App\Models\EventDraft;
 use App\Models\User;
@@ -15,6 +16,7 @@ use App\Publishing\Actions\ReopenDraft;
 use App\Review\DraftPublishability;
 use App\Review\Exceptions\DraftNotPublishable;
 use App\Review\Exceptions\InvalidReviewTransition;
+use App\Review\ReviewQueue;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -36,6 +38,13 @@ use Livewire\Component;
  * decided in another tab therefore still offers the buttons the admin sees,
  * and clicking one reports "This draft was already reviewed" instead of
  * doing nothing.
+ *
+ * "Approve & next" (REV-10, D-09/D-10): on the review page Approve, Reject
+ * and Skip open the next pending draft in ReviewQueue order (the list with
+ * "You've reached the end of the queue" after the last one). Every button
+ * shows its key and carries aria-keyshortcuts; the keys themselves are a
+ * guarded Alpine handler in the page view, never Filament's key bindings
+ * (Mousetrap's global bindings fire inside text inputs).
  */
 final class ReviewActions
 {
@@ -52,9 +61,13 @@ final class ReviewActions
     {
         return [
             self::approve(),
+            self::edit(),
             self::reject(),
+            self::skip(),
+            self::previous(),
             self::reopen(),
             self::rawContent(),
+            self::help(),
         ];
     }
 
@@ -74,7 +87,8 @@ final class ReviewActions
     public static function approve(): Action
     {
         return Action::make('approve')
-            ->label('Approve and publish')
+            ->label('Approve & next (A)')
+            ->extraAttributes(['aria-keyshortcuts' => 'A'])
             ->color('success')
             ->visible(fn (EventDraft $record, Component $livewire): bool => self::shownStatus($record, $livewire) === ReviewStatus::PendingReview)
             ->disabled(fn (EventDraft $record): bool => app(DraftPublishability::class)->blockers($record) !== [])
@@ -87,19 +101,80 @@ final class ReviewActions
                 $published = self::run(fn (User $actor) => app(ApproveDraft::class)($record, $actor), 'Published', $livewire);
 
                 if ($published) {
-                    $livewire->redirect(EventDraftResource::getUrl('index'));
+                    self::openNext($record, $livewire);
                 }
             });
     }
 
     /**
+     * Open the edit-and-approve page (REV-03).
+     */
+    public static function edit(): Action
+    {
+        return Action::make('edit')
+            ->label('Edit (E)')
+            ->extraAttributes(['aria-keyshortcuts' => 'E'])
+            ->color('gray')
+            ->visible(fn (EventDraft $record, Component $livewire): bool => self::shownStatus($record, $livewire) === ReviewStatus::PendingReview)
+            ->url(fn (EventDraft $record): string => EventDraftResource::getUrl('edit', ['record' => $record]));
+    }
+
+    /**
+     * Leave this draft pending and open the next one (D-09).
+     */
+    public static function skip(): Action
+    {
+        return Action::make('skip')
+            ->label('Skip (S)')
+            ->extraAttributes(['aria-keyshortcuts' => 'S J'])
+            ->color('gray')
+            ->visible(fn (EventDraft $record, Component $livewire): bool => self::shownStatus($record, $livewire) === ReviewStatus::PendingReview)
+            ->action(fn (EventDraft $record, Component $livewire) => self::openNext($record, $livewire));
+    }
+
+    /**
+     * Open the pending draft before this one; hidden on the first.
+     */
+    public static function previous(): Action
+    {
+        return Action::make('previous')
+            ->label('Previous (K)')
+            ->extraAttributes(['aria-keyshortcuts' => 'K'])
+            ->color('gray')
+            ->visible(fn (EventDraft $record): bool => app(ReviewQueue::class)->previous($record) !== null)
+            ->action(function (EventDraft $record, Component $livewire): void {
+                $previous = app(ReviewQueue::class)->previous($record);
+
+                $livewire->redirect($previous === null
+                    ? EventDraftResource::getUrl('index')
+                    : EventDraftResource::getUrl('review', ['record' => $previous]));
+            });
+    }
+
+    /**
+     * The keyboard shortcuts (D-10), also opened with "?".
+     */
+    public static function help(): Action
+    {
+        return Action::make('help')
+            ->label('Keyboard shortcuts (?)')
+            ->extraAttributes(['aria-keyshortcuts' => '?'])
+            ->color('gray')
+            ->modalHeading('Keyboard shortcuts')
+            ->modalContent(view('filament.resources.event-drafts.keyboard-help'))
+            ->modalSubmitAction(false)
+            ->modalCancelActionLabel('Close');
+    }
+
+    /**
      * Reject with an optional preset reason and note (REV-04, D-11). From
-     * the review page it returns to the queue; in the table it stays put.
+     * the review page it opens the next draft; in the table it stays put.
      */
     public static function reject(): Action
     {
         return Action::make('reject')
-            ->label('Reject')
+            ->label(fn (Component $livewire): string => $livewire instanceof ReviewEventDraft ? 'Reject (R)' : 'Reject')
+            ->extraAttributes(fn (Component $livewire): array => $livewire instanceof ReviewEventDraft ? ['aria-keyshortcuts' => 'R'] : [])
             ->color('danger')
             ->visible(fn (EventDraft $record, Component $livewire): bool => self::shownStatus($record, $livewire) === ReviewStatus::PendingReview)
             ->modalHeading('Reject this draft?')
@@ -112,8 +187,8 @@ final class ReviewActions
 
                 $rejected = self::run(fn (User $actor) => app(RejectDraft::class)($record, $actor, $reason, $note), 'Draft rejected', $livewire);
 
-                if ($rejected && $livewire instanceof ReviewEventDraft) {
-                    $livewire->redirect(EventDraftResource::getUrl('index'));
+                if ($rejected) {
+                    self::openNext($record, $livewire);
                 }
             });
     }
@@ -251,6 +326,28 @@ final class ReviewActions
         self::resync($livewire);
 
         return true;
+    }
+
+    /**
+     * On the review page, open the pending draft after $current (D-09), or
+     * the queue with a notice at the end. Elsewhere (the table) stay put.
+     */
+    private static function openNext(EventDraft $current, Component $livewire): void
+    {
+        if (! $livewire instanceof ReviewEventDraft) {
+            return;
+        }
+
+        $next = app(ReviewQueue::class)->next($current);
+
+        if ($next === null) {
+            Notification::make()->title(EditEventDraft::END_OF_QUEUE)->info()->send();
+            $livewire->redirect(EventDraftResource::getUrl('index'));
+
+            return;
+        }
+
+        $livewire->redirect(EventDraftResource::getUrl('review', ['record' => $next]));
     }
 
     private static function resync(Component $livewire): void
