@@ -111,13 +111,17 @@ it('changes nothing when the same data is saved again', function () {
     expect(occurrenceSnapshot($event))->toBe($before);
 });
 
-it('leaves exactly one future occurrence keyed by start_date when a series becomes "Does not repeat"', function () {
+// WR-06 (01-13): a series can no longer become "Does not repeat", because
+// the one-off UID scheme would change every occurrence's UID.
+it('refuses to make a series "Does not repeat" and leaves its occurrences as they were', function () {
     $event = app(PublishEvent::class)(editData($this->baseData), $this->admin, EventOrigin::Manual);
+    $before = occurrenceSnapshot($event);
 
-    $updated = app(UpdatePublishedEvent::class)($event, editData($this->baseData, ['repeats' => RepeatPattern::None]), $this->admin);
+    expect(fn () => app(UpdatePublishedEvent::class)($event, editData($this->baseData, ['repeats' => RepeatPattern::None]), $this->admin))
+        ->toThrow(InvalidArgumentException::class, "can't switch between one-off and repeating");
 
-    expect($updated->recurrence_rule)->toBeNull()
-        ->and(array_keys(occurrenceSnapshot($event)))->toBe(['2026-10-23']);
+    expect($event->fresh()->recurrence_rule)->toBe('FREQ=WEEKLY;BYDAY=FR')
+        ->and(occurrenceSnapshot($event))->toBe($before);
 });
 
 it('sets ends_at NULL and expires_at = starts_at + 3h on every future occurrence when the end time is cleared', function () {

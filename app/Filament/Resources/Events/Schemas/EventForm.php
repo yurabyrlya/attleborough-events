@@ -107,9 +107,17 @@ class EventForm
                 Section::make('Repeats')
                     ->columns(2)
                     ->schema([
+                        // Edit page mirrors UpdatePublishedEvent's WR-06 guard:
+                        // an event never switches between one-off and repeating.
                         Select::make('repeats')
                             ->label('Repeats')
-                            ->options(fn (Get $get): array => self::repeatOptions($get))
+                            ->options(fn (Get $get, string $operation, mixed $record): array => self::repeatOptions($get, self::editedEventRepeats($operation, $record)))
+                            ->disabled(fn (string $operation, mixed $record): bool => self::editedEventRepeats($operation, $record) === false)
+                            ->helperText(fn (string $operation, mixed $record): ?string => match (self::editedEventRepeats($operation, $record)) {
+                                false => "To make this repeat, hide it and create a new repeating event. The hidden event's page will stop working and the new event gets its own web address.",
+                                true => 'To stop it repeating, set a last date or hide it.',
+                                null => null,
+                            })
                             ->default(RepeatPattern::None->value)
                             ->selectablePlaceholder(false)
                             ->live()
@@ -226,18 +234,41 @@ class EventForm
 
     /**
      * Repeats options computed from the chosen start date (Europe/London).
+     * On the edit page a one-off event keeps only "Does not repeat" and a
+     * series loses it (WR-06): see UpdatePublishedEvent.
      *
+     * @param  bool|null  $editedEventRepeats  null on the create page
      * @return array<string, string>
      */
-    private static function repeatOptions(Get $get): array
+    private static function repeatOptions(Get $get, ?bool $editedEventRepeats = null): array
     {
-        $start = self::startLocal($get);
+        $none = [RepeatPattern::None->value => 'Does not repeat'];
 
-        if ($start === null) {
-            return [RepeatPattern::None->value => 'Does not repeat'];
+        if ($editedEventRepeats === false) {
+            return $none;
         }
 
-        return ManualRecurrence::optionsFor($start);
+        $start = self::startLocal($get);
+        $options = $start === null ? $none : ManualRecurrence::optionsFor($start);
+
+        if ($editedEventRepeats === true) {
+            unset($options[RepeatPattern::None->value]);
+        }
+
+        return $options;
+    }
+
+    /**
+     * Whether the event being edited is stored as a series: true for a series,
+     * false for a one-off event, null when creating.
+     */
+    private static function editedEventRepeats(string $operation, mixed $record): ?bool
+    {
+        if ($operation !== 'edit' || ! $record instanceof Event) {
+            return null;
+        }
+
+        return $record->recurrence_rule !== null;
     }
 
     private static function repeats(Get $get): RepeatPattern

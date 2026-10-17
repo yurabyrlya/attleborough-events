@@ -18,6 +18,10 @@ use App\Models\EventOccurrence;
  * upsert preserves) go in: never the title, slug, times or the occurrence
  * row id, so edits and re-syncs keep the UID. The domain is the brand domain
  * (D-02) from config('site.domain'), not the hosting URL.
+ *
+ * The "never change" property relies on UpdatePublishedEvent refusing to
+ * switch an event between one-off and repeating (WR-06); a future change to
+ * that guard must come with a UID migration plan.
  */
 final class OccurrenceUid
 {
