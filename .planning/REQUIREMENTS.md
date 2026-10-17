@@ -45,7 +45,7 @@
 
 - [x] **REV-01**: Admin sees drafts of kind new / update / cancellation, each showing extracted fields, recurrence summary, source name and URL, extraction method, raw content link, quality band with reasons, parse errors and any duplicate warning with a link to the suspected event
 - [x] **REV-02**: Admin can approve a draft. The event (and its occurrences) is published in one transaction, linked to the draft, with approver and time recorded. Only review actions and manual entry can write published events
-- [ ] **REV-03**: Admin can edit a draft's fields and approve
+- [x] **REV-03**: Admin can edit a draft's fields and approve
 - [x] **REV-04**: Admin can reject a draft with an optional reason
 - [ ] **REV-05**: Admin can mark a draft as a duplicate of an existing event. It is linked through `event_sources` and nothing new is published
 - [ ] **REV-06**: Admin sees update drafts as a three-column diff (published now / source before / source now) and can apply or ignore. Both actions update the accepted baseline
@@ -200,7 +200,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SUB-04 | Phase 2 | Complete |
 | REV-01 | Phase 2 | Complete |
 | REV-02 | Phase 2 | Complete |
-| REV-03 | Phase 2 | Pending |
+| REV-03 | Phase 2 | Complete |
 | REV-04 | Phase 2 | Complete |
 | REV-05 | Phase 3 | Pending |
 | REV-06 | Phase 3 | Pending |

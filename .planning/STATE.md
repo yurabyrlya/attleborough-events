@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 02
 current_phase_name: Draft Model, Review Queue & Submissions
 status: executing
-stopped_at: Completed 02-13-PLAN.md
-last_updated: "2026-10-17T20:50:33.824Z"
+stopped_at: Completed 02-14-PLAN.md
+last_updated: "2026-10-17T21:04:35.765Z"
 last_activity: 2026-10-17
-last_activity_desc: "Completed 02-11 (Rules screen: Category mappings + Geofence tabs, mapping link in CategoryAssigner, RulesSeeder)"
-state_head: 6e1e266f1ee18bb7d360b7732a8f4e695b27e58f
+last_activity_desc: "Completed 02-14 (Edit-and-approve: EventForm section builders, EventDraftForm, EditEventDraft Save / Save & approve; REV-03 complete)"
+state_head: f4753eec7dcee1536bc64bcb2b76545180abaf12
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 31
-  completed_plans: 26
+  completed_plans: 27
   percent: 20
 ---
 
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 02 (Draft Model, Review Queue & Submissions) — EXECUTING
-Plan: 13 of 16 complete (02-01 to 02-12 done; wave 4 in progress — 02-13 next)
+Plan: 14 of 16 complete (02-01 to 02-14 done; wave 6 next — 02-15)
 Status: Ready to execute
-Last activity: 2026-10-17 — Completed 02-12 (Review queue: EventDraftResource list + review page with full REV-01 detail, approve/reject/reopen/raw content via Publishing actions, ReviewQueue one D-09 sort key for table and next/previous, global search on drafts and events; REV-01 and ADM-06 complete)
+Last activity: 2026-10-17 — Completed 02-14 (Edit-and-approve: draft edit page reusing EventForm's sections, repeats translation with 'No repeat rule needed', suggested venue + pre-filled 'Create new venue', Save & approve in one transaction landing on the next draft; REV-03 complete)
 
-Progress: 24/31 plans ([██░░░░░░░░] 20%); phase 2: 11/16; phases complete: 1/5
+Progress: 27/31 plans ([██░░░░░░░░] 20%); phase 2: 14/16; phases complete: 1/5
 
 ## Performance Metrics
 
@@ -82,6 +82,7 @@ Progress: 24/31 plans ([██░░░░░░░░] 20%); phase 2: 11/16; ph
 | Phase 02 P11 | 6min | 2 tasks | 12 files |
 | Phase 02 P12 | 10min | 3 tasks | 16 files |
 | Phase 02 P13 | 8min | 2 tasks | 5 files |
+| Phase 02 P14 | 9min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -134,6 +135,9 @@ Recent decisions affecting current work:
 - [Phase 02]: 02-12: EventDraftResource and EventResource canAccess() use the AdminGate rule; global search covers drafts (title, reference, organiser, typed venue) and events (title, organiser)
 - [Phase 02]: 02-13: ListEventDrafts ignores the tab scope for explicitly ticked rows (and tabs exclude their scope when resolving a record), so drafts decided elsewhere are reported as 'already reviewed' instead of silently dropped from bulk runs
 - [Phase 02]: 02-13: Bulk approve checks review_status before bulkBlockerKeys(); skip messages use Filament's injected $failureCount
+- [Phase 02]: 02-14: Draft form leaves WR-06 off for drafts (editedEventRepeats null); only hasUneditableRule() is draft-aware, so admins can add a rule to a submission
+- [Phase 02]: 02-14: Admin category pick on the review form is stored as 'Chosen by admin' via DraftData::categoryChosenByAdmin (DraftWriter passes the Manual chooser); unchanged category re-runs the draft's original chain
+- [Phase 02]: 02-14: Save & approve = DraftWriter::update + ApproveDraft in one DB::transaction; blockers roll back edits, form keeps typed values
 
 ### Pending Todos
 
@@ -167,6 +171,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-17T20:50:33.466Z
-Stopped at: Completed 02-13-PLAN.md
+Last session: 2026-10-17T21:04:35.413Z
+Stopped at: Completed 02-14-PLAN.md
 Resume file: None
