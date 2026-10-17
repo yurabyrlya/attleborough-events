@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -22,6 +25,29 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->pinUrlsToAppUrl();
+        $this->configureRateLimiting();
+    }
+
+    /**
+     * SUB-04 (T-02-29): the 'submissions' limiter guards POST /submit only
+     * (GET /submit is never throttled). Per request IP: review.submission
+     * .per_hour and .per_day, using Laravel's atomic cache-backed limiter so
+     * two simultaneous requests can't both take the last slot.
+     *
+     * Both limits key on the exact IP string (ip:{address}) with a window
+     * suffix: ThrottleRequests hashes limiter name + key, so two limits with
+     * an identical key would share (and double-hit) one counter.
+     *
+     * The IP lives only in the rate-limit cache, for at most a day (disclosed
+     * on /privacy); nothing else stores it. Behind a proxy $request->ip() is
+     * the proxy until trusted proxies are configured (STATE.md, Phase 5).
+     */
+    private function configureRateLimiting(): void
+    {
+        RateLimiter::for('submissions', fn (Request $request): array => [
+            Limit::perHour((int) config('review.submission.per_hour'))->by('ip:'.$request->ip().':hour'),
+            Limit::perDay((int) config('review.submission.per_day'))->by('ip:'.$request->ip().':day'),
+        ]);
     }
 
     /**

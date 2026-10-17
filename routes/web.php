@@ -20,7 +20,9 @@ Route::get('/events/{slug}/{key}.ics', OccurrenceIcsController::class)
 
 // Public URL contract (costly to change): organisers bookmark /submit (D-04).
 Route::get('/submit', [SubmissionController::class, 'create'])->name('submit.create');
-Route::post('/submit', [SubmissionController::class, 'store'])->name('submit.store');
+Route::post('/submit', [SubmissionController::class, 'store'])
+    ->middleware('throttle:submissions')
+    ->name('submit.store');
 Route::get('/submit/thanks', [SubmissionController::class, 'thanks'])->name('submit.thanks');
 
 // Public URL contract (costly to change): Phase 5 expands the notice at the same URL (D-04).
