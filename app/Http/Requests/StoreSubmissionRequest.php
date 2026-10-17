@@ -4,14 +4,31 @@ namespace App\Http\Requests;
 
 use App\Models\Category;
 use App\Models\Venue;
+use App\Submissions\Honeypot;
+use App\Submissions\TurnstileVerifier;
 use Carbon\CarbonImmutable;
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Validator;
 
 /**
  * The public "Add your event" form (SUB-01, SUB-03). Anyone can post it, so
- * authorize() is open; the spam layers (02-09) and the rate limit (02-10)
- * sit in front of the same controller.
+ * authorize() is open; the rate limit (02-10) sits in front of it.
+ *
+ * Spam defence (SUB-04, D-17), in this order:
+ *  1. honeypot + timing token (Honeypot). A filled trap marks the request
+ *     as a bot: no rules run and the controller shows a plain thank-you
+ *     with no reference. Every other refusal is a visible error on "form"
+ *     so a person always knows what to do (SUB-03).
+ *  2. the field rules.
+ *  3. Cloudflare Turnstile, only when nothing has failed so far, so a field
+ *     error never spends a Cloudflare call.
+ *  4. the token is marked used only once every check has passed, so a
+ *     validation error doesn't burn it, but a re-post of a sent form is
+ *     refused (SUB-01 idempotency).
+ * In production without Turnstile keys the form rests and refuses
+ * everything. Refusals are logged with a reason key only: no input, no IP.
  *
  * "Today" is the Europe/London date, never the app (UTC) date: between
  * 00:00 and 01:00 BST the UTC date is still yesterday (RESEARCH Pitfall 4).
@@ -33,6 +50,45 @@ final class StoreSubmissionRequest extends FormRequest
      */
     private const CHECKBOXES = ['all_day', 'contact_public', 'family_friendly'];
 
+    /**
+     * Visible messages for each honeypot / timing refusal.
+     */
+    private const SPAM_MESSAGES = [
+        'missing' => 'Please reload the page and try again.',
+        'too_fast' => 'That was quick! Please check the details and send again.',
+        'too_old' => 'This form has been open a while. Please send it again.',
+        'reused' => 'This form was already sent. Reload the page to add another event.',
+    ];
+
+    /**
+     * Honeypot::check() result for this request, taken from the raw input.
+     */
+    private ?string $spamCheck = null;
+
+    /**
+     * True when the form must refuse everything: production without
+     * Turnstile keys (RESEARCH Pitfall 7).
+     */
+    public static function formIsResting(): bool
+    {
+        if (! app()->isProduction()) {
+            return false;
+        }
+
+        $siteKey = config('services.turnstile.site_key');
+        $secret = config('services.turnstile.secret');
+
+        return ! is_string($siteKey) || $siteKey === '' || ! is_string($secret) || $secret === '';
+    }
+
+    /**
+     * A filled honeypot: the controller answers with a silent thank-you.
+     */
+    public function isBot(): bool
+    {
+        return $this->spamCheck === 'trap';
+    }
+
     public function authorize(): bool
     {
         return true;
@@ -43,6 +99,10 @@ final class StoreSubmissionRequest extends FormRequest
      */
     public function rules(): array
     {
+        if ($this->isBot()) {
+            return [];
+        }
+
         $today = CarbonImmutable::now('Europe/London')->startOfDay();
         $latest = $today->addMonthsNoOverflow(12);
 
@@ -139,11 +199,64 @@ final class StoreSubmissionRequest extends FormRequest
     }
 
     /**
+     * Spam checks around the field rules (see the class docblock for order).
+     *
+     * @return array<int, Closure(Validator): void>
+     */
+    public function after(): array
+    {
+        return [
+            function (Validator $validator): void {
+                $contact = (string) config('site.contact_email');
+
+                if (self::formIsResting()) {
+                    $this->refuse($validator, 'resting', "The form is resting. Please email the details to {$contact}");
+
+                    return;
+                }
+
+                if ($this->isBot()) {
+                    Log::info('submission refused', ['reason' => 'trap']);
+
+                    return;
+                }
+
+                if ($this->spamCheck !== null) {
+                    $this->refuse($validator, $this->spamCheck, self::SPAM_MESSAGES[$this->spamCheck]);
+                }
+
+                if ($validator->errors()->isNotEmpty()) {
+                    return;
+                }
+
+                $turnstileToken = $this->input('cf-turnstile-response');
+                $codes = app(TurnstileVerifier::class)->verify(
+                    is_string($turnstileToken) ? $turnstileToken : null,
+                    (string) $this->ip(),
+                );
+
+                if ($codes !== []) {
+                    $this->refuse($validator, 'turnstile', "We couldn't confirm you're not a robot. Please try again, or email {$contact}");
+
+                    return;
+                }
+
+                if (! Honeypot::markUsed((string) $this->input(Honeypot::TOKEN))) {
+                    $this->refuse($validator, 'reused', self::SPAM_MESSAGES['reused']);
+                }
+            },
+        ];
+    }
+
+    /**
      * Trim every string, turn blanks into null, uppercase the postcode and
-     * read unticked checkboxes as false.
+     * read unticked checkboxes as false. The honeypot is judged first, on
+     * the input as posted.
      */
     protected function prepareForValidation(): void
     {
+        $this->spamCheck = Honeypot::check($this->all());
+
         $clean = [];
 
         foreach ($this->all() as $key => $value) {
@@ -162,6 +275,16 @@ final class StoreSubmissionRequest extends FormRequest
         }
 
         $this->merge($clean);
+    }
+
+    /**
+     * A visible, logged refusal on the whole form.
+     */
+    private function refuse(Validator $validator, string $reason, string $message): void
+    {
+        Log::info('submission refused', ['reason' => $reason]);
+
+        $validator->errors()->add('form', $message);
     }
 
     /**

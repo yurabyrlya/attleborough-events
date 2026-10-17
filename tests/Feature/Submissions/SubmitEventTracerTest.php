@@ -21,6 +21,7 @@ use function Pest\Laravel\post;
  */
 beforeEach(function () {
     freezeLondon('2026-10-20 10:00');
+    fakeTurnstilePass();
     $this->seed(CategorySeeder::class);
     $this->community = Category::where('slug', 'community')->firstOrFail();
     $this->venue = Venue::factory()->create(['name' => 'Connaught Hall']);

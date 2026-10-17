@@ -26,13 +26,23 @@ use Illuminate\Http\RedirectResponse;
  * approves its draft (SUB-02 prohibition). Every submitted value is rendered
  * through escaped Blade only (T-02-21); the form carries @csrf (T-02-22);
  * links must be http(s) and are only shown after approval (T-02-23). The
- * spam layers (02-09) and the rate limit (02-10) sit in front of store().
+ * spam layers run in StoreSubmissionRequest (02-09) and the rate limit
+ * (02-10) sits in front of store().
+ *
+ * A filled honeypot gets the same thank-you page with no reference and
+ * nothing is written, so a bot learns nothing (SUB-04). The Turnstile
+ * widget is rendered only when a site key is set (D-17); in production
+ * without keys the form is replaced by the "resting" notice.
  */
 final class SubmissionController
 {
     public function create(): View
     {
+        $siteKey = config('services.turnstile.site_key');
+
         return view('submit.create', [
+            'formResting' => StoreSubmissionRequest::formIsResting(),
+            'turnstileSiteKey' => is_string($siteKey) && $siteKey !== '' ? $siteKey : null,
             'venues' => Venue::query()->orderBy('name')->get(['id', 'name']),
             'categories' => Category::query()->orderBy('sort')->orderBy('name')->get(['id', 'name']),
         ]);
@@ -40,6 +50,10 @@ final class SubmissionController
 
     public function store(StoreSubmissionRequest $request, DraftWriter $writer): RedirectResponse
     {
+        if ($request->isBot()) {
+            return redirect()->route('submit.thanks')->with('submitted', true);
+        }
+
         $draft = $writer->create(DraftData::fromSubmission($request->validated()));
 
         return redirect()->route('submit.thanks')->with([

@@ -12,12 +12,22 @@
      * error, and the error text starts with a visually hidden "Error:", so
      * nothing relies on colour alone.
      *
+     * Spam defence (SUB-04, D-17, D-18): the honeypot and timing token are
+     * always in the form. Cloudflare Turnstile's widget and script appear
+     * only when a site key is set; this is the one third-party script on
+     * the public site and it is pushed from this view only, never the
+     * layout. A <noscript> notice gives people without JavaScript the email
+     * route. In production without keys the form is replaced by a notice.
+     *
+     * @var bool $formResting
+     * @var string|null $turnstileSiteKey
      * @var \Illuminate\Support\Collection<int, \App\Models\Venue> $venues
      * @var \Illuminate\Support\Collection<int, \App\Models\Category> $categories
      */
 
     // The element an error summary link jumps to, when it isn't the field name.
-    $fieldIds = ['price_type' => 'price_type_free'];
+    $fieldIds = ['price_type' => 'price_type_free', 'form' => 'form-check'];
+    $contactEmail = (string) config('site.contact_email');
 
     // aria-describedby for a field: its hint (when it has one) and its error (when there is one).
     $describedBy = function (string $field, ?string $hintId = null) use ($errors): ?string {
@@ -39,14 +49,24 @@
 @section('description', "Send your Attleborough event to What's On Attleborough. We check every event before it goes on the calendar.")
 
 @push('head')
-    {{-- The only script on the page: the first-party venue reveal (D-01). The form works without it. --}}
+    {{-- The first-party venue reveal (D-01). The form works without it. --}}
     @vite('resources/js/submit.js')
 @endpush
+
+@if ($turnstileSiteKey !== null && ! $formResting)
+    @push('head')
+        {{-- D-17: Cloudflare Turnstile, the only third-party script on the public site, on /submit only. --}}
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    @endpush
+@endif
 
 @section('content')
     <h1 class="mt-6 text-2xl font-bold text-ink">Add your event</h1>
     <p class="mt-2 text-ink">Tell us about your event and we'll check it before it goes on the calendar.</p>
 
+    @if ($formResting)
+        <p role="status" class="mt-6 rounded-md border-2 border-line p-4 text-ink">The form is resting. Please email the details to <a href="mailto:{{ $contactEmail }}" class="text-accent underline underline-offset-2">{{ $contactEmail }}</a></p>
+    @else
     @if ($errors->any())
         <div role="alert" aria-labelledby="error-summary-heading" tabindex="-1" data-error-summary class="mt-6 rounded-md border-2 border-cancel p-4">
             <h2 id="error-summary-heading" class="text-lg font-semibold text-ink">Please check these</h2>
@@ -60,6 +80,7 @@
 
     <form method="POST" action="{{ route('submit.store', absolute: false) }}" novalidate class="mt-6 flex flex-col gap-8">
         @csrf
+        <x-submit.honeypot />
 
         <fieldset class="flex flex-col gap-4">
             <legend class="{{ $legend }}">What's happening</legend>
@@ -247,6 +268,17 @@
             </div>
         </fieldset>
 
+        <div id="form-check" class="flex flex-col gap-3">
+            @error('form')<p id="form-error" class="text-sm font-semibold text-cancel"><span class="sr-only">Error:</span> {{ $message }}</p>@enderror
+            <noscript>
+                <p class="text-ink">Our spam check needs JavaScript. If you can't turn it on, email the details to <a href="mailto:{{ $contactEmail }}" class="text-accent underline underline-offset-2">{{ $contactEmail }}</a></p>
+            </noscript>
+            @if ($turnstileSiteKey !== null)
+                <div class="cf-turnstile" data-sitekey="{{ $turnstileSiteKey }}" data-action="submit"></div>
+            @endif
+        </div>
+
         <button type="submit" class="tap-target self-start rounded-md bg-accent px-4 font-semibold text-accent-ink">Send for review</button>
     </form>
+    @endif
 @endsection

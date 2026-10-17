@@ -28,6 +28,21 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    /*
+     * Cloudflare Turnstile on /submit only (SUB-04, D-17). With no site key
+     * the widget and script are not rendered; with no secret the verifier
+     * refuses everything (fail closed), and in production /submit rests.
+     * Hostnames (comma-separated) are checked when set: leave empty locally,
+     * set whatsonattleborough.co.uk in production. Never commit real keys;
+     * Cloudflare's test keys are fine for local use.
+     */
+    'turnstile' => [
+        'site_key' => env('TURNSTILE_SITE_KEY'),
+        'secret' => env('TURNSTILE_SECRET_KEY'),
+        'action' => 'submit',
+        'hostnames' => array_values(array_filter(explode(',', (string) env('TURNSTILE_HOSTNAMES', '')))),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

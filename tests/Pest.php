@@ -4,10 +4,13 @@ use App\Models\Category;
 use App\Models\Event;
 use App\Models\EventOccurrence;
 use App\Models\Venue;
+use App\Submissions\Honeypot;
+use App\Submissions\TurnstileVerifier;
 use Carbon\CarbonImmutable;
 use Dom\HTMLDocument;
 use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
@@ -72,8 +75,16 @@ function freezeLondon(string $localDateTime): void
  * A complete, valid POST body for the public /submit form (SUB-01), dated
  * ten days after the frozen London "today". Unless overridden, it picks a
  * new known venue (factory) and the first category by sort order (seed
- * CategorySeeder first, or one is made). 02-09 extends it with the
- * spam-defence fields.
+ * CategorySeeder first, or one is made).
+ *
+ * Spam-defence fields (02-09): the honeypot `fax_number` is present and
+ * empty, and `form_token` is a fresh timing token minted five seconds
+ * before "now" (time is put back exactly as it was), so an inline
+ * `post('/submit', validSubmission())` is already past the 3-second
+ * minimum. Tests that pin the timing mint their own token with
+ * Honeypot::mintToken() under travelTo() and travel before posting.
+ * Callers still need fakeTurnstilePass() (or their own Http::fake) for the
+ * Turnstile check; the `cf-turnstile-response` token defaults to 'tok'.
  *
  * @param  array<string, mixed>  $overrides
  * @return array<string, mixed>
@@ -104,9 +115,46 @@ function validSubmission(array $overrides = []): array
         'organiser_website' => '',
         'source_url' => '',
         'consent' => '1',
+        Honeypot::FIELD => '',
+        Honeypot::TOKEN => array_key_exists(Honeypot::TOKEN, $overrides) ? null : mintTokenSecondsAgo(5),
+        'cf-turnstile-response' => 'tok',
     ];
 
     return array_merge($defaults, $overrides);
+}
+
+/**
+ * A timing token minted $seconds before the current (possibly frozen) time.
+ * The test clock is restored exactly afterwards.
+ */
+function mintTokenSecondsAgo(int $seconds): string
+{
+    $previous = Carbon::getTestNow();
+
+    test()->travelTo(Carbon::now()->subSeconds($seconds));
+    $token = Honeypot::mintToken();
+    Carbon::setTestNow($previous);
+
+    return $token;
+}
+
+/**
+ * Make Cloudflare Turnstile pass offline: set a (Cloudflare test) secret
+ * and fake siteverify with a successful "submit" answer. Every other URL
+ * stays blocked by Http::preventStrayRequests().
+ */
+function fakeTurnstilePass(): void
+{
+    config()->set('services.turnstile.secret', '1x0000000000000000000000000000000AA');
+
+    Http::fake([
+        TurnstileVerifier::SITEVERIFY_URL => Http::response([
+            'success' => true,
+            'action' => 'submit',
+            'hostname' => 'whatsonattleborough.co.uk',
+            'error-codes' => [],
+        ]),
+    ]);
 }
 
 /**

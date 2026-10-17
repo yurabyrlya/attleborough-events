@@ -16,6 +16,7 @@ use function Pest\Laravel\get;
  */
 beforeEach(function () {
     freezeLondon('2026-10-20 10:00');
+    fakeTurnstilePass();
     $this->seed(CategorySeeder::class);
 });
 
