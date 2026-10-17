@@ -1,5 +1,7 @@
 # Attleborough event sources: verified inventory
 
+> Owner-facing summary (grouped by how each source can be used, with events-page links): [source-inventory.md](./source-inventory.md). This file holds the full evidence.
+
 - **Date of probes:** 2026-10-17 (Saturday). First pass 17:56-18:13 UTC from a developer machine on a corporate network. Follow-up after the owner's decisions D-23..D-26 at 18:34-18:58 UTC: from the owner's **home network** (residential) for the Town Council, the u3a and the probe-script test, and for the D-23/D-24 re-probes.
 - **Method:** curl + manual review, one request at a time, at least 5 s between requests to one host (11 s where robots.txt sets `Crawl-delay: 10`). Every row below records what the server actually returned. No research tooling was added to `app/`. Re-checks and new sources use `ops/probe-sources.sh` (same rules, automated; see `tests/Fixtures/sources/README.md`).
 - **User-Agent:** `WhatsOnAttleboroughResearch/0.1 (+mailto:hello@whatsonattleborough.co.uk)` on every request. It was never changed to get past a block.
