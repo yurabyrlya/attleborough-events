@@ -4,10 +4,10 @@ current_phase: 1
 current_phase_name: Foundation & Published Calendar
 status: verifying
 stopped_at: Phase 2 context gathered
-last_updated: "2026-10-17T09:07:31.385Z"
-last_activity: 2026-10-16
+last_updated: "2026-10-17T09:15:21.428Z"
+last_activity: 2026-10-17
 last_activity_desc: Scope change - infra deferred to Phase 5
-state_head: 000b3a2be952b3ea9b896edf476b770801b31676
+state_head: b7e852735444f5f6e1f8cc5fc1e5207b4aae4f51
 progress:
   total_phases: 5
   completed_phases: 0
@@ -30,9 +30,9 @@ See: .planning/PROJECT.md (updated 2026-10-16)
 Phase: 1 (Foundation & Published Calendar) — EXECUTING
 Plan: 12 of 12 in Phase 1 — gap closure in progress (01-11, 01-14, 01-12 done; next 01-13). Milestone plans: 11/14 complete
 Status: Ready to execute (gap closure: /gsd-execute-phase 1 --gaps-only)
-Last activity: 2026-10-16 — Scope change: infra/domain deferred to Phase 5 (01-02/01-03 moved to 05-01/05-02); Phase 1 is local-dev only
+Last activity: 2026-10-17 - Completed quick task 261017-e46: Set up a Filament custom theme so Tailwind classes work in admin views
 
-Progress: [████████░░] 79% of planned plans (11/14); phases complete: 0/5
+Progress: [░░░░░░░░░░] 0% of planned plans (11/14); phases complete: 0/5
 
 ## Performance Metrics
 
@@ -93,6 +93,12 @@ None yet.
 - [Phase 5]: Umami Cloud UK GDPR data region / DPA unverified (fallback: Plausible)
 - [Phase 3]: Crawling needs a real User-Agent contact/about URL; until Phase 5 is live use a config placeholder (e.g. CRAWLER_CONTACT_URL in config/site.php / .env) and swap in the live URL at launch
 - [Phase 4]: Success criterion 5 / RES-04 say P0 sources are configured "in production", but production now arrives in Phase 5. Until then P0 sources run on the local app; revisit the wording when planning Phase 4 (or move the production half to Phase 5)
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 261017-e46 | Set up a Filament custom theme so Tailwind classes work in admin views | 2026-10-17 | b7e8527 | [261017-e46-set-up-a-filament-custom-theme-so-tailwi](./quick/261017-e46-set-up-a-filament-custom-theme-so-tailwi/) |
 
 ## Deferred Items
 
