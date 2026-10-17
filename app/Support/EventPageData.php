@@ -48,6 +48,8 @@ final readonly class EventPageData
         public ?string $organiserName,
         public ?string $contactText,
         public ?string $contactHref,
+        public ?string $organiserWebsiteUrl,
+        public ?string $organiserWebsiteHost,
         public ?string $sourceNote,
         public ?string $sourceUrl,
         public ?string $sourceHost,
@@ -67,6 +69,8 @@ final readonly class EventPageData
         // D-03 (T-02-11): the contact reaches residents only with consent.
         $contact = $event->contact_public ? self::blankToNull($event->organiser_contact) : null;
         $source = SafeLinks::http($event->source_url);
+        // http/https only (T-02-12); anything else leaves no website line.
+        $website = SafeLinks::http($event->organiser_website);
 
         return new self(
             title: $event->title,
@@ -89,6 +93,8 @@ final readonly class EventPageData
             organiserName: self::blankToNull($event->organiser_name),
             contactText: $contact,
             contactHref: SafeLinks::contactHref($contact),
+            organiserWebsiteUrl: $website['url'] ?? null,
+            organiserWebsiteHost: $website['host'] ?? null,
             sourceNote: self::blankToNull($event->source_note),
             sourceUrl: $source['url'] ?? null,
             sourceHost: $source['host'] ?? null,

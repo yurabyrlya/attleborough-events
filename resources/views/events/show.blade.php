@@ -77,6 +77,9 @@
         @if ($page->contactText !== null)
             <p class="contact mt-1 text-ink wrap-anywhere">Contact: @if ($page->contactHref !== null)<a href="{{ $page->contactHref }}">{{ $page->contactText }}</a>@else{{ $page->contactText }}@endif</p>
         @endif
+        @if ($page->organiserWebsiteUrl !== null)
+            <p class="website mt-1 text-ink wrap-anywhere">Website: <a href="{{ $page->organiserWebsiteUrl }}" rel="nofollow ugc noopener">{{ $page->organiserWebsiteHost }}</a></p>
+        @endif
         @if ($page->sourceNote !== null)
             <p class="source mt-1 text-muted wrap-anywhere">Source: {{ $page->sourceNote }}</p>
         @endif

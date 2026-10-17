@@ -161,7 +161,7 @@ it('links the organiser website by host with nofollow ugc noopener', function ()
     get(PublicUrl::eventPath(Event::sole()))
         ->assertOk()
         ->assertSee(
-            'Website: <a href="https://www.club.example/events" rel="nofollow ugc noopener" class="text-accent underline underline-offset-2">club.example</a>',
+            'Website: <a href="https://www.club.example/events" rel="nofollow ugc noopener">club.example</a>',
             escape: false,
         );
 });

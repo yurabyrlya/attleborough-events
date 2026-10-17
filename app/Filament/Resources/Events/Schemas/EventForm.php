@@ -244,9 +244,9 @@ class EventForm
                             ->label('Source URL')
                             ->url()
                             ->maxLength(2048)
-                            ->requiredWithout('organiser_contact')
+                            ->requiredWithoutAll(['organiser_contact', 'organiser_website'])
                             ->validationMessages([
-                                'required_without' => 'Add a source URL or an organiser contact.',
+                                'required_without_all' => 'Add a source URL, an organiser contact or a website.',
                             ]),
                         Textarea::make('source_note')
                             ->label('Source note')

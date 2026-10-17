@@ -55,7 +55,7 @@ final readonly class PublishableEventData
         // non-blank title and description; real Y-m-d start, end and last
         // dates (round-trip checked, so 2026-02-30 fails); HH:MM[:SS] times;
         // a start time unless all-day; end date and last date not before the
-        // start date; a source URL or an organiser contact. Then the
+        // start date; a source URL, an organiser contact or a website. Then the
         // recurrence must be single-day and fit the start date.
         $this->assertValid();
 
@@ -114,8 +114,10 @@ final readonly class PublishableEventData
             throw new InvalidArgumentException('The last date cannot be before the start date.');
         }
 
-        if (self::nullableString($this->sourceUrl) === null && self::nullableString($this->organiserContact) === null) {
-            throw new InvalidArgumentException('Add a source URL or an organiser contact.');
+        if (self::nullableString($this->sourceUrl) === null
+            && self::nullableString($this->organiserContact) === null
+            && self::nullableString($this->organiserWebsite) === null) {
+            throw new InvalidArgumentException('Add a source URL, an organiser contact or a website.');
         }
     }
 
