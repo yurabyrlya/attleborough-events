@@ -104,7 +104,10 @@ final class DraftWriter
      */
     private function derive(EventDraft $draft, DraftData $data): void
     {
-        $decision = $this->categories->assign($data->preferredCategoryId, $data->origin, [], $draft->title);
+        // The admin's pick on the review form reads "Chosen by admin" for
+        // any origin; the draft's own origin is never rewritten.
+        $chooser = $data->categoryChosenByAdmin ? EventOrigin::Manual : $data->origin;
+        $decision = $this->categories->assign($data->preferredCategoryId, $chooser, [], $draft->title);
 
         $draft->forceFill([
             'category_id' => $decision->categoryId,

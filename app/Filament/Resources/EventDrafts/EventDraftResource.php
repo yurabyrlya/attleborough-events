@@ -3,8 +3,10 @@
 namespace App\Filament\Resources\EventDrafts;
 
 use App\Enums\ReviewStatus;
+use App\Filament\Resources\EventDrafts\Pages\EditEventDraft;
 use App\Filament\Resources\EventDrafts\Pages\ListEventDrafts;
 use App\Filament\Resources\EventDrafts\Pages\ReviewEventDraft;
+use App\Filament\Resources\EventDrafts\Schemas\EventDraftForm;
 use App\Filament\Resources\EventDrafts\Schemas\EventDraftInfolist;
 use App\Filament\Resources\EventDrafts\Tables\EventDraftsTable;
 use App\Models\EventDraft;
@@ -21,7 +23,7 @@ use UnitEnum;
 
 /**
  * The Review queue (REV-01): every draft, soonest event first (D-09), with a
- * review page per draft. There is no create page (manual entry stays on
+ * review page and an edit-and-approve page (REV-03) per draft. There is no create page (manual entry stays on
  * EventResource) and no delete: drafts are the audit trail behind published
  * events, and rejected drafts purge on schedule (D-12).
  */
@@ -42,6 +44,14 @@ class EventDraftResource extends Resource
     public static function table(Table $table): Table
     {
         return EventDraftsTable::configure($table);
+    }
+
+    /**
+     * The edit-and-approve form (REV-03): manual entry's sections (D-07).
+     */
+    public static function form(Schema $schema): Schema
+    {
+        return EventDraftForm::configure($schema);
     }
 
     public static function infolist(Schema $schema): Schema
@@ -107,6 +117,7 @@ class EventDraftResource extends Resource
     {
         return [
             'index' => ListEventDrafts::route('/'),
+            'edit' => EditEventDraft::route('/{record}/edit'),
             'review' => ReviewEventDraft::route('/{record}/review'),
         ];
     }
