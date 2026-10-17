@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\EventDrafts\Pages;
 
 use App\Calendar\ManualRecurrence;
+use App\Enums\ReviewStatus;
 use App\Filament\Resources\EventDrafts\Actions\ReviewActions;
 use App\Filament\Resources\EventDrafts\EventDraftResource;
 use App\Filament\Resources\Events\Schemas\EventForm;
@@ -36,6 +37,8 @@ use InvalidArgumentException;
  *
  * When the draft has no venue the picker is pre-filled with VenueMatcher's
  * suggestion; it becomes the draft's venue only when the admin saves (D-05).
+ * Approved and rejected drafts redirect to their review page; a save that
+ * meets a draft decided in another tab changes nothing and says so.
  */
 class EditEventDraft extends EditRecord
 {
@@ -44,6 +47,22 @@ class EditEventDraft extends EditRecord
     public const PUBLISH_BLOCKED = "Can't publish yet";
 
     public const END_OF_QUEUE = "You've reached the end of the queue";
+
+    /**
+     * A draft that is no longer pending (approved or rejected, maybe in
+     * another tab) is not editable: open its review page instead.
+     */
+    public function mount(int|string $record): void
+    {
+        parent::mount($record);
+
+        $draft = $this->draft($this->getRecord());
+
+        if ($draft->review_status !== ReviewStatus::PendingReview) {
+            $this->alreadyReviewedNotification()->body(null)->send();
+            $this->redirect(EventDraftResource::getUrl('review', ['record' => $draft]));
+        }
+    }
 
     public function getTitle(): string|Htmlable
     {
