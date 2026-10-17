@@ -2,16 +2,22 @@
 
 namespace App\Filament\Resources\EventDrafts\Actions;
 
+use App\Enums\EventOrigin;
+use App\Enums\RejectReason;
 use App\Enums\ReviewStatus;
 use App\Filament\Resources\EventDrafts\EventDraftResource;
 use App\Filament\Resources\EventDrafts\Pages\ReviewEventDraft;
 use App\Models\EventDraft;
 use App\Models\User;
 use App\Publishing\Actions\ApproveDraft;
+use App\Publishing\Actions\RejectDraft;
+use App\Publishing\Actions\ReopenDraft;
 use App\Review\DraftPublishability;
 use App\Review\Exceptions\DraftNotPublishable;
 use App\Review\Exceptions\InvalidReviewTransition;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -46,6 +52,9 @@ final class ReviewActions
     {
         return [
             self::approve(),
+            self::reject(),
+            self::reopen(),
+            self::rawContent(),
         ];
     }
 
@@ -56,7 +65,10 @@ final class ReviewActions
      */
     public static function forTable(): array
     {
-        return [];
+        return [
+            self::reject(),
+            self::reopen(),
+        ];
     }
 
     public static function approve(): Action
@@ -78,6 +90,95 @@ final class ReviewActions
                     $livewire->redirect(EventDraftResource::getUrl('index'));
                 }
             });
+    }
+
+    /**
+     * Reject with an optional preset reason and note (REV-04, D-11). From
+     * the review page it returns to the queue; in the table it stays put.
+     */
+    public static function reject(): Action
+    {
+        return Action::make('reject')
+            ->label('Reject')
+            ->color('danger')
+            ->visible(fn (EventDraft $record, Component $livewire): bool => self::shownStatus($record, $livewire) === ReviewStatus::PendingReview)
+            ->modalHeading('Reject this draft?')
+            ->modalDescription('It leaves the queue and nothing is published. The organiser is not told. Rejected drafts are deleted after the retention period.')
+            ->schema([
+                Select::make('reject_reason')
+                    ->label('Reason (optional)')
+                    ->options(RejectReason::class)
+                    ->placeholder('No reason'),
+                Textarea::make('review_notes')
+                    ->label('Note (optional)')
+                    ->rows(3)
+                    ->maxLength(2000),
+            ])
+            ->modalSubmitActionLabel('Reject draft')
+            ->modalCancelActionLabel(self::KEEP_LABEL)
+            ->action(function (EventDraft $record, array $data, Component $livewire): void {
+                $reason = self::rejectReason($data['reject_reason'] ?? null);
+                $note = is_string($data['review_notes'] ?? null) ? $data['review_notes'] : null;
+
+                $rejected = self::run(fn (User $actor) => app(RejectDraft::class)($record, $actor, $reason, $note), 'Draft rejected', $livewire);
+
+                if ($rejected && $livewire instanceof ReviewEventDraft) {
+                    $livewire->redirect(EventDraftResource::getUrl('index'));
+                }
+            });
+    }
+
+    /**
+     * Return a rejected draft to the queue (D-12).
+     */
+    public static function reopen(): Action
+    {
+        return Action::make('reopen')
+            ->label('Reopen')
+            ->color('gray')
+            ->visible(fn (EventDraft $record, Component $livewire): bool => self::shownStatus($record, $livewire)->canTransitionTo(ReviewStatus::PendingReview))
+            ->requiresConfirmation()
+            ->modalHeading('Reopen this draft?')
+            ->modalDescription('It goes back into the review queue as pending. The rejection note is kept.')
+            ->modalSubmitActionLabel('Reopen')
+            ->modalCancelActionLabel(self::KEEP_LABEL)
+            ->action(fn (EventDraft $record, Component $livewire) => self::run(fn (User $actor) => app(ReopenDraft::class)($record, $actor), 'Draft reopened', $livewire));
+    }
+
+    /**
+     * What the organiser sent, as escaped text (T-02-33). Read-only.
+     */
+    public static function rawContent(): Action
+    {
+        return Action::make('rawContent')
+            ->label('Raw content')
+            ->color('gray')
+            ->modalHeading('What the organiser sent')
+            ->modalContent(fn (EventDraft $record) => view('filament.resources.event-drafts.raw-content', [
+                'payload' => $record->raw_payload ?? [],
+                'emptyMessage' => self::noRawContentMessage($record),
+            ]))
+            ->modalSubmitAction(false)
+            ->modalCancelActionLabel('Close');
+    }
+
+    /**
+     * Shown when a draft kept no raw content.
+     */
+    public static function noRawContentMessage(EventDraft $record): string
+    {
+        return $record->origin === EventOrigin::Manual
+            ? 'No raw content: entered by admin'
+            : 'No raw content was kept';
+    }
+
+    private static function rejectReason(mixed $value): ?RejectReason
+    {
+        if ($value instanceof RejectReason) {
+            return $value;
+        }
+
+        return is_string($value) && $value !== '' ? RejectReason::tryFrom($value) : null;
     }
 
     /**

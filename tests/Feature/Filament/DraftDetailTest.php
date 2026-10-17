@@ -303,11 +303,17 @@ it('escapes organiser text on the page and in the raw content modal', function (
         $field => $field === 'raw_payload' ? ['title' => $script, $script => 'x'] : $script,
     ]);
 
-    ($this->page)($draft)
-        ->assertDontSeeHtml($script)
-        ->assertSee($script)
-        ->mountAction('rawContent')
-        ->assertMountedActionModalDontSeeHtml($script);
+    $page = ($this->page)($draft)->assertDontSeeHtml($script);
+
+    if ($field !== 'raw_payload') {
+        $page->assertSee($script);
+    }
+
+    $page->mountAction('rawContent')->assertMountedActionModalDontSeeHtml($script);
+
+    if ($field === 'raw_payload') {
+        $page->assertMountedActionModalSee($script);
+    }
 })->with(['title', 'description', 'repeats_text', 'raw_payload']);
 
 it('escapes the title in notifications after a stale click', function () {
