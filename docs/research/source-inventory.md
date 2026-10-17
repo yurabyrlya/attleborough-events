@@ -184,7 +184,10 @@ We never get around a block: no disguising the crawler as a browser, no CAPTCHA 
 - **Possible solutions, best first:**
   1. Ask the organiser to send events through our submission form.
   2. The admin enters events by hand from their posts.
-  3. Later, with the account owner's consent: the official Instagram API (Instagram Login). The farm connects its business or creator account to our app, and we read only its own posts. This needs a Meta developer app and Meta's app review, and posts are free text, so they'd still need review before publishing.
+  3. **Facebook Page events via the official API, with the Page admin's consent:** the organiser connects our Meta app with a Page role, giving a Page access token (`pages_read_engagement`) for their own Page's events. Needs a Meta developer app, App Review and Business Verification. We can't read events of Pages we don't manage.
+  4. **Instagram captions via the official API (Business Discovery):** our own Instagram business account can read the public captions of other business or creator accounts, such as `daisysmilkshed`, without their login. Instagram has no events, so captions are free text and would only pre-fill a draft for review. Needs our own Instagram business account linked to a Facebook Page, a Meta app with `instagram_basic`, `instagram_manage_insights` and `pages_read_engagement`, App Review and Business Verification (typically 2-6 weeks). Check Meta's Platform Terms on reusing caption text first.
+- **Not possible:** Facebook Groups. Meta shut down the Groups API on 22 April 2024 (Graph API v19.0), so group events and posts can't be read at all.
+- **Decision:** not in scope for the current phases. Revisit after launch if several organisers post only on Facebook or Instagram.
 
 ### Snetterton Circuit
 
