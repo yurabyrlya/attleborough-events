@@ -180,7 +180,7 @@ class EventDraft extends Model
      * published events) are never pruned. Cutoffs are UTC instants compared
      * with the UTC reviewed_at column.
      *
-     * @return Builder<self>
+     * @return Builder<static>
      */
     public function prunable(): Builder
     {
