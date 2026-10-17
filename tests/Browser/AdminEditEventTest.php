@@ -166,7 +166,9 @@ it('F7: hides, shows, cancels and reinstates the whole event from the events tab
         ->assertPresent('tr:has-text("UAT Quiz Night") >> '.Uat::role('button', 'Show on calendar'))
         ->assertNotPresent('tr:has-text("UAT Quiz Night") >> '.Uat::role('button', 'Mark as cancelled'));
     $page->navigate('/')->assertDontSee('UAT Quiz Night');
-    $page->navigate($eventPage)->assertTitleContains('Not Found');
+    $page->navigate($eventPage)
+        ->assertTitleContains('Page not found')
+        ->assertSee("See what's on");
 
     $page->navigate('/admin/events')->waitForText($row);
     confirmAction($page, 'Show on calendar', 'Show event', $row)
