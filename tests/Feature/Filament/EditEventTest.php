@@ -11,6 +11,7 @@ use App\Models\Event;
 use App\Models\User;
 use App\Models\Venue;
 use App\Publishing\Actions\PublishEvent;
+use App\Publishing\Actions\UpdatePublishedEvent;
 use App\Publishing\Data\PublishableEventData;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Testing\TestAction;
@@ -64,6 +65,33 @@ it('saves an edit through the form and shows the change on the public list', fun
     expect($event->fresh()->recurrence_rule)->toBe('FREQ=MONTHLY;BYDAY=-1FR;UNTIL=20270331T225959Z');
 
     get('/')->assertOk()->assertSee('Fri 30 Oct, 8pm')->assertDontSee('Fri 30 Oct, 7:30pm');
+});
+
+it('tells the Occurrences table to refresh after a successful save', function () {
+    $event = ($this->publish)();
+
+    livewire(EditEvent::class, ['record' => $event->getRouteKey()])
+        ->fillForm(['start_time' => '20:00'])
+        ->call('save')
+        ->assertHasNoFormErrors()
+        ->assertDispatched(OccurrencesRelationManager::REFRESH_EVENT);
+});
+
+it('re-renders the Occurrences table with the new times when the refresh event arrives', function () {
+    $event = ($this->publish)();
+
+    $table = livewire(OccurrencesRelationManager::class, ['ownerRecord' => $event, 'pageClass' => EditEvent::class])
+        ->assertSee('Fri 30 Oct 2026, 19:30');
+
+    app(UpdatePublishedEvent::class)(
+        $event,
+        PublishableEventData::fromForm([...PublishableEventData::fromEvent($event), 'start_time' => '20:00']),
+        $this->admin,
+    );
+
+    $table->dispatch(OccurrencesRelationManager::REFRESH_EVENT)
+        ->assertSee('Fri 30 Oct 2026, 20:00')
+        ->assertDontSee('Fri 30 Oct 2026, 19:30');
 });
 
 it('has no delete action on the edit page', function () {

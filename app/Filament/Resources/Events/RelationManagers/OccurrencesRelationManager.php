@@ -8,6 +8,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Livewire\Attributes\On;
 
 /**
  * A series' generated dates. Rows are written only by OccurrenceGenerator;
@@ -17,6 +18,12 @@ use Filament\Tables\Table;
  */
 class OccurrencesRelationManager extends RelationManager
 {
+    /**
+     * Browser event EditEvent dispatches after a successful save, so this
+     * table shows the regenerated times without a page reload.
+     */
+    public const REFRESH_EVENT = 'event-occurrences-saved';
+
     protected static string $relationship = 'occurrences';
 
     protected static ?string $title = 'Occurrences';
@@ -27,6 +34,13 @@ class OccurrencesRelationManager extends RelationManager
     {
         return true;
     }
+
+    /**
+     * Re-renders the table after the event is saved on the edit page; the
+     * rows are re-queried on render. Writes nothing.
+     */
+    #[On(self::REFRESH_EVENT)]
+    public function refreshOccurrences(): void {}
 
     public function table(Table $table): Table
     {

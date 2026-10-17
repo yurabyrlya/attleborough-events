@@ -8,6 +8,7 @@ use App\Enums\PriceType;
 use App\Enums\RepeatEnds;
 use App\Enums\RepeatPattern;
 use App\Models\Event;
+use App\Publishing\Actions\UpdatePublishedEvent;
 use Carbon\CarbonImmutable;
 use Closure;
 use Filament\Forms\Components\DatePicker;
@@ -18,6 +19,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Callout;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
@@ -31,6 +33,13 @@ use Throwable;
  */
 class EventForm
 {
+    /**
+     * Display-only Repeats value for a stored rule the form cannot edit
+     * (WR-09/WR-10). Not a RepeatPattern: it never reaches
+     * PublishableEventData, and the read-only page cannot save.
+     */
+    public const CUSTOM_RULE_OPTION = 'custom';
+
     public static function configure(Schema $schema): Schema
     {
         return $schema
@@ -107,13 +116,21 @@ class EventForm
                 Section::make('Repeats')
                     ->columns(2)
                     ->schema([
+                        Callout::make("This repeat rule can't be edited here")
+                            // Plain string only: Callout escapes the description (stored rules may come from imports).
+                            ->description(fn (mixed $record): string => 'Stored rule: '.($record instanceof Event ? (string) $record->recurrence_rule : '').'. You can still hide or cancel the event with the buttons at the top of the page.')
+                            ->warning()
+                            ->visible(fn (string $operation, mixed $record): bool => self::hasUneditableRule($operation, $record))
+                            ->columnSpanFull(),
                         // Edit page mirrors UpdatePublishedEvent's WR-06 guard:
                         // an event never switches between one-off and repeating.
                         Select::make('repeats')
                             ->label('Repeats')
-                            ->options(fn (Get $get, string $operation, mixed $record): array => self::repeatOptions($get, self::editedEventRepeats($operation, $record)))
+                            ->options(fn (Get $get, string $operation, mixed $record): array => self::hasUneditableRule($operation, $record)
+                                ? [self::CUSTOM_RULE_OPTION => "Custom rule (can't be edited here)"]
+                                : self::repeatOptions($get, self::editedEventRepeats($operation, $record)))
                             ->disabled(fn (string $operation, mixed $record): bool => self::editedEventRepeats($operation, $record) === false)
-                            ->helperText(fn (string $operation, mixed $record): ?string => match (self::editedEventRepeats($operation, $record)) {
+                            ->helperText(fn (string $operation, mixed $record): ?string => self::hasUneditableRule($operation, $record) ? null : match (self::editedEventRepeats($operation, $record)) {
                                 false => "To make this repeat, hide it and create a new repeating event. The hidden event's page will stop working and the new event gets its own web address.",
                                 true => 'To stop it repeating, set a last date or hide it.',
                                 null => null,
@@ -269,6 +286,19 @@ class EventForm
         }
 
         return $record->recurrence_rule !== null;
+    }
+
+    /**
+     * True on the edit page for a series whose stored rule the form cannot
+     * represent. UpdatePublishedEvent::canEdit() is the single check, so the
+     * form, EditEvent and the events table cannot disagree.
+     */
+    private static function hasUneditableRule(string $operation, mixed $record): bool
+    {
+        return $operation === 'edit'
+            && $record instanceof Event
+            && $record->recurrence_rule !== null
+            && ! UpdatePublishedEvent::canEdit($record);
     }
 
     private static function repeats(Get $get): RepeatPattern

@@ -7,6 +7,8 @@ use App\Enums\OccurrenceStatus;
 use App\Enums\RepeatPattern;
 use App\Filament\Resources\Events\Pages\EditEvent;
 use App\Filament\Resources\Events\Pages\ListEvents;
+use App\Filament\Resources\Events\RelationManagers\OccurrencesRelationManager;
+use App\Filament\Resources\Events\Schemas\EventForm;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\EventOccurrence;
@@ -30,6 +32,7 @@ use function Pest\Livewire\livewire;
  * offers the status actions.
  */
 const UNSUPPORTED_RULE_WARNING = "This event's repeat rule can't be edited here. You can still hide or cancel it.";
+const UNSUPPORTED_RULE_CALLOUT = "This repeat rule can't be edited here";
 
 beforeEach(function () {
     freezeLondon('2026-10-16 12:00');
@@ -81,8 +84,22 @@ it('opens the edit page read-only with a warning and no Save action', function (
         ->assertNotified(UNSUPPORTED_RULE_WARNING)
         ->assertActionDoesNotExist(TestAction::make('save')->schemaComponent('form-actions', 'content'))
         ->assertFormFieldDisabled('title')
-        ->assertFormFieldDisabled('repeats');
+        ->assertFormFieldDisabled('repeats')
+        ->assertFormSet(['repeats' => EventForm::CUSTOM_RULE_OPTION])
+        ->assertSee("Custom rule (can't be edited here)")
+        ->assertDontSee('Weekly on Friday')
+        ->assertSee(UNSUPPORTED_RULE_CALLOUT)
+        ->assertSee("Stored rule: {$rule}.");
 })->with('unsupported rules');
+
+it('escapes the stored rule shown in the read-only callout', function () {
+    $event = ($this->stored)('FREQ=DAILY;X-NOTE=<script>alert(1)</script>');
+
+    livewire(EditEvent::class, ['record' => $event->getRouteKey()])
+        ->assertSee(UNSUPPORTED_RULE_CALLOUT)
+        ->assertSeeHtml('X-NOTE=&lt;script&gt;alert(1)&lt;/script&gt;')
+        ->assertDontSeeHtml('<script>alert(1)</script>');
+});
 
 it('refuses a forced save and leaves the stored event unchanged', function (string $rule) {
     $event = ($this->stored)($rule);
@@ -91,7 +108,8 @@ it('refuses a forced save and leaves the stored event unchanged', function (stri
         ->set('data.title', 'Forged Title')
         ->set('data.repeats', RepeatPattern::None->value)
         ->call('save')
-        ->assertNotified(UNSUPPORTED_RULE_WARNING);
+        ->assertNotified(UNSUPPORTED_RULE_WARNING)
+        ->assertNotDispatched(OccurrencesRelationManager::REFRESH_EVENT);
 
     $fresh = $event->fresh();
 
@@ -120,7 +138,9 @@ it('opens a supported weekly series with Repeats hydrated, Save present and no w
         ->assertFormSet(['repeats' => RepeatPattern::Weekly->value])
         ->assertActionExists(TestAction::make('save')->schemaComponent('form-actions', 'content'))
         ->assertFormFieldEnabled('title')
-        ->assertNotNotified(UNSUPPORTED_RULE_WARNING);
+        ->assertNotNotified(UNSUPPORTED_RULE_WARNING)
+        ->assertDontSee(UNSUPPORTED_RULE_CALLOUT)
+        ->assertDontSee("Custom rule (can't be edited here)");
 });
 
 it('refuses an edit in UpdatePublishedEvent itself when the stored rule is unsupported', function () {

@@ -4,6 +4,8 @@ namespace App\Filament\Resources\Events\Pages;
 
 use App\Filament\Resources\Events\Actions\StatusActions;
 use App\Filament\Resources\Events\EventResource;
+use App\Filament\Resources\Events\RelationManagers\OccurrencesRelationManager;
+use App\Filament\Resources\Events\Schemas\EventForm;
 use App\Models\Event;
 use App\Models\User;
 use App\Publishing\Actions\UpdatePublishedEvent;
@@ -24,9 +26,14 @@ use Livewire\Attributes\Locked;
  * StatusActions -> ChangeEventStatus.
  *
  * WR-09: an event whose stored recurrence_rule the form cannot represent
- * still opens, read-only, with a persistent warning and no Save action, so
- * the header status actions stay reachable. A forced save is refused here
- * (warning + Halt) and again by UpdatePublishedEvent.
+ * still opens, read-only, with a persistent warning, an inline warning
+ * callout showing the stored rule, the Repeats select set to the display-only
+ * "Custom rule" value and no Save action, so the header status actions stay
+ * reachable. A forced save is refused here (warning + Halt) and again by
+ * UpdatePublishedEvent.
+ *
+ * After a successful save the page tells the Occurrences table to re-render
+ * (OccurrencesRelationManager::REFRESH_EVENT); a refused save never gets there.
  */
 class EditEvent extends EditRecord
 {
@@ -52,6 +59,8 @@ class EditEvent extends EditRecord
 
         if (! $this->recurrenceEditable) {
             $this->unsupportedRuleWarning()->persistent()->send();
+
+            return [...PublishableEventData::fromEvent($event), 'repeats' => EventForm::CUSTOM_RULE_OPTION];
         }
 
         return PublishableEventData::fromEvent($event);
@@ -96,6 +105,15 @@ class EditEvent extends EditRecord
         $editor = auth()->user();
 
         return app(UpdatePublishedEvent::class)($this->event($record), PublishableEventData::fromForm($data), $editor);
+    }
+
+    /**
+     * Filament only calls this after handleRecordUpdate() succeeded, so a
+     * refused save (Halt) never refreshes the Occurrences table.
+     */
+    protected function afterSave(): void
+    {
+        $this->dispatch(OccurrencesRelationManager::REFRESH_EVENT);
     }
 
     /**
