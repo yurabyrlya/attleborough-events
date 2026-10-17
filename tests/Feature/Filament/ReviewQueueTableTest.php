@@ -57,7 +57,7 @@ it('labels the tabs in order with their counts', function () {
 
     expect(array_keys($tabs))->toBe(['pending', 'rejected', 'approved', 'all'])
         ->and(collect($tabs)->map(fn ($tab) => $tab->getLabel())->values()->all())->toBe(['Pending', 'Rejected', 'Approved', 'All'])
-        ->and(collect($tabs)->map(fn ($tab) => $tab->getBadge())->values()->all())->toBe([2, 1, 0, 3]);
+        ->and(collect($tabs)->map(fn ($tab) => $tab->getBadge())->values()->all())->toBe(['2', '1', '0', '3']);
 });
 
 it('filters by kind', function () {
