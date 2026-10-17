@@ -174,11 +174,17 @@ We never get around a block: no disguising the crawler as a browser, no CAPTCHA 
   1. Ask local organisers who sell through TicketSource, such as Attleborough Players, to send their events or use our form.
   2. Cloudflare Verified Bots (Phase 5), for public event pages only, honouring robots.txt.
 
-### Facebook Pages and Groups
+### Facebook and Instagram (Meta)
 
-- **Example page:** https://www.facebook.com/attleboroughsummercarnival
-- **Why blocked:** robots.txt disallows everything, and Facebook's terms forbid automated collection without written permission. The project rule is no Facebook scraping.
-- **Possible solutions:** the admin enters events by hand; ask group organisers to use our submission form.
+- **Example pages:**
+  - Attleborough Summer Carnival: https://www.facebook.com/attleboroughsummercarnival
+  - St Mary's Church: https://www.facebook.com/AttleboroughWithBesthorpe
+  - Daisy's Milk Shed (Attleborough Hall Farm): https://www.instagram.com/daisysmilkshed/
+- **Why blocked:** both robots.txt files say `Disallow: /` for all crawlers, and Meta's terms forbid automated collection without written permission ("Collection of data on Instagram through automated means is prohibited unless you have express written permission"). The project rule is no Facebook or Instagram scraping.
+- **Possible solutions, best first:**
+  1. Ask the organiser to send events through our submission form.
+  2. The admin enters events by hand from their posts.
+  3. Later, with the account owner's consent: the official Instagram API (Instagram Login). The farm connects its business or creator account to our app, and we read only its own posts. This needs a Meta developer app and Meta's app review, and posts are free text, so they'd still need review before publishing.
 
 ### Snetterton Circuit
 
@@ -220,7 +226,7 @@ We never get around a block: no disguising the crawler as a browser, no CAPTCHA 
 - **Attleborough u3a** (http://u3asites.org.uk/attleborough/): no working site. The secure connection fails and plain HTTP shows an empty holding page. The owner may know the current site.
 - **The Events Calendar demo** (https://demo.theeventscalendar.com/): not local; used only to check the feed format.
 - **The Bear, Attleborough** (https://thebearattleborough.co.uk/): a brochure site with no events page (about, contact, gallery only).
-- **Attleborough Hall Farm** (https://www.attleboroughhallfarm.co.uk/): raw-milk dairy on Wix. robots.txt allows everything and there's no challenge, but there's no events page or events app; the pages (about, services, milk shed, contact) and two blog posts mention no open days or events. If it announces an open day, enter it by hand; recheck its blog feed occasionally.
+- **Attleborough Hall Farm** (https://www.attleboroughhallfarm.co.uk/): raw-milk dairy on Wix (it posts as Daisy's Milk Shed on Instagram, see D). robots.txt allows everything and there's no challenge, but there's no events page or events app; the pages (about, services, milk shed, contact) and two blog posts mention no open days or events. If it announces an open day, enter it by hand; recheck its blog feed occasionally.
 
 ---
 
@@ -235,7 +241,7 @@ Searched on 17 October (web search, domain checks, Wikipedia, national directori
 - **Village halls and parish councils** (Besthorpe, Great Ellingham, Deopham, Morley, Rockland St Peter, Larling, Snetterton): no sites found; Old Buckenham's new site is an empty placeholder.
 - **Attleborough Sports Hall:** run by Everyone Active; its listings would be class timetables, not community events.
 - **Attleborough u3a:** still no working site.
-- **Facebook-only groups:** manual entry only.
+- **Facebook- or Instagram-only groups:** manual entry or our submission form.
 
 ---
 
