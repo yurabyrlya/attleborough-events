@@ -30,7 +30,7 @@ await page.getByLabel('Password').first().fill('<local password>');
 await page.getByRole('button', { name: 'Sign in' }).click();
 ```
 
-Expected: redirect to `/admin` (Dashboard), sidebar shows **Dashboard**, **Events**, **System → System health**.
+Expected: redirect to `/admin` (Dashboard), sidebar shows **Dashboard**, **Events**, **Review → Review queue** (with the pending count) and **Rules**, **System → System health**.
 
 ## F1. Public calendar look (desktop and phone, light and dark)
 
@@ -83,6 +83,7 @@ Expected:
 - Before a start date is picked, Repeats offers only "Does not repeat". After picking Fri 30 Oct (the 5th Friday) it offers exactly "Weekly on Friday" and "Monthly on the last Friday" (no "5th Friday", because not every month has one).
 - "Next dates" preview in UK format: "Fri 30 Oct, 7:30pm / Fri 27 Nov, 7:30pm / Fri 25 Dec, 7:30pm" (same local time after the 25 Oct clock change).
 - **Create** → "Created" notification, redirect to `/admin/events`, row shows Title · Category · Next occurrence · **Repeats** ("Monthly on the last Friday") · Status ("Published") · actions **Edit / Hide from calendar / Mark as cancelled**.
+- Since Phase 2, manual entry goes through a draft (D-07): a manual draft is created and approved at once. It appears under **Review queue → Approved** (Source "Manual entry", status Approved), linked to the event, and never sits in Pending.
 
 ## F4. Stored data and public listing
 
@@ -232,6 +233,19 @@ Bulk menu items are `role=menuitem` (`getByRole('menuitem', { name: 'Approve sel
 
 Public effect: only the approved draft appears on `/`. Rejected and skipped drafts never do.
 
+## F14. Rules screen
+
+Sidebar **Review → Rules** (`/admin/rules`): four tabs, **Categories**, **Keyword rules**, **Category mappings**, **Geofence**, and one **Save rules** button that saves all four at once (or nothing).
+
+1. **Keyword rules** → **Add keyword rule** → Keyword "pumpkin", Category Community, Priority 100 (the default) → **Save rules**. Expected: "Rules saved".
+2. On `/submit` send "UAT Pumpkin carving" with **Category** → **Not sure** (F11). In the queue its Category reads Community (not "Other (check)"); on its review page **Why this category** reads "Keyword rule: 'pumpkin' → Community".
+3. **Categories**: the **Other** row has no Delete button (every other row has one), so the fallback category can't be removed. Delete a category that is in use (e.g. Community with a published event) → **Save rules**. Expected: a persistent "Rules not saved" notification naming the problem ("'Community' is used by …"), and nothing is changed. Reload to put the row back.
+4. **Geofence**: add a place name (type it and press Tab or comma) and a postcode district such as NR17 → **Save rules** → "Rules saved". A district that isn't one ("NR") is refused with "'NR' isn't a postcode district like NR17."
+
+Selectors: tabs are `role=tab` (`getByRole('tab', { name: 'Keyword rules' })`) and load lazily, so wait for them before clicking; repeater fields have ids like `form.keyword_rules.<uuid>.keyword`; `getByRole('button', { name: 'Save rules' })`.
+
+Public effect: none directly. Rules only decide the category of the **next** drafts; published events keep theirs. A category renamed here is renamed on the public chips (its slug, used in links, never changes).
+
 ## Cleanup
 
 - Hide the UAT events (`Hide from calendar`) or remove them from the local database if they would confuse later work. Never remove real data.
@@ -243,14 +257,13 @@ Public effect: only the approved draft appears on `/`. Rejected and skipped draf
 
 When a phase adds or changes UI, add a flow here in the same shape (steps, selectors, expected result, public effect) and reference it in that phase's UAT file. Likely next flows:
 
-- Phase 2: organiser submission form (validation, honeypot, rate limit, confirmation page), review queue (approve, edit-and-approve, reject, bulk actions, "Approve & next" keyboard shortcuts).
 - Phase 3: source registry ("Run now"), update drafts with the three-column diff, cancellation drafts, duplicate warnings.
 - Phase 4: test-run preview of a source without creating drafts.
 - Phase 5: contact/complaints form, "Report a problem", expired-event banner, public ICS/RSS feeds; repeat F1–F10 against the production URL.
 
 ### Automating these flows
 
-F0–F10 are automated as Pest browser tests in [`tests/Browser`](../../tests/Browser) (`pestphp/pest-plugin-browser`, driving Playwright Chromium). Approved by the owner on 2026-10-17.
+F0–F14 are automated as Pest browser tests in [`tests/Browser`](../../tests/Browser) (`pestphp/pest-plugin-browser`, driving Playwright Chromium). Approved by the owner on 2026-10-17.
 
 | File | Flows |
 |---|---|
@@ -259,13 +272,18 @@ F0–F10 are automated as Pest browser tests in [`tests/Browser`](../../tests/Br
 | `AdminEditEventTest.php` | F5, F6 (including WR-06), F7 (table and edit page header), F8 |
 | `EventPageTest.php` | F9 (page, calendar links, share block, Copy link) |
 | `SystemHealthTest.php` | F10 page: stale workers, failed-jobs badge, Retry / Delete |
+| `SubmitEventTest.php` | F11: thank-you page with a WOA- reference, nothing on `/`, "Somewhere else" fields, error summary with typed values kept, noscript notice |
+| `ReviewQueueTest.php` | F12 (queue, review page reasons, Raw content, edit with Create new venue and a weekly repeat, Save & approve opens the next draft, four dates on `/`) and F13 (bulk approve skip reasons, bulk reject with Spam, Reopen) |
+| `ApproveAndNextKeyboardTest.php` | F12 keyboard shortcuts: A then Enter, the guards while typing or in a dialog, ?, J / K, the remembered off switch, A on a blocked draft |
+| `RulesTest.php` | F14: a keyword rule decides the next submission's category; Other has no Delete; a category in use is refused with "Rules not saved" |
 
 How they differ from the manual run:
 
 - The app is served in-process on the `attleborough_testing` database with `RefreshDatabase`. No `php artisan serve` is needed and the dev database is never touched, so the cleanup steps don't apply.
-- Time is frozen in Europe/London, and data is published through `PublishEvent` (`Tests\Browser\UatFixtures`). The date pickers are driven through their Year and Month controls, so the tests don't depend on the browser's real date.
+- Time is frozen in Europe/London, and data is published through `PublishEvent` (`Tests\Browser\UatFixtures`). Drafts are written through the submission path (`UatFixtures::submissionDraft()` → `DraftWriter::create(DraftData::fromSubmission(...))`). The form's timing check is passed by moving the frozen clock forward 5 seconds before sending.
+- Offline: no Turnstile site key is set in tests, so the widget and Cloudflare's script are never rendered, and `UatFixtures::fakeTurnstile()` binds a verifier that accepts any token. No request leaves the app. The date pickers are driven through their Year and Month controls, so the tests don't depend on the browser's real date.
 - Selectors are Playwright role and label locators (`UatFixtures::role('button', 'Hide event')`), as in the conventions above.
-- Still manual: the worker drill in F10 (`schedule:work`, `queue:work`, `ops:drill`), the `.ics` headers (covered by `tests/Feature/Public/EventCalendarAndShareTest.php`), the branded error pages (covered by `tests/Feature/Public/ErrorPagesTest.php`) and the phone-only checks in F9.
+- Still manual: the worker drill in F10 (`schedule:work`, `queue:work`, `ops:drill`), the `.ics` headers (covered by `tests/Feature/Public/EventCalendarAndShareTest.php`), the branded error pages (covered by `tests/Feature/Public/ErrorPagesTest.php`) and the phone-only checks in F9. From Phase 2: `/submit` with JavaScript really switched off (the tests check the fields are visible before any choice and the `<noscript>` text is in the source), the real Turnstile widget with Cloudflare's test keys, and the rate limit (covered by `tests/Feature/Submissions/`).
 - Since quick task 261017-hp9, `PublicCalendarTest.php` F2 reopens **More filters** after each reload and removes a filter with its "Remove filter:" chip, and also checks a filtered page on 375×812 stays above the fold; `EventPageTest.php` F9 uses the "Apple / Outlook (.ics) for …" link name.
 
 Run them:

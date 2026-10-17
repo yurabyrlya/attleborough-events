@@ -1,6 +1,9 @@
 <?php
 
+use App\Enums\EventOrigin;
+use App\Enums\ReviewStatus;
 use App\Models\Event;
+use App\Models\EventDraft;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Tests\Browser\UatFixtures as Uat;
@@ -120,6 +123,12 @@ it('F3 + F4: creates a monthly series that the public calendar lists date by dat
     // F4: stored rule, London-date keys and UTC instants inside the 90-day horizon.
     $event = Event::query()->where('title', 'UAT Quiz Night')->sole();
     expect($event->recurrence_rule)->toBe('FREQ=MONTHLY;BYDAY=-1FR;UNTIL=20270331T225959Z');
+
+    // D-07: manual entry goes through a draft that is approved at once.
+    $draft = EventDraft::query()->sole();
+    expect($draft->origin)->toBe(EventOrigin::Manual)
+        ->and($draft->review_status)->toBe(ReviewStatus::Approved)
+        ->and($draft->event_id)->toBe($event->id);
 
     $occurrences = DB::select(
         "select recurrence_key, to_char(starts_at at time zone 'UTC', 'YYYY-MM-DD HH24:MI') as starts, status
