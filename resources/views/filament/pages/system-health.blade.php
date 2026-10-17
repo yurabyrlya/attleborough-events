@@ -1,5 +1,6 @@
 <x-filament-panels::page>
-    <div class="grid gap-6">
+    {{-- Inline: the panel has no custom theme, so Tailwind grid/gap utilities aren't compiled into Filament's CSS. --}}
+    <div style="display: grid; gap: 1.5rem;">
         @foreach ($this->checks() as $check)
             <x-filament::section :heading="$check->title">
                 <x-slot name="afterHeader">
