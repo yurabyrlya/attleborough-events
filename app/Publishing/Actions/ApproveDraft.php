@@ -8,6 +8,7 @@ use App\Models\EventDraft;
 use App\Models\User;
 use App\Publishing\AdminGate;
 use App\Publishing\Data\PublishableEventData;
+use App\Review\DraftPublishability;
 use App\Review\Exceptions\DraftNotPublishable;
 use App\Review\Exceptions\InvalidReviewTransition;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -21,15 +22,19 @@ use InvalidArgumentException;
  *
  * Admin-only, checked before the transaction opens, so a refused call writes
  * nothing. In ONE transaction it re-reads the draft with SELECT ... FOR
- * UPDATE, asserts pending_review -> approved on that fresh status, builds the
- * publishable data from the draft, calls PublishEvent (the only creator of
+ * UPDATE, asserts pending_review -> approved on that fresh status, refuses it
+ * with DraftPublishability's blockers (the same check the Approve button
+ * uses, re-run here whatever the page showed), builds the publishable data, calls PublishEvent (the only creator of
  * Event rows; its own transaction becomes a savepoint) and stamps the draft
  * approved with the event, reviewer and time. If any step throws, neither the
  * draft change nor any events / event_occurrences row persists.
  */
 final class ApproveDraft
 {
-    public function __construct(private PublishEvent $publish) {}
+    public function __construct(
+        private PublishEvent $publish,
+        private DraftPublishability $publishability,
+    ) {}
 
     /**
      * @throws AuthorizationException when the reviewer is not the configured admin
@@ -45,6 +50,12 @@ final class ApproveDraft
             $locked = EventDraft::query()->whereKey($draft->id)->lockForUpdate()->firstOrFail();
 
             $locked->review_status->assertCanTransitionTo(ReviewStatus::Approved);
+
+            $blockers = $this->publishability->blockers($locked);
+
+            if ($blockers !== []) {
+                throw new DraftNotPublishable($blockers);
+            }
 
             try {
                 $data = PublishableEventData::fromDraft($locked);

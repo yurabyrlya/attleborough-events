@@ -6,9 +6,12 @@ use App\Enums\DraftKind;
 use App\Enums\EventOrigin;
 use App\Enums\ExtractionMethod;
 use App\Enums\PriceType;
+use App\Enums\QualityBand;
 use App\Enums\ReviewStatus;
 use Carbon\CarbonImmutable;
+use Database\Factories\EventDraftFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -61,7 +64,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property array<string, mixed>|null $raw_payload
  * @property CarbonImmutable|null $consented_at
  * @property int|null $quality_score
- * @property string|null $quality_band
+ * @property QualityBand|null $quality_band
  * @property list<string> $quality_reasons
  * @property list<string> $parse_errors
  * @property string|null $reject_reason
@@ -87,6 +90,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 ])]
 class EventDraft extends Model
 {
+    /** @use HasFactory<EventDraftFactory> */
+    use HasFactory;
+
     /**
      * Mirrors the migration defaults.
      *
@@ -177,6 +183,7 @@ class EventDraft extends Model
             'start_date' => 'immutable_date',
             'end_date' => 'immutable_date',
             'quality_score' => 'integer',
+            'quality_band' => QualityBand::class,
             'quality_reasons' => 'array',
             'parse_errors' => 'array',
             'raw_payload' => 'array',
