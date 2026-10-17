@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 02
 current_phase_name: Draft Model, Review Queue & Submissions
 status: executing
-stopped_at: Phase 1 complete, ready to plan Phase 02
-last_updated: "2026-10-17T17:22:30.747Z"
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-10-17T17:47:48.931Z"
 last_activity: 2026-10-17
-last_activity_desc: Phase 1 complete, transitioned to Phase 02
-state_head: 6c60657416ea6ececc99adad97b4b98646fc2c38
+last_activity_desc: Completed 02-01 (manual entry through draft + ApproveDraft)
+state_head: cb510e1c2c421ff9659e03e2af9637305d3e7239
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 31
-  completed_plans: 13
+  completed_plans: 14
   percent: 20
 ---
 
@@ -27,17 +27,17 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 
 ## Current Position
 
-Phase: 02 (Draft Model, Review Queue & Submissions) — READY TO EXECUTE
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-10-17 — Phase 1 complete, transitioned to Phase 02
+Phase: 02 (Draft Model, Review Queue & Submissions) — EXECUTING
+Plan: 1 of 16 complete (02-01 done; next in wave 1: 02-02)
+Status: Executing
+Last activity: 2026-10-17 — Completed 02-01 (manual entry through draft + ApproveDraft, event_drafts schema)
 
-Progress: [█████████████████░░░] 13/15 plans ([██░░░░░░░░] 20%); phases complete: 1/5
+Progress: 14/31 plans ([██░░░░░░░░] 20%); phase 2: 1/16; phases complete: 1/5
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
+- Total plans completed: 14
 - Average duration: -
 - Total execution time: 0.0 hours
 
@@ -69,6 +69,7 @@ Progress: [█████████████████░░░] 13/15 p
 | Phase 1 P12 | 5min | 2 tasks | 13 files |
 | Phase 1 P13 | 11min | 2 tasks | 12 files |
 | Phase 1 P15 | 9min | 2 tasks | 9 files |
+| Phase 02 P01 | 7min | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -85,6 +86,8 @@ Recent decisions affecting current work:
 - [Testing]: Browser UAT flows (F0–F10) live in docs/uat/browser-uat.md; every phase runs them before sign-off and adds flows for new UI
 - [Phase 1]: Complete 2026-10-17. Verification passed (168/173 + owner-accepted backstops and prohibitions); security verified (0 open); UI review 17/24 with top 3 fixed (261017-hp9); open advisory review items WR-15, IN-09..16 in 01-REVIEW-DISPOSITION.md
 - [Testing]: Browser suite runs in CI; tests/Pest.php forgets scoped instances after each in-process request; use Uat::settleFields() after filling Livewire forms
+- [Phase 02]: [02-01]: Manual entry is a manual draft approved at once through ApproveDraft (D-07); PublishEvent is called only by ApproveDraft
+- [Phase 02]: [02-01]: ApproveDraft logs via DB::afterCommit so nested approvals log only after the outermost commit; fromDraft blocks a missing start date
 
 ### Pending Todos
 
@@ -117,6 +120,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-17
-Stopped at: Phase 1 complete, ready to plan Phase 02 (02-CONTEXT.md already exists)
+Last session: 2026-10-17T17:47:48.628Z
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None
