@@ -13,35 +13,35 @@ findings:
     title: "`EventOccurrence` still allows mass assignment of `status` (WR-07 applied to `Event` only)"
   - id: IN-01
     severity: info
-    disposition: open
+    disposition: deferred
     title: "`Carbon::parse` still used, contrary to the stated \"no Carbon::parse\" rule (carried forward, unchanged)"
   - id: IN-02
     severity: info
-    disposition: open
+    disposition: deferred
     title: "The calendar timezone is hard-coded beside `config('calendar.timezone')` (carried forward, slightly worsened)"
   - id: IN-03
     severity: info
-    disposition: open
+    disposition: deferred
     title: "Failed-job retention is duplicated; the config key is unused (carried forward, unchanged)"
   - id: IN-04
     severity: info
-    disposition: open
+    disposition: deferred
     title: "The release directory name is published on every public page (carried forward, unchanged)"
   - id: IN-05
     severity: info
-    disposition: open
+    disposition: deferred
     title: "The occurrence generator hard-deletes future rows that carry admin-set status and audit data (carried forward; now reachable via WR-10)"
   - id: IN-06
     severity: info
-    disposition: open
+    disposition: deferred
     title: "SEQUENCE and LAST-MODIFIED change on every daily sync even when nothing changed (carried forward, unchanged)"
   - id: IN-07
     severity: info
-    disposition: open
+    disposition: deferred
     title: "The Retry action ignores the `queue:retry` exit code (carried forward, unchanged)"
   - id: IN-08
     severity: info
-    disposition: open
+    disposition: deferred
     title: "Ops and CI hard-coding and supply-chain hygiene (carried forward, unchanged; line numbers moved)"
   - id: IN-09
     severity: info
@@ -106,14 +106,14 @@ recorded: 2026-10-17T09:33:32.563Z
 |---------|----------|-------------|--------|
 | WR-10 | warning | open | - |
 | WR-11 | warning | open | - |
-| IN-01 | info | open | - |
-| IN-02 | info | open | - |
-| IN-03 | info | open | - |
-| IN-04 | info | open | - |
-| IN-05 | info | open | - |
-| IN-06 | info | open | - |
-| IN-07 | info | open | - |
-| IN-08 | info | open | - |
+| IN-01 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) |
+| IN-02 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) |
+| IN-03 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) |
+| IN-04 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) |
+| IN-05 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) |
+| IN-06 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) |
+| IN-07 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) |
+| IN-08 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) |
 | IN-09 | info | open | - |
 | IN-10 | info | open | - |
 | IN-11 | info | open | - |
