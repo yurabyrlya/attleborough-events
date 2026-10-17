@@ -75,11 +75,11 @@ blocked: 0
 ## Gaps
 
 None blocking. Minor UX findings from the browser walkthrough (2026-10-17), candidates for a follow-up quick task:
-- Mobile: filter chips push the first event below the fold (collapse categories into a <details> disclosure or a horizontal scroller; works without JS)
-- Admin: Occurrences table not refreshed after Save on the edit page
-- Admin: read-only Repeats dropdown misreports unsupported rules (shows 'Weekly on Friday'); warning is dismissible rather than inline
-- Admin: confirmation dialogs 'Cancel' vs 'Confirm' wording in 'Cancel this date?' (use 'Keep date' / 'Cancel date')
+- Mobile: filter chips push the first event below the fold (collapse categories into a <details> disclosure or a horizontal scroller; works without JS) — FIXED by quick 261017-gac
+- Admin: Occurrences table not refreshed after Save on the edit page — FIXED by quick 261017-gac
+- Admin: read-only Repeats dropdown misreports unsupported rules (shows 'Weekly on Friday'); warning is dismissible rather than inline — FIXED by quick 261017-gac
+- Admin: confirmation dialogs 'Cancel' vs 'Confirm' wording in 'Cancel this date?' (use 'Keep date' / 'Cancel date') — FIXED by quick 261017-gac
 - Admin: 'Next dates' preview says 'No upcoming dates' before a last date is entered; 3-date cap not labelled
-- Admin: System health badge stays stale until reload; failed-job Reason shows absolute path
+- Admin: System health badge stays stale until reload; failed-job Reason shows absolute path — badge FIXED by quick 261017-gac (absolute path still open; Retry/Delete dialogs still Cancel/Confirm)
 - Admin: not branded (Filament amber, not Norfolk green); 'Date key' column is internal jargon; all-day shown as '00:00' in the events list; 24h times in admin vs 7:30pm public
 - Demo data (owner): First Demo Event has '5£', 'town center' and a Source URL pointing at /admin/events/create
