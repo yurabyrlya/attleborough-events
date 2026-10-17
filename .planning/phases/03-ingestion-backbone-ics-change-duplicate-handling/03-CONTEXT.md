@@ -45,6 +45,16 @@ Out of scope (other phases): RSS, TEC REST, JSON-LD and selector extractors and 
 ### Roadmap
 - **D-18 [informational]:** Owner removed the `**Mode:** mvp` tag from Phase 3 in ROADMAP.md (same as Phases 1 and 2).
 
+### Owner decisions after research (2026-10-17, 03-RESEARCH.md open questions)
+- **D-19:** **ICS recurrence scope = option B.** Publish one-off events and repeat rules the admin form can represent (ManualRecurrence round-trip, Phase 1 WR-10). Add an `excluded_dates` store so EXDATE exclusions survive. A RECURRENCE-ID override that moves a single date, or any rule the form can't represent, becomes a parse error on the draft that tells the admin what to fix. RDATE-only extras are parse errors too. — **Reversibility:** costly — `excluded_dates` is a schema addition that occurrence sync and published series depend on.
+- **D-20:** **Keep `calendar.horizon_days` at 90.** The import window is therefore 90 days ahead (not 12 months): items further ahead are skipped and counted as `skipped_far_future` (this still satisfies PIPE-01's ">12 months skipped and counted"). Missing-item detection only considers items inside this window. A confirmed cancellation therefore never falls outside the occurrence horizon.
+- **D-21:** **Feed items with no description use a neutral fallback** such as "Details from {source name}." followed by "Read more at {source}", and can be approved (individually, in bulk and via "Approve all like this"). The admin can still edit the excerpt (D-15).
+- **D-22:** **A venue set as the source's default venue counts as confirmed** (`venue_id`), so those drafts aren't skipped by bulk approve for an unresolved venue (Phase 2 D-21).
+- **D-23:** **Rejected source items stay rejected**: later runs don't re-draft an item the admin rejected unless its facts change or the admin reopens it.
+- **D-24:** **"Create drafts" after a test run reuses the preview's fetched body if it's under 60 minutes old**, to avoid a second request to the source; otherwise it fetches again politely.
+- **D-25:** **Primary attribution (D-12) is a per-source flag "Organiser's own site"** set on the source. When two linked sources cover one event, a source with that flag is the main attribution; otherwise the first approved source is.
+- **D-26 [informational]:** D-01's test-run preview delivers part of SRC-02 (mapped to Phase 4); plans should note it as partly delivered here.
+
 ### Carried forward (do not re-ask)
 - Architecture from research SUMMARY D13, D14, D19, D20 and Phase 3 notes: one source item per ICS series UID (master + overrides + EXDATE/RDATE in one fragment and hash); `raw_hash` to skip unchanged content plus a semantic `content_hash`; accepted baseline (`accepted_hash` + `accepted_payload`) updated on approve, apply and ignore; past and >12-month items skipped and counted; per-rung body validation (`BEGIN:VCALENDAR`), a bot wall or wrong content type is a failed `content_invalid` run, a robots disallow is a `blocked` run that doesn't degrade health; SSRF guard; never bypass bot protection.
 - sabre/vobject is the only recurrence engine; floating times are Europe/London; unknown TZIDs are parse errors; store UTC (Phase 1 rules, EXT-07). `OccurrenceGenerator` preserves admin-set occurrence status.
