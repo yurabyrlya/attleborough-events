@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 02
 current_phase_name: Draft Model, Review Queue & Submissions
 status: executing
-stopped_at: Completed 02-14-PLAN.md
-last_updated: "2026-10-17T21:04:35.765Z"
+stopped_at: Completed 02-15-PLAN.md
+last_updated: "2026-10-17T21:16:18.033Z"
 last_activity: 2026-10-17
-last_activity_desc: "Completed 02-14 (Edit-and-approve: EventForm section builders, EventDraftForm, EditEventDraft Save / Save & approve; REV-03 complete)"
-state_head: f4753eec7dcee1536bc64bcb2b76545180abaf12
+last_activity_desc: "Completed 02-15 (Approve & next: next-draft redirects, Edit/Skip/Previous/help actions, guarded A/E/R/S/J/K/? shortcuts with a remembered toggle; REV-10 complete)"
+state_head: e389101a01f78cd7716e74ff1de9c937bef7a480
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 31
-  completed_plans: 27
+  completed_plans: 28
   percent: 20
 ---
 
@@ -28,9 +28,9 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 02 (Draft Model, Review Queue & Submissions) — EXECUTING
-Plan: 14 of 16 complete (02-01 to 02-14 done; wave 6 next — 02-15)
+Plan: 15 of 16 complete (02-01 to 02-15 done; next — 02-16)
 Status: Ready to execute
-Last activity: 2026-10-17 — Completed 02-14 (Edit-and-approve: draft edit page reusing EventForm's sections, repeats translation with 'No repeat rule needed', suggested venue + pre-filled 'Create new venue', Save & approve in one transaction landing on the next draft; REV-03 complete)
+Last activity: 2026-10-17 — Completed 02-15 (Approve & next review page: approve/reject/skip open the next pending draft in D-09 order; guarded single-key shortcuts A/E/R/S/J/K/? with visible hints, aria-keyshortcuts, help dialog and a remembered off switch; proven in a real browser; REV-10 complete)
 
 Progress: 27/31 plans ([██░░░░░░░░] 20%); phase 2: 14/16; phases complete: 1/5
 
@@ -83,6 +83,7 @@ Progress: 27/31 plans ([██░░░░░░░░] 20%); phase 2: 14/16; ph
 | Phase 02 P12 | 10min | 3 tasks | 16 files |
 | Phase 02 P13 | 8min | 2 tasks | 5 files |
 | Phase 02 P14 | 9min | 2 tasks | 8 files |
+| Phase 02 P15 | 10min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -138,6 +139,8 @@ Recent decisions affecting current work:
 - [Phase 02]: 02-14: Draft form leaves WR-06 off for drafts (editedEventRepeats null); only hasUneditableRule() is draft-aware, so admins can add a rule to a submission
 - [Phase 02]: 02-14: Admin category pick on the review form is stored as 'Chosen by admin' via DraftData::categoryChosenByAdmin (DraftWriter passes the Manual chooser); unchanged category re-runs the draft's original chain
 - [Phase 02]: 02-14: Save & approve = DraftWriter::update + ApproveDraft in one DB::transaction; blockers roll back edits, form keeps typed values
+- [Phase 02]: 02-15: Publish is autofocused in the approve dialog so A then Enter publishes (D-10); Filament confirmation modals put 'Keep as is' first
+- [Phase 02]: 02-15: Single-key review shortcuts use one guarded Alpine keydown handler (inputs, dialogs, modifiers, repeat) with a localStorage 'woa-shortcuts' toggle, never Filament keyBindings()
 
 ### Pending Todos
 
@@ -171,6 +174,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-17T21:04:35.413Z
-Stopped at: Completed 02-14-PLAN.md
+Last session: 2026-10-17T21:16:17.650Z
+Stopped at: Completed 02-15-PLAN.md
 Resume file: None

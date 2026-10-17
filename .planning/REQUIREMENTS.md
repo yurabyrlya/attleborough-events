@@ -52,7 +52,7 @@
 - [ ] **REV-07**: Admin can confirm a cancellation draft (event or occurrence becomes cancelled) or ignore it
 - [x] **REV-08**: Admin can bulk approve and bulk reject. Bulk approve skips drafts with parse errors, duplicate warnings or Low quality
 - [x] **REV-09**: Admin can filter the queue by kind, source, quality band, duplicate flag and date
-- [ ] **REV-10**: Admin can review on an "Approve & next" page with keyboard shortcuts
+- [x] **REV-10**: Admin can review on an "Approve & next" page with keyboard shortcuts
 - [x] **REV-11**: Admin approves a recurring series once, and its occurrences are generated automatically
 
 ### Administration (ADM)
@@ -207,7 +207,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | REV-07 | Phase 3 | Pending |
 | REV-08 | Phase 2 | Complete |
 | REV-09 | Phase 2 | Complete |
-| REV-10 | Phase 2 | Pending |
+| REV-10 | Phase 2 | Complete |
 | REV-11 | Phase 2 | Complete |
 | ADM-01 | Phase 1 | Complete |
 | ADM-02 | Phase 1 | Complete |
