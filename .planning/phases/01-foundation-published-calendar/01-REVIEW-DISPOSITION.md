@@ -5,11 +5,11 @@ titles: json
 findings:
   - id: WR-10
     severity: warning
-    disposition: open
+    disposition: fixed
     title: "`canEdit()` accepts stored rules that do not round-trip, so saving an unrelated edit silently changes a series' days"
   - id: WR-11
     severity: warning
-    disposition: open
+    disposition: fixed
     title: "`EventOccurrence` still allows mass assignment of `status` (WR-07 applied to `Event` only)"
   - id: IN-01
     severity: info
@@ -104,8 +104,8 @@ recorded: 2026-10-17T09:33:32.563Z
 
 | Finding | Severity | Disposition | Source |
 |---------|----------|-------------|--------|
-| WR-10 | warning | open | - |
-| WR-11 | warning | open | - |
+| WR-10 | warning | fixed | gap plan 01-15; confirmed by verifier round 3 (2026-10-17) |
+| WR-11 | warning | fixed | gap plan 01-15; confirmed by verifier round 3 (2026-10-17) |
 | IN-01 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) |
 | IN-02 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) |
 | IN-03 | info | deferred | carried forward from first review; owner left info findings for a later pass (2026-10-17) |
