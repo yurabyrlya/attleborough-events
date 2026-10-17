@@ -24,10 +24,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $status_changed_by
  * @property-read Event $event
  *
- * status after insert, status_changed_at and status_changed_by are written
- * only by App\Publishing\Actions\ChangeOccurrenceStatus (never fillable).
+ * status, status_changed_at and status_changed_by are never mass-assignable.
+ * status is set on insert by OccurrenceGenerator's upsert (which bypasses
+ * fillable) and changed only by App\Publishing\Actions\ChangeOccurrenceStatus
+ * via forceFill (WR-11).
  */
-#[Fillable(['event_id', 'recurrence_key', 'starts_at', 'ends_at', 'expires_at', 'status'])]
+#[Fillable(['event_id', 'recurrence_key', 'starts_at', 'ends_at', 'expires_at'])]
 class EventOccurrence extends Model
 {
     /**

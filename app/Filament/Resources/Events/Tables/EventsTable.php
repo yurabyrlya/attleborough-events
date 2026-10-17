@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\Events\Tables;
 
-use App\Calendar\ManualRecurrence;
 use App\Enums\EventStatus;
 use App\Filament\Resources\Events\Actions\StatusActions;
 use App\Models\Event;
+use App\Publishing\Data\PublishableEventData;
 use Carbon\CarbonImmutable;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -64,11 +64,15 @@ class EventsTable
             return 'One-off';
         }
 
+        // Same round-trip check as the edit page and UpdatePublishedEvent
+        // (WR-10): a rule that does not round-trip never shows the start
+        // date's weekday.
         try {
+            $recurrence = PublishableEventData::editableRecurrence($event);
             $start = CarbonImmutable::createFromFormat('!Y-m-d', $event->start_date->format('Y-m-d'), $event->timezone);
 
-            return $start instanceof CarbonImmutable
-                ? ManualRecurrence::fromRrule($event->recurrence_rule, $event->all_day)->label($start)
+            return $recurrence !== null && $start instanceof CarbonImmutable
+                ? $recurrence->label($start)
                 : 'Repeats';
         } catch (Throwable) {
             return 'Repeats';
