@@ -206,6 +206,31 @@ it('renders occurrences of one event on different days as separate cards under t
     expect(cardsIn($response))->toHaveCount(2);
 });
 
+it('shows a timed occurrence that ends exactly at midnight as a single day', function () {
+    makeOccurrence(
+        ['title' => 'Halloween Disco', 'start_date' => '2026-10-31', 'start_time' => '19:00:00', 'end_time' => '00:00:00'],
+        '2026-10-31 19:00',
+        '2026-11-01 00:00',
+    );
+    $cards = cardsIn(get('/')->assertOk());
+
+    expect($cards)->toHaveCount(1)
+        ->and($cards[0])->toContain('>Sat 31 Oct, 7pm</time>')
+        ->and($cards[0])->not->toContain('until');
+});
+
+it('still shows an overnight occurrence that ends after midnight as running into the next day', function () {
+    makeOccurrence(
+        ['title' => 'Late Gig', 'start_date' => '2026-10-31', 'start_time' => '22:00:00', 'end_time' => '00:30:00'],
+        '2026-10-31 22:00',
+        '2026-11-01 00:30',
+    );
+    $cards = cardsIn(get('/')->assertOk());
+
+    expect($cards)->toHaveCount(1)
+        ->and($cards[0])->toContain('Sat 31 Oct, 10pm until Sun 1 Nov');
+});
+
 it('shows London wall-clock hours and minutes only', function (string $start, string $label) {
     expect(onlyCard(['title' => 'Timed'], $start))->toContain('>'.$label.'</time>');
 })->with([
