@@ -44,7 +44,7 @@
 ### Review Queue (REV)
 
 - [ ] **REV-01**: Admin sees drafts of kind new / update / cancellation, each showing extracted fields, recurrence summary, source name and URL, extraction method, raw content link, quality band with reasons, parse errors and any duplicate warning with a link to the suspected event
-- [ ] **REV-02**: Admin can approve a draft. The event (and its occurrences) is published in one transaction, linked to the draft, with approver and time recorded. Only review actions and manual entry can write published events
+- [x] **REV-02**: Admin can approve a draft. The event (and its occurrences) is published in one transaction, linked to the draft, with approver and time recorded. Only review actions and manual entry can write published events
 - [ ] **REV-03**: Admin can edit a draft's fields and approve
 - [ ] **REV-04**: Admin can reject a draft with an optional reason
 - [ ] **REV-05**: Admin can mark a draft as a duplicate of an existing event. It is linked through `event_sources` and nothing new is published
@@ -53,7 +53,7 @@
 - [ ] **REV-08**: Admin can bulk approve and bulk reject. Bulk approve skips drafts with parse errors, duplicate warnings or Low quality
 - [ ] **REV-09**: Admin can filter the queue by kind, source, quality band, duplicate flag and date
 - [ ] **REV-10**: Admin can review on an "Approve & next" page with keyboard shortcuts
-- [ ] **REV-11**: Admin approves a recurring series once, and its occurrences are generated automatically
+- [x] **REV-11**: Admin approves a recurring series once, and its occurrences are generated automatically
 
 ### Administration (ADM)
 
@@ -199,7 +199,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SUB-03 | Phase 2 | Pending |
 | SUB-04 | Phase 2 | Pending |
 | REV-01 | Phase 2 | Pending |
-| REV-02 | Phase 2 | Pending |
+| REV-02 | Phase 2 | Complete |
 | REV-03 | Phase 2 | Pending |
 | REV-04 | Phase 2 | Pending |
 | REV-05 | Phase 3 | Pending |
@@ -208,7 +208,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | REV-08 | Phase 2 | Pending |
 | REV-09 | Phase 2 | Pending |
 | REV-10 | Phase 2 | Pending |
-| REV-11 | Phase 2 | Pending |
+| REV-11 | Phase 2 | Complete |
 | ADM-01 | Phase 1 | Complete |
 | ADM-02 | Phase 1 | Complete |
 | ADM-03 | Phase 1 | Complete |

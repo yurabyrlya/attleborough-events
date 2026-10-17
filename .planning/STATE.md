@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 02
 current_phase_name: Draft Model, Review Queue & Submissions
 status: executing
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-10-17T18:30:55.974Z"
+stopped_at: Completed 02-03-PLAN.md
+last_updated: "2026-10-17T19:04:40.456Z"
 last_activity: 2026-10-17
-last_activity_desc: Completed 02-02 (source research: two-list event-sources.md, P0 fixtures, privacy guard)
-state_head: 28ec6520d1ff49a9b4968564c1aa3c72e7d52864
+last_activity_desc: "Completed 02-03 (approval contract, bulk skip keys, PublishEvent choke-point arch test)"
+state_head: 439a42b1503683809ea4c681fd141ebfa5e9f357
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 31
-  completed_plans: 15
+  completed_plans: 16
   percent: 20
 ---
 
@@ -28,9 +28,9 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 02 (Draft Model, Review Queue & Submissions) — EXECUTING
-Plan: 2 of 16 complete (02-01, 02-02 done; wave 1 complete; next: 02-03)
+Plan: 3 of 16 complete (02-01, 02-02, 02-03 done; next: wave 2 continues with 02-04 / 02-05)
 Status: Ready to execute
-Last activity: 2026-10-17 — Completed 02-02 (source research: 1 List 1 source (P0, Baptist Church ICS + dated RSS), 18 on List 2, fixtures + privacy guard; owner follow-ups pending)
+Last activity: 2026-10-17 — Completed 02-03 (approval contract: DraftPublishability blockers + bulk skip keys, DraftWriter::update, CategoryAssigner, EventDraftFactory, PublishEvent choke-point arch test)
 
 Progress: 15/31 plans ([██░░░░░░░░] 20%); phase 2: 2/16; phases complete: 1/5
 
@@ -71,6 +71,7 @@ Progress: 15/31 plans ([██░░░░░░░░] 20%); phase 2: 2/16; pha
 | Phase 1 P15 | 9min | 2 tasks | 9 files |
 | Phase 02 P01 | 7min | 2 tasks | 14 files |
 | Phase 02 P02 | 40min | 4 tasks | 7 files |
+| Phase 02 P03 | 9min | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -92,6 +93,9 @@ Recent decisions affecting current work:
 - [Phase 02]: Source research: a feed the site itself offers (rel=alternate, Export/Subscribe, robots Allow) puts a robots-allowed, ToS-silent source on List 1; HTML/JSON-LD with silent ToS is List 2 ToS-unclear
 - [Phase 02]: Attleborough Baptist Church (Hubb ICS + dated RSS) is the only List 1 source (P0); terms checked by owner 2026-10-17
 - [Phase 02]: 8 ToS-unclear/prohibited sources await owner permission and 5 bot walls await an owner home-network check; all stay List 2, never bypassed
+- [Phase 02]: PublishEvent choke point enforced with Pest toOnlyBeUsedIn('App\Publishing\Actions'); ->ignoring() would be vacuous because it also skips matching dependencies
+- [Phase 02]: DraftPublishability is the single publishability check; bulk skip keys report specific reasons (unresolved_venue, repeats_unset) before 'blocked'
+- [Phase 02]: phpunit.xml memory_limit 512M so the arch scan does not exhaust memory for the Feature suite
 
 ### Pending Todos
 
@@ -125,6 +129,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-17T18:30:55.657Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-10-17T19:04:40.149Z
+Stopped at: Completed 02-03-PLAN.md
 Resume file: None
