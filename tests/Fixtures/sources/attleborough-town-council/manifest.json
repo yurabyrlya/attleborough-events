@@ -1,0 +1,103 @@
+{
+    "source": "attleborough-town-council",
+    "name": "Attleborough Town Council",
+    "files": [
+        {
+            "file": "2026-10-17-ical.ics",
+            "type": "ical",
+            "url": "https://attleboroughtc.org.uk/?post_type=tribe_events&ical=1",
+            "fetched_at": "2026-10-17T18:41:27Z",
+            "http_status": 200,
+            "headers": {
+                "content-type": "text/calendar; charset=UTF-8",
+                "etag": "\"87260-1792262397;;;\"",
+                "last-modified": null,
+                "cache-control": "no-store, no-cache, must-revalidate"
+            },
+            "robots_status": "allowed",
+            "robots_fetched_at": "2026-10-17T18:40:54Z",
+            "robots_rules": [
+                "User-agent: *",
+                "Disallow: /wp-admin/",
+                "Allow: /wp-admin/admin-ajax.php"
+            ],
+            "network": "residential (owner's home network); the same host answered the corporate gateway with a LiteSpeed reCAPTCHA page",
+            "sha256_raw": "52b99aa84423186cf8793c9b529d8cad12dd304677989bb3d7321f72b9345f5e",
+            "redactions": {
+                "email": 8,
+                "phone": 0,
+                "name": 9
+            },
+            "modified": true,
+            "events": 30,
+            "window": "2026-10-17 to 2026-10-27 (TEC iCal default: the next 30 events); spans BST end Sun 25 Oct 2026",
+            "notes": "TEC iCal export (PRODID -//Attleborough Town Council - ECPv6.18.0//). Also advertised on every page as <link rel=\"alternate\" type=\"text/calendar\" href=\"https://attleboroughtc.org.uk/events/?ical=1\">. VTIMEZONE Europe/London; DTSTART;TZID=Europe/London. UIDs '{post id}-{start epoch}-{end epoch}@attleboroughtc.org.uk' are stable per occurrence. Redaction: unfolded, ORGANIZER CN/MAILTO and SUMMARY/URL redacted (a private yoga teacher's name, her email, a cafe's Gmail, the Heritage Group's email), then re-folded at 75 octets; CRLF kept."
+        },
+        {
+            "file": "2026-10-17-tec-p1.json",
+            "type": "tec-p1",
+            "url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events?start_date=2026-10-19&end_date=2026-11-22&per_page=50&page=1",
+            "fetched_at": "2026-10-17T18:41:13Z",
+            "http_status": 200,
+            "headers": {
+                "content-type": "application/json; charset=UTF-8",
+                "etag": null,
+                "last-modified": null,
+                "cache-control": "no-cache, must-revalidate, max-age=0, no-store, private",
+                "x-tec-total": "72",
+                "x-tec-totalpages": "2"
+            },
+            "robots_status": "allowed",
+            "robots_fetched_at": "2026-10-17T18:40:54Z",
+            "robots_rules": [
+                "User-agent: *",
+                "Disallow: /wp-admin/",
+                "(no rule matches /wp-json/)"
+            ],
+            "network": "residential (owner's home network)",
+            "sha256_raw": "ef2ee2b12c091a5d583d2013791ad646354c1e4ff9522ed8575bb7ec22e0987e",
+            "redactions": {
+                "email": 15,
+                "phone": 10,
+                "name": 39
+            },
+            "modified": true,
+            "events": 50,
+            "window": "2026-10-19 to 2026-11-22, page 1 of 2 (total 72); spans BST end Sun 25 Oct 2026",
+            "notes": "TEC REST v1 (The Events Calendar 6.18). Re-encoded with JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT after redacting string values. Organiser names, emails, phones, organiser slugs/URLs and event titles/slugs/URLs naming two private individuals were replaced ('[name removed]', 'name-removed'). next_rest_url points at page 2. Events carry start_date (local) and utc_start_date; 25 Oct items show the same local and UTC time (GMT). Titles keep HTML entities (&#038;)."
+        },
+        {
+            "file": "2026-10-17-tec-p2.json",
+            "type": "tec-p2",
+            "url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/?per_page=50&start_date=2026-10-19+00%3A00%3A00&end_date=2026-11-22+23%3A59%3A59&status=publish&page=2",
+            "fetched_at": "2026-10-17T18:41:20Z",
+            "http_status": 200,
+            "headers": {
+                "content-type": "application/json; charset=UTF-8",
+                "etag": null,
+                "last-modified": null,
+                "cache-control": "no-cache, must-revalidate, max-age=0, no-store, private",
+                "x-tec-total": "72",
+                "x-tec-totalpages": "2"
+            },
+            "robots_status": "allowed",
+            "robots_fetched_at": "2026-10-17T18:40:54Z",
+            "robots_rules": [
+                "User-agent: *",
+                "Disallow: /wp-admin/",
+                "(no rule matches /wp-json/)"
+            ],
+            "network": "residential (owner's home network)",
+            "sha256_raw": "2d985a782862959ff724242ac367a6f5bf3f2407e2448480b2544566b804a105",
+            "redactions": {
+                "email": 11,
+                "phone": 7,
+                "name": 27
+            },
+            "modified": true,
+            "events": 22,
+            "window": "2026-10-19 to 2026-11-22, page 2 of 2 (last page: no next_rest_url, has previous_rest_url)",
+            "notes": "Fetched from page 1's next_rest_url. Same redaction as page 1."
+        }
+    ]
+}

@@ -1,0 +1,2932 @@
+{
+    "events": [
+        {
+            "id": 23562,
+            "global_id": "attleboroughtc.org.uk?id=23562",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=23562"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2026-09-22 13:08:35",
+            "date_utc": "2026-09-22 12:08:35",
+            "modified": "2026-09-22 13:08:35",
+            "modified_utc": "2026-09-22 12:08:35",
+            "url": "https://attleboroughtc.org.uk/event/wi-committee-meeting-24",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/23562",
+            "title": "WI Committee Meeting",
+            "description": "",
+            "excerpt": "",
+            "slug": "wi-committee-meeting-24",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-09 10:00:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "09",
+                "hour": "10",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-09 12:30:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "09",
+                "hour": "12",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-09 10:00:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "09",
+                "hour": "10",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-09 12:30:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "09",
+                "hour": "12",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "GMT",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "",
+                "currency_code": "",
+                "currency_position": "",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 282,
+                "author": "1",
+                "status": "publish",
+                "date": "2023-12-19 15:25:01",
+                "date_utc": "2023-12-19 15:25:01",
+                "modified": "2023-12-19 15:25:01",
+                "modified_utc": "2023-12-19 15:25:01",
+                "url": "https://attleboroughtc.org.uk/venue/town-hall",
+                "venue": "Town Hall",
+                "slug": "town-hall",
+                "show_map": true,
+                "show_map_link": true,
+                "global_id": "attleboroughtc.org.uk?id=282",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=282"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 15026,
+                    "author": "6",
+                    "status": "publish",
+                    "date": "2024-06-06 15:01:57",
+                    "date_utc": "2024-06-06 14:01:57",
+                    "modified": "2024-06-06 15:01:57",
+                    "modified_utc": "2024-06-06 14:01:57",
+                    "url": "https://attleboroughtc.org.uk/organiser/wi",
+                    "organizer": "WI",
+                    "slug": "wi",
+                    "global_id": "attleboroughtc.org.uk?id=15026",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=15026"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 10006803,
+            "global_id": "attleboroughtc.org.uk?id=10006803",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=10006803"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2026-10-12 14:59:24",
+            "date_utc": "2026-10-12 13:59:24",
+            "modified": "2026-10-12 14:59:24",
+            "modified_utc": "2026-10-12 13:59:24",
+            "url": "https://attleboroughtc.org.uk/event/meet-up-mondays-25/2026-11-09",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/10006803",
+            "title": "Meet up Mondays",
+            "description": "",
+            "excerpt": "",
+            "slug": "meet-up-mondays-25",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-09 14:00:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "09",
+                "hour": "14",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-09 16:00:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "09",
+                "hour": "16",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-09 14:00:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "09",
+                "hour": "14",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-09 16:00:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "09",
+                "hour": "16",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "GMT",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "",
+                "currency_code": "",
+                "currency_position": "",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 282,
+                "author": "1",
+                "status": "publish",
+                "date": "2023-12-19 15:25:01",
+                "date_utc": "2023-12-19 15:25:01",
+                "modified": "2023-12-19 15:25:01",
+                "modified_utc": "2023-12-19 15:25:01",
+                "url": "https://attleboroughtc.org.uk/venue/town-hall",
+                "venue": "Town Hall",
+                "slug": "town-hall",
+                "show_map": true,
+                "show_map_link": true,
+                "global_id": "attleboroughtc.org.uk?id=282",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=282"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 15494,
+                    "author": "6",
+                    "status": "publish",
+                    "date": "2024-06-11 12:31:12",
+                    "date_utc": "2024-06-11 11:31:12",
+                    "modified": "2024-06-11 12:31:12",
+                    "modified_utc": "2024-06-11 11:31:12",
+                    "url": "https://attleboroughtc.org.uk/organiser/name-removed",
+                    "organizer": "[name removed]",
+                    "slug": "name-removed",
+                    "phone": "01632 960000",
+                    "global_id": "attleboroughtc.org.uk?id=15494",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=15494"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 10002576,
+            "global_id": "attleboroughtc.org.uk?id=10002576",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=10002576"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2024-06-06 15:19:23",
+            "date_utc": "2024-06-06 14:19:23",
+            "modified": "2025-12-01 12:49:37",
+            "modified_utc": "2025-12-01 12:49:37",
+            "url": "https://attleboroughtc.org.uk/event/attleborough-heritage-group/2026-11-10",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/10002576",
+            "title": "Attleborough Heritage Group",
+            "description": "",
+            "excerpt": "",
+            "slug": "attleborough-heritage-group",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-10 09:30:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "10",
+                "hour": "09",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-10 12:30:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "10",
+                "hour": "12",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-10 09:30:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "10",
+                "hour": "09",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-10 12:30:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "10",
+                "hour": "12",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "BST",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "£",
+                "currency_code": "GBP",
+                "currency_position": "prefix",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 282,
+                "author": "1",
+                "status": "publish",
+                "date": "2023-12-19 15:25:01",
+                "date_utc": "2023-12-19 15:25:01",
+                "modified": "2023-12-19 15:25:01",
+                "modified_utc": "2023-12-19 15:25:01",
+                "url": "https://attleboroughtc.org.uk/venue/town-hall",
+                "venue": "Town Hall",
+                "slug": "town-hall",
+                "show_map": true,
+                "show_map_link": true,
+                "global_id": "attleboroughtc.org.uk?id=282",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=282"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 14176,
+                    "author": "6",
+                    "status": "publish",
+                    "date": "2024-05-22 09:28:07",
+                    "date_utc": "2024-05-22 08:28:07",
+                    "modified": "2024-05-22 09:28:07",
+                    "modified_utc": "2024-05-22 08:28:07",
+                    "url": "https://attleboroughtc.org.uk/organiser/attleborough-heritage-group",
+                    "organizer": "Attleborough Heritage Group",
+                    "slug": "attleborough-heritage-group",
+                    "phone": "01632 960000",
+                    "website": "https://www.attleboroughheritage.org.uk/",
+                    "email": "redacted@example.invalid",
+                    "global_id": "attleboroughtc.org.uk?id=14176",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=14176"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 10006024,
+            "global_id": "attleboroughtc.org.uk?id=10006024",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=10006024"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2026-04-01 12:12:25",
+            "date_utc": "2026-04-01 11:12:25",
+            "modified": "2026-04-01 12:12:25",
+            "modified_utc": "2026-04-01 11:12:25",
+            "url": "https://attleboroughtc.org.uk/event/rbl-armistice-day-services/2026-11-11/1",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/10006024",
+            "title": "RBL ~ Armistice Day Services",
+            "description": "<p>2 x Services</p>",
+            "excerpt": "",
+            "slug": "rbl-armistice-day-services",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-11 11:00:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "11",
+                "hour": "11",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-11 11:30:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "11",
+                "hour": "11",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-11 11:00:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "11",
+                "hour": "11",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-11 11:30:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "11",
+                "hour": "11",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "GMT",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "",
+                "currency_code": "",
+                "currency_position": "",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 15849,
+                "author": "6",
+                "status": "publish",
+                "date": "2024-07-17 10:05:46",
+                "date_utc": "2024-07-17 09:05:46",
+                "modified": "2024-07-17 10:05:46",
+                "modified_utc": "2024-07-17 09:05:46",
+                "url": "https://attleboroughtc.org.uk/venue/queens-square",
+                "venue": "Queens Square",
+                "slug": "queens-square",
+                "show_map": false,
+                "show_map_link": false,
+                "global_id": "attleboroughtc.org.uk?id=15849",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=15849"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 16250,
+                    "author": "6",
+                    "status": "publish",
+                    "date": "2024-09-11 11:37:31",
+                    "date_utc": "2024-09-11 10:37:31",
+                    "modified": "2024-09-11 11:37:31",
+                    "modified_utc": "2024-09-11 10:37:31",
+                    "url": "https://attleboroughtc.org.uk/organiser/rbl",
+                    "organizer": "RBL",
+                    "slug": "rbl",
+                    "global_id": "attleboroughtc.org.uk?id=16250",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=16250"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 10006792,
+            "global_id": "attleboroughtc.org.uk?id=10006792",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=10006792"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2026-10-01 14:30:39",
+            "date_utc": "2026-10-01 13:30:39",
+            "modified": "2026-10-01 14:30:39",
+            "modified_utc": "2026-10-01 13:30:39",
+            "url": "https://attleboroughtc.org.uk/event/name-removed-yoga-14/2026-11-11",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/10006792",
+            "title": "[name removed] ~ Yoga",
+            "description": "",
+            "excerpt": "",
+            "slug": "name-removed-yoga-14",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-11 18:00:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "11",
+                "hour": "18",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-11 20:00:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "11",
+                "hour": "20",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-11 18:00:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "11",
+                "hour": "18",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-11 20:00:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "11",
+                "hour": "20",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "GMT",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "",
+                "currency_code": "",
+                "currency_position": "",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 282,
+                "author": "1",
+                "status": "publish",
+                "date": "2023-12-19 15:25:01",
+                "date_utc": "2023-12-19 15:25:01",
+                "modified": "2023-12-19 15:25:01",
+                "modified_utc": "2023-12-19 15:25:01",
+                "url": "https://attleboroughtc.org.uk/venue/town-hall",
+                "venue": "Town Hall",
+                "slug": "town-hall",
+                "show_map": true,
+                "show_map_link": true,
+                "global_id": "attleboroughtc.org.uk?id=282",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=282"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 14996,
+                    "author": "6",
+                    "status": "publish",
+                    "date": "2024-06-06 14:23:04",
+                    "date_utc": "2024-06-06 13:23:04",
+                    "modified": "2024-06-06 14:23:04",
+                    "modified_utc": "2024-06-06 13:23:04",
+                    "url": "https://attleboroughtc.org.uk/organiser/name-removed",
+                    "organizer": "[name removed]",
+                    "slug": "name-removed",
+                    "phone": "01632 960000",
+                    "email": "redacted@example.invalid",
+                    "global_id": "attleboroughtc.org.uk?id=14996",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=14996"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 10006025,
+            "global_id": "attleboroughtc.org.uk?id=10006025",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=10006025"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2026-04-01 12:12:25",
+            "date_utc": "2026-04-01 11:12:25",
+            "modified": "2026-04-01 12:12:25",
+            "modified_utc": "2026-04-01 11:12:25",
+            "url": "https://attleboroughtc.org.uk/event/rbl-armistice-day-services/2026-11-11/2",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/10006025",
+            "title": "RBL ~ Armistice Day Services",
+            "description": "<p>2 x Services</p>",
+            "excerpt": "",
+            "slug": "rbl-armistice-day-services",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-11 19:00:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "11",
+                "hour": "19",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-11 19:30:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "11",
+                "hour": "19",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-11 19:00:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "11",
+                "hour": "19",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-11 19:30:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "11",
+                "hour": "19",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "GMT",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "",
+                "currency_code": "",
+                "currency_position": "",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 15849,
+                "author": "6",
+                "status": "publish",
+                "date": "2024-07-17 10:05:46",
+                "date_utc": "2024-07-17 09:05:46",
+                "modified": "2024-07-17 10:05:46",
+                "modified_utc": "2024-07-17 09:05:46",
+                "url": "https://attleboroughtc.org.uk/venue/queens-square",
+                "venue": "Queens Square",
+                "slug": "queens-square",
+                "show_map": false,
+                "show_map_link": false,
+                "global_id": "attleboroughtc.org.uk?id=15849",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=15849"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 16250,
+                    "author": "6",
+                    "status": "publish",
+                    "date": "2024-09-11 11:37:31",
+                    "date_utc": "2024-09-11 10:37:31",
+                    "modified": "2024-09-11 11:37:31",
+                    "modified_utc": "2024-09-11 10:37:31",
+                    "url": "https://attleboroughtc.org.uk/organiser/rbl",
+                    "organizer": "RBL",
+                    "slug": "rbl",
+                    "global_id": "attleboroughtc.org.uk?id=16250",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=16250"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 10005548,
+            "global_id": "attleboroughtc.org.uk?id=10005548",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=10005548"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2025-10-27 13:43:53",
+            "date_utc": "2025-10-27 13:43:53",
+            "modified": "2026-10-13 12:04:37",
+            "modified_utc": "2026-10-13 11:04:37",
+            "url": "https://attleboroughtc.org.uk/event/the-chambers-community-cafe-36/2026-11-12",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/10005548",
+            "title": "The Chambers ~ Community Cafe",
+            "description": "",
+            "excerpt": "",
+            "slug": "the-chambers-community-cafe-36",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-12 11:00:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "12",
+                "hour": "11",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-12 15:00:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "12",
+                "hour": "15",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-12 11:00:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "12",
+                "hour": "11",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-12 15:00:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "12",
+                "hour": "15",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "GMT",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "",
+                "currency_code": "",
+                "currency_position": "",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 282,
+                "author": "1",
+                "status": "publish",
+                "date": "2023-12-19 15:25:01",
+                "date_utc": "2023-12-19 15:25:01",
+                "modified": "2023-12-19 15:25:01",
+                "modified_utc": "2023-12-19 15:25:01",
+                "url": "https://attleboroughtc.org.uk/venue/town-hall",
+                "venue": "Town Hall",
+                "slug": "town-hall",
+                "show_map": true,
+                "show_map_link": true,
+                "global_id": "attleboroughtc.org.uk?id=282",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=282"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 20305,
+                    "author": "6",
+                    "status": "publish",
+                    "date": "2025-10-16 08:50:18",
+                    "date_utc": "2025-10-16 07:50:18",
+                    "modified": "2025-10-16 08:50:18",
+                    "modified_utc": "2025-10-16 07:50:18",
+                    "url": "https://attleboroughtc.org.uk/organiser/the-chambers-2",
+                    "organizer": "The Chambers",
+                    "slug": "the-chambers-2",
+                    "email": "redacted@example.invalid",
+                    "global_id": "attleboroughtc.org.uk?id=20305",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=20305"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 24184,
+            "global_id": "attleboroughtc.org.uk?id=24184",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=24184"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2026-10-01 15:36:59",
+            "date_utc": "2026-10-01 14:36:59",
+            "modified": "2026-10-01 15:36:59",
+            "modified_utc": "2026-10-01 14:36:59",
+            "url": "https://attleboroughtc.org.uk/event/private-function-22",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/24184",
+            "title": "Private Function",
+            "description": "",
+            "excerpt": "",
+            "slug": "private-function-22",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-12 18:30:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "12",
+                "hour": "18",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-12 23:00:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "12",
+                "hour": "23",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-12 18:30:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "12",
+                "hour": "18",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-12 23:00:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "12",
+                "hour": "23",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "GMT",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "",
+                "currency_code": "",
+                "currency_position": "",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 282,
+                "author": "1",
+                "status": "publish",
+                "date": "2023-12-19 15:25:01",
+                "date_utc": "2023-12-19 15:25:01",
+                "modified": "2023-12-19 15:25:01",
+                "modified_utc": "2023-12-19 15:25:01",
+                "url": "https://attleboroughtc.org.uk/venue/town-hall",
+                "venue": "Town Hall",
+                "slug": "town-hall",
+                "show_map": true,
+                "show_map_link": true,
+                "global_id": "attleboroughtc.org.uk?id=282",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=282"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 18761,
+                    "author": "6",
+                    "status": "publish",
+                    "date": "2025-05-10 11:48:56",
+                    "date_utc": "2025-05-10 10:48:56",
+                    "modified": "2025-05-10 11:48:56",
+                    "modified_utc": "2025-05-10 10:48:56",
+                    "url": "https://attleboroughtc.org.uk/organiser/private-hire",
+                    "organizer": "Private Hire",
+                    "slug": "private-hire",
+                    "global_id": "attleboroughtc.org.uk?id=18761",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=18761"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 10005357,
+            "global_id": "attleboroughtc.org.uk?id=10005357",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=10005357"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2025-10-16 11:08:17",
+            "date_utc": "2025-10-16 10:08:17",
+            "modified": "2026-01-14 10:56:35",
+            "modified_utc": "2026-01-14 10:56:35",
+            "url": "https://attleboroughtc.org.uk/event/attleborough-lifelong-learning-19/2026-11-13",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/10005357",
+            "title": "Attleborough Lifelong Learning",
+            "description": "",
+            "excerpt": "",
+            "slug": "attleborough-lifelong-learning-19",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-13 09:30:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "13",
+                "hour": "09",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-13 12:00:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "13",
+                "hour": "12",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-13 09:30:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "13",
+                "hour": "09",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-13 12:00:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "13",
+                "hour": "12",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "GMT",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "",
+                "currency_code": "",
+                "currency_position": "",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 282,
+                "author": "1",
+                "status": "publish",
+                "date": "2023-12-19 15:25:01",
+                "date_utc": "2023-12-19 15:25:01",
+                "modified": "2023-12-19 15:25:01",
+                "modified_utc": "2023-12-19 15:25:01",
+                "url": "https://attleboroughtc.org.uk/venue/town-hall",
+                "venue": "Town Hall",
+                "slug": "town-hall",
+                "show_map": true,
+                "show_map_link": true,
+                "global_id": "attleboroughtc.org.uk?id=282",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=282"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 16830,
+                    "author": "6",
+                    "status": "publish",
+                    "date": "2024-10-17 09:40:25",
+                    "date_utc": "2024-10-17 08:40:25",
+                    "modified": "2024-10-17 09:40:25",
+                    "modified_utc": "2024-10-17 08:40:25",
+                    "url": "https://attleboroughtc.org.uk/organiser/attleborough-lifelong-learning",
+                    "organizer": "Attleborough Lifelong Learning",
+                    "slug": "attleborough-lifelong-learning",
+                    "global_id": "attleboroughtc.org.uk?id=16830",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=16830"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 10006752,
+            "global_id": "attleboroughtc.org.uk?id=10006752",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=10006752"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2026-09-08 11:36:53",
+            "date_utc": "2026-09-08 10:36:53",
+            "modified": "2026-09-08 11:36:53",
+            "modified_utc": "2026-09-08 10:36:53",
+            "url": "https://attleboroughtc.org.uk/event/veterans-breakfast-5/2026-11-14",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/10006752",
+            "title": "Veterans Breakfast",
+            "description": "",
+            "excerpt": "",
+            "slug": "veterans-breakfast-5",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-14 09:30:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "14",
+                "hour": "09",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-14 11:30:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "14",
+                "hour": "11",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-14 09:30:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "14",
+                "hour": "09",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-14 11:30:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "14",
+                "hour": "11",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "GMT",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "",
+                "currency_code": "",
+                "currency_position": "",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 282,
+                "author": "1",
+                "status": "publish",
+                "date": "2023-12-19 15:25:01",
+                "date_utc": "2023-12-19 15:25:01",
+                "modified": "2023-12-19 15:25:01",
+                "modified_utc": "2023-12-19 15:25:01",
+                "url": "https://attleboroughtc.org.uk/venue/town-hall",
+                "venue": "Town Hall",
+                "slug": "town-hall",
+                "show_map": true,
+                "show_map_link": true,
+                "global_id": "attleboroughtc.org.uk?id=282",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=282"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 20305,
+                    "author": "6",
+                    "status": "publish",
+                    "date": "2025-10-16 08:50:18",
+                    "date_utc": "2025-10-16 07:50:18",
+                    "modified": "2025-10-16 08:50:18",
+                    "modified_utc": "2025-10-16 07:50:18",
+                    "url": "https://attleboroughtc.org.uk/organiser/the-chambers-2",
+                    "organizer": "The Chambers",
+                    "slug": "the-chambers-2",
+                    "email": "redacted@example.invalid",
+                    "global_id": "attleboroughtc.org.uk?id=20305",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=20305"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 10003896,
+            "global_id": "attleboroughtc.org.uk?id=10003896",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=10003896"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2024-10-23 16:07:33",
+            "date_utc": "2024-10-23 15:07:33",
+            "modified": "2026-09-08 09:41:17",
+            "modified_utc": "2026-09-08 08:41:17",
+            "url": "https://attleboroughtc.org.uk/event/name-removed-yoga/2026-11-15",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/10003896",
+            "title": "[name removed] ~ Yoga",
+            "description": "",
+            "excerpt": "",
+            "slug": "name-removed-yoga",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-15 10:00:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "15",
+                "hour": "10",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-15 11:00:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "15",
+                "hour": "11",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-15 10:00:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "15",
+                "hour": "10",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-15 11:00:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "15",
+                "hour": "11",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "BST",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "",
+                "currency_code": "",
+                "currency_position": "",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 282,
+                "author": "1",
+                "status": "publish",
+                "date": "2023-12-19 15:25:01",
+                "date_utc": "2023-12-19 15:25:01",
+                "modified": "2023-12-19 15:25:01",
+                "modified_utc": "2023-12-19 15:25:01",
+                "url": "https://attleboroughtc.org.uk/venue/town-hall",
+                "venue": "Town Hall",
+                "slug": "town-hall",
+                "show_map": true,
+                "show_map_link": true,
+                "global_id": "attleboroughtc.org.uk?id=282",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=282"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 14996,
+                    "author": "6",
+                    "status": "publish",
+                    "date": "2024-06-06 14:23:04",
+                    "date_utc": "2024-06-06 13:23:04",
+                    "modified": "2024-06-06 14:23:04",
+                    "modified_utc": "2024-06-06 13:23:04",
+                    "url": "https://attleboroughtc.org.uk/organiser/name-removed",
+                    "organizer": "[name removed]",
+                    "slug": "name-removed",
+                    "phone": "01632 960000",
+                    "email": "redacted@example.invalid",
+                    "global_id": "attleboroughtc.org.uk?id=14996",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=14996"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 10005549,
+            "global_id": "attleboroughtc.org.uk?id=10005549",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=10005549"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2025-10-27 13:43:53",
+            "date_utc": "2025-10-27 13:43:53",
+            "modified": "2026-10-13 12:04:37",
+            "modified_utc": "2026-10-13 11:04:37",
+            "url": "https://attleboroughtc.org.uk/event/the-chambers-community-cafe-36/2026-11-15",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/10005549",
+            "title": "The Chambers ~ Community Cafe",
+            "description": "",
+            "excerpt": "",
+            "slug": "the-chambers-community-cafe-36",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-15 12:00:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "15",
+                "hour": "12",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-15 14:00:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "15",
+                "hour": "14",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-15 12:00:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "15",
+                "hour": "12",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-15 14:00:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "15",
+                "hour": "14",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "GMT",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "",
+                "currency_code": "",
+                "currency_position": "",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 282,
+                "author": "1",
+                "status": "publish",
+                "date": "2023-12-19 15:25:01",
+                "date_utc": "2023-12-19 15:25:01",
+                "modified": "2023-12-19 15:25:01",
+                "modified_utc": "2023-12-19 15:25:01",
+                "url": "https://attleboroughtc.org.uk/venue/town-hall",
+                "venue": "Town Hall",
+                "slug": "town-hall",
+                "show_map": true,
+                "show_map_link": true,
+                "global_id": "attleboroughtc.org.uk?id=282",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=282"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 20305,
+                    "author": "6",
+                    "status": "publish",
+                    "date": "2025-10-16 08:50:18",
+                    "date_utc": "2025-10-16 07:50:18",
+                    "modified": "2025-10-16 08:50:18",
+                    "modified_utc": "2025-10-16 07:50:18",
+                    "url": "https://attleboroughtc.org.uk/organiser/the-chambers-2",
+                    "organizer": "The Chambers",
+                    "slug": "the-chambers-2",
+                    "email": "redacted@example.invalid",
+                    "global_id": "attleboroughtc.org.uk?id=20305",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=20305"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 10006289,
+            "global_id": "attleboroughtc.org.uk?id=10006289",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=10006289"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2026-02-24 10:54:01",
+            "date_utc": "2026-02-24 10:54:01",
+            "modified": "2026-07-13 14:27:40",
+            "modified_utc": "2026-07-13 13:27:40",
+            "url": "https://attleboroughtc.org.uk/event/full-council-meeting-24/2026-11-16",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/10006289",
+            "title": "Full Council Meeting",
+            "description": "",
+            "excerpt": "",
+            "slug": "full-council-meeting-24",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-16 19:00:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "16",
+                "hour": "19",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-16 21:00:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "16",
+                "hour": "21",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-16 19:00:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "16",
+                "hour": "19",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-16 21:00:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "16",
+                "hour": "21",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "BST",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "",
+                "currency_code": "",
+                "currency_position": "",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 282,
+                "author": "1",
+                "status": "publish",
+                "date": "2023-12-19 15:25:01",
+                "date_utc": "2023-12-19 15:25:01",
+                "modified": "2023-12-19 15:25:01",
+                "modified_utc": "2023-12-19 15:25:01",
+                "url": "https://attleboroughtc.org.uk/venue/town-hall",
+                "venue": "Town Hall",
+                "slug": "town-hall",
+                "show_map": true,
+                "show_map_link": true,
+                "global_id": "attleboroughtc.org.uk?id=282",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=282"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 284,
+                    "author": "1",
+                    "status": "publish",
+                    "date": "2023-12-19 15:25:25",
+                    "date_utc": "2023-12-19 15:25:25",
+                    "modified": "2023-12-19 15:25:25",
+                    "modified_utc": "2023-12-19 15:25:25",
+                    "url": "https://attleboroughtc.org.uk/organiser/attleborough-town-council",
+                    "organizer": "Attleborough Town Council",
+                    "slug": "attleborough-town-council",
+                    "global_id": "attleboroughtc.org.uk?id=284",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=284"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 10002577,
+            "global_id": "attleboroughtc.org.uk?id=10002577",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=10002577"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2024-06-06 15:19:23",
+            "date_utc": "2024-06-06 14:19:23",
+            "modified": "2025-12-01 12:49:37",
+            "modified_utc": "2025-12-01 12:49:37",
+            "url": "https://attleboroughtc.org.uk/event/attleborough-heritage-group/2026-11-17",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/10002577",
+            "title": "Attleborough Heritage Group",
+            "description": "",
+            "excerpt": "",
+            "slug": "attleborough-heritage-group",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-17 09:30:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "17",
+                "hour": "09",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-17 12:30:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "17",
+                "hour": "12",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-17 09:30:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "17",
+                "hour": "09",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-17 12:30:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "17",
+                "hour": "12",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "BST",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "£",
+                "currency_code": "GBP",
+                "currency_position": "prefix",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 282,
+                "author": "1",
+                "status": "publish",
+                "date": "2023-12-19 15:25:01",
+                "date_utc": "2023-12-19 15:25:01",
+                "modified": "2023-12-19 15:25:01",
+                "modified_utc": "2023-12-19 15:25:01",
+                "url": "https://attleboroughtc.org.uk/venue/town-hall",
+                "venue": "Town Hall",
+                "slug": "town-hall",
+                "show_map": true,
+                "show_map_link": true,
+                "global_id": "attleboroughtc.org.uk?id=282",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=282"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 14176,
+                    "author": "6",
+                    "status": "publish",
+                    "date": "2024-05-22 09:28:07",
+                    "date_utc": "2024-05-22 08:28:07",
+                    "modified": "2024-05-22 09:28:07",
+                    "modified_utc": "2024-05-22 08:28:07",
+                    "url": "https://attleboroughtc.org.uk/organiser/attleborough-heritage-group",
+                    "organizer": "Attleborough Heritage Group",
+                    "slug": "attleborough-heritage-group",
+                    "phone": "01632 960000",
+                    "website": "https://www.attleboroughheritage.org.uk/",
+                    "email": "redacted@example.invalid",
+                    "global_id": "attleboroughtc.org.uk?id=14176",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=14176"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 24172,
+            "global_id": "attleboroughtc.org.uk?id=24172",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=24172"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2026-10-01 14:33:05",
+            "date_utc": "2026-10-01 13:33:05",
+            "modified": "2026-10-01 14:33:05",
+            "modified_utc": "2026-10-01 13:33:05",
+            "url": "https://attleboroughtc.org.uk/event/francis-friends-18",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/24172",
+            "title": "Francis Friends",
+            "description": "",
+            "excerpt": "",
+            "slug": "francis-friends-18",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-18 14:00:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "18",
+                "hour": "14",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-18 16:30:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "18",
+                "hour": "16",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-18 14:00:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "18",
+                "hour": "14",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-18 16:30:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "18",
+                "hour": "16",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "GMT",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "",
+                "currency_code": "",
+                "currency_position": "",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 282,
+                "author": "1",
+                "status": "publish",
+                "date": "2023-12-19 15:25:01",
+                "date_utc": "2023-12-19 15:25:01",
+                "modified": "2023-12-19 15:25:01",
+                "modified_utc": "2023-12-19 15:25:01",
+                "url": "https://attleboroughtc.org.uk/venue/town-hall",
+                "venue": "Town Hall",
+                "slug": "town-hall",
+                "show_map": true,
+                "show_map_link": true,
+                "global_id": "attleboroughtc.org.uk?id=282",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=282"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 15055,
+                    "author": "6",
+                    "status": "publish",
+                    "date": "2024-06-06 15:20:19",
+                    "date_utc": "2024-06-06 14:20:19",
+                    "modified": "2024-06-06 15:20:19",
+                    "modified_utc": "2024-06-06 14:20:19",
+                    "url": "https://attleboroughtc.org.uk/organiser/francis-friends",
+                    "organizer": "Francis Friends",
+                    "slug": "francis-friends",
+                    "global_id": "attleboroughtc.org.uk?id=15055",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=15055"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 10006793,
+            "global_id": "attleboroughtc.org.uk?id=10006793",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=10006793"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2026-10-01 14:30:39",
+            "date_utc": "2026-10-01 13:30:39",
+            "modified": "2026-10-01 14:30:39",
+            "modified_utc": "2026-10-01 13:30:39",
+            "url": "https://attleboroughtc.org.uk/event/name-removed-yoga-14/2026-11-18",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/10006793",
+            "title": "[name removed] ~ Yoga",
+            "description": "",
+            "excerpt": "",
+            "slug": "name-removed-yoga-14",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-18 18:00:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "18",
+                "hour": "18",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-18 20:00:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "18",
+                "hour": "20",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-18 18:00:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "18",
+                "hour": "18",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-18 20:00:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "18",
+                "hour": "20",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "GMT",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "",
+                "currency_code": "",
+                "currency_position": "",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 282,
+                "author": "1",
+                "status": "publish",
+                "date": "2023-12-19 15:25:01",
+                "date_utc": "2023-12-19 15:25:01",
+                "modified": "2023-12-19 15:25:01",
+                "modified_utc": "2023-12-19 15:25:01",
+                "url": "https://attleboroughtc.org.uk/venue/town-hall",
+                "venue": "Town Hall",
+                "slug": "town-hall",
+                "show_map": true,
+                "show_map_link": true,
+                "global_id": "attleboroughtc.org.uk?id=282",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=282"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 14996,
+                    "author": "6",
+                    "status": "publish",
+                    "date": "2024-06-06 14:23:04",
+                    "date_utc": "2024-06-06 13:23:04",
+                    "modified": "2024-06-06 14:23:04",
+                    "modified_utc": "2024-06-06 13:23:04",
+                    "url": "https://attleboroughtc.org.uk/organiser/name-removed",
+                    "organizer": "[name removed]",
+                    "slug": "name-removed",
+                    "phone": "01632 960000",
+                    "email": "redacted@example.invalid",
+                    "global_id": "attleboroughtc.org.uk?id=14996",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=14996"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 10005550,
+            "global_id": "attleboroughtc.org.uk?id=10005550",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=10005550"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2025-10-27 13:43:53",
+            "date_utc": "2025-10-27 13:43:53",
+            "modified": "2026-10-13 12:04:37",
+            "modified_utc": "2026-10-13 11:04:37",
+            "url": "https://attleboroughtc.org.uk/event/the-chambers-community-cafe-36/2026-11-19",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/10005550",
+            "title": "The Chambers ~ Community Cafe",
+            "description": "",
+            "excerpt": "",
+            "slug": "the-chambers-community-cafe-36",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-19 11:00:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "19",
+                "hour": "11",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-19 15:00:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "19",
+                "hour": "15",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-19 11:00:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "19",
+                "hour": "11",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-19 15:00:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "19",
+                "hour": "15",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "GMT",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "",
+                "currency_code": "",
+                "currency_position": "",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 282,
+                "author": "1",
+                "status": "publish",
+                "date": "2023-12-19 15:25:01",
+                "date_utc": "2023-12-19 15:25:01",
+                "modified": "2023-12-19 15:25:01",
+                "modified_utc": "2023-12-19 15:25:01",
+                "url": "https://attleboroughtc.org.uk/venue/town-hall",
+                "venue": "Town Hall",
+                "slug": "town-hall",
+                "show_map": true,
+                "show_map_link": true,
+                "global_id": "attleboroughtc.org.uk?id=282",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=282"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 20305,
+                    "author": "6",
+                    "status": "publish",
+                    "date": "2025-10-16 08:50:18",
+                    "date_utc": "2025-10-16 07:50:18",
+                    "modified": "2025-10-16 08:50:18",
+                    "modified_utc": "2025-10-16 07:50:18",
+                    "url": "https://attleboroughtc.org.uk/organiser/the-chambers-2",
+                    "organizer": "The Chambers",
+                    "slug": "the-chambers-2",
+                    "email": "redacted@example.invalid",
+                    "global_id": "attleboroughtc.org.uk?id=20305",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=20305"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 10005358,
+            "global_id": "attleboroughtc.org.uk?id=10005358",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=10005358"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2025-10-16 11:08:17",
+            "date_utc": "2025-10-16 10:08:17",
+            "modified": "2026-01-14 10:56:35",
+            "modified_utc": "2026-01-14 10:56:35",
+            "url": "https://attleboroughtc.org.uk/event/attleborough-lifelong-learning-19/2026-11-20",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/10005358",
+            "title": "Attleborough Lifelong Learning",
+            "description": "",
+            "excerpt": "",
+            "slug": "attleborough-lifelong-learning-19",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-20 09:30:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "20",
+                "hour": "09",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-20 12:00:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "20",
+                "hour": "12",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-20 09:30:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "20",
+                "hour": "09",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-20 12:00:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "20",
+                "hour": "12",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "GMT",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "",
+                "currency_code": "",
+                "currency_position": "",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 282,
+                "author": "1",
+                "status": "publish",
+                "date": "2023-12-19 15:25:01",
+                "date_utc": "2023-12-19 15:25:01",
+                "modified": "2023-12-19 15:25:01",
+                "modified_utc": "2023-12-19 15:25:01",
+                "url": "https://attleboroughtc.org.uk/venue/town-hall",
+                "venue": "Town Hall",
+                "slug": "town-hall",
+                "show_map": true,
+                "show_map_link": true,
+                "global_id": "attleboroughtc.org.uk?id=282",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=282"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 16830,
+                    "author": "6",
+                    "status": "publish",
+                    "date": "2024-10-17 09:40:25",
+                    "date_utc": "2024-10-17 08:40:25",
+                    "modified": "2024-10-17 09:40:25",
+                    "modified_utc": "2024-10-17 08:40:25",
+                    "url": "https://attleboroughtc.org.uk/organiser/attleborough-lifelong-learning",
+                    "organizer": "Attleborough Lifelong Learning",
+                    "slug": "attleborough-lifelong-learning",
+                    "global_id": "attleboroughtc.org.uk?id=16830",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=16830"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 10005725,
+            "global_id": "attleboroughtc.org.uk?id=10005725",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=10005725"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2026-01-09 12:34:02",
+            "date_utc": "2026-01-09 12:34:02",
+            "modified": "2026-01-09 12:34:02",
+            "modified_utc": "2026-01-09 12:34:02",
+            "url": "https://attleboroughtc.org.uk/event/councillor-surgeries/2026-11-21",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/10005725",
+            "title": "Councillor Surgeries",
+            "description": "",
+            "excerpt": "",
+            "slug": "councillor-surgeries",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-21 09:30:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "21",
+                "hour": "09",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-21 11:30:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "21",
+                "hour": "11",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-21 09:30:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "21",
+                "hour": "09",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-21 11:30:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "21",
+                "hour": "11",
+                "minutes": "30",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "GMT",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "",
+                "currency_code": "",
+                "currency_position": "",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 282,
+                "author": "1",
+                "status": "publish",
+                "date": "2023-12-19 15:25:01",
+                "date_utc": "2023-12-19 15:25:01",
+                "modified": "2023-12-19 15:25:01",
+                "modified_utc": "2023-12-19 15:25:01",
+                "url": "https://attleboroughtc.org.uk/venue/town-hall",
+                "venue": "Town Hall",
+                "slug": "town-hall",
+                "show_map": true,
+                "show_map_link": true,
+                "global_id": "attleboroughtc.org.uk?id=282",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=282"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 284,
+                    "author": "1",
+                    "status": "publish",
+                    "date": "2023-12-19 15:25:25",
+                    "date_utc": "2023-12-19 15:25:25",
+                    "modified": "2023-12-19 15:25:25",
+                    "modified_utc": "2023-12-19 15:25:25",
+                    "url": "https://attleboroughtc.org.uk/organiser/attleborough-town-council",
+                    "organizer": "Attleborough Town Council",
+                    "slug": "attleborough-town-council",
+                    "global_id": "attleboroughtc.org.uk?id=284",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=284"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 23436,
+            "global_id": "attleboroughtc.org.uk?id=23436",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=23436"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2026-09-09 16:23:24",
+            "date_utc": "2026-09-09 15:23:24",
+            "modified": "2026-09-09 16:23:24",
+            "modified_utc": "2026-09-09 15:23:24",
+            "url": "https://attleboroughtc.org.uk/event/attleborough-athletics-academy-agm-2",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/23436",
+            "title": "Attleborough Athletics Academy ~ AGM",
+            "description": "",
+            "excerpt": "",
+            "slug": "attleborough-athletics-academy-agm-2",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-21 11:00:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "21",
+                "hour": "11",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-21 14:00:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "21",
+                "hour": "14",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-21 11:00:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "21",
+                "hour": "11",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-21 14:00:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "21",
+                "hour": "14",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "GMT",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "",
+                "currency_code": "",
+                "currency_position": "",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Attleborough Town Football &amp; Social Club",
+                    "slug": "attleborough-town-football-social-club-events",
+                    "term_group": 0,
+                    "term_taxonomy_id": 97,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 110,
+                    "filter": "raw",
+                    "id": 97,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/97",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 17115,
+                "author": "1",
+                "status": "publish",
+                "date": "2024-11-27 13:56:58",
+                "date_utc": "2024-11-27 13:56:58",
+                "modified": "2026-09-29 15:24:36",
+                "modified_utc": "2026-09-29 14:24:36",
+                "url": "https://attleboroughtc.org.uk/venue/attleborough-town-football-social-club",
+                "venue": "Attleborough Town Football &#038; Social Club",
+                "slug": "attleborough-town-football-social-club",
+                "show_map": false,
+                "show_map_link": true,
+                "global_id": "attleboroughtc.org.uk?id=17115",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=17115"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 20384,
+                    "author": "6",
+                    "status": "publish",
+                    "date": "2025-10-16 14:08:47",
+                    "date_utc": "2025-10-16 13:08:47",
+                    "modified": "2025-10-16 14:08:47",
+                    "modified_utc": "2025-10-16 13:08:47",
+                    "url": "https://attleboroughtc.org.uk/organiser/attleborough-athletics-academy",
+                    "organizer": "Attleborough Athletics Academy",
+                    "slug": "attleborough-athletics-academy",
+                    "global_id": "attleboroughtc.org.uk?id=20384",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=20384"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 10003897,
+            "global_id": "attleboroughtc.org.uk?id=10003897",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=10003897"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2024-10-23 16:07:33",
+            "date_utc": "2024-10-23 15:07:33",
+            "modified": "2026-09-08 09:41:17",
+            "modified_utc": "2026-09-08 08:41:17",
+            "url": "https://attleboroughtc.org.uk/event/name-removed-yoga/2026-11-22",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/10003897",
+            "title": "[name removed] ~ Yoga",
+            "description": "",
+            "excerpt": "",
+            "slug": "name-removed-yoga",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-22 10:00:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "22",
+                "hour": "10",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-22 11:00:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "22",
+                "hour": "11",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-22 10:00:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "22",
+                "hour": "10",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-22 11:00:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "22",
+                "hour": "11",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "BST",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "",
+                "currency_code": "",
+                "currency_position": "",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 282,
+                "author": "1",
+                "status": "publish",
+                "date": "2023-12-19 15:25:01",
+                "date_utc": "2023-12-19 15:25:01",
+                "modified": "2023-12-19 15:25:01",
+                "modified_utc": "2023-12-19 15:25:01",
+                "url": "https://attleboroughtc.org.uk/venue/town-hall",
+                "venue": "Town Hall",
+                "slug": "town-hall",
+                "show_map": true,
+                "show_map_link": true,
+                "global_id": "attleboroughtc.org.uk?id=282",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=282"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 14996,
+                    "author": "6",
+                    "status": "publish",
+                    "date": "2024-06-06 14:23:04",
+                    "date_utc": "2024-06-06 13:23:04",
+                    "modified": "2024-06-06 14:23:04",
+                    "modified_utc": "2024-06-06 13:23:04",
+                    "url": "https://attleboroughtc.org.uk/organiser/name-removed",
+                    "organizer": "[name removed]",
+                    "slug": "name-removed",
+                    "phone": "01632 960000",
+                    "email": "redacted@example.invalid",
+                    "global_id": "attleboroughtc.org.uk?id=14996",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=14996"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        },
+        {
+            "id": 10005551,
+            "global_id": "attleboroughtc.org.uk?id=10005551",
+            "global_id_lineage": [
+                "attleboroughtc.org.uk?id=10005551"
+            ],
+            "author": "6",
+            "status": "publish",
+            "date": "2025-10-27 13:43:53",
+            "date_utc": "2025-10-27 13:43:53",
+            "modified": "2026-10-13 12:04:37",
+            "modified_utc": "2026-10-13 11:04:37",
+            "url": "https://attleboroughtc.org.uk/event/the-chambers-community-cafe-36/2026-11-22",
+            "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/10005551",
+            "title": "The Chambers ~ Community Cafe",
+            "description": "",
+            "excerpt": "",
+            "slug": "the-chambers-community-cafe-36",
+            "image": false,
+            "all_day": false,
+            "start_date": "2026-11-22 12:00:00",
+            "start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "22",
+                "hour": "12",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "end_date": "2026-11-22 14:00:00",
+            "end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "22",
+                "hour": "14",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_start_date": "2026-11-22 12:00:00",
+            "utc_start_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "22",
+                "hour": "12",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "utc_end_date": "2026-11-22 14:00:00",
+            "utc_end_date_details": {
+                "year": "2026",
+                "month": "11",
+                "day": "22",
+                "hour": "14",
+                "minutes": "00",
+                "seconds": "00"
+            },
+            "timezone": "Europe/London",
+            "timezone_abbr": "GMT",
+            "cost": "",
+            "cost_details": {
+                "currency_symbol": "",
+                "currency_code": "",
+                "currency_position": "",
+                "values": []
+            },
+            "website": "",
+            "show_map": true,
+            "show_map_link": true,
+            "hide_from_listings": false,
+            "sticky": false,
+            "featured": false,
+            "categories": [
+                {
+                    "name": "Town Hall",
+                    "slug": "town-hall",
+                    "term_group": 0,
+                    "term_taxonomy_id": 98,
+                    "taxonomy": "tribe_events_cat",
+                    "description": "",
+                    "parent": 0,
+                    "count": 601,
+                    "filter": "raw",
+                    "id": 98,
+                    "urls": {
+                        "self": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories/98",
+                        "collection": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/categories"
+                    }
+                }
+            ],
+            "tags": [],
+            "venue": {
+                "id": 282,
+                "author": "1",
+                "status": "publish",
+                "date": "2023-12-19 15:25:01",
+                "date_utc": "2023-12-19 15:25:01",
+                "modified": "2023-12-19 15:25:01",
+                "modified_utc": "2023-12-19 15:25:01",
+                "url": "https://attleboroughtc.org.uk/venue/town-hall",
+                "venue": "Town Hall",
+                "slug": "town-hall",
+                "show_map": true,
+                "show_map_link": true,
+                "global_id": "attleboroughtc.org.uk?id=282",
+                "global_id_lineage": [
+                    "attleboroughtc.org.uk?id=282"
+                ]
+            },
+            "organizer": [
+                {
+                    "id": 20305,
+                    "author": "6",
+                    "status": "publish",
+                    "date": "2025-10-16 08:50:18",
+                    "date_utc": "2025-10-16 07:50:18",
+                    "modified": "2025-10-16 08:50:18",
+                    "modified_utc": "2025-10-16 07:50:18",
+                    "url": "https://attleboroughtc.org.uk/organiser/the-chambers-2",
+                    "organizer": "The Chambers",
+                    "slug": "the-chambers-2",
+                    "email": "redacted@example.invalid",
+                    "global_id": "attleboroughtc.org.uk?id=20305",
+                    "global_id_lineage": [
+                        "attleboroughtc.org.uk?id=20305"
+                    ]
+                }
+            ],
+            "custom_fields": [],
+            "ticketed": false,
+            "is_virtual": false,
+            "virtual_url": null,
+            "virtual_video_source": ""
+        }
+    ],
+    "rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/?page=2&per_page=50&start_date=2026-10-19 00:00:00&end_date=2026-11-22 23:59:59&status=publish",
+    "previous_rest_url": "https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events/?per_page=50&start_date=2026-10-19+00%3A00%3A00&end_date=2026-11-22+23%3A59%3A59&status=publish",
+    "total": 72,
+    "total_pages": 2
+}
