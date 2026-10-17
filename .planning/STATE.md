@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 02
 current_phase_name: Draft Model, Review Queue & Submissions
 status: executing
-stopped_at: Completed 02-03-PLAN.md
-last_updated: "2026-10-17T19:04:40.456Z"
+stopped_at: Completed 02-04-PLAN.md
+last_updated: "2026-10-17T19:12:35.737Z"
 last_activity: 2026-10-17
-last_activity_desc: "Completed 02-03 (approval contract, bulk skip keys, PublishEvent choke-point arch test)"
-state_head: 439a42b1503683809ea4c681fd141ebfa5e9f357
+last_activity_desc: "Completed 02-04 (events.contact_public / organiser_website, contact gate on event page and cards, website link)"
+state_head: 23a8fba7f99103ef1cfd798c46c81789bf37d027
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 31
-  completed_plans: 16
+  completed_plans: 17
   percent: 20
 ---
 
@@ -28,9 +28,9 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 02 (Draft Model, Review Queue & Submissions) — EXECUTING
-Plan: 3 of 16 complete (02-01, 02-02, 02-03 done; next: wave 2 continues with 02-04 / 02-05)
+Plan: 4 of 16 complete (02-01, 02-02, 02-03, 02-04 done; next: wave 2 continues with 02-05)
 Status: Ready to execute
-Last activity: 2026-10-17 — Completed 02-03 (approval contract: DraftPublishability blockers + bulk skip keys, DraftWriter::update, CategoryAssigner, EventDraftFactory, PublishEvent choke-point arch test)
+Last activity: 2026-10-17 — Completed 02-04 (events.contact_public default true + organiser_website; admin form toggle and website field; contact hidden on event page and cards unless public; "Website: {host}" safe link; website alone satisfies the check rule)
 
 Progress: 15/31 plans ([██░░░░░░░░] 20%); phase 2: 2/16; phases complete: 1/5
 
@@ -72,6 +72,7 @@ Progress: 15/31 plans ([██░░░░░░░░] 20%); phase 2: 2/16; pha
 | Phase 02 P01 | 7min | 2 tasks | 14 files |
 | Phase 02 P02 | 40min | 4 tasks | 7 files |
 | Phase 02 P03 | 9min | 2 tasks | 14 files |
+| Phase 02 P04 | 6min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,8 @@ Recent decisions affecting current work:
 - [Phase 02]: PublishEvent choke point enforced with Pest toOnlyBeUsedIn('App\Publishing\Actions'); ->ignoring() would be vacuous because it also skips matching dependencies
 - [Phase 02]: DraftPublishability is the single publishability check; bulk skip keys report specific reasons (unresolved_venue, repeats_unset) before 'blocked'
 - [Phase 02]: phpunit.xml memory_limit 512M so the arch scan does not exhaust memory for the Feature suite
+- [Phase 02]: 02-04: contact_public defaults to true at DB, model and DTO (Phase 1 and admin entry stay public); submissions start private via DraftData
+- [Phase 02]: 02-04: a source URL, an organiser contact or a website satisfies the 'how to check this' rule on the form and in PublishableEventData
 
 ### Pending Todos
 
@@ -129,6 +132,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-17T19:04:40.149Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-10-17T19:12:35.420Z
+Stopped at: Completed 02-04-PLAN.md
 Resume file: None
