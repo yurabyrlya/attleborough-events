@@ -1,0 +1,41 @@
+{
+    "source": "attleborough-academy",
+    "name": "Attleborough Academy",
+    "files": [
+        {
+            "file": "2026-10-17-ical.ics",
+            "type": "ical",
+            "url": "https://www.attleboroughacademy.org/calendar/events.ics",
+            "fetched_at": "2026-10-17T18:36:21Z",
+            "http_status": 200,
+            "headers": {
+                "content-type": "text/calendar;;charset=UTF-8",
+                "etag": null,
+                "last-modified": null,
+                "cache-control": "public, max-age=1, s-maxage=86400"
+            },
+            "robots_status": "allowed",
+            "robots_fetched_at": "2026-10-17T18:36:17Z",
+            "robots_rules": [
+                "User-agent: *",
+                "Disallow: /cms/",
+                "Disallow: /reactcms/",
+                "Disallow: /account/",
+                "Disallow: /uploads/document/",
+                "Crawl-delay: 3",
+                "(no rule matches /calendar/events.ics)"
+            ],
+            "legal_basis": "permission_granted (written permission held by owner, D-24; not committed)",
+            "sha256_raw": "0460e90f5e5a34837850356023d657d1c60cf0391fc92e2a21c9bdf78d33d706",
+            "redactions": {
+                "email": 0,
+                "phone": 0,
+                "name": 0
+            },
+            "modified": false,
+            "events": 59,
+            "window": "2026-10-07 to 2027-07-22 (school year); spans BST end 25 Oct 2026 (half-term all-day span) and BST start 28 Mar 2027 (Easter holiday span)",
+            "notes": "Feed advertised on /100/calendar as webcal://. Content-Type has a doubled ';;' (parsers must tolerate it). VTIMEZONE Europe/London; timed events use DTSTART;TZID=Europe/London, all-day and multi-day events use VALUE=DATE with exclusive DTEND. No RRULE in events. UIDs are NOT stable: each is a row number followed by the request's Unix time (e.g. UID:2841792262071), so dedupe must key on SUMMARY + DTSTART. Most items are school-internal (term dates, mocks, parents' evenings); public ones include open evenings, presentation evenings, Children in Need."
+        }
+    ]
+}

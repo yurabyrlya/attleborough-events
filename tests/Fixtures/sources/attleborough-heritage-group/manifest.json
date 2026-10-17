@@ -1,0 +1,33 @@
+{
+    "source": "attleborough-heritage-group",
+    "name": "Attleborough Heritage Group",
+    "files": [
+        {
+            "file": "2026-10-17-events-page.html",
+            "type": "events-page",
+            "url": "https://www.attleboroughheritage.org.uk/Events/FutureEvents.aspx",
+            "fetched_at": "2026-10-17T18:36:45Z",
+            "http_status": 200,
+            "headers": {
+                "content-type": "text/html; charset=utf-8",
+                "etag": null,
+                "last-modified": null,
+                "cache-control": "private"
+            },
+            "robots_status": "no robots.txt (404): no rules",
+            "robots_fetched_at": "2026-10-17T18:36:39Z",
+            "robots_rules": [],
+            "legal_basis": "factual_extract_only (robots allows, terms silent, owner decision D-23, polite crawling, attribution and link back)",
+            "sha256_raw": "3f146b9e790b1a8f7d8baba7bbda0056bacaaabd7b0675cfb53ffb5fcff9315a",
+            "redactions": {
+                "email": 0,
+                "phone": 0,
+                "name": 0
+            },
+            "modified": false,
+            "events": 1,
+            "window": "all future events listed by the site (one: Coffee and Chat, Sat 21 Nov 2026, 10.30-11.30, St Mary's Church Hall)",
+            "notes": "ASP.NET WebForms (IIS 8.5), server-rendered. Events are in two GridViews: #ctl00_maincontent_GridViewList (desktop) and #ctl00_maincontent_GridViewListMobile; each row has a date heading ('Saturday, 21 November 2026'), a title and a free-text description holding the time and place. Times are prose ('10.30-11.30'), so a selector parser should treat a missing/unparseable time as all-day or a parse error, not a guess. Low volume (~1 event a month)."
+        }
+    ]
+}

@@ -1,0 +1,288 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head id="ctl00_Head1"><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="Attleborough Heritage Group" /><title>
+	Attleborough Heritage Group
+</title><link rel="shortcut icon" type="image/x-icon" href="../favicon.ico" /><meta http-equiv="content-type" content="text/html; charset=utf-8" /><link rel="stylesheet" type="text/css" href="../engine1/style5A9.css" />
+	
+	<script type="text/javascript" src='/jqueryhamburger.js' ></script>
+	
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXX"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-XXXXXXXXXX');
+</script>
+
+<script type="text/javascript">
+    jQuery(function($) {
+        $('.menu-btn').click(function() {
+            $('.responsive-menu').addClass('expand')
+            $('.menu-btn').addClass('btn-none')
+        })
+
+        $('.close-btn').click(function() {
+            $('.responsive-menu').removeClass('expand')
+            $('.menu-btn').removeClass('btn-none')
+        })
+    })
+ </script>
+<script type="text/javascript">
+    // When the user scrolls down 20px from the top of the document, show the button
+    window.onscroll = function() { scrollFunction() };
+
+    function scrollFunction() {
+        if (document.body.scrollTop > 40 || document.documentElement.scrollTop > 40) {
+            document.getElementById("navigation").style.top = "10px";
+            document.getElementById("navigationback").style.height = "70px";
+            document.getElementById("myBtn").style.display = "block";
+        } else {
+        document.getElementById("navigation").style.top = "40px";
+        document.getElementById("navigationback").style.height = "120px";
+            document.getElementById("myBtn").style.display = "none";
+        }
+    }
+
+    // When the user clicks on the button, scroll to the top of the document
+    function topFunction() {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+    }
+</script>
+
+</head>
+
+<body>
+<form name="aspnetForm" method="post" action="FutureEvents.aspx" id="aspnetForm">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="HaV8lEYhYjffilDxdqONcFVSNDv/o4328FlxUNtESPJ/uW3Q1Cnd3tztmlEhC08hcGRERefVSwrgxdNUTiaDRMK6WvCnkx5lAAjn7C7IhgXMrmyT2XBYFgfxeFsjTYQNUojKa6xwJGzPFmgMdd95U8x/z+XhGpqULpEQo+6OrEuJOpsCBvum8Cz9CtFECUmrJND7JPRUMnPsxeyr0q6JeehRgH7Zfzf6dmE6jRgIkxAQK2e61wgI9QvKIamXmVkyGWXkuVpNs3GjNsyfnt6IEU4hLziLd+DHpz4tTN7jfnniiJq5P9w0mFX+wHOu47LTdfvuAXuRUaO/QcCm425P8ICdT6jp+0/w98AeuNd51/eUIRR/970POw1W+pg8nhh0mU5Yk+p9ncHxSRLJSOlZ6XTtDq4ygitWa9Kff1TBvtOfd0GICbARE0QIy0ltrZeCJv3rPDCUqMsE8d0Jfv5CwmovAizIjyCJ3nbh22FTzMuLL8RwrfWTn+L+5sWOW/PZ9ouf/hd70J+i/DKJMbaFr/ppLUghAH1Ud/VX34G2C9cO9/V41jxC5qZeb1e5UYTV/1Rx5leYj3MfLdLKm8q4q3YvQa04WCItTZ7n7N9A/nonhq90jFKNJqH7kaxNpvz5LBGzGZ3nyAOR+o9p2wDvkH0nmox3d9o97TGtQD1XuKwBsiOdkjqKokfDAAEvRgKvbgspOvEVTexcr7rAjFYyGiFZwnVRmp4j2ArKGW9qcIo1OMsySB2GerSXuWzTOmoRs2j8xH+34+mC0WztKJb7Xy95D7zBjGkTxzD5z3nDqeAPGqnRU0MX0cJ16I0mCoULVX0nQLkMKTL9WyLl+HoHjswrtkVx/08xPdoy4t1v0mjqsRlHhpzR1iwcw8GO0a/RE2vSHehAfzhZkN/HZ0Fy80E1NI6+hAAnpFfk9cs2PbopPIRFyJy+9GQheytZBjvnsPziOj8x1iC6xLnCFAIrzfexGCWDag5yO+kZIGGOU+iXZJgDp1+mBWFPKg23WE8OLlr8EWJWStSRVySkTe87xRuAKKikvrR5oyzfXQAgh7p88O4pY2XW71ziGd9kNyu4XTI5U/2b15CNfSVRPh+Lf9rX6wuLbFBEGhn/cyqUsEgJSkE8BOnNdk13x06FYW1eLil8cZqXLWOX0JYobBRyT3eiJCtJCpDSmv6m0B/SrNmntpRce88L1FTGMmSp6fLv5wW+yPXxABKzkE2Mc+SVtf3HKQ9kWEYpjprtSP3TWnR8cUFXYzOlqWuD41/r/no8spdd9pz8JVCJH93ClN/Kc2hk794ibLqD/UZ5jCE488M+psZLlhyCkbw9RcPRyWM+6aryKfa4Minqwpk3YOMFdbUXO8uZXZByKg4BIAtN/Zs8y3v95sT0deErWX8Hd/oO/OMQm6ninQ/hQoVWowA7UY9FtLM5zk1s3+R4gf77EKT0o7pM0kTaynz0pysapJi0kPZdUCFZZFve2fPuKj28LDu+nOgpmMLjN91zccfDJjbLBXYHbHm3AZWYmIAqPuZjQ+5NPnFeVrrQvpdJMIrckIw+TXlUvzQQ+TOBA+reqiMrLymvblN7NaVHDJyd8X/XgoENPnGXenPWQabvtbZPuBM8WYTOybr9UtER0PhuaYOQ/tEAebrTFlgy2ePfCXl5RB0rJ0UkJ2nUtYtwIowgaqYRavGnQXpgtyXsdNzb3fWNrpIYI/B74jquUAanNI416n5GBYBw0ksuu9rRtyY4/g7S0BYRinlMa2KjQeFse8q2ORzztXP8XwQb5kjZPiAjWPIeb08bE93muCM88Wkm/fB9K9Y=" />
+
+<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="2E231C74" />
+<input type="hidden" name="__VIEWSTATEENCRYPTED" id="__VIEWSTATEENCRYPTED" value="" />
+<div>
+
+ <span class="menu-menu" onclick="openNav()">MENU</span>
+        
+            <div class="menu-btn" id="menu-btn" onclick="openNav()">
+                <span style="background-color: #000000;"></span> 
+                <span style="background-color: #000000;"></span> 
+                <span style="background-color: #000000;"></span>     
+            </div>
+        
+
+
+<script type="text/javascript">
+    document.body.onload = function() { document.getElementById("ctl00_HyperLinkEV").style.color = '#A60000'; ; } 
+</script>
+<span class="topbox">
+   <img id="ctl00_maincontenttop_Image4" class="imagebanner" src="../data1/images/banner6.jpg" border="0" />
+   <span id="ctl00_maincontenttop_Label2" class="labelbanner1">Attleborough Heritage Group</span>
+   <span id="ctl00_maincontenttop_Label4" class="labelbanner2">Preserving Yesterday's and Today's Memories for Tomorrow</span>
+    <span id="ctl00_maincontenttop_Label1" class="labelbanner3">Events</span>
+</span>
+ 
+        
+
+</div>
+
+<div class="responsive-menu">
+<div id="navigationback">  
+</div> 
+    <div id="navigation">
+<ul onclick="return true">
+<li></li>
+<li></li>
+<li><a id="ctl00_lnkHome" href="../Default.aspx">Home</a></li>
+    
+    
+    <li class="dropdown">
+      <a id="ctl00_HyperLinkOG">Our Group<br /><i class="down"></i></a>
+    <div class="dropdown-content">
+    <a id="ctl00_HyperLink21d" href="../AboutUs/AboutUs.aspx">About Us</a>
+    <a id="ctl00_HyperLink23" href="../AboutUs/JoiningUs.aspx">Joining Us</a>
+    <a id="ctl00_HyperLink24" href="../AboutUs/Benefits.aspx">Benefits of Membership</a>
+    <a id="ctl00_HyperLink25" href="../AboutUs/Committee.aspx">Committee</a>
+    <a id="ctl00_HyperLink10" href="../AboutUs/WhereWeMeet.aspx">Town Hall</a>
+    <a id="ctl00_HyperLink26" href="../AboutUs/Documents.aspx">Documents</a>
+     
+    </div>
+    </li>
+    <li><a id="ctl00_HyperLinkEV" href="FutureEvents.aspx">Events</a></li>
+    <li><a id="ctl00_HyperLinkNews" href="../News/News.aspx">News</a></li>
+    <li><a id="ctl00_HyperLinkPub" href="../AboutUs/Publications.aspx">Publications</a></li> 
+    <li><a id="ctl00_HyperLinkContact" href="../AboutUs/ContactUs.aspx">Contact Us</a></li>
+    <li><a id="ctl00_HyperLinkGA" href="../Gallery/Gallery.aspx">Gallery</a></li>
+    <li><a id="ctl00_HyperLinkUL" href="../UsefulLinks/UsefulLinks.aspx">Useful Links</a></li>
+    <li><a id="ctl00_HyperLinkMA" href="../MembersArea/LogIn.aspx">Members Area</a></li>
+    
+</ul>
+</div>
+
+</div>
+<button onclick="topFunction()" id="myBtn" title="Go to top">Top</button> 
+<div id="mySidenav" class="sidenav">
+  <img id="ctl00_Image1" class="footerside" src="../Images/logo.png" border="0" />
+ <br /><br />
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+  
+ <a <a id="ctl00_lnkHomell" href="../Default.aspx">Home</a></a>
+ 
+  <a <button class="dropdown-btn">Our Group <i class="down"></i></button></a>
+    <div class="dropdown-container">
+    <a id="ctl00_HyperLink9x" href="../AboutUs/AboutUs.aspx">About Us</a>
+    <a id="ctl00_HyperLink2" href="../AboutUs/JoiningUs.aspx">Joining Us</a>
+    <a id="ctl00_HyperLink4" href="../AboutUs/Benefits.aspx">Benefits of Membership</a>
+    <a id="ctl00_HyperLink13x" href="../AboutUs/Committee.aspx">Committee</a>
+    <a id="ctl00_HyperLink14x" href="../AboutUs/WhereWeMeet.aspx">Town Hall</a>
+    <a id="ctl00_HyperLink15" href="../AboutUs/Documents.aspx">Documents</a>
+    </div>
+    
+    <a <a id="ctl00_HyperLink5" href="FutureEvents.aspx">Events</a></a>
+    <a <a id="ctl00_HyperLink6" href="../News/News.aspx">News</a></a>
+    <a <a id="ctl00_HyperLink7" href="../AboutUs/Publications.aspx">Publications</a></a> 
+    <a <a id="ctl00_HyperLink8" href="../AboutUs/ContactUs.aspx">Contact Us</a></a>
+    <a <a id="ctl00_HyperLink9" href="../Gallery/Gallery1.aspx">Gallery</a></a>
+    <a <a id="ctl00_HyperLink13" href="../UsefulLinks/UsefulLinks.aspx">Useful Links</a></a>
+    <a <a id="ctl00_HyperLink14" href="../MembersArea/LogIn.aspx">Members Area</a></a>
+    
+</div>
+
+<script type="text/javascript">
+    function openNav() {
+        document.getElementById("mySidenav").style.width = "100%";
+    }
+
+    function closeNav() {
+        document.getElementById("mySidenav").style.width = "0";
+    }
+</script>
+
+
+   <script type="text/javascript">
+       /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
+       var dropdown = document.getElementsByClassName("dropdown-btn");
+       var i;
+
+       for (i = 0; i < dropdown.length; i++) {
+           dropdown[i].addEventListener("click", function() {
+               this.classList.toggle("active");
+               var dropdownContent = this.nextElementSibling;
+               if (dropdownContent.style.display === "block") {
+                   dropdownContent.style.display = "none";
+               } else {
+                   dropdownContent.style.display = "block";
+               }
+           });
+       }
+</script>
+
+    
+    <div id="one-column-mobile">
+   <br /><br />
+   <a id="ctl00_maincontent_HyperLink1" class="HoverClassMobile" href="PreviousEvents.aspx" style="display:inline-block;">Click here for previous events</a>
+   <br /><br />
+   
+   <span id="ctl00_maincontent_lblNone" class="labeldate"></span>
+   <div id="gridheightmobile">
+     <div>
+	<table class="gridback" cellspacing="0" rules="all" border="1" id="ctl00_maincontent_GridViewListMobile">
+		<tr>
+			<th scope="col">&nbsp;</th>
+		</tr><tr class="closebtn">
+			<td>
+            <hr class="gridbar" />
+            <table class="gridleft">
+                <tr style="color: #D20000; font-size: 26px; font-weight: bold;">
+                   <td >Saturday, 21 November 2026</td>
+                </tr>
+                <tr style="color: #A60000; font-size: 26px; font-weight: bold;">
+                   <td>Coffee and Chat</td>
+                </tr>
+               
+                <tr style="color: #D20000; font-size: 26px; font-weight: bold;">
+                   <td></td>
+                </tr>
+                <tr><img id="ctl00_maincontent_GridViewListMobile_ctl02_Image1" class="imageeventmobile" onerror="this.src='default.jpg';" src="../Images/UploadEvents/129.png" border="0" /></tr>
+                <tr>
+                <tr>
+                   <td><p>Stalls at Coffee and Chat Being held at St Mary's Church Hall 10.30-11.30 Stalls will include Raffle, Tombola, Cakes ans produce, Cards and Gifts, Bric a Brac and used books for sale</p></td>
+                </tr>
+            </table>                
+        </td>
+		</tr>
+	</table>
+</div>
+        
+    </div>
+   </div>
+   <div id="mobile">
+   <div id="two-column-left">
+         <a id="ctl00_maincontent_HyperLink3" class="HoverClass" href="PreviousEvents.aspx" style="display:inline-block;">Click here for previous events</a>
+            <br /><br />
+       <div id="gridheight">   
+        <div>
+	<table cellspacing="0" rules="all" border="1" id="ctl00_maincontent_GridViewList">
+		<tr class="gridselectedrow" onmouseover="this.originalstyle=this.style.backgroundColor;this.style.backgroundColor='#FFFFFF';this.style.cursor='pointer';" onmouseout="this.style.backgroundColor=this.originalstyle;" onclick="__doPostBack('ctl00$maincontent$GridViewList','Select$0')">
+			<td class="gridviewitem">21 November 2026</td><td class="gridviewitem">Coffee and Chat</td>
+		</tr>
+	</table>
+</div>
+    </div>
+    <h2>Click on a row and scroll to display more details about the event</h2>
+    
+    </div>
+    <div id="two-column-right">
+              <span id="ctl00_maincontent_lblHeading" class="labelheading">Coffee and Chat</span>
+              <span id="ctl00_maincontent_lblLecturer" class="labellecturer"></span>
+              <span id="ctl00_maincontent_lblDateList" class="labeldate">Saturday 21 November 2026</span>
+              <p><img id="ctl00_maincontent_Image1" class="imageevent" src="../images/UploadNews/192.png?myTime=1636639441" border="0" />
+              <p><span id="ctl00_maincontent_lblContent"><p>Stalls at Coffee and Chat Being held at St Mary's Church Hall 10.30-11.30 Stalls will include Raffle, Tombola, Cakes ans produce, Cards and Gifts, Bric a Brac and used books for sale</p></span></p>
+        </div>
+     </div>
+        <div class="clear">
+        </div>
+
+      
+
+    <div id="footer">
+    <div class="footer1">
+    <span id="ctl00_Label3" class="footerheader">Information</span>
+     <br />
+        <span id="ctl00_Label1"><font color="White">Attleborough Heritage Group</font></span>
+       <br />
+       <br />
+       <br />
+        <a id="ctl00_HyperLink20" class="HoverClassFooter" href="../Privacy/Privacy.aspx"><font color="White">Privacy Policy</font></a>
+        <br />
+        <a id="ctl00_HyperLink1" class="HoverClassFooter" href="http://www.asdemo.org.uk"><font color="White">Designed and Built by Airedale Solutions</font></a>
+    </div>
+    <div class="footer2">
+    <span id="ctl00_Label2" class="footerheader">What's On</span>
+    <br />
+    <a id="ctl00_HyperLink3" class="HoverClassFooter" href="FutureEvents.aspx"><font color="White">Events</font></a>
+    <br />
+    <a id="ctl00_HyperLink30" class="HoverClassFooter" href="../News/News.aspx"><font color="White">News</font></a>
+
+    </div>
+   <div class="footer3">
+   <span id="ctl00_Label4" class="footerheader">About Us</span>
+    <br />
+   <a id="ctl00_HyperLink11" class="HoverClassFooter" href="../AboutUs/AboutUs.aspx"><font color="White">About Us</font></a>
+    <br />
+    <a id="ctl00_HyperLink32" class="HoverClassFooter" href="../AboutUs/JoiningUs.aspx"><font color="White">Joining Us</font></a>
+    <br />
+    <a id="ctl00_HyperLink33" class="HoverClassFooter" href="../AboutUs/WhereWeMeet.aspx"><font color="White">Town Hall</font></a>
+    <br />
+    <a id="ctl00_HyperLink34" class="HoverClassFooter" href="../AboutUs/Committee.aspx"><font color="White">Committee</font></a>
+    <br />
+    <a id="ctl00_HyperLink35" class="HoverClassFooter" href="../AboutUs/Documents.aspx"><font color="White">Documents</font></a> </div>
+   </div>
+</form>
+</body>
+</html>
