@@ -8,10 +8,15 @@ use App\Enums\RepeatEnds;
 use App\Enums\RepeatPattern;
 use App\Models\Category;
 use App\Models\Event;
+use App\Models\EventDraft;
 use App\Models\User;
 use App\Models\Venue;
 use App\Publishing\Actions\PublishEvent;
 use App\Publishing\Data\PublishableEventData;
+use App\Review\Data\DraftData;
+use App\Review\DraftWriter;
+use App\Submissions\TurnstileVerifier;
+use Carbon\CarbonImmutable;
 use Database\Seeders\CategorySeeder;
 use RuntimeException;
 
@@ -65,6 +70,49 @@ final class UatFixtures
             'startTime' => '19:30:00',
             'organiserContact' => 'uat@example.test',
         ], $overrides)), $admin, EventOrigin::Manual);
+    }
+
+    /**
+     * Make the public form's Turnstile check pass offline. No site key is
+     * set in tests, so the widget and Cloudflare's script are not rendered;
+     * this binds a verifier that accepts any token for the current test only
+     * (the next test boots a fresh container).
+     */
+    public static function fakeTurnstile(): void
+    {
+        app()->instance(TurnstileVerifier::class, new class extends TurnstileVerifier
+        {
+            public function verify(?string $token, string $ip): array
+            {
+                return [];
+            }
+        });
+    }
+
+    /**
+     * A pending submission draft written through the real write path
+     * (DraftWriter::create(DraftData::fromSubmission(...))), exactly as the
+     * public form stores one: scored, category assigned, venue matched.
+     * Defaults: a known venue, Community, ten days after the frozen London
+     * "today", 7pm to 9pm, free.
+     *
+     * @param  array<string, mixed>  $overrides  validated /submit form keys
+     */
+    public static function submissionDraft(array $overrides = []): EventDraft
+    {
+        return app(DraftWriter::class)->create(DraftData::fromSubmission(array_merge([
+            'title' => 'UAT Submitted Event',
+            'description' => 'A UAT test submission with enough detail to read well.',
+            'category_choice' => (string) self::category('community')->id,
+            'start_date' => CarbonImmutable::now('Europe/London')->addDays(10)->toDateString(),
+            'start_time' => '19:00',
+            'end_time' => '21:00',
+            'venue_choice' => (string) self::venue()->id,
+            'price_type' => 'free',
+            'organiser_name' => 'UAT Organiser',
+            'organiser_email' => 'organiser@example.test',
+            'consent' => '1',
+        ], $overrides)));
     }
 
     /**

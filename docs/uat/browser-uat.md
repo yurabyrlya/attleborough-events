@@ -181,6 +181,26 @@ Expected: `404`. In the browser the page shows the wordmark, "We can't find that
 6. `ops:health` prints **HEALTHY** within 6 minutes; the page shows all three cards OK.
 7. **Stop both workers** (kill by PID) and delete any temp logs.
 
+## F11. Submit an event (public)
+
+Open `/submit` (the "Add your event" form) on a phone (375×812) and on a desktop. It is a plain form: no Livewire, and it posts without JavaScript.
+
+Turnstile: locally with Cloudflare's always-pass test keys from `.env.example` (`TURNSTILE_SITE_KEY=1x00000000000000000000AA`), the widget shows a small "Success" box above **Send for review**. In the automated tests no site key is set, so the widget and `challenges.cloudflare.com` script are not rendered and the verifier is faked.
+
+1. **JavaScript off (once, manual):** the "Somewhere else" fields (**Name of the place**, **Address**, **Postcode (optional)**) are visible, and the notice "Our spam check needs JavaScript. If you can't turn it on, email the details to …" shows above the button.
+2. **Known venue:** fill **Name of the event** "UAT Lantern Evening", **Description**, **Category** → Community, **Date** (a date in the next few weeks), **Start time**, **End time (optional)**, **Venue** → an existing venue, price **Free**, **Your name or group**, **Email address**, tick the consent box ("I agree that … privacy notice (opens in a new tab)"). Wait at least 3 seconds after the page loads (the timing check), then click **Send for review**.
+3. **Somewhere else:** before choosing a venue the "Somewhere else" fields are visible; pick a known venue and they hide; pick **Somewhere else** and they show again. Fill **Name of the place** "The Old Barn", **Address** and send.
+4. **No date:** fill everything except **Date** and send.
+
+Selectors: `getByLabel('Name of the event')`, `getByLabel('Category')`, `#start_date` ("Date" alone also matches "End date"), `getByLabel('Venue')`, `#price_type_free`, `#consent`, `getByRole('button', { name: 'Send for review' })`.
+
+Expected:
+- Steps 2 and 3: `/submit/thanks` with the heading "Thanks for sending your event" and "Your reference: WOA-…". Reloading the thanks page creates nothing new. Step 3's draft has no venue and keeps "The Old Barn" as the typed venue.
+- Step 4: back on `/submit` with the summary "Please check these" at the top, focused, and a link to the Date field; the Date field is marked invalid; every typed value is still there; no draft is created.
+- No horizontal overflow on the phone; the only third-party script on the page is Turnstile's (and only when a site key is set).
+
+Public effect: none. Nothing appears on `/` until the admin approves the draft (F12).
+
 ## Cleanup
 
 - Hide the UAT events (`Hide from calendar`) or remove them from the local database if they would confuse later work. Never remove real data.
