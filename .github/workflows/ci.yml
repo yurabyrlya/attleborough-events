@@ -97,7 +97,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Browser UAT (Pest browser tests)
-        run: vendor/bin/pest --ci --testsuite=Browser --filter=F0
+        run: vendor/bin/pest --ci --testsuite=Browser
 
       - name: Upload browser failure screenshots
         if: failure()
