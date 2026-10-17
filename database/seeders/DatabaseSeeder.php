@@ -14,9 +14,12 @@ class DatabaseSeeder extends Seeder
      *
      * Production-safe: reference data only. No users (the admin is created
      * with `php artisan make:filament-user`) and no demo events (ADM-02).
+     * The rules seeder (starter keyword rules, geofence defaults) needs the
+     * categories, and only creates what is missing.
      */
     public function run(): void
     {
         $this->call(CategorySeeder::class);
+        $this->call(RulesSeeder::class);
     }
 }
