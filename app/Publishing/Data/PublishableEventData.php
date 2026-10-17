@@ -166,6 +166,12 @@ final readonly class PublishableEventData
      * Form state for an existing event: its attributes plus the Repeats/Ends
      * fields recovered from the stored recurrence_rule.
      *
+     * A stored rule the form cannot represent (WR-09) falls back to the
+     * "Does not repeat" / "Never" state instead of throwing. That state is
+     * display-only: EditEvent makes the form read-only and refuses to save,
+     * and UpdatePublishedEvent refuses the edit, so it can never overwrite
+     * the stored rule.
+     *
      * @return array<string, mixed>
      */
     public static function fromEvent(Event $event): array
@@ -174,10 +180,9 @@ final readonly class PublishableEventData
         $attributes['start_date'] = $event->start_date->format('Y-m-d');
         $attributes['end_date'] = $event->end_date?->format('Y-m-d');
 
-        return array_merge(
-            $attributes,
-            ManualRecurrence::fromRrule($event->recurrence_rule, $event->all_day)->toFormState(),
-        );
+        $recurrence = ManualRecurrence::tryFromRrule($event->recurrence_rule, $event->all_day) ?? new ManualRecurrence;
+
+        return array_merge($attributes, $recurrence->toFormState());
     }
 
     public function recurrence(): ManualRecurrence

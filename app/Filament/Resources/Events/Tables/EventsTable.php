@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Events\Tables;
 
 use App\Calendar\ManualRecurrence;
 use App\Enums\EventStatus;
+use App\Filament\Resources\Events\Actions\StatusActions;
 use App\Models\Event;
 use Carbon\CarbonImmutable;
 use Filament\Actions\EditAction;
@@ -43,11 +44,16 @@ class EventsTable
                     ->options(EventStatus::class),
             ])
             // Edit opens EditEvent, which saves through UpdatePublishedEvent.
-            // No delete, bulk delete or force delete (ADM-03): hiding is the
-            // only way to take an event off the public calendar, and no
-            // Eloquent write path bypasses App\Publishing\Actions.
+            // The status actions are the edit page's own StatusActions (same
+            // confirmations, visibility and ChangeEventStatus path), so taking
+            // an event off the calendar never depends on the edit form
+            // rendering (WR-09). No delete, bulk delete or force delete
+            // (ADM-03): hiding is the only way to take an event off the public
+            // calendar, and no Eloquent write path bypasses
+            // App\Publishing\Actions.
             ->recordActions([
                 EditAction::make(),
+                ...StatusActions::forEvent(),
             ])
             ->toolbarActions([]);
     }

@@ -2,6 +2,7 @@
 
 namespace App\Publishing\Actions;
 
+use App\Calendar\ManualRecurrence;
 use App\Calendar\OccurrenceGenerator;
 use App\Models\Event;
 use App\Models\User;
@@ -28,20 +29,29 @@ use InvalidArgumentException;
  * UID never changes. Switching between repeating patterns is allowed. The
  * admin's workaround is to hide the event and create a new one.
  *
+ * Also refuses any edit to an event whose stored recurrence_rule
+ * ManualRecurrence::tryFromRrule() cannot represent (WR-09), so no caller
+ * (a forged Livewire save, a future job) can overwrite a rule the form only
+ * shows as "Does not repeat". Hide and cancel still work through
+ * ChangeEventStatus.
+ *
  * Status changes (hide/cancel/reinstate) are separate actions (plan 01-05).
  */
 final class UpdatePublishedEvent
 {
+    public const UNSUPPORTED_RULE_REFUSED = "This event's repeat rule can't be edited here. You can still hide or cancel it.";
+
+    private const TYPE_SWITCH_REFUSED = "An event can't switch between one-off and repeating. Hide it and create a new event instead.";
+
     public function __construct(
         private OccurrenceGenerator $occurrences,
         private EventSlugger $slugger,
     ) {}
 
-    private const TYPE_SWITCH_REFUSED = "An event can't switch between one-off and repeating. Hide it and create a new event instead.";
-
     /**
      * @throws AuthorizationException when the editor is not the configured admin
-     * @throws InvalidArgumentException when the edit would switch one-off <-> repeating
+     * @throws InvalidArgumentException when the stored rule is unsupported or
+     *                                  the edit would switch one-off <-> repeating
      */
     public function __invoke(Event $event, PublishableEventData $data, User $editor): Event
     {
@@ -51,7 +61,12 @@ final class UpdatePublishedEvent
         return DB::transaction(function () use ($event, $data): Event {
             $locked = Event::query()->whereKey($event->id)->lockForUpdate()->firstOrFail();
 
-            // Compared on the locked row, before any write (WR-06).
+            // Both checks use the locked row and run before any write.
+            if (! self::canEdit($locked)) {
+                throw new InvalidArgumentException(self::UNSUPPORTED_RULE_REFUSED);
+            }
+
+            // WR-06: one-off and series UIDs differ, so the type never changes.
             if (($locked->recurrence_rule === null) === $data->isRecurring()) {
                 throw new InvalidArgumentException(self::TYPE_SWITCH_REFUSED);
             }
@@ -65,5 +80,15 @@ final class UpdatePublishedEvent
 
             return $locked->refresh();
         });
+    }
+
+    /**
+     * Whether the event's stored recurrence rule is one the edit form can
+     * represent (WR-09). One-off events always can.
+     */
+    public static function canEdit(Event $event): bool
+    {
+        return $event->recurrence_rule === null
+            || ManualRecurrence::tryFromRrule($event->recurrence_rule, $event->all_day) !== null;
     }
 }

@@ -124,6 +124,21 @@ final readonly class ManualRecurrence
     }
 
     /**
+     * fromRrule() for display paths: null when the stored rule is a shape
+     * this class cannot represent (another FREQ, COUNT above 999, an
+     * impossible UNTIL), so an edit page can fall back instead of failing
+     * (WR-09). fromRrule() stays strict for every other caller.
+     */
+    public static function tryFromRrule(?string $rrule, bool $allDay): ?self
+    {
+        try {
+            return self::fromRrule($rrule, $allDay);
+        } catch (InvalidArgumentException) {
+            return null;
+        }
+    }
+
+    /**
      * The Repeats options offered for a start date, value => label.
      *
      * Nth weekday is offered when n <= 4; last weekday when start + 7 days

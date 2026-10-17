@@ -37,6 +37,7 @@ These rules are specific to "What's On Attleborough" (repo `attleborough-events`
 
 - Only `App\Publishing\Actions\*` create, update or change status on `events` / `event_occurrences`. `PublishEvent` is the only creator of Event rows and wraps the event write and occurrence sync in one `DB::transaction`.
 - Filament pages call actions (`handleRecordCreation` / `handleRecordUpdate` / action closures). No `Event::create()` or `$event->update()` in Filament pages, controllers or jobs.
+- `UpdatePublishedEvent` refuses switching an event between one-off and repeating (the `OccurrenceUid` "never change" contract depends on it; lifting it needs a UID migration plan) and refuses edits to events whose stored rule `ManualRecurrence::tryFromRrule()` cannot represent (hide/cancel still work via `ChangeEventStatus`).
 - Seeders seed reference data only (categories). Never seed demo events or users.
 
 ## Tests
