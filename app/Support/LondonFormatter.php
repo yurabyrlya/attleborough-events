@@ -73,6 +73,21 @@ final class LondonFormatter
     }
 
     /**
+     * Like cardTime() but always names the day, for places with no date
+     * heading above them (event page dates list, add-to-calendar link
+     * names, share text): all-day becomes "Sat 7 Nov, all day" /
+     * "Sat 7 Nov, all day until Sun 8 Nov"; timed is cardTime() unchanged.
+     */
+    public static function datedTime(EventOccurrence $occurrence): string
+    {
+        if (! $occurrence->event->all_day) {
+            return self::cardTime($occurrence);
+        }
+
+        return self::local($occurrence->starts_at)->format('D j M').', '.lcfirst(self::cardTime($occurrence));
+    }
+
+    /**
      * The last local calendar day the occurrence covers. All-day ends are
      * exclusive (next local midnight), so step back one second.
      */

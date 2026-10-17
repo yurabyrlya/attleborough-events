@@ -4,7 +4,8 @@
     /**
      * Event page (EVT-01, EVT-02). Renders only EventPageData fields, through
      * escaped echo. Every optional element renders only when its value is
-     * set. The head carries one Event JSON-LD script per listed date.
+     * set. The head carries one Event JSON-LD script per listed date and the
+     * first-party share module; the body ends with the share block.
      *
      * @var \App\Support\EventPageData $page
      */
@@ -17,6 +18,8 @@
     <link rel="canonical" href="{{ $page->canonicalUrl }}">
     {{-- Event JSON-LD (EVT-03): an HtmlString from App\Seo\EventJsonLd, one script per listed date. --}}
     {{ $page->jsonLd }}
+    {{-- The only script on the page: the first-party share module (EVT-07). Never loaded on /. --}}
+    @vite('resources/js/share.js')
 @endpush
 
 @push('og')
@@ -84,4 +87,6 @@
             <p class="listed-by mt-1 text-muted">Listed by What's On Attleborough.</p>
         @endif
     </section>
+
+    @include('events.partials.share', ['page' => $page])
 @endsection

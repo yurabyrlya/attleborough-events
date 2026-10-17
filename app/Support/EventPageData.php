@@ -19,7 +19,8 @@ use Illuminate\Support\HtmlString;
  *
  * Absolute URLs come from PublicUrl (config('app.url')) only. Each date
  * row carries its .ics path and Google Calendar link (EVT-06); jsonLd holds
- * one Event script per listed date (EVT-03).
+ * one Event script per listed date (EVT-03); share holds the share text and
+ * no-JS share links (EVT-07).
  */
 final readonly class EventPageData
 {
@@ -54,6 +55,7 @@ final readonly class EventPageData
         public array $dates,
         public int $remaining,
         public HtmlString $jsonLd,
+        public ShareLinks $share,
     ) {}
 
     public static function make(Event $event, UpcomingDates $dates, CarbonImmutable $now): self
@@ -92,13 +94,14 @@ final readonly class EventPageData
             isSeries: $event->recurrence_rule !== null,
             dates: $dates->occurrences->map(fn (EventOccurrence $occurrence): array => [
                 'datetimeIso' => LondonFormatter::local($occurrence->starts_at)->toIso8601String(),
-                'timeLabel' => LondonFormatter::cardTime($occurrence),
+                'timeLabel' => LondonFormatter::datedTime($occurrence),
                 'isCancelled' => OccurrenceIcs::isCancelled($occurrence),
                 'icsPath' => PublicUrl::icsPath($occurrence),
                 'googleUrl' => GoogleCalendarLink::for($occurrence),
             ])->values()->all(),
             remaining: $dates->remaining,
             jsonLd: EventJsonLd::scripts($event, $dates->occurrences),
+            share: ShareLinks::for($event, $first),
         );
     }
 

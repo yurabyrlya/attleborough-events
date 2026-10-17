@@ -129,9 +129,11 @@ it('uses whole dates with an exclusive end for an all-day event', function () {
         'allDay' => true,
     ]);
 
-    $query = queryOf((string) googleLinks(get('/events/craft-fair')->assertOk())[0]->getAttribute('href'));
+    $links = googleLinks(get('/events/craft-fair')->assertOk());
+    $query = queryOf((string) $links[0]->getAttribute('href'));
 
-    expect($query['dates'])->toBe('20261107/20261109');
+    expect($query['dates'])->toBe('20261107/20261109')
+        ->and(trim((string) preg_replace('/\s+/', ' ', (string) $links[0]->textContent)))->toBe('Google Calendar for Sat 7 Nov, all day until Sun 8 Nov');
 });
 
 it('keeps UTC across the clock change and offers no add links for a cancelled date', function () {
@@ -226,6 +228,21 @@ it('starts the share text with "Cancelled: " when the event is cancelled', funct
     $root = shareTestDocument(get('/events/quiz-night')->assertOk())->querySelector('[data-share]');
 
     expect((string) $root->getAttribute('data-share-text'))->toBe("Cancelled: Quiz Night – Fri 23 Oct, 7:30pm at Connaught Hall, on What's On Attleborough");
+});
+
+it('names the day in the share text for an all-day event and trims the venue name', function () {
+    Venue::whereKey($this->base['venueId'])->update(['name' => 'Connaught Hall ']);
+    shareTestPublish($this->base, [
+        'title' => 'Craft Fair',
+        'startDate' => '2026-11-07',
+        'startTime' => null,
+        'endTime' => null,
+        'allDay' => true,
+    ]);
+
+    $root = shareTestDocument(get('/events/craft-fair')->assertOk())->querySelector('[data-share]');
+
+    expect((string) $root->getAttribute('data-share-text'))->toBe("Craft Fair – Sat 7 Nov, all day at Connaught Hall, on What's On Attleborough");
 });
 
 it('leaves the date out of the share text when no date is upcoming', function () {

@@ -3,5 +3,11 @@
         "file": "assets/app-fixture.css",
         "src": "resources/css/app.css",
         "isEntry": true
+    },
+    "resources/js/share.js": {
+        "file": "assets/share-fixture.js",
+        "name": "share",
+        "src": "resources/js/share.js",
+        "isEntry": true
     }
 }
