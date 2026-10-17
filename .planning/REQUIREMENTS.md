@@ -123,9 +123,9 @@
 
 ### Source Research (RES)
 
-- [ ] **RES-01**: `docs/research/event-sources.md` lists verified local sources with coverage, platform, extraction method, robots status, legal basis, estimated volume and priority (P0-P3)
-- [ ] **RES-02**: The Events Calendar endpoints, RSS feeds with event dates, and JSON-LD presence are verified live on candidate sources
-- [ ] **RES-03**: Fixture samples are saved for each P0/P1 source for parser tests
+- [x] **RES-01**: `docs/research/event-sources.md` lists verified local sources with coverage, platform, extraction method, robots status, legal basis, estimated volume and priority (P0-P3)
+- [x] **RES-02**: The Events Calendar endpoints, RSS feeds with event dates, and JSON-LD presence are verified live on candidate sources
+- [x] **RES-03**: Fixture samples are saved for each P0/P1 source for parser tests
 - [ ] **RES-04**: Initial P0 sources are configured in production and producing drafts
 
 ## v2 Requirements
@@ -254,9 +254,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OPS-04 | Phase 1 | Complete |
 | OPS-01b | Phase 5 | Pending |
 | OPS-04b | Phase 5 | Pending |
-| RES-01 | Phase 2 | Pending |
-| RES-02 | Phase 2 | Pending |
-| RES-03 | Phase 2 | Pending |
+| RES-01 | Phase 2 | Complete |
+| RES-02 | Phase 2 | Complete |
+| RES-03 | Phase 2 | Complete |
 | RES-04 | Phase 4 | Pending |
 
 **Coverage:**

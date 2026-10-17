@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 02
 current_phase_name: Draft Model, Review Queue & Submissions
 status: executing
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-10-17T17:47:48.931Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-10-17T18:30:55.974Z"
 last_activity: 2026-10-17
-last_activity_desc: Completed 02-01 (manual entry through draft + ApproveDraft)
-state_head: cb510e1c2c421ff9659e03e2af9637305d3e7239
+last_activity_desc: Completed 02-02 (source research: two-list event-sources.md, P0 fixtures, privacy guard)
+state_head: 28ec6520d1ff49a9b4968564c1aa3c72e7d52864
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 31
-  completed_plans: 14
+  completed_plans: 15
   percent: 20
 ---
 
@@ -28,16 +28,16 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 02 (Draft Model, Review Queue & Submissions) — EXECUTING
-Plan: 1 of 16 complete (02-01 done; next in wave 1: 02-02)
-Status: Executing
-Last activity: 2026-10-17 — Completed 02-01 (manual entry through draft + ApproveDraft, event_drafts schema)
+Plan: 2 of 16 complete (02-01, 02-02 done; wave 1 complete; next: 02-03)
+Status: Ready to execute
+Last activity: 2026-10-17 — Completed 02-02 (source research: 1 List 1 source (P0, Baptist Church ICS + dated RSS), 18 on List 2, fixtures + privacy guard; owner follow-ups pending)
 
-Progress: 14/31 plans ([██░░░░░░░░] 20%); phase 2: 1/16; phases complete: 1/5
+Progress: 15/31 plans ([██░░░░░░░░] 20%); phase 2: 2/16; phases complete: 1/5
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
+- Total plans completed: 15
 - Average duration: -
 - Total execution time: 0.0 hours
 
@@ -70,6 +70,7 @@ Progress: 14/31 plans ([██░░░░░░░░] 20%); phase 2: 1/16; pha
 | Phase 1 P13 | 11min | 2 tasks | 12 files |
 | Phase 1 P15 | 9min | 2 tasks | 9 files |
 | Phase 02 P01 | 7min | 2 tasks | 14 files |
+| Phase 02 P02 | 40min | 4 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -88,6 +89,9 @@ Recent decisions affecting current work:
 - [Testing]: Browser suite runs in CI; tests/Pest.php forgets scoped instances after each in-process request; use Uat::settleFields() after filling Livewire forms
 - [Phase 02]: [02-01]: Manual entry is a manual draft approved at once through ApproveDraft (D-07); PublishEvent is called only by ApproveDraft
 - [Phase 02]: [02-01]: ApproveDraft logs via DB::afterCommit so nested approvals log only after the outermost commit; fromDraft blocks a missing start date
+- [Phase 02]: Source research: a feed the site itself offers (rel=alternate, Export/Subscribe, robots Allow) puts a robots-allowed, ToS-silent source on List 1; HTML/JSON-LD with silent ToS is List 2 ToS-unclear
+- [Phase 02]: Attleborough Baptist Church (Hubb ICS + dated RSS) is the only List 1 source (P0); terms checked by owner 2026-10-17
+- [Phase 02]: 8 ToS-unclear/prohibited sources await owner permission and 5 bot walls await an owner home-network check; all stay List 2, never bypassed
 
 ### Pending Todos
 
@@ -96,7 +100,7 @@ None yet.
 ### Blockers/Concerns
 
 - [Phase 5]: Domain registration + VPS deferred (name decided: whatsonattleborough.co.uk; .co.uk availability unconfirmed)
-- [Phase 2→3]: Local source inventory is unknown (automated search was blocked). Owner URL collection is on the critical path for Phase 3
+- [Phase 2→3]: Inventory verified (02-02): one List 1 source (Attleborough Baptist Church, P0, ICS + dated RSS, fixtures saved). Still open with the owner: local URLs for empty categories, 8 permission asks, home-network check of 5 bot walls (see docs/research/event-sources.md "Owner hand-off"). Phase 3 can start on ICS/dated RSS; TEC and JSON-LD have no cleared local source yet
 - [Phase 5]: Umami Cloud UK GDPR data region / DPA unverified (fallback: Plausible)
 - [Phase 5]: Configure trusted proxies (Caddy / Cloudflare) so per-IP rate limiting on /submit and Turnstile hostname/remoteip checks see the real client IP (Phase 2 research)
 - [Phase 3]: Crawling needs a real User-Agent contact/about URL; until Phase 5 is live use a config placeholder (e.g. CRAWLER_CONTACT_URL in config/site.php / .env) and swap in the live URL at launch
@@ -120,6 +124,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-17T17:47:48.628Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-10-17T18:30:55.657Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None
