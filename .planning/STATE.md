@@ -95,6 +95,7 @@ None yet.
 - [Phase 5]: Domain registration + VPS deferred (name decided: whatsonattleborough.co.uk; .co.uk availability unconfirmed)
 - [Phase 2→3]: Local source inventory is unknown (automated search was blocked). Owner URL collection is on the critical path for Phase 3
 - [Phase 5]: Umami Cloud UK GDPR data region / DPA unverified (fallback: Plausible)
+- [Phase 5]: Configure trusted proxies (Caddy / Cloudflare) so per-IP rate limiting on /submit and Turnstile hostname/remoteip checks see the real client IP (Phase 2 research)
 - [Phase 3]: Crawling needs a real User-Agent contact/about URL; until Phase 5 is live use a config placeholder (e.g. CRAWLER_CONTACT_URL in config/site.php / .env) and swap in the live URL at launch
 - [Phase 4]: Success criterion 5 / RES-04 say P0 sources are configured "in production", but production now arrives in Phase 5. Until then P0 sources run on the local app; revisit the wording when planning Phase 4 (or move the production half to Phase 5)
 

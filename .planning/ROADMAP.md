@@ -52,7 +52,6 @@ Decimal phases appear between their surrounding integers in numeric order.
 ### Phase 2: Draft Model, Review Queue & Submissions
 
 **Goal**: Organisers can submit events, and the admin can triage every incoming draft quickly through one review queue that is the only path to publication. By the end, the local source inventory is verified and fixtures are saved.
-**Mode:** mvp
 **Depends on**: Phase 1
 **Requirements**: SUB-01, SUB-02, SUB-03, SUB-04, REV-01, REV-02, REV-03, REV-04, REV-08, REV-09, REV-10, REV-11, PIPE-03, PIPE-04, ADM-04, ADM-06, RES-01, RES-02, RES-03
 **Success Criteria** (what must be TRUE):

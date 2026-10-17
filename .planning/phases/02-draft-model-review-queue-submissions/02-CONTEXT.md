@@ -48,6 +48,14 @@ Not in this phase:
   2. **Not crawlable, for owner review:** robots-disallowed, ToS-prohibited, **ToS-unclear** (robots allows but the ToS is silent or vague), JS-rendered, login-walled and Facebook sources. Each one gets the specific reason and a suggested route (manual entry, ask permission, or drop). The owner decides on these after the phase. Nothing on this list is configured as a source until the owner clears it.
   Only sources on the Crawlable list get P0/P1 fixtures (RES-03).
 
+### Owner decisions at planning (2026-10-17, from 02-RESEARCH.md open questions)
+- **D-17:** **Turnstile's script is allowed on `/submit` only.** This is the single exception to the "no third-party scripts" public-site rule. Add a one-line exception to the AGENTS.md project rules and extend `NoThirdPartyAssetsTest` so every other public page stays free of third-party scripts. Server-side verification uses an in-house verifier on Laravel's `Http` client (checks `success`, `action`, `hostname`; fails closed) so `Http::fake()` keeps tests offline. The privacy page mentions Turnstile.
+- **D-18:** **No-JS visitors get a `<noscript>` "email us instead" notice on `/submit`** (`hello@`), because Turnstile can't run without JavaScript.
+- **D-19:** **Add `events.contact_public` (default true) and `events.organiser_website`.** Event pages and calendar cards show organiser contact only when `contact_public` is true. Phase 1 events keep their current output. — **Reversibility:** costly (published privacy promise, D-03).
+- **D-20:** **REV-09's "source" filter means origin** (submission / manual entry) until Phase 3 adds a `sources` table.
+- **D-21:** **Bulk approve treats a venue as resolved only when the draft has a confirmed `venue_id`.** A suggested match alone makes bulk approve skip the draft (with that reason).
+- **D-22:** **No UI-SPEC for Phase 2.** Plan against Phase 1's brand decisions (Phase 1 D-05..D-08), the public-site rules in AGENTS.md, and the Phase 1 UI review findings (`01-UI-REVIEW.md`).
+
 ### Carried forward (do not re-ask)
 - Brand "What's On Attleborough", domain `whatsonattleborough.co.uk`, `hello@` contact, and the friendly-noticeboard voice with British English (Phase 1 D-01, D-02, D-04, D-05).
 - Cloudflare is already in the stack, so use **Cloudflare Turnstile** for SUB-04, alongside a honeypot and Laravel per-IP rate limiting.
