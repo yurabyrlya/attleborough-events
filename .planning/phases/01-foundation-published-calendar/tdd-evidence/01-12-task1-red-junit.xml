@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\Publishing\PublishEventTest" file="tests/Feature/Publishing/PublishEventTest.php" tests="12" assertions="27" errors="0" failures="3" skipped="0" time="1.283280">
+    <testcase name="it publishes with origin, approver and approval time recorded" file="tests/Feature/Publishing/PublishEventTest.php::it publishes with origin, approver and approval time recorded" class="Tests\Feature\Publishing\PublishEventTest" classname="Tests.Feature.Publishing.PublishEventTest" assertions="4" time="0.625999"/>
+    <testcase name="it stores a 19:30 BST start on 20 Oct 2026 as 18:30 UTC" file="tests/Feature/Publishing/PublishEventTest.php::it stores a 19:30 BST start on 20 Oct 2026 as 18:30 UTC" class="Tests\Feature\Publishing\PublishEventTest" classname="Tests.Feature.Publishing.PublishEventTest" assertions="1" time="0.039124"/>
+    <testcase name="it stores ends_at NULL and expires_at = starts_at + 3h when there is no end time" file="tests/Feature/Publishing/PublishEventTest.php::it stores ends_at NULL and expires_at = starts_at + 3h when there is no end time" class="Tests\Feature\Publishing\PublishEventTest" classname="Tests.Feature.Publishing.PublishEventTest" assertions="2" time="0.033998"/>
+    <testcase name="it stores a Sat-Sun all-day event as exactly one occurrence ending Monday 00:00 London" file="tests/Feature/Publishing/PublishEventTest.php::it stores a Sat-Sun all-day event as exactly one occurrence ending Monday 00:00 London" class="Tests\Feature\Publishing\PublishEventTest" classname="Tests.Feature.Publishing.PublishEventTest" assertions="3" time="0.032808"/>
+    <testcase name="it persists price, family-friendly, organiser and source note" file="tests/Feature/Publishing/PublishEventTest.php::it persists price, family-friendly, organiser and source note" class="Tests\Feature\Publishing\PublishEventTest" classname="Tests.Feature.Publishing.PublishEventTest" assertions="5" time="0.031414"/>
+    <testcase name="it persists nothing when occurrence generation throws" file="tests/Feature/Publishing/PublishEventTest.php::it persists nothing when occurrence generation throws" class="Tests\Feature\Publishing\PublishEventTest" classname="Tests.Feature.Publishing.PublishEventTest" assertions="4" time="0.031604"/>
+    <testcase name="it creates two separate events when invoked twice with identical data (no implicit dedupe)" file="tests/Feature/Publishing/PublishEventTest.php::it creates two separate events when invoked twice with identical data (no implicit dedupe)" class="Tests\Feature\Publishing\PublishEventTest" classname="Tests.Feature.Publishing.PublishEventTest" assertions="2" time="0.037565"/>
+    <testcase name="it refuses an approver who is not the admin and writes nothing" file="tests/Feature/Publishing/PublishEventTest.php::it refuses an approver who is not the admin and writes nothing" class="Tests\Feature\Publishing\PublishEventTest" classname="Tests.Feature.Publishing.PublishEventTest" assertions="1" time="0.271950">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">it refuses an approver who is not the admin and writes nothingException [Illuminate\Auth\Access\AuthorizationException] not thrown.
+at tests/Feature/Publishing/PublishEventTest.php:139</failure>
+    </testcase>
+    <testcase name="it matches the admin email case-insensitively when publishing" file="tests/Feature/Publishing/PublishEventTest.php::it matches the admin email case-insensitively when publishing" class="Tests\Feature\Publishing\PublishEventTest" classname="Tests.Feature.Publishing.PublishEventTest" assertions="2" time="0.054964"/>
+    <testcase name="it refuses everyone, the former admin included, when ADMIN_EMAIL is empty" file="tests/Feature/Publishing/PublishEventTest.php::it refuses everyone, the former admin included, when ADMIN_EMAIL is empty" class="Tests\Feature\Publishing\PublishEventTest" classname="Tests.Feature.Publishing.PublishEventTest" assertions="1" time="0.052013">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">it refuses everyone, the former admin included, when ADMIN_EMAIL is emptyException [Illuminate\Auth\Access\AuthorizationException] not thrown.
+at tests/Feature/Publishing/PublishEventTest.php:160</failure>
+    </testcase>
+    <testcase name="it records the approval time as the current moment" file="tests/Feature/Publishing/PublishEventTest.php::it records the approval time as the current moment" class="Tests\Feature\Publishing\PublishEventTest" classname="Tests.Feature.Publishing.PublishEventTest" assertions="1" time="0.041932"/>
+    <testcase name="it does not let publishing state or approval data be mass-assigned on Event" file="tests/Feature/Publishing/PublishEventTest.php::it does not let publishing state or approval data be mass-assigned on Event" class="Tests\Feature\Publishing\PublishEventTest" classname="Tests.Feature.Publishing.PublishEventTest" assertions="1" time="0.029910">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">it does not let publishing state or approval data be mass-assigned on Eventstatus should not be fillable
+Failed asserting that true is false.
+at tests/Feature/Publishing/PublishEventTest.php:176</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -11,6 +11,7 @@ use App\Models\Venue;
 use App\Publishing\Actions\PublishEvent;
 use App\Publishing\Data\PublishableEventData;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 
 function publishableData(array $overrides = []): PublishableEventData
@@ -128,4 +129,53 @@ it('creates two separate events when invoked twice with identical data (no impli
 
     expect(Event::count())->toBe(2)
         ->and(EventOccurrence::count())->toBe(2);
+});
+
+it('refuses an approver who is not the admin and writes nothing', function () {
+    $intruder = User::factory()->create(['email' => 'someone@example.test']);
+    $data = publishableData();
+
+    expect(fn () => app(PublishEvent::class)($data, $intruder, EventOrigin::Manual))
+        ->toThrow(AuthorizationException::class, 'Only the admin can publish events.');
+
+    expect(DB::table('events')->count())->toBe(0)
+        ->and(DB::table('event_occurrences')->count())->toBe(0)
+        ->and(DB::table('event_slugs')->count())->toBe(0);
+});
+
+it('matches the admin email case-insensitively when publishing', function () {
+    $shouty = User::factory()->create(['email' => 'ADMIN@EXAMPLE.TEST']);
+
+    $event = app(PublishEvent::class)(publishableData(), $shouty, EventOrigin::Manual);
+
+    expect($event->status)->toBe(EventStatus::Published)
+        ->and($event->approved_by)->toBe($shouty->id);
+});
+
+it('refuses everyone, the former admin included, when ADMIN_EMAIL is empty', function () {
+    config(['app.admin_email' => '']);
+    $data = publishableData();
+
+    expect(fn () => app(PublishEvent::class)($data, $this->admin, EventOrigin::Manual))
+        ->toThrow(AuthorizationException::class, 'Only the admin can publish events.');
+
+    expect(DB::table('events')->count())->toBe(0);
+});
+
+it('records the approval time as the current moment', function () {
+    $event = app(PublishEvent::class)(publishableData(), $this->admin, EventOrigin::Manual);
+
+    expect($event->fresh()->approved_at->utc()->toIso8601String())
+        ->toBe(CarbonImmutable::now()->utc()->toIso8601String());
+});
+
+it('does not let publishing state or approval data be mass-assigned on Event', function () {
+    $event = new Event;
+
+    foreach (['status', 'origin', 'approved_by', 'approved_at'] as $column) {
+        expect($event->isFillable($column))->toBeFalse("{$column} should not be fillable");
+    }
+
+    expect($event->isFillable('title'))->toBeTrue()
+        ->and(array_key_exists('status', (new Event(['title' => 'X', 'status' => 'hidden']))->getAttributes()))->toBeFalse();
 });
