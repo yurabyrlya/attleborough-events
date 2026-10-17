@@ -34,6 +34,38 @@
             "events": 64,
             "window": "2026-10-18 to 2027-03-14 (days=150), spans BST end Sun 25 Oct 2026",
             "notes": "RSS 2.0 from the Hubb platform. Event start is in <title> as local 'YYYY-MM-DD HH:MM - Name' and in <description> 'Time: Sunday, 18 October 2026 at 10:30'; <pubDate> equals the event start in UTC (not used as the event date, EXT-05)."
+        },
+        {
+            "file": "2026-10-17-ical.ics",
+            "type": "ical",
+            "url": "https://www.attleborough.church/Calendar/Calendar.ics",
+            "fetched_at": "2026-10-17T18:12:38Z",
+            "http_status": 200,
+            "headers": {
+                "content-type": "text/calendar; charset=utf-8",
+                "etag": null,
+                "last-modified": null,
+                "cache-control": "private"
+            },
+            "robots_status": "allowed",
+            "robots_fetched_at": "2026-10-17T18:04:35Z",
+            "robots_rules": [
+                "User-agent: *",
+                "Crawl-delay: 10",
+                "Disallow: /Admin/",
+                "Disallow: /User/",
+                "(no rule matches /Calendar/Calendar.ics)"
+            ],
+            "sha256_raw": "518cce7c136a425591cd80de748d7ebc6f39496443b647d605034fae13fecff8",
+            "redactions": {
+                "email": 0,
+                "phone": 0,
+                "name": 0
+            },
+            "modified": false,
+            "events": 64,
+            "window": "2026-10-18 to 2027-03-14, spans BST end Sun 25 Oct 2026",
+            "notes": "The URL the month view's 'Export > ICAL' control shows ('Use the URL below to access your calendar from other applications', system.min.js DoExport). PRODID -//Endis Ltd/Insight//. CRLF line endings, no VTIMEZONE: DTSTART/DTEND are UTC (Z). Stable UID E{event id}@UK.endis.com matches show_event={id} in the RSS. No RRULE: recurring services are separate VEVENTs."
         }
     ]
 }

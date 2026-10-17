@@ -21,6 +21,11 @@ function sourceFixturePersonalData(string $text): array
 {
     $found = [];
 
+    // An ICS UID (RFC 5545) is an identifier that is often email-shaped
+    // ("E5936475@UK.endis.com"); it is structure, not a contact address.
+    // RFC 5545 continuation lines (leading space or tab) belong to the UID too.
+    $text = (string) preg_replace('/^UID[;:].*(?:\r?\n[ \t].*)*/mi', '', $text);
+
     preg_match_all('/(?<![\w.+-])[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}(?![\w-])/', $text, $emails);
 
     foreach ($emails[0] as $email) {
@@ -95,6 +100,7 @@ it('flags personal emails and UK phone numbers', function (string $text) {
     expect(sourceFixturePersonalData($text))->not->toBeEmpty();
 })->with([
     'personal email' => 'jane.smith@gmail.com',
+    'email in an ICS description' => "UID:E1@UK.endis.com\r\nDESCRIPTION:Contact jane.smith@gmail.com",
     'mobile' => '07700 900123',
     'international mobile' => '+44 7700 900123',
     'bracketed area code' => '(01953) 456789',
@@ -110,6 +116,7 @@ it('does not flag placeholders or structural values', function (string $text) {
     'ICS timestamp' => '20261019T090000Z',
     'epoch milliseconds' => '1729339200000',
     'hex hash' => 'a1b2c3d4e5f60123456789',
+    'ICS UID' => "BEGIN:VEVENT\r\nUID:E5936475@UK.endis.com\r\nEND:VEVENT",
     'email placeholder' => SOURCE_FIXTURE_EMAIL_PLACEHOLDER,
     'phone placeholder' => SOURCE_FIXTURE_PHONE_PLACEHOLDER,
 ]);
