@@ -1,16 +1,16 @@
 # What's On Attleborough: event source inventory
 
-Owner-facing summary of every researched source, grouped by how we can use it. Status as of **17 October 2026**. Every classification rests on a live probe or the owner's decisions D-13 to D-26 (`.planning/phases/02-draft-model-review-queue-submissions/02-CONTEXT.md`). The technical evidence (probe logs, robots.txt rules, quotes from terms, endpoints, fixtures) lives in [event-sources.md](./event-sources.md).
+Owner-facing summary of every researched source, grouped by how we can use it. Status as of **17 October 2026** (gap categories researched the same evening). Every classification rests on a live probe or the owner's decisions D-13 to D-26 (`.planning/phases/02-draft-model-review-queue-submissions/02-CONTEXT.md`). The technical evidence (probe logs, robots.txt rules, quotes from terms, endpoints, fixtures) lives in [event-sources.md](./event-sources.md).
 
 Every imported event goes to the review queue first: nothing is published without admin approval.
 
 ## At a glance
 
-- **A. Feed or API (automatic import):** 3 sources
+- **A. Feed or API (automatic import):** 4 sources (Connaught Hall is covered by the Town Council feed)
 - **B. Crawlable web pages (automatic import with page parsers):** 4 sources
-- **C. Allowed, but manual entry:** 3 sources
+- **C. Allowed, but manual entry:** 5 sources
 - **D. Blocked:** 9 sources, manual entry until one of the listed solutions works
-- **E. Excluded (no usable events):** 9 sites
+- **E. Excluded (no usable events):** 10 sites
 
 ---
 
@@ -24,6 +24,7 @@ The best sources: the site itself publishes a machine-readable calendar.
 - **API:** https://attleboroughtc.org.uk/wp-json/tribe/events/v1/events (The Events Calendar REST API, JSON)
 - **Calendar file (ICS):** https://attleboroughtc.org.uk/?post_type=tribe_events&ical=1
 - **Volume:** about 60 events a month: Town Hall groups, council meetings, Remembrance, Attleborough Town FC home games.
+- **Venues it covers:** Town Hall, **Connaught Hall** (https://attleboroughtc.org.uk/venue/connaught-hall), Queens Square (market), Recreation Ground, Gamyers Meadow, The Arch, Scout Hall, Attleborough Town Football & Social Club. So Connaught Hall's events come through this feed.
 - **Legal basis:** robots.txt allows it. We take facts only (title, date, time, venue) with attribution and a link back (D-26).
 - **Watch out for:**
   - The terms have a generic "no republishing" clause, so the courtesy email asks the clerk for an explicit yes.
@@ -46,6 +47,15 @@ The best sources: the site itself publishes a machine-readable calendar.
 - **Volume:** about 6 events a month, mostly internal to the school. A few public ones a term: open evenings, presentation evenings, charity days.
 - **Legal basis:** the owner's written permission (D-24).
 - **Watch out for:** event IDs change on every fetch, so duplicates are matched on title and start time.
+
+### Diocese of Norwich (P2)
+
+- **Events page:** https://www.dioceseofnorwich.org/events/
+- **API:** https://www.dioceseofnorwich.org/wp-json/tribe/events/v1/events (The Events Calendar REST API, JSON)
+- **Calendar file (ICS):** https://www.dioceseofnorwich.org/events/?ical=1
+- **Volume:** diocese-wide (all of Norfolk); few Attleborough events. It has venue records for St Mary's Church, Attleborough, with past events (a craft market, a summer fete), but none upcoming on 17 October.
+- **Legal basis:** robots.txt allows everything; to be confirmed against its terms before import. Facts only, with attribution and a link back.
+- **Watch out for:** robots.txt asks for 10 seconds between requests. Regional, so keep only Attleborough-area venues (geofence or venue filter).
 
 ---
 
@@ -106,6 +116,21 @@ Crawling is allowed, but these sites give no dates that a parser can read reliab
 - **Events page:** https://www.banhamzoo.co.uk/events
 - **Why manual:** the listing has titles only, and detail pages give dates in prose.
 - **Volume:** 1-2 events a month, regional.
+
+### St Mary's Church, Attleborough with All Saints, Besthorpe (P3)
+
+- **Website:** https://www.attleboroughchurch.org.uk/
+- **Why manual:** its what's-on page (https://www.attleboroughchurch.org.uk/whats-on.html) is an embedded Facebook feed (https://www.facebook.com/AttleboroughWithBesthorpe), which we can't read. The concerts (https://www.attleboroughchurch.org.uk/concerts.html) and artisan market (https://www.attleboroughchurch.org.uk/artisan-market.html) pages are prose and posters.
+- **Legal basis:** robots.txt allows the pages.
+- **Next step:** manual entry. Ask the parish to tag its events in the Diocese of Norwich calendar (group A); they'd then arrive automatically.
+
+### Rosecroft Primary School (P3)
+
+- **Website:** https://www.rosecroftprimary.org
+- **Calendar page:** https://www.rosecroftprimary.org/parents/school-calendar
+- **Why manual:** the calendar only shows with JavaScript ("Sorry - Javascript is required to view the calendar"). Term dates are on https://www.rosecroftprimary.org/parents/term-dates.
+- **Watch out for:** robots.txt asks for 3 hours 20 minutes between requests (same school website provider as Attleborough Primary).
+- **Next step:** manual entry for public events; check later whether the calendar has a feed behind it.
 
 ---
 
@@ -194,22 +219,22 @@ We never get around a block: no disguising the crawler as a browser, no CAPTCHA 
 - **Wymondham Town Council** (https://wymondhamtowncouncil.gov.uk/): no events of its own. It links to Visit Wymondham (group B).
 - **Attleborough u3a** (http://u3asites.org.uk/attleborough/): no working site. The secure connection fails and plain HTTP shows an empty holding page. The owner may know the current site.
 - **The Events Calendar demo** (https://demo.theeventscalendar.com/): not local; used only to check the feed format.
+- **The Bear, Attleborough** (https://thebearattleborough.co.uk/): a brochure site with no events page (about, contact, gallery only).
 
 ---
 
 ## Gaps: nothing found yet
 
-These categories from the spec have no source yet. The owner will add local URLs, and each one gets the same checks.
+Searched on 17 October (web search, domain checks, Wikipedia, national directories). These still need the owner's local knowledge, such as Facebook group names or noticeboard posters:
 
-- St Mary's parish church (the Church Near You search needs JavaScript)
-- Connaught Hall
-- Rosecroft Primary School
-- Rotary and Lions
-- Pubs and venues
-- Businesses and farms
-- Women's Institute (some sessions appear in the Town Council feed)
-- Any other local site that uses The Events Calendar
-- Facebook-only groups (manual entry only)
+- **Rotary and Lions:** no website found (about ten likely domains don't exist; Rotary's club finder needs JavaScript). Probably Facebook only.
+- **Pubs:** The Griffin, The Cock, The London Tavern and The Mulberry Tree have no website found; The Bear's site has no events (see E). Quiz and music nights are probably on Facebook.
+- **Businesses and farms:** nothing new. The Thursday market on Queens Square is already in the Town Council feed.
+- **Women's Institute:** the national WI directory needs JavaScript, and no Norfolk Federation site was found. Some WI sessions appear in the Town Council feed.
+- **Village halls and parish councils** (Besthorpe, Great Ellingham, Deopham, Morley, Rockland St Peter, Larling, Snetterton): no sites found; Old Buckenham's new site is an empty placeholder.
+- **Attleborough Sports Hall:** run by Everyone Active; its listings would be class timetables, not community events.
+- **Attleborough u3a:** still no working site.
+- **Facebook-only groups:** manual entry only.
 
 ---
 
@@ -222,5 +247,6 @@ These categories from the spec have no source yet. The owner will add local URLs
    - Norfolk Libraries (a calendar feed or monthly list)
    - Norfolk Museums (send us their events)
    - local TicketSource organisers such as Attleborough Players
-4. **Add local URLs** for the gaps above.
-5. **Phase 5:** apply for Cloudflare Verified Bots once the production crawler is public. We need a page about the crawler, a distinct crawler name with a contact URL, a published IP list or reverse DNS, and robots.txt compliance. This could unlock the public pages of Breckland, Norfolk Libraries, Norfolk Museums and TicketSource.
+4. **Add local URLs** for the gaps above (Facebook page names are fine; they become manual-entry sources).
+5. **Ask St Mary's** to tag its events in the Diocese of Norwich calendar.
+6. **Phase 5:** apply for Cloudflare Verified Bots once the production crawler is public. We need a page about the crawler, a distinct crawler name with a contact URL, a published IP list or reverse DNS, and robots.txt compliance. This could unlock the public pages of Breckland, Norfolk Libraries, Norfolk Museums and TicketSource.
