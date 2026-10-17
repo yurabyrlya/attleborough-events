@@ -85,3 +85,72 @@ it('loads only the CSS entry from the layout and has no skeleton JS or welcome v
         ->and(file_exists(base_path('resources/js/bootstrap.js')))->toBeFalse()
         ->and(file_exists(base_path('resources/views/welcome.blade.php')))->toBeFalse();
 });
+
+/*
+ * D-17 (SUB-04): Cloudflare Turnstile on /submit is the single third-party
+ * exception. Every other public page still loads nothing third-party.
+ */
+
+const TURNSTILE_SCRIPT = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+
+/**
+ * Resource URLs that are neither relative nor on the app host.
+ *
+ * @return list<string>
+ */
+function thirdPartyUrlsIn(string $html): array
+{
+    $appUrl = parse_url((string) config('app.url'));
+    $ownOrigin = ($appUrl['scheme'] ?? 'http').'://'.($appUrl['host'] ?? 'localhost')
+        .(isset($appUrl['port']) ? ':'.$appUrl['port'] : '');
+
+    return array_values(array_filter(resourceUrlsIn($html), function (string $url) use ($ownOrigin): bool {
+        $relative = str_starts_with($url, '/') && ! str_starts_with($url, '//');
+        $ownHost = $url === $ownOrigin || str_starts_with($url, $ownOrigin.'/');
+
+        return ! $relative && ! $ownHost;
+    }));
+}
+
+dataset('pages without third-party resources', [
+    'calendar' => ['/', []],
+    'privacy notice' => ['/privacy', []],
+    'submission thanks' => ['/submit/thanks', ['submitted' => true, 'reference' => 'WOA-TEST']],
+]);
+
+it('loads no third-party resource on the other public pages, even with a Turnstile key set', function (string $path, array $session) {
+    $this->withVite();
+    app()->usePublicPath(base_path('tests/Fixtures/public'));
+    config()->set('services.turnstile.site_key', '1x00000000000000000000AA');
+
+    $html = (string) $this->withSession($session)->get($path)->assertOk()->getContent();
+
+    expect(thirdPartyUrlsIn($html))->toBe([])
+        ->and($html)->not->toContain('challenges.cloudflare.com')
+        ->and($html)->not->toContain('cf-turnstile')
+        ->and(preg_match(THIRD_PARTY_DENY_LIST, $html))->toBe(0);
+})->with('pages without third-party resources');
+
+it('allows exactly the Turnstile script on /submit when a site key is set', function () {
+    config()->set('services.turnstile.site_key', '1x00000000000000000000AA');
+
+    $html = (string) get('/submit')->assertOk()->getContent();
+    $document = HTMLDocument::createFromString($html, LIBXML_NOERROR);
+    $widgets = $document->querySelectorAll('div.cf-turnstile');
+
+    expect(thirdPartyUrlsIn($html))->toBe([TURNSTILE_SCRIPT])
+        ->and($widgets->length)->toBe(1)
+        ->and((string) $widgets->item(0)->getAttribute('data-action'))->toBe('submit')
+        ->and((string) $widgets->item(0)->getAttribute('data-sitekey'))->toBe('1x00000000000000000000AA')
+        ->and($document->querySelectorAll('link[rel~="preconnect"], link[rel~="dns-prefetch"]')->length)->toBe(0);
+});
+
+it('loads nothing third-party on /submit when no site key is set', function () {
+    config()->set('services.turnstile.site_key', null);
+
+    $html = (string) get('/submit')->assertOk()->getContent();
+
+    expect(thirdPartyUrlsIn($html))->toBe([])
+        ->and($html)->not->toContain('challenges.cloudflare.com')
+        ->and($html)->not->toContain('cf-turnstile');
+});
