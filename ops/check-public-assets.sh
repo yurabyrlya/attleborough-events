@@ -5,6 +5,12 @@
 # files (favicon.svg/.ico, apple-touch-icon, og:image) load, and / has no
 # script element.
 #
+# Host probe (CR-01, T-01-70): one extra GET / with a spoofed
+# "Host: hostprobe.invalid" must not echo that host anywhere in the body
+# (URLs come from config('app.url') or are root-relative, never from Host).
+# A refused or non-200 answer passes: a production reverse proxy may reject
+# unknown hosts outright.
+#
 # Usage: ops/check-public-assets.sh [BASE_URL]
 #   BASE_URL defaults to http://localhost:8000 (local APP_URL, served by
 #   `php artisan serve`). Plan 05-02 runs it against the production URL.
@@ -91,6 +97,12 @@ fi
 
 if grep -qiE "$DENY" "$TMP/index.body"; then
     fail "deny-list host in the HTML of /: $(grep -oiE "$DENY" "$TMP/index.body" | head -n 1)"
+fi
+
+# --- Spoofed Host probe (CR-01) -----------------------------------------------
+curl -sS --max-time 20 -H 'Host: hostprobe.invalid' -o "$TMP/hostprobe.body" "$BASE_URL/" 2>/dev/null || true
+if [ -f "$TMP/hostprobe.body" ] && grep -qi 'hostprobe\.invalid' "$TMP/hostprobe.body"; then
+    fail "/ echoes a spoofed Host header"
 fi
 
 # Resource-bearing tags and their src/href values.
@@ -204,4 +216,4 @@ esac
 [ "$(host_of "$og_url")" = "$BASE_HOST" ] || fail "THIRD-PARTY: $og_url (og:image)"
 check_file "$og_url" og-image image/png
 
-echo "PUBLIC ASSETS OK: css=$css_path fonts=$fonts third-party=0"
+echo "PUBLIC ASSETS OK: css=$css_path fonts=$fonts third-party=0 host-probe=clean"
