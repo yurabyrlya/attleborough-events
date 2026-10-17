@@ -8,11 +8,15 @@ use App\Filament\Resources\EventDrafts\Pages\ReviewEventDraft;
 use App\Filament\Resources\EventDrafts\Schemas\EventDraftInfolist;
 use App\Filament\Resources\EventDrafts\Tables\EventDraftsTable;
 use App\Models\EventDraft;
+use App\Models\User;
+use App\Publishing\AdminGate;
+use App\Support\LondonFormatter;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
 /**
@@ -43,6 +47,48 @@ class EventDraftResource extends Resource
     public static function infolist(Schema $schema): Schema
     {
         return EventDraftInfolist::configure($schema);
+    }
+
+    /**
+     * Same rule as the panel gate (User::canAccessPanel), so global search
+     * and the pages refuse a non-admin even outside the panel middleware.
+     */
+    public static function canAccess(): bool
+    {
+        $user = auth()->user();
+
+        return $user instanceof User && AdminGate::allows($user);
+    }
+
+    /**
+     * ADM-06. PostgreSQL search is case-insensitive substring matching, so
+     * a reference typed in lower case still finds the draft.
+     *
+     * @return list<string>
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title', 'reference', 'organiser_name', 'venue_name'];
+    }
+
+    public static function getGlobalSearchResultUrl(Model $record): string
+    {
+        return static::getUrl('review', ['record' => $record]);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        if (! $record instanceof EventDraft) {
+            return [];
+        }
+
+        return [
+            'Status' => $record->review_status->getLabel(),
+            'Starts' => LondonFormatter::wallClock($record->start_date, $record->start_time, $record->all_day),
+        ];
     }
 
     public static function canCreate(): bool
