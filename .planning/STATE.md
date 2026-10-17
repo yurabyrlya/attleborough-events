@@ -82,6 +82,7 @@ Recent decisions affecting current work:
 - [Roadmap]: Source research (RES-01..03) runs alongside Phases 1-2 and gates Phase 3; RES-04 (P0 sources live) closes Phase 4
 - [Roadmap]: TEC is the verified platform adapter; no Squarespace `?format=` endpoints (robots-disallowed)
 - [Scope]: Infra/domain deferred to Phase 5; Phase 1 is local-dev only. (2026-10-16: 01-02/01-03 moved to 05-01/05-02; OPS-02 to Phase 5; OPS-01b/OPS-04b split out for production.)
+- [Testing]: Browser UAT flows (F0–F10) live in docs/uat/browser-uat.md; every phase runs them before sign-off and adds flows for new UI
 
 ### Pending Todos
 

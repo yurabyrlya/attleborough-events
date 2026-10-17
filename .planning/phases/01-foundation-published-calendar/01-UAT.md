@@ -6,6 +6,8 @@ started: 2026-10-17T10:06:11Z
 updated: 2026-10-17T10:35:50Z
 ---
 
+> Browser flows used for this UAT are documented in `docs/uat/browser-uat.md` (F0–F10). Re-run them for future phases and regressions.
+
 ## Current Test
 
 number: 7

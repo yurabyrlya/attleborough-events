@@ -49,6 +49,7 @@ These rules are specific to "What's On Attleborough" (repo `attleborough-events`
 - Assert stored instants with raw SQL where it matters: `DB::selectOne("select starts_at at time zone 'UTC' as s ...")`.
 - CI runs with `TZ=America/New_York` to catch reliance on the system timezone.
 - Boost's Pest guidance targets Pest 3/4. Pest 5 conventions win.
+- Browser UAT: before signing off a phase, run the flows in `docs/uat/browser-uat.md` against the local app and record results in that phase's `NN-UAT.md`. A phase that adds or changes UI also adds or updates its flow there.
 
 ## Filament 5 (not covered by Boost)
 
