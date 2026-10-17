@@ -47,6 +47,7 @@ These rules are specific to "What's On Attleborough" (repo `attleborough-events`
 
 - Blade + Tailwind 4. No Livewire on public pages. Filters are plain query-string links that work without JavaScript.
 - No third-party scripts, fonts, images or CDNs. Fonts are self-hosted npm packages.
+- Exception (D-17): Cloudflare Turnstile's script from challenges.cloudflare.com is allowed on `/submit` only, pushed from that page and never from the layout. `tests/Feature/Public/NoThirdPartyAssetsTest.php` keeps every other public page free of third-party resources.
 - WCAG 2.2 AA: 24x24px minimum targets, visible focus, `<time datetime>` on dates, "Cancelled" shown as text.
 - British English and UK formats: "Sat 14 Nov, 7:30pm" (drop `:00`), headings "Today" / "Tomorrow" / "Saturday 31 October".
 - Escaped Blade output (`{{ }}`) only. Descriptions are plain text.

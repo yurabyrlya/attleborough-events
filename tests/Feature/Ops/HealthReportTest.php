@@ -128,3 +128,70 @@ it('exits 1 from ops:health when the queue worker is stale even if the scheduler
         ->expectsOutput('UNHEALTHY')
         ->assertExitCode(1);
 });
+
+describe('submission spam check (T-02-31)', function () {
+    it('lists the spam check after the existing entries', function () {
+        expect(array_map(fn ($check) => $check->key, app(HealthReport::class)->all()))
+            ->toBe(['scheduler', 'queue', 'calendar-sync', 'spam-check']);
+    });
+
+    it('fails in production when either Turnstile key is missing', function (?string $siteKey, ?string $secret) {
+        $this->app['env'] = 'production';
+        config()->set('services.turnstile.site_key', $siteKey);
+        config()->set('services.turnstile.secret', $secret);
+
+        $check = app(HealthReport::class)->spamCheck();
+
+        expect($check->key)->toBe('spam-check')
+            ->and($check->title)->toBe('Submission spam check')
+            ->and($check->state)->toBe(HealthState::Failed)
+            ->and($check->detail)->toBe('Turnstile keys missing: the public form is resting')
+            ->and($check->expectation)->toBe('Turnstile keys are set in production');
+    })->with([
+        'no secret' => ['site-key', ''],
+        'no site key' => ['', 'secret'],
+        'neither (unset)' => [null, null],
+    ]);
+
+    it('is OK in production with both keys set', function () {
+        $this->app['env'] = 'production';
+        config()->set('services.turnstile.site_key', 'site-key');
+        config()->set('services.turnstile.secret', 'secret');
+
+        $check = app(HealthReport::class)->spamCheck();
+
+        expect($check->state)->toBe(HealthState::Ok)
+            ->and($check->detail)->toBeNull();
+    });
+
+    it('is OK and not checked outside production, even with no keys', function () {
+        config()->set('services.turnstile.site_key', '');
+        config()->set('services.turnstile.secret', '');
+
+        $check = app(HealthReport::class)->spamCheck();
+
+        expect($check->state)->toBe(HealthState::Ok)
+            ->and($check->detail)->toBe('Not checked outside production');
+    });
+
+    it('shows the entry on the System health page', function () {
+        actingAs(OpsFixtures::admin())
+            ->get('/admin/system-health')
+            ->assertOk()
+            ->assertSeeInOrder(['Submission spam check', 'OK', 'Turnstile keys are set in production'])
+            ->assertSee('Not checked outside production');
+    });
+
+    it('makes ops:health unhealthy in production without keys', function () {
+        OpsFixtures::beatAgo(Heartbeat::SCHEDULER, 30);
+        OpsFixtures::beatAgo(Heartbeat::QUEUE, 120, ['latency_seconds' => 1]);
+        $this->app['env'] = 'production';
+        config()->set('services.turnstile.site_key', '');
+        config()->set('services.turnstile.secret', '');
+
+        $this->artisan('ops:health')
+            ->expectsOutputToContain('spam-check: FAILED')
+            ->expectsOutput('UNHEALTHY')
+            ->assertExitCode(1);
+    });
+});

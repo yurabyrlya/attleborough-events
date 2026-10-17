@@ -3,6 +3,7 @@
 namespace App\Ops;
 
 use App\Enums\HealthState;
+use App\Http\Requests\StoreSubmissionRequest;
 use App\Models\FailedJob;
 use App\Models\Heartbeat;
 use Carbon\CarbonImmutable;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\DB;
  * The single source of health states for the System health page, its nav
  * badge and ops:health (OPS-04). Reads the heartbeats, jobs and failed_jobs
  * tables only, never the cache store. Every query is a single cheap lookup
- * or aggregate.
+ * or aggregate. The spam check reads config only.
  */
 class HealthReport
 {
@@ -77,6 +78,26 @@ class HealthReport
         return new HealthCheck('calendar-sync', 'Daily calendar sync', $state, $heartbeat->last_seen_at, $age, $expectation, $detail);
     }
 
+    /**
+     * T-02-31: a production /submit without both Turnstile keys is resting
+     * (02-09), so the public form silently stops taking events. Uses the
+     * same rule as the form so the two can never disagree.
+     */
+    public function spamCheck(): HealthCheck
+    {
+        $expectation = 'Turnstile keys are set in production';
+
+        if (! app()->isProduction()) {
+            return new HealthCheck('spam-check', 'Submission spam check', HealthState::Ok, null, null, $expectation, 'Not checked outside production');
+        }
+
+        if (StoreSubmissionRequest::formIsResting()) {
+            return new HealthCheck('spam-check', 'Submission spam check', HealthState::Failed, null, null, $expectation, 'Turnstile keys missing: the public form is resting');
+        }
+
+        return new HealthCheck('spam-check', 'Submission spam check', HealthState::Ok, null, null, $expectation);
+    }
+
     public function failedJobCount(): int
     {
         return FailedJob::query()->count();
@@ -102,7 +123,7 @@ class HealthReport
      */
     public function all(): array
     {
-        return [$this->scheduler(), $this->queue(), $this->calendarSync()];
+        return [$this->scheduler(), $this->queue(), $this->calendarSync(), $this->spamCheck()];
     }
 
     /**
