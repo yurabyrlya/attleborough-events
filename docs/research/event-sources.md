@@ -420,7 +420,7 @@ One row per candidate; "-" means the rung did not apply (not WordPress, no feed 
 | attleborough-academy | P1 | 2026-10-17-ical.ics |
 | attleborough-heritage-group | P1 | 2026-10-17-events-page.html |
 
-**Pending (not in the index until captured):** `attleborough-primary-school` (P1, provisional). Its `Crawl-delay: 12000` means `ops/probe-sources.sh attleborough-primary-school` has to run after 23:05 BST on 2026-10-17 or later. Then add it to the table above, which makes the privacy test require its manifest.
+**Pending (not in the index until captured):** `attleborough-primary-school` (P1, provisional). Its `Crawl-delay: 12000` means `ops/probe-sources.sh attleborough-primary-school` was deferred by the script at 23:19 BST and has to run after 02:39 BST on 2026-10-18 or later. Then add it to the table above and drop "fixtures pending" from its List 1 heading; the guard test then requires its manifest. Owner override recorded in 02-VERIFICATION.md: capture before Phase 3 planning.
 
 ## Risks (technical and legal)
 

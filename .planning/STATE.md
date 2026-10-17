@@ -147,7 +147,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+- [Phase 2→3] Capture the Attleborough Primary School fixture after 02:39 BST 2026-10-18: `ops/probe-sources.sh attleborough-primary-school`, redact, add to the Fixture index and drop "fixtures pending" from its List 1 heading (owner override in 02-VERIFICATION.md; must be done before Phase 3 planning).
 
 ### Blockers/Concerns
 

@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 /*
  * D-14 / RES-03 (threat T-02-07): source fixtures are raw third-party bytes
  * committed to a public repo. Personal emails and phone numbers must be
@@ -149,24 +151,32 @@ it('lists every fixture file in its source manifest', function () {
     expect($unlisted)->toBe([]);
 });
 
-it('has fixtures for every P0 and P1 source in the research fixture index', function () {
+it('has fixtures for every P0 and P1 source in List 1 unless it is openly marked pending', function () {
     $doc = (string) file_get_contents(base_path('docs/research/event-sources.md'));
-    preg_match('/^## Fixture index\R(.*?)(?=^## |\z)/ms', $doc, $section);
+    preg_match('/^## List 1: Crawlable\R(.*?)(?=^## |\z)/ms', $doc, $list1);
+    preg_match('/^\*\*Pending \(not in the index until captured\):\*\*(.*)$/m', $doc, $pendingNote);
+    preg_match_all('/^### (.+?) \((P0|P1)([^)]*)\)\s*$/m', $list1[1] ?? '', $headings, PREG_SET_ORDER);
 
     $missing = [];
+    $undeclared = [];
 
-    foreach (preg_split('/\R/', $section[1] ?? '') as $line) {
-        $cells = array_map(fn (string $cell): string => trim($cell, " `\t"), explode('|', trim($line, " |\t")));
+    foreach ($headings as [, $name, , $flags]) {
+        $slug = Str::slug($name);
 
-        if (count($cells) < 2 || ! in_array($cells[1], ['P0', 'P1'], true)) {
+        if (str_contains($flags, 'fixtures pending')) {
+            if (! str_contains($pendingNote[1] ?? '', "`{$slug}`")) {
+                $undeclared[] = $slug;
+            }
+
             continue;
         }
 
-        if (sourceFixtureManifestFiles($cells[0]) === []) {
-            $missing[] = $cells[0];
+        if (sourceFixtureManifestFiles($slug) === []) {
+            $missing[] = $slug;
         }
     }
 
-    expect($section)->not->toBeEmpty()
-        ->and($missing)->toBe([]);
+    expect($headings)->not->toBeEmpty()
+        ->and($missing)->toBe([])
+        ->and($undeclared)->toBe([]);
 });

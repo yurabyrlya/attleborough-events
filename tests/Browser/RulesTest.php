@@ -32,7 +32,12 @@ function lastRepeaterInputId(mixed $page, string $repeater, string $suffix): str
  */
 function markCategoryRow(mixed $page, string $name, string $marker): string
 {
-    $found = $page->script('() => { const input = [...document.querySelectorAll(\'input[id^="form.categories."][id$=".name"]\')].find((el) => el.value === '.json_encode($name).'); input?.closest("tr")?.setAttribute("data-uat-row", '.json_encode($marker).'); return Boolean(input); }');
+    $match = '[...document.querySelectorAll(\'input[id^="form.categories."][id$=".name"]\')].find((el) => el.value === '.json_encode($name).')';
+
+    // Inputs exist before Livewire has filled their values: wait for the value.
+    Uat::waitUntil($page, $match.' !== undefined');
+
+    $found = $page->script('() => { const input = '.$match.'; input?.closest("tr")?.setAttribute("data-uat-row", '.json_encode($marker).'); return Boolean(input); }');
 
     expect($found)->toBeTrue("No Categories row named {$name}.");
 
