@@ -38,6 +38,7 @@ beforeEach(function () {
         startDate: '2026-10-23',
         startTime: '10:00:00',
         repeats: RepeatPattern::Weekly,
+        organiserContact: 'organiser@example.test',
     ), $this->admin, EventOrigin::Manual);
 
     $this->change = fn (Event $event, EventStatus $to, ?User $actor = null): Event => app(ChangeEventStatus::class)($event, $to, $actor ?? $this->admin);

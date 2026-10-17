@@ -39,6 +39,7 @@ beforeEach(function () {
         'venueId' => Venue::factory()->create()->id,
         'startDate' => '2026-10-24',
         'startTime' => '18:00:00',
+        'organiserContact' => 'organiser@example.test',
     ], $overrides)), $this->admin, EventOrigin::Manual);
 
     $this->event = ($this->publish)();

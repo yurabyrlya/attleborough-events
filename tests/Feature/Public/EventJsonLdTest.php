@@ -43,6 +43,7 @@ beforeEach(function () {
         'startDate' => '2026-10-23',
         'startTime' => '19:30:00',
         'endTime' => '22:00:00',
+        'organiserContact' => 'organiser@example.test',
     ];
     $this->appUrl = rtrim((string) config('app.url'), '/');
 });

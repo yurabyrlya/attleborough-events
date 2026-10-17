@@ -37,6 +37,7 @@ beforeEach(function () {
         startDate: '2026-10-23',
         startTime: '10:00:00',
         repeats: RepeatPattern::Weekly,
+        organiserContact: 'organiser@example.test',
     ), $this->admin, EventOrigin::Manual);
 
     $this->on = fn (string $key): EventOccurrence => EventOccurrence::query()

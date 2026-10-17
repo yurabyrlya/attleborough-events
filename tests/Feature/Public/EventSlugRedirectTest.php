@@ -30,6 +30,7 @@ beforeEach(function () {
         'venueId' => Venue::factory()->create()->id,
         'startDate' => '2026-10-23',
         'startTime' => '19:30:00',
+        'organiserContact' => 'organiser@example.test',
     ];
     $this->appUrl = rtrim((string) config('app.url'), '/');
     $this->event = app(PublishEvent::class)(new PublishableEventData(...$this->base), $this->admin, EventOrigin::Manual);

@@ -44,6 +44,7 @@ beforeEach(function () {
         'start_date' => '2026-10-23',
         'start_time' => '10:00',
         'repeats' => 'weekly',
+        'organiser_contact' => 'organiser@example.test',
     ]), $this->admin, EventOrigin::Manual);
 
     $this->on = fn (string $key): ?EventOccurrence => EventOccurrence::query()
@@ -160,6 +161,7 @@ it('filters the events list by status so hidden and cancelled events can be foun
         'venue_id' => Venue::factory()->create()->id,
         'start_date' => '2026-11-14',
         'start_time' => '19:00',
+        'organiser_contact' => 'organiser@example.test',
     ]), $this->admin, EventOrigin::Manual);
 
     $published = $publish('Quiz Night');
