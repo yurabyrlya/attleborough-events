@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 02
 current_phase_name: Draft Model, Review Queue & Submissions
 status: executing
-stopped_at: Completed 02-05-PLAN.md
-last_updated: "2026-10-17T19:26:34.198Z"
+stopped_at: Completed 02-06-PLAN.md
+last_updated: "2026-10-17T19:34:13.980Z"
 last_activity: 2026-10-17
-last_activity_desc: "Completed 02-05 (public /submit form -> pending submission drafts, PRG thanks page, interim /privacy, venue reveal, footer links)"
-state_head: 2a0bd560aeed8b5a9d34916cc57328394d925c56
+last_activity_desc: Completed 02-06 (RejectDraft with optional D-11 reason + note, ReopenDraft, EventDraft MassPrunable 30/90-day retention, daily model:prune 03:40 London)
+state_head: 90d8b40f9c5309bf3f6654a3d1aac6209dbcb257
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 31
-  completed_plans: 18
+  completed_plans: 19
   percent: 20
 ---
 
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 02 (Draft Model, Review Queue & Submissions) — EXECUTING
-Plan: 5 of 16 complete (02-01 to 02-05 done; wave 2 complete; next: wave 3 with 02-06)
+Plan: 6 of 16 complete (02-01 to 02-06 done; wave 3 in progress with 02-07 to 02-10)
 Status: Ready to execute
-Last activity: 2026-10-17 — Completed 02-05 (public /submit form with London-today validation writes one pending_review submission draft via DraftWriter; PRG /submit/thanks with WOA- reference; interim /privacy; submit.js venue reveal on /submit only; footer links to Add your event and Privacy)
+Last activity: 2026-10-17 — Completed 02-06 (RejectReason enum with D-11 presets; RejectDraft / ReopenDraft admin-only locked transitions; EventDraft MassPrunable deletes rejected drafts after 30 days for spam, 90 otherwise; daily model:prune at 03:40 Europe/London; no email on any decision)
 
-Progress: 18/31 plans ([██░░░░░░░░] 20%); phase 2: 5/16; phases complete: 1/5
+Progress: 19/31 plans ([██░░░░░░░░] 20%); phase 2: 6/16; phases complete: 1/5
 
 ## Performance Metrics
 
@@ -74,6 +74,7 @@ Progress: 18/31 plans ([██░░░░░░░░] 20%); phase 2: 5/16; pha
 | Phase 02 P03 | 9min | 2 tasks | 14 files |
 | Phase 02 P04 | 6min | 2 tasks | 10 files |
 | Phase 02 P05 | 10min | 3 tasks | 14 files |
+| Phase 02 P06 | 8min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -103,6 +104,8 @@ Recent decisions affecting current work:
 - [Phase 02]: 02-05: Typed venue fields use exclude_unless:venue_choice,other so hidden, half-typed values with a known venue are never stored
 - [Phase 02]: 02-05: Submission 'today' bounds come from CarbonImmutable::now('Europe/London'); dates strict Y-m-d, times strict H:i, stored as typed wall-clock
 - [Phase 02]: 02-05: Public pages load per-page first-party JS from their own head stack (submit.js on /submit only); the layout loads only app.css
+- [Phase 02]: 02-06: Rejecting overwrites review_notes with the trimmed note (or null); Reopen keeps review_notes
+- [Phase 02]: 02-06: A rejection with no reason is retained as non-spam (90 days); prunable() only matches rejected rows with reviewed_at set
 
 ### Pending Todos
 
@@ -136,6 +139,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-17T19:26:33.860Z
-Stopped at: Completed 02-05-PLAN.md
+Last session: 2026-10-17T19:34:13.635Z
+Stopped at: Completed 02-06-PLAN.md
 Resume file: None
