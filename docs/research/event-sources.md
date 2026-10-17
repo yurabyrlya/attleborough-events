@@ -7,6 +7,18 @@
 - **URL discovery:** web search was not usable: DuckDuckGo is blocked by the local gateway (OpenDNS block page), and Bing and Mojeek disallow `/search` in robots.txt. URLs came from Wikipedia's Attleborough article (its external links and its Churches/Education sections), links on probed sites (Heritage Group "Useful Links", Eastern Baptist Association, Wymondham Town Council) and DNS checks of likely domain names. Two early discovery queries went to `https://en.wikipedia.org/w/api.php` and `https://www.wikidata.org/w/api.php` before we noticed that both hosts' robots.txt disallow `/w/` for `User-agent: *`; no further `/w/` requests were made.
 - **Requirements:** RES-01 (verified sources with fields), RES-02 (live ladder probes), RES-03 (fixtures). Decisions D-13 (agent first pass, then owner), D-14 (fixtures), D-16 (two lists).
 
+## Summary for Phase 3
+
+- **List 1 (Crawlable): 1 source.** P0: 1 (Attleborough Baptist Church), P1: 0, P2: 0. Fixtures: `tests/Fixtures/sources/attleborough-baptist-church/2026-10-17-ical.ics` and `2026-10-17-feed.xml` (64 events each, spanning the BST end on 25 Oct 2026).
+- **List 2 (Not crawlable, for owner review): 18 sources.** Bot wall 5, Facebook 1, JS-rendered 1, robots-disallowed 1, ToS-prohibited 3, ToS-unclear 7.
+- **Rungs needed first:** the **ICS** rung (EXT-01). The only cleared source is a plain ICS: UTC times, no VTIMEZONE, no RRULE, stable UIDs. The TEC (EXT-02) and JSON-LD (EXT-04) rungs have no cleared local source. TEC was verified live only on the vendor demo (see "TEC contract check"). JSON-LD `Event` exists on Visit Norfolk and Visit Wymondham, which are waiting on permission. Selector sources (Heritage Group) are also waiting on permission.
+- **Dated RSS (EXT-05):** **yes, one feed.** The Baptist Church RSS carries the event start in `<title>` (`YYYY-MM-DD HH:MM - Name`, local time) and in `<description>` (`Time: Sunday, 18 October 2026 at 10:30`). Its `pubDate` is the start in UTC, but EXT-05 must not use it. The same source's ICS is the better rung, so the RSS fixture mainly tests EXT-05 parsing.
+- **Open owner decisions on List 2:**
+  - Permission asks, which the owner is making: Heritage Group, Visit Norfolk, Visit Wymondham, Attleborough Academy, Attleborough Primary School, Summer Carnival, Players, Banham Zoo.
+  - Home-network check of the five bot walls: Town Council, Breckland, Norfolk County Council, Norfolk Museums, TicketSource.
+  - Local URLs the owner will add later (see "Owner URL hand-off — pending").
+- **Phase 3 risk:** List 1 has a P0 source, but only one. Until permissions come in, discovered events will be few and mostly church services. Manual entry and submissions carry the calendar.
+
 ## How a source is classified (D-16)
 
 The probe ladder per candidate: robots.txt → homepage/events page (platform fingerprint, server-rendered y/n, `<link rel="alternate">` feeds, Google Calendar embeds) → WordPress `/wp-json/` namespaces and The Events Calendar (TEC) REST `/wp-json/tribe/events/v1/events` and iCal `?ical=1` → feeds (do items carry an **event** date? `pubDate` never counts) → JSON-LD `Event` (including `@graph`) → terms/legal page.
