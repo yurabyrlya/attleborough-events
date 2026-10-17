@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\Category;
 use App\Models\Venue;
+use App\Publishing\Data\PublishableEventData;
 use App\Submissions\Honeypot;
 use App\Submissions\TurnstileVerifier;
 use Carbon\CarbonImmutable;
@@ -120,7 +121,7 @@ final class StoreSubmissionRequest extends FormRequest
             'all_day' => ['boolean'],
             'start_time' => ['exclude_if:all_day,true', 'required', 'date_format:H:i'],
             'end_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:start_date'],
-            'end_time' => ['exclude_if:all_day,true', 'nullable', 'date_format:H:i'],
+            'end_time' => ['exclude_if:all_day,true', 'nullable', 'date_format:H:i', $this->endTimeDiffersFromStart(...)],
             'repeats_text' => ['nullable', 'string', 'max:200'],
 
             'venue_choice' => ['required', 'string', $this->venueChoice(...)],
@@ -285,6 +286,28 @@ final class StoreSubmissionRequest extends FormRequest
         Log::info('submission refused', ['reason' => $reason]);
 
         $validator->errors()->add('form', $message);
+    }
+
+    /**
+     * Review CR-02: on the same day the end time must differ from the start
+     * time, or the event would be published as running for 24 hours (an end
+     * earlier than the start means overnight). Same rule and wording as the
+     * event form; DraftPublishability and PublishableEventData refuse it too.
+     */
+    private function endTimeDiffersFromStart(string $attribute, mixed $value, Closure $fail): void
+    {
+        $startTime = $this->input('start_time');
+
+        if (! is_string($value) || ! is_string($startTime)) {
+            return;
+        }
+
+        $endDate = $this->input('end_date');
+        $sameDay = $endDate === null || $endDate === $this->input('start_date');
+
+        if ($sameDay && PublishableEventData::sameClockTime($startTime, $value)) {
+            $fail('The end time must be different from the start time.');
+        }
     }
 
     /**

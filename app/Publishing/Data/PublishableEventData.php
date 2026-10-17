@@ -55,7 +55,8 @@ final readonly class PublishableEventData
         // non-blank title and description; real Y-m-d start, end and last
         // dates (round-trip checked, so 2026-02-30 fails); HH:MM[:SS] times;
         // a start time unless all-day; end date and last date not before the
-        // start date; a source URL, an organiser contact or a website. Then the
+        // start date; a same-day end time different from the start time; a
+        // source URL, an organiser contact or a website. Then the
         // recurrence must be single-day and fit the start date.
         $this->assertValid();
 
@@ -109,6 +110,15 @@ final readonly class PublishableEventData
             throw new InvalidArgumentException('The end date cannot be before the start date.');
         }
 
+        // Review CR-02: EventTiming reads end <= start as overnight, so a
+        // same-day end equal to the start would publish as a 24-hour event.
+        // (A timed event has a start time: checked above.)
+        if (! $this->allDay && $this->endTime !== null
+            && ($this->endDate === null || $this->endDate === $this->startDate)
+            && self::sameClockTime($this->startTime, $this->endTime)) {
+            throw new InvalidArgumentException('The end time must be different from the start time.');
+        }
+
         if ($this->isRecurring() && $this->repeatEnds === RepeatEnds::OnDate
             && $this->repeatUntil !== null && $this->repeatUntil < $this->startDate) {
             throw new InvalidArgumentException('The last date cannot be before the start date.');
@@ -119,6 +129,15 @@ final readonly class PublishableEventData
             && self::nullableString($this->organiserWebsite) === null) {
             throw new InvalidArgumentException('Add a source URL, an organiser contact or a website.');
         }
+    }
+
+    /**
+     * Whether two wall-clock times are the same hour and minute (HH:MM and
+     * HH:MM:SS compare equal; seconds are never entered).
+     */
+    public static function sameClockTime(string $first, string $second): bool
+    {
+        return substr(trim($first), 0, 5) === substr(trim($second), 0, 5);
     }
 
     /**

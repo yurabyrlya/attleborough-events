@@ -109,6 +109,17 @@ it('skips a draft whose organiser says it repeats but has no rule', function () 
         ->and(Event::count())->toBe(0);
 });
 
+it('skips a draft whose same-day end time equals its start time', function () {
+    $draft = EventDraft::factory()->create(['start_time' => '19:00:00', 'end_time' => '19:00:00']);
+
+    livewire(ListEventDrafts::class)
+        ->callTableBulkAction('approveSelected', [$draft]);
+
+    expect(bulkNotificationLines())->toContain('1 skipped: end time same as start time')
+        ->and($draft->refresh()->review_status)->toBe(ReviewStatus::PendingReview)
+        ->and(Event::count())->toBe(0);
+});
+
 it('reports a draft approved elsewhere first as already reviewed and approves the rest', function () {
     $raced = EventDraft::factory()->create(['title' => 'Raced Draft']);
     $others = EventDraft::factory()->count(2)->create();

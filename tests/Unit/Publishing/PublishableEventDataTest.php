@@ -47,6 +47,12 @@ it('accepts a source URL without an organiser contact', function () {
     expect($data->sourceUrl)->toBe('https://example.test/poster');
 });
 
+it('accepts an end time equal to the start time when the event ends on a later day', function () {
+    $data = validEventData(['endDate' => '2026-10-24', 'endTime' => '19:30']);
+
+    expect($data->endTime)->toBe('19:30');
+});
+
 it('accepts an ends-on-a-date series whose last date is after the start date', function () {
     $data = validEventData([
         'repeats' => RepeatPattern::Weekly,
@@ -70,6 +76,8 @@ it('rejects input the publish form would refuse, naming the problem', function (
     'end date before start date' => [['startDate' => '2026-11-05', 'endDate' => '2026-11-01'], 'end date'],
     'start time out of range' => [['startTime' => '25:00'], 'start time'],
     'malformed end time' => [['endTime' => '7pm'], 'end time'],
+    'same-day end time equal to the start time' => [['startTime' => '19:30', 'endTime' => '19:30:00'], 'end time must be different'],
+    'end time equal to the start time, end date on the start date' => [['startTime' => '19:30', 'endDate' => '2026-10-23', 'endTime' => '19:30'], 'end time must be different'],
     'timed event without a start time' => [['allDay' => false, 'startTime' => null], 'start time'],
     'impossible last date' => [[
         'repeats' => RepeatPattern::Weekly,

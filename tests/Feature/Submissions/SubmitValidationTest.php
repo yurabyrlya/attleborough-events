@@ -120,6 +120,8 @@ dataset('boundaries', [
     'start date 12 months and a day ahead' => [['start_date' => '2027-10-21'], false],
     'end date before the start' => [['start_date' => '2026-11-14', 'end_date' => '2026-11-13'], false],
     'end date on the start' => [['start_date' => '2026-11-14', 'end_date' => '2026-11-14'], true],
+    'end time equal to the start time on a later end date' => [['start_date' => '2026-11-14', 'end_date' => '2026-11-15', 'start_time' => '19:00', 'end_time' => '19:00'], true],
+    'end time earlier than the start time (overnight)' => [['start_time' => '19:00', 'end_time' => '01:00'], true],
     'repeats text of 200 characters' => [['repeats_text' => str_repeat('c', 200)], true],
     'repeats text of 201 characters' => [['repeats_text' => str_repeat('c', 201)], false],
     'price text of 60 characters' => [['price_text' => str_repeat('d', 60)], true],
@@ -137,6 +139,17 @@ it('accepts or refuses values at the limits', function (array $overrides, bool $
         expect(EventDraft::count())->toBe(0);
     }
 })->with('boundaries');
+
+it('refuses a same-day end time equal to the start time with the event form wording', function (array $overrides) {
+    submitForm(['start_date' => '2026-11-14', 'start_time' => '19:00', 'end_time' => '19:00', ...$overrides])
+        ->assertRedirect('/submit')
+        ->assertSessionHasErrors(['end_time' => 'The end time must be different from the start time.']);
+
+    expect(EventDraft::count())->toBe(0);
+})->with([
+    'no end date' => [['end_date' => '']],
+    'end date on the start date' => [['end_date' => '2026-11-14']],
+]);
 
 it('stores a 120-character accented title in full', function () {
     submitForm(['title' => str_repeat('é', 120)])->assertSessionHasNoErrors();

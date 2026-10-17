@@ -29,6 +29,7 @@ final class DraftPublishability
         'low_quality' => 'Low quality',
         'unresolved_venue' => 'no confirmed venue',
         'repeats_unset' => 'repeat rule not set',
+        'end_time_same_as_start' => 'end time same as start time',
         'blocked' => 'not ready to publish',
         'already_reviewed' => 'already reviewed',
         'not_pending' => 'already reviewed',
@@ -38,7 +39,7 @@ final class DraftPublishability
      * Blockers that bulk approve reports under a specific key, so they never
      * also count as "blocked".
      */
-    private const SPECIFIC_BULK_BLOCKERS = ['no_venue', 'repeats_unacknowledged'];
+    private const SPECIFIC_BULK_BLOCKERS = ['no_venue', 'repeats_unacknowledged', 'end_time_same_as_start'];
 
     /**
      * What stops a single approve, in a fixed order; empty when the draft can
@@ -54,8 +55,9 @@ final class DraftPublishability
     /**
      * Why bulk approve skips this draft, every applicable key in the order
      * parse_errors, duplicate, low_quality, unresolved_venue, repeats_unset,
-     * blocked; empty when bulk approve may take it. Bulk approve reports the
-     * first key, so each skipped draft is counted once.
+     * end_time_same_as_start, blocked; empty when bulk approve may take it.
+     * Bulk approve reports the first key, so each skipped draft is counted
+     * once.
      *
      * Stricter than blockers(): bulk needs a High or Medium score (unscored
      * counts as Low), a confirmed venue even when an exact match is suggested
@@ -86,6 +88,10 @@ final class DraftPublishability
 
         if (self::filled($draft->repeats_text) && $draft->recurrence_rule === null) {
             $keys[] = 'repeats_unset';
+        }
+
+        if (self::endTimeIsStartTime($draft)) {
+            $keys[] = 'end_time_same_as_start';
         }
 
         $otherBlockers = array_diff(array_keys($this->blockerMessages($draft)), self::SPECIFIC_BULK_BLOCKERS);
@@ -151,6 +157,10 @@ final class DraftPublishability
             $blockers['no_start_time'] = 'Add a start time.';
         }
 
+        if (self::endTimeIsStartTime($draft)) {
+            $blockers['end_time_same_as_start'] = 'The end time must be different from the start time.';
+        }
+
         if (! self::filled($draft->source_url) && ! self::filled($draft->organiser_contact) && ! self::filled($draft->organiser_website)) {
             $blockers['no_contact'] = 'Add a source URL, an organiser contact or a website.';
         }
@@ -173,5 +183,21 @@ final class DraftPublishability
     private static function filled(?string $value): bool
     {
         return $value !== null && trim($value) !== '';
+    }
+
+    /**
+     * Review CR-02: a same-day end time equal to the start time. EventTiming
+     * reads end <= start as overnight, so it would publish as a 24-hour
+     * event. Mirrors the event form's rule and PublishableEventData.
+     */
+    private static function endTimeIsStartTime(EventDraft $draft): bool
+    {
+        if ($draft->all_day || $draft->start_date === null || ! self::filled($draft->start_time) || ! self::filled($draft->end_time)) {
+            return false;
+        }
+
+        $sameDay = $draft->end_date === null || $draft->end_date->isSameDay($draft->start_date);
+
+        return $sameDay && PublishableEventData::sameClockTime((string) $draft->start_time, (string) $draft->end_time);
     }
 }
