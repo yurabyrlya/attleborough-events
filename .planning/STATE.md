@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 03
 current_phase_name: Ingestion Backbone, ICS & Change/Duplicate Handling
 status: executing
-stopped_at: Completed 03-06-PLAN.md
-last_updated: "2026-10-18T09:40:22.205Z"
+stopped_at: Completed 03-08-PLAN.md
+last_updated: "2026-10-18T09:55:40.045Z"
 last_activity: 2026-10-18
 last_activity_desc: Phase 2 complete, transitioned to Phase 3
-state_head: c377dddd0db602bdbe3b06fee56e107c3bbc231a
+state_head: aef040ff4200eed6bf243c7187ab6ab2bb09c9e8
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 48
-  completed_plans: 35
+  completed_plans: 36
   percent: 40
 ---
 
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 03 (Ingestion Backbone, ICS & Change/Duplicate Handling) — EXECUTING
-Plan: 7 of 17
+Plan: 8 of 17
 Status: Ready to execute
-Last activity: 2026-10-18 — Completed 03-04 (ICS extractor, hashes, window classifier)
+Last activity: 2026-10-18 — Completed 03-08 (source links, accepted baseline, ICS exclusions)
 
-Progress: [█████████████░░░░░░░] 32/48 planned plans ([████░░░░░░] 40%); phases complete: 2/5
+Progress: [███████████████░░░░░] 36/48 planned plans ([████░░░░░░] 40%); phases complete: 2/5
 
 ## Performance Metrics
 
@@ -92,6 +92,7 @@ Progress: [█████████████░░░░░░░] 32/48 p
 | Phase 03 P04 | 13min | 2 tasks | 15 files |
 | Phase 03 P05 | 15min | 3 tasks | 15 files |
 | Phase 03 P06 | 8min | 2 tasks | 9 files |
+| Phase 03 P08 | 13min | 3 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -174,6 +175,10 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-06: next_check_at advances only after the run insert succeeds or is refused as already active; other errors leave the source due for the next 10-minute pass
 - [Phase 03]: 03-06: nextCheckAt = London date + 1/7 days at check_time + (id*7) mod 20 min, stored UTC
 - [Phase 03]: 03-06: run logs older than a year are pruned except each source's latest; raw_path cleared only when the body file is really gone
+- [Phase 03]: 03-08: event_sources written only by LinkEventSource; first link primary, an is_organiser_source link takes primary from a non-organiser primary, else also-listed (D-12/D-25)
+- [Phase 03]: 03-08: PublishableEventData::excludedDates nullable — null (fromForm) leaves stored EXDATEs untouched (C2)
+- [Phase 03]: 03-08: sourced approval cancels raw_payload cancelled_keys occurrences inside the horizon via ChangeOccurrenceStatus; beyond-horizon gap deferred
+- [Phase 03]: 03-08: ReopenDraft refuses non-new drafts and items with another pending draft (DraftNotReopenable)
 
 ### Pending Todos
 
@@ -208,6 +213,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-18T09:40:21.430Z
-Stopped at: Completed 03-06-PLAN.md
+Last session: 2026-10-18T09:55:39.250Z
+Stopped at: Completed 03-08-PLAN.md
 Resume file: None
