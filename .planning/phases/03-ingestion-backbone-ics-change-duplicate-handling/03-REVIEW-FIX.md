@@ -1,10 +1,10 @@
 ---
 phase: 03
-fixed_at: 2026-10-18T15:10:00+01:00
+fixed_at: 2026-10-18T15:55:00+01:00
 review_path: .planning/phases/03-ingestion-backbone-ics-change-duplicate-handling/03-REVIEW.md
 iteration: 2
-findings_in_scope: 10
-fixed: 10
+findings_in_scope: 11
+fixed: 11
 skipped: 0
 status: all_fixed
 ---
@@ -18,7 +18,8 @@ status: all_fixed
 **Summary:**
 - Pass 1 (critical): 4 findings in scope (CR-01, CR-02, CR-03, security T-03-11), 4 fixed. Details below.
 - Pass 2 (warnings, iteration 2): 6 findings in scope (WR-01, WR-02, WR-03, WR-05, WR-07, WR-08), 6 fixed. See "Warnings" below. WR-04 (Retry-After) and WR-06 (source_items retention) are deferred by the owner and were not touched; IN-01…IN-03 were out of scope.
-- Total: 10 in scope, 10 fixed, 0 skipped.
+- Verification follow-up: VER-01 from 03-VERIFICATION.md (human-verification item 2), fixed. See "Verification follow-up" below.
+- Total: 11 in scope, 11 fixed, 0 skipped.
 
 **Where verification ran (pass 1):** in the main checkout on `main`. No worktree was used because the orchestrator asked for sequential commits on main. The numbers can be reproduced from this tree.
 - Targeted tests for each fix, then `./vendor/bin/pest --testsuite=Unit,Feature`: **1674 passed** (10455 assertions)
@@ -173,8 +174,42 @@ status: all_fixed
 - A very large feed can now end a run as "Timed out" with partial counts instead of being killed by the worker. Job timeout is 300 s and the database queue's retry_after default is 330 s (WR-07). **Phase 5:** the worker's `--timeout` should be ≥ 300, systemd `TimeoutStopSec` should be ≥ 300 (e.g. 330), and any `DB_QUEUE_RETRY_AFTER` set in production must be > 300. The current 05-01 plan says `--timeout=60` and `TimeoutStopSec=90`.
 - Review actions no longer show a 500 for documented refusals or deadlocks. Bulk approve and Approve all like this report them as skips (WR-08).
 
+## Verification follow-up
+
+Source: 03-VERIFICATION.md, human-verification item 2 (PIPE-09 / D-15 / D-17). 1 finding in scope, 1 fixed.
+
+**Where verification ran:** in the main checkout on `main` (no worktree), so the numbers can be reproduced from this tree.
+- Targeted: `DiscoveredDescriptionTest`, `ApproveDraftTest`, `ExcerptBuilderTest`, `BulkReviewTest`, `ApproveAllLikeThisTest`: 148 passed. Against the pre-fix app code (`git stash` of the four changed app files), 11 of the 17 new edit/approve tests failed, as they should. The 6 that passed are the control cases (emoji length, harmless numbers, manual and submission drafts).
+- `./vendor/bin/pest --testsuite=Unit,Feature`: **1740 passed** (10752 assertions)
+- `npm run build`, then `./vendor/bin/pest --testsuite=Browser`: **40 passed** (599 assertions)
+- `./vendor/bin/phpstan analyse --memory-limit=1G`: 0 errors
+- `vendor/bin/pint --dirty --format agent`: passed
+- No migration was needed.
+
+### VER-01: The admin could edit a discovered draft's excerpt past 200 characters or add a phone number, and a single approve published it
+
+**Files modified:** `app/Review/DiscoveredDescription.php` (new), `app/Ingestion/Pipeline/ExcerptBuilder.php`, `app/Review/DraftPublishability.php`, `app/Filament/Resources/Events/Schemas/EventForm.php`, `app/Filament/Resources/EventDrafts/Schemas/EventDraftForm.php`, `database/factories/EventDraftFactory.php`, `docs/uat/browser-uat.md`, `tests/Feature/Filament/DiscoveredDescriptionTest.php` (new), `tests/Feature/Review/ApproveDraftTest.php`, `tests/Unit/Ingestion/ExcerptBuilderTest.php`, `tests/Feature/Filament/BulkReviewTest.php`, `tests/Feature/Filament/ApproveAllLikeThisTest.php`
+**Commit:** bcb71e2
+**Applied fix:** This only applies to discovered drafts (`origin = discovered`). Manual entries and public submissions keep their 5000-character limit and their contact rules.
+- **One rule, `DiscoveredDescription`.** A description can be at most 200 characters (`ExcerptBuilder::LIMIT`) and must not contain a phone number or email. Characters are counted as graphemes, the same way `ExcerptBuilder`/`TextLimit` cut the excerpt. Counting with `mb_strlen` or the browser's `maxlength` would have refused an untouched excerpt that contains emoji. That is also why there is no HTML `maxlength` attribute: the limit is checked on save, and helper text tells the admin about it.
+- **Edit page.** `EventForm::whatSection()` now takes an optional configurator for the description Textarea. `EventDraftForm` uses it to add, for discovered drafts only, the helper text "Up to 200 characters. Phone numbers and emails are not allowed on discovered events." and a validation rule. The rule's messages are "Discovered events can show up to 200 characters. Shorten the description (it has N)." and "Remove the phone number or email from the description. Discovered events never show contacts from feeds." Save and Save & approve both validate first, so neither saves or publishes anything that breaks the rule.
+- **Single approval.** `DraftPublishability::blockers()` adds "Shorten the description to 200 characters." and/or "Remove the phone number or email from the description." These show under "Before you can publish" and disable Approve. `ApproveDraft` re-checks them under lock and throws `DraftNotPublishable`, so Save & approve, the A key and the review page all refuse in the same way.
+- **Bulk stays consistent.** A contact found by the strict rule is always also `contact_like`, because `mayContainContact()` now includes `containsContact()`. A description that is too long gets its own skip key `description_too_long` ("description longer than 200 characters"). Both new blockers are in `SPECIFIC_BULK_BLOCKERS`, so they are never also counted as "not ready to publish". Bulk approve and Approve all like this work as before for every existing case.
+- **Which contact detector.** Single approval and the edit page use the new **strict** `ExcerptBuilder::containsContact()`. It is built from the same patterns `make()` strips: an email, a UK number (10-12 digits after a leading 0 or +44), or a 6-8 digit local number after a phone word. Text like "Seasons 2026-2027", "Open 0930-1630" or "£5.00" is never refused. The **loose** CR-01 backstop (any `@`, a 6+ digit run, or two 3+ digit groups) would refuse "Seasons 2026-2027" even after a human had read it, so it is still used only to skip drafts in bulk. One result of this: a bare number with no phone word ("Box office 452300") is still skipped in bulk but can be approved on its own after review. This is the same trade-off CR-01 made.
+- **Factory.** A discovered factory draft now gets `fake()->sentence()` instead of `paragraph()`. About 15% of paragraphs are longer than 200 characters, which would have made existing tests for discovered drafts flaky. Manual and submission drafts are unchanged.
+- **UAT.** F20 step 4 adds the manual check.
+**Tests:**
+- Edit page: help shown only on discovered drafts. 201 characters refused with nothing saved, 200 saved. 200 emoji with skin tones (400 code points) saved and approvable. UK number, bracketed area code, "Ring us on 452 300" and an email each refused. Harmless numbers saved and published through Save & approve. Save & approve with 201 characters refused with nothing published. Manual and submission drafts with 200+ characters and a phone number and email save and publish.
+- Review page and `ApproveDraft`: each blocker is listed under "Before you can publish", Approve is disabled, and `ApproveDraft` throws with exactly that blocker. Both blockers appear in order. Manual and submission drafts are not blocked.
+- `ApproveDraftTest`: the CR-01 dataset now expects the contact blocker for the bracketed and email cases and none for "Box office 452300" and "Seasons 2026-2027". New tests cover the `description_too_long` key and its skip message.
+- `ExcerptBuilderTest`: a `containsContact` dataset (with the loose rule always flagging what the strict rule finds), and checks that no excerpt `make()` produces is ever refused by `containsContact`.
+- Bulk approve and Approve all like this: a 201-character discovered draft is skipped as "description longer than 200 characters" and the rest are approved. The existing CR-01 skip tests are unchanged and pass.
+**Status:** fixed: requires human verification (choice of contact detector for single approval)
+
+**Behaviour change the owner should know about:** a single Approve or Save & approve of a discovered draft is now refused when its description is over 200 characters or contains an email, a UK phone number, or a local number after a phone word. Before this, only bulk approval checked for these.
+
 ---
 
 _Fixed: 2026-10-18_
 _Fixer: the agent (gsd-code-fixer)_
-_Iteration: 2 (pass 1 critical, pass 2 warnings)_
+_Iteration: 2 (pass 1 critical, pass 2 warnings), plus verification follow-up VER-01_
