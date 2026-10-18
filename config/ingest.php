@@ -27,9 +27,17 @@ return [
     'connect_timeout' => 10,
     'timeout' => 30,
 
-    // Overall budget for one fetch (every hop and inline host wait), below
-    // FetchSourceJob's 75-second job timeout.
+    // Overall budget for one fetch (every hop and inline host wait), part of
+    // run_deadline.
     'fetch_deadline' => 55,
+
+    // Overall budget for one live run, counted from when the job claims it:
+    // the fetch, extraction and recording every item (WR-07). Items not
+    // reached in time are left for the next check, and the run fails as
+    // timeout. Stays below FetchSourceJob's 300-second job timeout, which
+    // leaves time to finish the run (health, missing detection); the
+    // database queue's retry_after (330) must stay above that timeout.
+    'run_deadline' => 240,
 
     // Largest decoded body accepted, in bytes (SRC-06): 5 MiB.
     'max_bytes' => 5 * 1024 * 1024,

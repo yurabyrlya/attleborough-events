@@ -27,8 +27,11 @@ use Throwable;
  * and maxExceptions = 1 fails the job on its first real exception (RESEARCH
  * F8, Pitfall 10). Any other Throwable marks the run failed/abandoned,
  * records it with SourceHealthTracker (a live run counts as a failure,
- * SRC-08) and is rethrown. timeout 75 s stays below the database queue's
- * retry_after (90).
+ * SRC-08) and is rethrown. timeout 300 s covers ingest.run_deadline (240 s:
+ * fetch, extraction and item recording) plus finishing the run (WR-07), and
+ * stays below the database queue's retry_after (330). This property
+ * overrides the worker's --timeout; the production worker's systemd
+ * TimeoutStopSec must still let a job this long finish on a restart.
  *
  * Properties, not attributes, like QueueHeartbeat (conflict C8). Unique per
  * source; the source_runs_one_active index is the real guarantee (SRC-04).
@@ -39,7 +42,7 @@ class FetchSourceJob implements ShouldBeUnique, ShouldQueue
 
     public int $uniqueFor = 900;
 
-    public int $timeout = 75;
+    public int $timeout = 300;
 
     public int $maxExceptions = 1;
 

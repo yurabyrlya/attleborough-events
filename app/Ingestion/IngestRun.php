@@ -35,6 +35,10 @@ use Throwable;
  * with RawBodyStore for inspection. HostBusy is the one exception that
  * escapes: FetchSourceJob releases itself on it.
  *
+ * A live run stops recording items once ingest.run_deadline (counted from
+ * when the job claimed it) has passed, and fails as timeout with the
+ * counters it reached (WR-07), well inside FetchSourceJob's timeout.
+ *
  * Each item is recorded in its own transaction; an item that throws counts
  * as skipped_parse_error and is logged by ids only, so one bad item never
  * fails the run. Such a run stores no ETag/Last-Modified (WR-01), so the
@@ -173,8 +177,16 @@ final class IngestRun
         $counters = array_fill_keys(SourceRun::COUNTERS, 0);
         $observedUntil = null;
         $itemFailures = 0;
+        $deadline = ($run->started_at ?? CarbonImmutable::now())->addSeconds((int) config('ingest.run_deadline', 240));
+        $total = count($extraction->items);
 
         foreach ($extraction->items as $index => $item) {
+            if (! CarbonImmutable::now()->lessThan($deadline)) {
+                $this->timedOut($run, $source, $counters, $observedUntil, $nowLondon, $total);
+
+                return;
+            }
+
             $counters['items_found']++;
             $observedUntil = $this->laterDate($observedUntil, $item);
 
@@ -209,6 +221,30 @@ final class IngestRun
         // run get a 304 and never see that item again until the feed
         // changes, so drop them: the next run fetches the whole body.
         $this->finish($run, $source, RunStatus::Succeeded, null, null, $result, keepValidators: $itemFailures === 0);
+    }
+
+    /**
+     * WR-07: the run used up ingest.run_deadline before every item was
+     * recorded. Items already recorded stay (one transaction each); the
+     * run fails as timeout with the counters of the items it reached, so
+     * it keeps no validators and missing detection does not run. The next
+     * check starts again from the top, and items already recorded are
+     * quick to see as unchanged, so it gets further.
+     *
+     * @param  array<string, int>  $counters
+     */
+    private function timedOut(SourceRun $run, Source $source, array $counters, ?string $observedUntil, CarbonImmutable $nowLondon, int $total): void
+    {
+        $run->forceFill([
+            ...$counters,
+            'observed_from' => $nowLondon->toDateString(),
+            'observed_until' => $observedUntil,
+        ]);
+
+        $message = FetchFailureKind::Timeout->getLabel().": recorded {$counters['items_found']} of {$total} items before the time limit. "
+            .'Items already recorded are quick to check again, so the next check gets further.';
+
+        $this->finish($run, $source, RunStatus::Failed, FetchFailureKind::Timeout, $message);
     }
 
     /**

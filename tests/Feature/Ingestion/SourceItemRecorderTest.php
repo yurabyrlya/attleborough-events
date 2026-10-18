@@ -245,7 +245,12 @@ it('keeps the job settings that stop polite waits counting as failures', functio
     $job = new FetchSourceJob(1);
 
     expect($job->uniqueFor)->toBe(900)
-        ->and($job->timeout)->toBe(75)
+        ->and($job->timeout)->toBe(300)
+        // WR-07: the run budget fits inside the job timeout with time to
+        // finish, and the queue never hands a running fetch to a second worker.
+        ->and(config('ingest.fetch_deadline'))->toBeLessThan(config('ingest.run_deadline'))
+        ->and(config('ingest.run_deadline') + 30)->toBeLessThanOrEqual($job->timeout)
+        ->and(config('queue.connections.database.retry_after'))->toBeGreaterThan($job->timeout)
         ->and($job->maxExceptions)->toBe(1)
         ->and($job->connection)->toBe('database')
         ->and($job->queue)->toBe('default')
