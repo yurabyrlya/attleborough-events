@@ -136,7 +136,9 @@ class SourceForm
                             ->helperText('ICS feeds need no adapter.'),
                         Select::make('parser_config.identity')
                             ->label('Item identity')
-                            ->options(IdentityStrategy::class)
+                            // Plain string options: parser_config is json, so its
+                            // state stays a string rather than an enum cast.
+                            ->options(collect(IdentityStrategy::cases())->mapWithKeys(fn (IdentityStrategy $strategy): array => [$strategy->value => $strategy->getLabel()])->all())
                             ->default(IdentityStrategy::Uid->value)
                             ->selectablePlaceholder(false)
                             ->required()

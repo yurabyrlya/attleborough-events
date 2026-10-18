@@ -1,17 +1,26 @@
 <?php
 
+use App\Enums\ExtractionMethod;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
 use App\Enums\RunTrigger;
 use App\Enums\SourceHealth;
+use App\Filament\Resources\Sources\Pages\CreateSource;
 use App\Filament\Resources\Sources\Pages\EditSource;
 use App\Filament\Resources\Sources\Pages\ListSources;
 use App\Filament\Resources\Sources\RelationManagers\RunsRelationManager;
+use App\Filament\Resources\Sources\Schemas\SourceForm;
 use App\Filament\Resources\Sources\SourceResource;
+use App\Ingestion\RunLauncher;
+use App\Models\EventDraft;
 use App\Models\Source;
 use App\Models\SourceRun;
+use App\Models\Venue;
 use Carbon\CarbonImmutable;
+use Database\Seeders\CategorySeeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Sleep;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Livewire\livewire;
@@ -163,4 +172,197 @@ describe('sources table and run log (SRC-07, SRC-08)', function () {
         'ten seconds, daily' => [10, 'daily', false],
         'two hours exactly, weekly' => [7200, 'weekly', false],
     ]);
+});
+
+describe('source form (SRC-01)', function () {
+    beforeEach(function () {
+        $this->valid = [
+            'name' => 'Town Council',
+            'url' => 'https://www.attleboroughtowncouncil.gov.uk/events/?ical=1',
+        ];
+    });
+
+    it('requires a name and a feed URL and saves nothing without them', function () {
+        livewire(CreateSource::class)
+            ->fillForm(['name' => '', 'url' => ''])
+            ->call('create')
+            ->assertHasFormErrors(['name' => 'required', 'url' => 'required']);
+
+        expect(Source::query()->count())->toBe(0);
+    });
+
+    it('saves with no title rules, no events page URL and no short name', function () {
+        livewire(CreateSource::class)
+            ->fillForm([...$this->valid, 'name' => 'Attleborough Town Council and Community Hall Bookings', 'events_page_url' => '', 'title_rules' => []])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $source = Source::query()->sole();
+
+        expect($source->title_rules)->toBe([])
+            ->and($source->events_page_url)->toBeNull()
+            ->and($source->short_name)->toBe('Attleborough Town Council and Community')
+            ->and(mb_strlen($source->short_name))->toBeLessThanOrEqual(40)
+            ->and($source->extraction_method)->toBe(ExtractionMethod::Ics)
+            ->and($source->default_timezone)->toBe('Europe/London')
+            ->and($source->check_frequency)->toBe('daily')
+            ->and($source->check_time)->toBe('05:30:00');
+    });
+
+    it('refuses feed and events page URLs the fetcher would refuse', function (string $url) {
+        livewire(CreateSource::class)
+            ->fillForm([...$this->valid, 'url' => $url, 'events_page_url' => $url])
+            ->call('create')
+            ->assertHasFormErrors(['url', 'events_page_url'])
+            ->assertSee(SourceForm::URL_REFUSED);
+
+        expect(Source::query()->count())->toBe(0);
+    })->with([
+        'ftp' => 'ftp://x',
+        'user and password' => 'https://user:secret@x/',
+        'non-standard port' => 'https://x:8080/',
+        'no scheme' => 'www.example.org/calendar.ics',
+    ]);
+
+    it('counts the 120-character name limit in characters, not bytes', function () {
+        $name = str_repeat('É', 119).'a';
+
+        livewire(CreateSource::class)
+            ->fillForm([...$this->valid, 'name' => $name])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        expect(Source::query()->sole()->name)->toBe($name);
+
+        livewire(CreateSource::class)
+            ->fillForm([...$this->valid, 'name' => $name.'b'])
+            ->call('create')
+            ->assertHasFormErrors(['name' => 'max']);
+
+        livewire(CreateSource::class)
+            ->fillForm([...$this->valid, 'short_name' => str_repeat('ü', 41)])
+            ->call('create')
+            ->assertHasFormErrors(['short_name' => 'max']);
+
+        expect(Source::query()->count())->toBe(1);
+    });
+
+    it('makes the slug from the name with a numeric suffix, and keeps it on rename', function () {
+        foreach ([1, 2, 3] as $attempt) {
+            livewire(CreateSource::class)->fillForm($this->valid)->call('create')->assertHasNoFormErrors();
+        }
+
+        expect(Source::query()->orderBy('id')->pluck('slug')->all())->toBe(['town-council', 'town-council-2', 'town-council-3']);
+
+        $first = Source::query()->orderBy('id')->firstOrFail();
+
+        livewire(EditSource::class, ['record' => $first->getRouteKey()])
+            ->fillForm(['name' => 'Attleborough Town Council'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        expect($first->refresh()->slug)->toBe('town-council')
+            ->and($first->name)->toBe('Attleborough Town Council');
+    });
+
+    it('reports a slug taken by a parallel save as a validation error', function () {
+        // Another save takes the slug between the free-slug check and the insert.
+        Source::creating(function (Source $source): void {
+            DB::table('sources')->insert([
+                'name' => 'Town Council', 'slug' => $source->slug, 'short_name' => 'Town Council',
+                'url' => 'https://example.org/a.ics', 'extraction_method' => 'ics',
+            ]);
+        });
+
+        livewire(CreateSource::class)
+            ->fillForm($this->valid)
+            ->call('create')
+            ->assertHasErrors(['data.name'])
+            ->assertSee(CreateSource::SLUG_TAKEN);
+    });
+
+    it('round-trips title rules and the item identity', function () {
+        livewire(CreateSource::class)
+            ->fillForm([
+                ...$this->valid,
+                'parser_config.identity' => 'tec_post_id',
+                'title_rules' => [
+                    ['mode' => 'skip', 'keyword' => '  Private hire '],
+                    ['mode' => 'keep', 'keyword' => 'yoga'],
+                ],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $source = Source::query()->sole();
+        $rules = [['mode' => 'skip', 'keyword' => 'Private hire'], ['mode' => 'keep', 'keyword' => 'yoga']];
+
+        expect($source->title_rules)->toBe($rules)
+            ->and($source->parser_config)->toBe(['identity' => 'tec_post_id']);
+
+        // parser_config keys the form does not edit survive a save.
+        $source->forceFill(['parser_config' => ['identity' => 'tec_post_id', 'future_key' => 'kept']])->save();
+
+        livewire(EditSource::class, ['record' => $source->getRouteKey()])
+            ->assertFormSet(['parser_config.identity' => 'tec_post_id'])
+            ->fillForm(['parser_config.identity' => 'summary_start'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        expect($source->refresh()->title_rules)->toBe($rules)
+            ->and($source->parser_config)->toBe(['identity' => 'summary_start', 'future_key' => 'kept']);
+    });
+
+    it('refuses a title rule without a keyword', function () {
+        livewire(CreateSource::class)
+            ->fillForm([...$this->valid, 'title_rules' => [['mode' => 'skip', 'keyword' => '']]])
+            ->call('create')
+            ->assertHasFormErrors(['title_rules.0.keyword' => 'required']);
+    });
+
+    it('always saves a new source inactive', function () {
+        livewire(CreateSource::class)
+            ->fillForm([...$this->valid, 'is_active' => true, 'health' => 'unhealthy'])
+            ->set('data.is_active', true)
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $source = Source::query()->sole();
+
+        expect($source->is_active)->toBeFalse()
+            ->and($source->health)->toBe(SourceHealth::Healthy);
+    });
+
+    it('leaves a queued run untouched when the source is edited; the run uses the saved settings', function () {
+        Sleep::fake(syncWithCarbon: true);
+        Storage::fake('local');
+        $this->seed(CategorySeeder::class);
+        ingestFeed(implode("\r\n", [
+            'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Test//EN',
+            'BEGIN:VEVENT', 'UID:coffee-1@test.invalid', 'DTSTAMP:20261017T050000Z', 'SUMMARY:Coffee Morning',
+            'DTSTART;TZID=Europe/London:20261024T100000', 'DTEND;TZID=Europe/London:20261024T120000', 'END:VEVENT',
+            'END:VCALENDAR', '',
+        ]));
+
+        $before = Venue::factory()->create(['name' => 'Church Hall']);
+        $after = Venue::factory()->create(['name' => 'Town Hall']);
+        $source = Source::factory()->ics()->active()->create(['default_venue_id' => $before->id]);
+
+        $run = app(RunLauncher::class)->runNow($source);
+        $snapshot = $run->refresh()->getAttributes();
+
+        livewire(EditSource::class, ['record' => $source->getRouteKey()])
+            ->fillForm(['default_venue_id' => $after->id])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        expect($run->refresh()->getAttributes())->toBe($snapshot)
+            ->and($source->refresh()->default_venue_id)->toBe($after->id)
+            ->and($source->is_active)->toBeTrue();
+
+        test()->artisan('queue:work', ['connection' => 'database', '--queue' => 'default', '--once' => true])->assertExitCode(0);
+
+        expect($run->refresh()->status)->toBe(RunStatus::Succeeded)
+            ->and(EventDraft::query()->sole()->venue_id)->toBe($after->id);
+    });
 });
