@@ -27,7 +27,7 @@ use Illuminate\Support\HtmlString;
  * event_sources link ("Listed by"), alsoListedBy the other links in link
  * order, and readMore the "Read more at {source}" link after the
  * description. Each links to the item's own page, else the source's events
- * page, through SafeLinks::http (no link when neither is http/https). With
+ * page, else the feed site's home page, through SafeLinks::http. With
  * attribution set, the Phase 2 "More information" line and the "Listed by
  * What's On Attleborough." fallback are not shown (C10). Organiser fields
  * are never filled from feeds (D-17), so only an organiser the admin typed
@@ -191,17 +191,26 @@ final readonly class EventPageData
 
     /**
      * Source name plus the item's own page, else the source's events page
-     * (D-16), http/https only.
+     * (D-16), else the home page of the feed's site, so every discovered
+     * event links somewhere a resident can read (LEG-04). http/https only;
+     * the feed file itself is never linked.
      *
      * @return array{name: string, url: string|null}
      */
     private static function attributionFor(EventSource $link): array
     {
         $source = $link->source;
+        $feed = SafeLinks::http($source->url);
+        $feedScheme = $feed !== null ? strtolower((string) parse_url($feed['url'], PHP_URL_SCHEME)) : null;
+        $feedHost = $feed !== null ? parse_url($feed['url'], PHP_URL_HOST) : null;
+        $home = is_string($feedHost) && $feedHost !== '' ? $feedScheme.'://'.$feedHost.'/' : null;
 
         return [
             'name' => $source->name,
-            'url' => SafeLinks::http($link->item_url)['url'] ?? SafeLinks::http($source->events_page_url)['url'] ?? null,
+            'url' => SafeLinks::http($link->item_url)['url']
+                ?? SafeLinks::http($source->events_page_url)['url']
+                ?? SafeLinks::http($home)['url']
+                ?? null,
         ];
     }
 

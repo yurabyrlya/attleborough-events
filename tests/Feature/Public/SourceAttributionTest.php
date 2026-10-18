@@ -8,7 +8,6 @@ use App\Models\Source;
 use App\Publishing\Actions\LinkEventSource;
 use App\Support\PublicUrl;
 use Database\Seeders\CategorySeeder;
-use Dom\Element;
 use Dom\HTMLDocument;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -264,10 +263,10 @@ it('shows no source credit and keeps the fallback for an event with no source li
         ->and($card)->not->toContain('via ');
 });
 
-it('never links a javascript: item URL and falls back to the events page, or to plain text', function () {
+it('never links a javascript: item URL and falls back to the events page, then the feed site\'s home page', function () {
     $admin = ingestAdmin();
     $withPage = attribSource('Source With Page');
-    $withoutPage = attribSource('Source Without Page', ['events_page_url' => null]);
+    $withoutPage = attribSource('Source Without Page', ['events_page_url' => null, 'url' => 'https://feeds.example.org/calendar/events.ics?key=1']);
     $event = attribEvent(['title' => 'Carnival', 'source_url' => null]);
 
     app(LinkEventSource::class)($event, $withPage, null, EventSource::VIA_APPROVED, $admin);
@@ -280,17 +279,13 @@ it('never links a javascript: item URL and falls back to the events page, or to 
     $text = attribText($html);
 
     expect($html)->not->toContain('javascript:')
+        ->and($html)->not->toContain('events.ics')
         ->and($text)->toContain('Listed by Source With Page')
         ->and($text)->toContain('Also listed by Source Without Page');
 
     assertLink($response, $withPage->events_page_url, 'Source With Page');
     assertLink($response, $withPage->events_page_url, 'Read more at Source With Page');
-
-    $document = HTMLDocument::createFromString($html, LIBXML_NOERROR);
-    $anchors = collect(iterator_to_array($document->querySelectorAll('a')))
-        ->filter(fn (Element $a): bool => trim((string) $a->textContent) === 'Source Without Page');
-
-    expect($anchors)->toHaveCount(0);
+    assertLink($response, 'https://feeds.example.org/', 'Source Without Page');
 });
 
 it('never shows organiser names, emails or phone numbers from a feed', function () {
