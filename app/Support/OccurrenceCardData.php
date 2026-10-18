@@ -10,6 +10,10 @@ use App\Models\EventOccurrence;
 /**
  * Card view model for the public list (CAL-07). The card partial renders
  * only these fields, all through escaped echo.
+ *
+ * A discovered event shows "via {source short name}" (D-14) from the
+ * eager-loaded event.primarySource.source instead of the Phase 2
+ * "Source: {host}" line (C10). The contact fallback is unchanged.
  */
 final readonly class OccurrenceCardData
 {
@@ -29,6 +33,7 @@ final readonly class OccurrenceCardData
         public ?string $sourceHost,
         public ?string $contactText,
         public ?string $contactHref,
+        public ?string $via,
         public bool $isCancelled,
     ) {}
 
@@ -40,6 +45,12 @@ final readonly class OccurrenceCardData
         // Source URL first; the contact is the fallback only when the
         // organiser agreed to show it (contact_public, D-03 / T-02-11).
         $contact = $sourceUrl === null && $event->contact_public ? self::blankToNull($event->organiser_contact) : null;
+        $via = self::via($occurrence);
+
+        if ($via !== null) {
+            $source = null;
+            $sourceUrl = null;
+        }
 
         return new self(
             title: $event->title,
@@ -58,6 +69,7 @@ final readonly class OccurrenceCardData
             contactText: $contact,
             // Cards link only email contacts (never tel:), as in 01-06.
             contactHref: SafeLinks::mailto($contact),
+            via: $via,
             isCancelled: $event->status === EventStatus::Cancelled
                 || $occurrence->status === OccurrenceStatus::Cancelled,
         );
@@ -105,6 +117,21 @@ final readonly class OccurrenceCardData
             PriceType::Paid => $text ?? 'Paid',
             PriceType::Unknown => $text,
         };
+    }
+
+    /**
+     * The primary source's short name, or its name when the short name is
+     * empty; null for an event with no source link.
+     */
+    private static function via(EventOccurrence $occurrence): ?string
+    {
+        $source = $occurrence->event->primarySource?->source;
+
+        if ($source === null) {
+            return null;
+        }
+
+        return self::blankToNull($source->short_name) ?? self::blankToNull($source->name);
     }
 
     private static function blankToNull(?string $value): ?string

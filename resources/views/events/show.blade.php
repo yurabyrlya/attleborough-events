@@ -67,10 +67,19 @@
     <section class="mt-6" aria-labelledby="about-heading">
         <h2 id="about-heading" class="text-lg font-semibold text-ink">About this event</h2>
         <p class="description mt-2 whitespace-pre-line text-ink wrap-anywhere">{{ $page->description }}</p>
+        @if ($page->readMore !== null)
+            <p class="read-more mt-2 wrap-anywhere"><a href="{{ $page->readMore['url'] }}" rel="nofollow noopener" class="tap-target text-accent underline underline-offset-2">{{ $page->readMore['label'] }}</a></p>
+        @endif
     </section>
 
     <section class="mt-6 [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-2" aria-labelledby="who-heading">
         <h2 id="who-heading" class="text-lg font-semibold text-ink">Who's running it</h2>
+        @if ($page->attribution !== null)
+            <p class="listed-by-source mt-2 text-ink wrap-anywhere">Listed by @if ($page->attribution['url'] !== null)<a href="{{ $page->attribution['url'] }}" rel="nofollow noopener">{{ $page->attribution['name'] }}</a>@else{{ $page->attribution['name'] }}@endif</p>
+        @endif
+        @if ($page->alsoListedBy !== [])
+            <p class="also-listed-by mt-1 text-muted wrap-anywhere">Also listed by @foreach ($page->alsoListedBy as $other)@if ($other['url'] !== null)<a href="{{ $other['url'] }}" rel="nofollow noopener">{{ $other['name'] }}</a>@else{{ $other['name'] }}@endif{{ $loop->last ? '' : ', ' }}@endforeach</p>
+        @endif
         @if ($page->organiserName !== null)
             <p class="organiser mt-2 text-ink wrap-anywhere">Organised by {{ $page->organiserName }}</p>
         @endif
@@ -86,7 +95,7 @@
         @if ($page->sourceUrl !== null)
             <p class="source-link mt-1 text-muted wrap-anywhere">More information: <a href="{{ $page->sourceUrl }}" rel="nofollow noopener">{{ $page->sourceHost }}</a></p>
         @endif
-        @if ($page->sourceNote === null && $page->sourceUrl === null)
+        @if ($page->attribution === null && $page->sourceNote === null && $page->sourceUrl === null)
             <p class="listed-by mt-1 text-muted">Listed by What's On Attleborough.</p>
         @endif
     </section>

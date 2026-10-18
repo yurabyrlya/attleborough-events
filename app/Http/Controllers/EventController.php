@@ -63,8 +63,11 @@ final class EventController
     {
         $lookup = strtolower($slug);
 
-        $event = Event::query()->with(['venue', 'category'])->where('slug', $lookup)->first()
-            ?? EventSlug::query()->where('slug', $lookup)->first()?->event()->with(['venue', 'category'])->first();
+        // eventSources.source: the attribution lines (LEG-04) without lazy loads.
+        $with = ['venue', 'category', 'eventSources.source'];
+
+        $event = Event::query()->with($with)->where('slug', $lookup)->first()
+            ?? EventSlug::query()->where('slug', $lookup)->first()?->event()->with($with)->first();
 
         abort_if($event === null || ! $event->status->isPubliclyListed(), 404);
 

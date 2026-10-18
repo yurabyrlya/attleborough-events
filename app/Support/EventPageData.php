@@ -8,6 +8,7 @@ use App\Calendar\UpcomingDates;
 use App\Enums\EventStatus;
 use App\Models\Event;
 use App\Models\EventOccurrence;
+use App\Models\EventSource;
 use App\Seo\EventJsonLd;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\HtmlString;
@@ -21,6 +22,16 @@ use Illuminate\Support\HtmlString;
  * row carries its .ics path and Google Calendar link (EVT-06); jsonLd holds
  * one Event script per listed date (EVT-03); share holds the share text and
  * no-JS share links (EVT-07).
+ *
+ * Discovered events (LEG-04, D-12, D-14..D-17): attribution is the primary
+ * event_sources link ("Listed by"), alsoListedBy the other links in link
+ * order, and readMore the "Read more at {source}" link after the
+ * description. Each links to the item's own page, else the source's events
+ * page, through SafeLinks::http (no link when neither is http/https). With
+ * attribution set, the Phase 2 "More information" line and the "Listed by
+ * What's On Attleborough." fallback are not shown (C10). Organiser fields
+ * are never filled from feeds (D-17), so only an organiser the admin typed
+ * reaches the page. Needs eventSources.source loaded to avoid lazy loads.
  */
 final readonly class EventPageData
 {
@@ -29,6 +40,9 @@ final readonly class EventPageData
     /**
      * @param  list<string>  $venueLines
      * @param  list<array{datetimeIso: string, timeLabel: string, isCancelled: bool, icsPath: string, googleUrl: string}>  $dates
+     * @param  array{name: string, url: string|null}|null  $attribution
+     * @param  list<array{name: string, url: string|null}>  $alsoListedBy
+     * @param  array{label: string, url: string}|null  $readMore
      */
     public function __construct(
         public string $title,
@@ -53,6 +67,9 @@ final readonly class EventPageData
         public ?string $sourceNote,
         public ?string $sourceUrl,
         public ?string $sourceHost,
+        public ?array $attribution,
+        public array $alsoListedBy,
+        public ?array $readMore,
         public bool $isSeries,
         public array $dates,
         public int $remaining,
@@ -71,6 +88,12 @@ final readonly class EventPageData
         $source = SafeLinks::http($event->source_url);
         // http/https only (T-02-12); anything else leaves no website line.
         $website = SafeLinks::http($event->organiser_website);
+        [$attribution, $alsoListedBy] = self::attributions($event);
+
+        if ($attribution !== null) {
+            // C10: the source credit replaces the Phase 2 source URL line.
+            $source = null;
+        }
 
         return new self(
             title: $event->title,
@@ -98,6 +121,11 @@ final readonly class EventPageData
             sourceNote: self::blankToNull($event->source_note),
             sourceUrl: $source['url'] ?? null,
             sourceHost: $source['host'] ?? null,
+            attribution: $attribution,
+            alsoListedBy: $alsoListedBy,
+            readMore: $attribution !== null && $attribution['url'] !== null
+                ? ['label' => 'Read more at '.$attribution['name'], 'url' => $attribution['url']]
+                : null,
             isSeries: $event->recurrence_rule !== null,
             dates: $dates->occurrences->map(fn (EventOccurrence $occurrence): array => [
                 'datetimeIso' => LondonFormatter::local($occurrence->starts_at)->toIso8601String(),
@@ -130,6 +158,51 @@ final readonly class EventPageData
             : $event->venue->name;
 
         return TextLimit::graphemes($lead.'. '.$description, self::META_DESCRIPTION_GRAPHEMES);
+    }
+
+    /**
+     * The primary link and the others, in linked_at then id order (the
+     * eventSources relation's order).
+     *
+     * @return array{0: array{name: string, url: string|null}|null, 1: list<array{name: string, url: string|null}>}
+     */
+    private static function attributions(Event $event): array
+    {
+        $primary = null;
+        $others = [];
+
+        foreach ($event->eventSources as $link) {
+            $entry = self::attributionFor($link);
+
+            if ($link->is_primary && $primary === null) {
+                $primary = $entry;
+            } else {
+                $others[] = $entry;
+            }
+        }
+
+        // An event always has a primary once linked; if not, credit the oldest link.
+        if ($primary === null && $others !== []) {
+            $primary = array_shift($others);
+        }
+
+        return [$primary, $others];
+    }
+
+    /**
+     * Source name plus the item's own page, else the source's events page
+     * (D-16), http/https only.
+     *
+     * @return array{name: string, url: string|null}
+     */
+    private static function attributionFor(EventSource $link): array
+    {
+        $source = $link->source;
+
+        return [
+            'name' => $source->name,
+            'url' => SafeLinks::http($link->item_url)['url'] ?? SafeLinks::http($source->events_page_url)['url'] ?? null,
+        ];
     }
 
     private static function blankToNull(?string $value): ?string

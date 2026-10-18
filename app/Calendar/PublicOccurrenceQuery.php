@@ -56,7 +56,7 @@ final class PublicOccurrenceQuery
             ->when($filters->family, fn ($query) => $query->where('events.family_friendly', true))
             ->orderBy('event_occurrences.starts_at')
             ->orderBy('event_occurrences.id')
-            ->with(['event.venue', 'event.category'])
+            ->with(['event.venue', 'event.category', 'event.primarySource.source'])
             ->simplePaginate((int) config('calendar.page_size', 30))
             // Root-relative page links: the Host header never reaches the HTML (T-01-41).
             ->withPath(route('calendar', absolute: false))

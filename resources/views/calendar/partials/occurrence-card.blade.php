@@ -35,6 +35,9 @@
             @if ($card->organiserName !== null)
                 <p class="organiser mt-2 text-sm text-muted">By {{ $card->organiserName }}</p>
             @endif
+            @if ($card->via !== null)
+                <p class="via text-sm text-muted">via {{ $card->via }}</p>
+            @endif
             @if ($card->sourceUrl !== null)
                 <p class="source text-sm text-muted">Source: <a href="{{ $card->sourceUrl }}" rel="nofollow noopener">{{ $card->sourceHost }}</a></p>
             @elseif ($card->contactText !== null)
