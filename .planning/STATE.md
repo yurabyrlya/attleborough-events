@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 03
 current_phase_name: Ingestion Backbone, ICS & Change/Duplicate Handling
 status: executing
-stopped_at: Completed 03-02-PLAN.md
-last_updated: "2026-10-18T08:20:46.267Z"
+stopped_at: Completed 03-03-PLAN.md
+last_updated: "2026-10-18T08:53:10.247Z"
 last_activity: 2026-10-18
 last_activity_desc: Phase 2 complete, transitioned to Phase 3
-state_head: f88b0d13e4aab8df41b5bc67f532c44d947c0671
+state_head: a74753947f560e36a20c5c6997e1014d8db9c2f5
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 48
-  completed_plans: 31
+  completed_plans: 32
   percent: 40
 ---
 
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 03 (Ingestion Backbone, ICS & Change/Duplicate Handling) — EXECUTING
-Plan: 3 of 17
+Plan: 4 of 17
 Status: Ready to execute
-Last activity: 2026-10-18 — Completed 03-02 (polite HttpFetcher core)
+Last activity: 2026-10-18 — Completed 03-03 (robots.txt, host throttle, raw body store)
 
-Progress: [█████████████░░░░░░░] 31/48 planned plans ([████░░░░░░] 40%); phases complete: 2/5
+Progress: [█████████████░░░░░░░] 32/48 planned plans ([████░░░░░░] 40%); phases complete: 2/5
 
 ## Performance Metrics
 
@@ -88,6 +88,7 @@ Progress: [█████████████░░░░░░░] 31/48 p
 | Phase 02 P16 | 14min | 3 tasks | 7 files |
 | Phase 03 P01 | 7min | 2 tasks | 14 files |
 | Phase 03 P02 | 40min | 2 tasks | 17 files |
+| Phase 03 P03 | 25min | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -155,6 +156,10 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-02: BodyValidator accepts any body starting with BEGIN:VCALENDAR (after BOM/whitespace) even with HTML inside X-ALT-DESC; markup/challenge markers only diagnose non-calendar bodies
 - [Phase 03]: 03-02: FetchRequest::startedAt lets the job count time already spent against ingest.fetch_deadline (55 s); per-request timeout = min(config, time left)
 - [Phase 03]: 03-02: HttpFetcher::beforeHop() is the per-hop hook 03-03 fills with robots (FetchResult::blocked) and HostThrottle
+- [Phase 03]: 03-03: crawl_hosts.last_request_at added; host spacing = max(now, next_allowed_at, last_request_at + max(5 s, Crawl-delay)) so a Crawl-delay learned from robots.txt spaces the very next request
+- [Phase 03]: 03-03: HostThrottle::reserve(host, delay, maxWait) throws HostBusy without booking; inline wait limit = min(max_inline_wait, deadline left - request timeout)
+- [Phase 03]: 03-03: robots disallow_all (5xx/network/unreachable) cached 1 h, other robots outcomes 24 h; a spent deadline is a timeout, never an unreachable robots.txt
+- [Phase 03]: 03-03: robots wildcards matched by a linear two-pointer walk (no regex from remote text); match target is path plus ?query
 
 ### Pending Todos
 
@@ -189,6 +194,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-18T08:20:36.265Z
-Stopped at: Completed 03-02-PLAN.md
+Last session: 2026-10-18T08:53:09.480Z
+Stopped at: Completed 03-03-PLAN.md
 Resume file: None
