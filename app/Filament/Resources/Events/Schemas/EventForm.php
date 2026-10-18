@@ -218,7 +218,7 @@ class EventForm
                     ->required(fn (Get $get): bool => self::ends($get) === RepeatEnds::AfterCount),
                 TextEntry::make('next_dates')
                     ->label('Next dates')
-                    ->state(fn (Get $get): array => self::nextDates($get))
+                    ->state(fn (Get $get, mixed $record): array => self::nextDates($get, self::excludedDatesOf($record)))
                     ->listWithLineBreaks()
                     ->placeholder('No upcoming dates')
                     ->visible(fn (Get $get): bool => self::repeats($get) !== RepeatPattern::None)
@@ -421,10 +421,13 @@ class EventForm
      * The first 5 dates of the series being edited, from today over the
      * horizon, formatted "Fri 23 Oct, 10am" or "Sun 25 Oct, all day" (D-05).
      * Formatted inline: LondonFormatter belongs to plan 01-06 in this wave.
+     * The record's excluded dates (EXDATE, D-19) are skipped, as the
+     * published series skips them.
      *
+     * @param  list<string>  $excludedDates
      * @return list<string>
      */
-    private static function nextDates(Get $get): array
+    private static function nextDates(Get $get, array $excludedDates = []): array
     {
         $start = self::startLocal($get);
         $allDay = (bool) $get('all_day');
@@ -454,6 +457,7 @@ class EventForm
                 'start_date' => $start->format('Y-m-d'),
                 'start_time' => $allDay ? null : $startTime,
                 'recurrence_rule' => $recurrence->toRrule($start, $allDay),
+                'excluded_dates' => $excludedDates,
             ]);
 
             $today = CarbonImmutable::now($start->timezone)->startOfDay();
@@ -475,6 +479,20 @@ class EventForm
 
             return $local?->format('D j M, ').str_replace(':00', '', (string) $local?->format('g:ia'));
         }, array_slice($keys, 0, 5));
+    }
+
+    /**
+     * The excluded dates of the event or draft being edited (none on create).
+     *
+     * @return list<string>
+     */
+    private static function excludedDatesOf(mixed $record): array
+    {
+        if (! $record instanceof Event && ! $record instanceof EventDraft) {
+            return [];
+        }
+
+        return array_values(array_filter($record->excluded_dates, is_string(...)));
     }
 
     private static function startLocal(Get $get): ?CarbonImmutable
