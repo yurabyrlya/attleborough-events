@@ -5,6 +5,7 @@ namespace App\Review;
 use App\Enums\DraftKind;
 use App\Enums\EventOrigin;
 use App\Enums\ReviewStatus;
+use App\Ingestion\Data\DuplicateMatch;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\EventDraft;
@@ -68,12 +69,15 @@ final class DraftWriter
      * payload and parse errors are forceFilled (never Fillable). The
      * item's ICS CATEGORIES ($sourceValues) reach CategoryAssigner's
      * mapping link after the source's default category (PIPE-03).
+     * $duplicate is DuplicateDetector's likely duplicate (PIPE-05), stored
+     * in the duplicate columns so the draft shows the warning and bulk
+     * approve skips it.
      *
      * @param  list<string>  $sourceValues
      */
-    public function createFromSource(DraftData $data, DraftKind $kind, Source $source, SourceItem $item, array $sourceValues): EventDraft
+    public function createFromSource(DraftData $data, DraftKind $kind, Source $source, SourceItem $item, array $sourceValues, ?DuplicateMatch $duplicate = null): EventDraft
     {
-        return $this->createSourced($data, $kind, $source, $item, $sourceValues);
+        return $this->createSourced($data, $kind, $source, $item, $sourceValues, DuplicateMatch::columns($duplicate));
     }
 
     /**
@@ -123,7 +127,9 @@ final class DraftWriter
      * edited) stays. Everything else is the source's, and the category and
      * quality are re-derived. Kind, origin and links are unchanged; for an
      * update or cancellation draft, diff, target key and relevant_starts_at
-     * are replaced.
+     * are replaced. $duplicate (PIPE-05): false leaves the duplicate
+     * columns as they are; a match or null (re-checked, nothing found)
+     * replaces them.
      *
      * @param  list<string>  $sourceValues
      * @param  array<string, mixed>|null  $diff
@@ -135,8 +141,9 @@ final class DraftWriter
         ?array $diff = null,
         ?string $targetRecurrenceKey = null,
         ?CarbonImmutable $relevantStartsAt = null,
+        DuplicateMatch|false|null $duplicate = false,
     ): ?EventDraft {
-        return DB::transaction(function () use ($draft, $data, $sourceValues, $diff, $targetRecurrenceKey, $relevantStartsAt): ?EventDraft {
+        return DB::transaction(function () use ($draft, $data, $sourceValues, $diff, $targetRecurrenceKey, $relevantStartsAt, $duplicate): ?EventDraft {
             $locked = EventDraft::query()->whereKey($draft->id)->lockForUpdate()->first();
 
             if ($locked === null || $locked->review_status !== ReviewStatus::PendingReview) {
@@ -179,6 +186,10 @@ final class DraftWriter
                     'target_recurrence_key' => $targetRecurrenceKey,
                     'relevant_starts_at' => $relevantStartsAt?->utc(),
                 ]);
+            }
+
+            if ($duplicate !== false) {
+                $locked->forceFill(DuplicateMatch::columns($duplicate));
             }
 
             $this->derive($locked, $data, $sourceValues);

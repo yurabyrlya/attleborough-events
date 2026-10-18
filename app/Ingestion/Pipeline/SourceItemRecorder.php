@@ -6,6 +6,7 @@ use App\Enums\DraftKind;
 use App\Enums\ReviewStatus;
 use App\Enums\SourceItemStatus;
 use App\Ingestion\Data\ChangeVerdict;
+use App\Ingestion\Data\DuplicateMatch;
 use App\Ingestion\Data\ExtractedItem;
 use App\Ingestion\Data\NormalisedFacts;
 use App\Ingestion\Data\RecordOutcome;
@@ -51,6 +52,11 @@ use Illuminate\Support\Facades\DB;
  *    New draft, or, when the feed already marks it STATUS:CANCELLED, a
  *    cancelled item and no draft (PIPE-07).
  *
+ * Every New draft written for an item (a new identity, a re-draft, or a
+ * replace of its pending New draft) is first checked by DuplicateDetector,
+ * and the likely duplicate is stored on the draft (PIPE-05, 03-11). A
+ * preview gets the same check through previewDuplicate().
+ *
  * Skipped identities that are not yet known get no source item: an item
  * far in the future today must still be drafted when it enters the window.
  * Lock order inside the item transaction: source item → draft.
@@ -88,6 +94,7 @@ final class SourceItemRecorder
         private readonly WindowClassifier $window,
         private readonly DraftWriter $drafts,
         private readonly ChangeDetector $detector,
+        private readonly DuplicateDetector $duplicates,
     ) {}
 
     public function record(SourceRun $run, Source $source, ExtractedItem $item, CarbonImmutable $nowLondon): RecordOutcome
@@ -168,6 +175,24 @@ final class SourceItemRecorder
     }
 
     /**
+     * The likely duplicate a New draft for this item would carry (D-01
+     * preview rows, PIPE-05), without writing or locking anything.
+     */
+    public function previewDuplicate(Source $source, ExtractedItem $item): ?DuplicateMatch
+    {
+        if ($item->facts === null) {
+            return null;
+        }
+
+        $existing = SourceItem::query()
+            ->where('source_id', $source->id)
+            ->where('external_id', $item->externalId)
+            ->first();
+
+        return $this->duplicates->find($item->facts, $source, $existing, DraftData::sourceVenueId($item->facts, $source));
+    }
+
+    /**
      * Acts on a change verdict for a locked source item (03-09): writes,
      * replaces or supersedes its draft. Shared by record() and
      * MissingItemDetector. A pending draft decided meanwhile is never
@@ -200,7 +225,8 @@ final class SourceItemRecorder
 
             case ChangeVerdict::REDRAFT:
                 $item->forceFill(['review_outcome' => 'pending'])->save();
-                $this->drafts->createFromSource($this->draftData($facts, $source, $parseErrors), DraftKind::New, $source, $item, $facts->categories);
+                $data = $this->draftData($facts, $source, $parseErrors);
+                $this->drafts->createFromSource($data, DraftKind::New, $source, $item, $facts->categories, $this->duplicates->find($facts, $source, $item, $data->venueId));
 
                 return ['created' => 1, 'replaced' => 0];
 
@@ -281,13 +307,19 @@ final class SourceItemRecorder
             return ['created' => 0, 'replaced' => 0];
         }
 
+        $data = $this->draftData($facts, $source, $parseErrors);
+        $isNew = $pending->kind === DraftKind::New;
+
         $replaced = $this->drafts->replacePendingFromSource(
             $pending,
-            $this->draftData($facts, $source, $parseErrors),
+            $data,
             $facts->categories,
-            $pending->kind === DraftKind::New ? null : $verdict->diff,
+            $isNew ? null : $verdict->diff,
             $verdict->targetKeys[0] ?? null,
             $verdict->relevantStartsAt,
+            // The new facts may match something else now (PIPE-05);
+            // remembered "Not a duplicate" pairs stay excluded.
+            $isNew ? $this->duplicates->find($facts, $source, $item, $data->venueId ?? $pending->venue_id) : false,
         );
 
         if ($replaced !== null) {
@@ -434,7 +466,10 @@ final class SourceItemRecorder
             return new RecordOutcome(self::NEW, cancelled: true);
         }
 
-        $this->drafts->createFromSource($this->draftData($facts, $source, $item->parseErrors), DraftKind::New, $source, $sourceItem, $facts->categories);
+        $data = $this->draftData($facts, $source, $item->parseErrors);
+        $duplicate = $this->duplicates->find($facts, $source, $sourceItem, $data->venueId);
+
+        $this->drafts->createFromSource($data, DraftKind::New, $source, $sourceItem, $facts->categories, $duplicate);
 
         return new RecordOutcome(self::NEW, draftsCreated: 1);
     }

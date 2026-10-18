@@ -6,6 +6,7 @@ use App\Enums\FetchFailureKind;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
 use App\Enums\RunTrigger;
+use App\Ingestion\Data\DuplicateMatch;
 use App\Ingestion\Data\ExtractedItem;
 use App\Ingestion\Data\RecordOutcome;
 use App\Ingestion\Health\SourceHealthTracker;
@@ -219,6 +220,8 @@ final class IngestRun
             $counters['items_found']++;
             $observedUntil = $this->laterDate($observedUntil, $item);
 
+            $duplicate = null;
+
             try {
                 $bucket = $this->recorder->verdict($source, $item, $nowLondon);
             } catch (Throwable $e) {
@@ -233,8 +236,22 @@ final class IngestRun
 
             $counters[SourceItemRecorder::COUNTER[$bucket]]++;
 
+            if ($bucket === SourceItemRecorder::NEW && count($rows) < self::PREVIEW_ROW_LIMIT) {
+                try {
+                    $duplicate = $this->recorder->previewDuplicate($source, $item);
+                } catch (Throwable $e) {
+                    // The row still shows; only the duplicate note is lost.
+                    Log::error('ingest: preview duplicate check failed', [
+                        'run_id' => $run->id,
+                        'source_id' => $source->id,
+                        'item_index' => $index,
+                        'exception' => $e::class,
+                    ]);
+                }
+            }
+
             if (count($rows) < self::PREVIEW_ROW_LIMIT) {
-                $rows[] = $this->previewRow($item, $bucket);
+                $rows[] = $this->previewRow($item, $bucket, $duplicate);
             }
         }
 
@@ -262,12 +279,13 @@ final class IngestRun
     /**
      * One preview row: title (≤ 255 characters), London start ("Y-m-d" or
      * "Y-m-d H:i", the next instance for a series), verdict new / changed /
-     * unchanged / skipped, and the skip reason past / far_future / rule /
-     * parse_error (null otherwise).
+     * unchanged / skipped, the skip reason past / far_future / rule /
+     * parse_error (null otherwise), and the likely duplicate a new draft
+     * would be flagged with (PIPE-05: {title, reason, score}, else null).
      *
-     * @return array{title: string|null, starts: string|null, verdict: string, reason: string|null}
+     * @return array{title: string|null, starts: string|null, verdict: string, reason: string|null, duplicate: array{title: string, reason: string, score: string}|null}
      */
-    private function previewRow(ExtractedItem $item, string $bucket): array
+    private function previewRow(ExtractedItem $item, string $bucket, ?DuplicateMatch $duplicate = null): array
     {
         $facts = $item->facts;
         $starts = null;
@@ -286,6 +304,7 @@ final class IngestRun
             'starts' => $starts,
             'verdict' => $skipped ? 'skipped' : $bucket,
             'reason' => $skipped ? substr($bucket, strlen('skipped_')) : null,
+            'duplicate' => $duplicate?->toPreview(),
         ];
     }
 

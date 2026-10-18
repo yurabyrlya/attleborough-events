@@ -74,7 +74,9 @@ final class DraftPublishability
             $keys[] = 'parse_errors';
         }
 
-        if ($draft->duplicate_of_event_id !== null) {
+        // PIPE-05: a likely duplicate of a published event or of another
+        // pending draft.
+        if ($draft->duplicate_of_event_id !== null || $draft->duplicate_of_draft_id !== null) {
             $keys[] = 'duplicate';
         }
 

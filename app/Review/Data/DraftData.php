@@ -339,7 +339,7 @@ final readonly class DraftData
      * D-22: the source's default venue when the item names no venue, or
      * names exactly that venue; otherwise null (the admin confirms).
      */
-    private static function sourceVenueId(NormalisedFacts $facts, Source $source): ?int
+    public static function sourceVenueId(NormalisedFacts $facts, Source $source): ?int
     {
         $defaultVenueId = $source->default_venue_id;
 
