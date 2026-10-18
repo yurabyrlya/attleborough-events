@@ -232,6 +232,8 @@ Recent decisions affecting current work:
 - [Phase 5]: Apply for Cloudflare Verified Bots (BotBase) once the production crawler is public: bot info page, distinct UA + contact URL, published IP list or reverse DNS (or Web Bot Auth), robots/Crawl-delay compliance. Unlocks Breckland, Norfolk CC, Norfolk Museums, TicketSource public pages (D-25)
 - [Phase 5]: Set TURNSTILE_HOSTNAMES=whatsonattleborough.co.uk in production (hostname check is skipped when empty; T-02-24 / review WR-03)
 - [Phase 5]: Queue worker for ingestion: `--timeout` ≥ 300 (05-01 now says 330) and systemd TimeoutStopSec > --timeout (360); any production DB_QUEUE_RETRY_AFTER must exceed 300 (Phase 3 WR-07: FetchSourceJob timeout 300 s, run deadline 240 s, fetch deadline 55 s)
+- [Owner check]: Phase 3 two-session concurrency spot check: with a queue worker running, press Run now on a source while approving/ignoring its drafts on the review page; expect no 500, no lost draft (03-VERIFICATION human item 3, accepted on tests while the owner was away)
+- [Owner check]: Phase 3 judgement items accepted by the orchestrator while the owner was away (bot-protection reading; concurrency on tests) — confirm or revoke (03-VERIFICATION.md)
 - [Before launch]: Decide a retention period for feed personal data kept in source_items (organiser names/emails, full descriptions) — Phase 3 review WR-06, deferred; implement pruning before go-live
 - [Before launch]: Honour Retry-After on 429/503 (Phase 3 review WR-04, deferred; low risk with daily checks)
 - [Phase 5]: Configure trusted proxies (Caddy / Cloudflare) so per-IP rate limiting on /submit and Turnstile hostname/remoteip checks see the real client IP (Phase 2 research)

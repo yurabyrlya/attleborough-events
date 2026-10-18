@@ -79,13 +79,13 @@
 
 ### Extraction Ladder (EXT)
 
-- [ ] **EXT-01**: System extracts events from ICS feeds, including VTIMEZONE, RRULE / RDATE / EXDATE, RECURRENCE-ID overrides, all-day events and `STATUS:CANCELLED`, storing one source item per series UID
+- [x] **EXT-01**: System extracts events from ICS feeds, including VTIMEZONE, RRULE / RDATE / EXDATE, RECURRENCE-ID overrides, all-day events and `STATUS:CANCELLED`, storing one source item per series UID *(Phase 3, within D-19: RDATE additions and moved RECURRENCE-ID overrides are stored but raised as parse errors for manual review instead of being published)*
 - [ ] **EXT-02**: System extracts events from WordPress sites running The Events Calendar via its REST API (explicit date window, full pagination), verified against live installs
 - [ ] **EXT-03**: System extracts Schema.org `Event` JSON-LD from pages, including `@graph` wrappers, arrays, Event subtypes and `eventStatus`
 - [ ] **EXT-04**: System extracts multiple events from a server-rendered listing page using a per-source CSS-selector configuration with per-source date patterns
 - [ ] **EXT-05**: System extracts events from RSS/Atom feeds only when items carry event dates (`date_required`) or by following item links to JSON-LD (`link_follow`). It never uses `pubDate` as the event date. (Part of the Definition of Done only if source research finds a qualifying feed)
 - [ ] **EXT-06**: Dates are parsed only with explicit per-source patterns. Ambiguous dates become parse errors. A date with no year is resolved only when a weekday is present, exactly one year in [fetch-7d, fetch+365d] matches, and the source's year policy allows it. An architecture test bans `strtotime` / `Carbon::parse` in ingestion code
-- [ ] **EXT-07**: Floating or timezone-less times are interpreted in the source's default timezone (Europe/London), unknown TZIDs become parse errors, and all times are stored in UTC
+- [x] **EXT-07**: Floating or timezone-less times are interpreted in the source's default timezone (Europe/London), unknown TZIDs become parse errors, and all times are stored in UTC
 - [ ] **EXT-08**: Every extractor is covered by fixture tests using saved real-world samples, including DST transition dates. Tests never touch the network
 
 ### Processing Pipeline (PIPE)
@@ -225,13 +225,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SRC-07 | Phase 3 | Complete |
 | SRC-08 | Phase 3 | Complete |
 | SRC-09 | Phase 3 | Complete |
-| EXT-01 | Phase 3 | Pending |
+| EXT-01 | Phase 3 | Complete (D-19 limits) |
 | EXT-02 | Phase 4 | Pending |
 | EXT-03 | Phase 4 | Pending |
 | EXT-04 | Phase 4 | Pending |
 | EXT-05 | Phase 4 | Pending |
 | EXT-06 | Phase 4 | Pending |
-| EXT-07 | Phase 3 | Pending |
+| EXT-07 | Phase 3 | Complete |
 | EXT-08 | Phase 4 | Pending |
 | PIPE-01 | Phase 3 | Complete |
 | PIPE-02 | Phase 4 | Pending |
@@ -239,7 +239,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PIPE-04 | Phase 2 | Complete |
 | PIPE-05 | Phase 3 | Complete |
 | PIPE-06 | Phase 3 | Complete |
-| PIPE-07 | Phase 3 | Pending |
+| PIPE-07 | Phase 3 (ICS STATUS:CANCELLED, done) + Phase 4 (JSON-LD eventStatus) | Pending |
 | PIPE-08 | Phase 3 | Complete |
 | PIPE-09 | Phase 3 | Complete |
 | REC-01 | Phase 1 | Complete |
