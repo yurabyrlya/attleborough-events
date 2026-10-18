@@ -108,11 +108,11 @@ Plans:
   4. Every fetch respects robots.txt (a disallow shows as a `blocked` run), sends the descriptive User-Agent and waits at least 5s per host. A bot wall or wrong content type is logged as a failed `content_invalid` run. After 3 / 5 consecutive failures the source shows as degraded / unhealthy (paused), a sudden zero-items run is flagged, and no previously published event disappears.
   5. Approved discovered events show visible source attribution with a link, plus an excerpt of at most 200 characters with phone numbers and emails stripped and a "Read more at {source}" link.
 
-**Plans**: 17 plans
+**Plans**: 1/17 plans executed
 
 Plans:
 **Wave 1**
-- [ ] 03-01-PLAN.md — Ingestion schema: sources, source_runs, source_items, draft/event columns, run enums, Source factory (wave 1)
+- [x] 03-01-PLAN.md — Ingestion schema: sources, source_runs, source_items, draft/event columns, run enums, Source factory (wave 1)
 - [ ] 03-02-PLAN.md — HttpFetcher core: UA, timeouts, size cap, manual redirects, conditional GET, SSRF guard, body validation (wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -197,7 +197,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Foundation & Published Calendar | 13/13 | Complete    | 2026-10-17 |
 | 2. Draft Model, Review Queue & Submissions | 16/16 | Complete    | 2026-10-17 |
-| 3. Ingestion Backbone, ICS & Change/Duplicate Handling | 0/TBD | Not started | - |
+| 3. Ingestion Backbone, ICS & Change/Duplicate Handling | 1/17 | In Progress | - |
 | 4. Extraction Ladder, Geofence & Live Sources | 0/TBD | Not started | - |
 | 5. Launch Readiness | 0/2+ | Not started | - |
 

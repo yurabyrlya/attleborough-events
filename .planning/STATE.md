@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 03
 current_phase_name: Ingestion Backbone, ICS & Change/Duplicate Handling
 status: executing
-stopped_at: Phase 3 context gathered
-last_updated: "2026-10-18T00:28:28.572Z"
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-10-18T00:37:15.180Z"
 last_activity: 2026-10-17
 last_activity_desc: Phase 2 complete, transitioned to Phase 3
-state_head: afe264692c543b796299c2110c34823c4fe8138a
+state_head: 69214a6c3412e15d175e793eb22bd391b926c6c6
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 48
-  completed_plans: 29
+  completed_plans: 30
   percent: 40
 ---
 
@@ -86,6 +86,7 @@ Progress: [███████████████████░] 29/31 p
 | Phase 02 P14 | 9min | 2 tasks | 8 files |
 | Phase 02 P15 | 10min | 2 tasks | 7 files |
 | Phase 02 P16 | 14min | 3 tasks | 7 files |
+| Phase 03 P01 | 7min | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -146,6 +147,9 @@ Recent decisions affecting current work:
 - [Phase 02]: 02-15: Single-key review shortcuts use one guarded Alpine keydown handler (inputs, dialogs, modifiers, repeat) with a localStorage 'woa-shortcuts' toggle, never Filament keyBindings()
 - [Phase 02]: 02-16: F14 proves 'Other can't be removed' through the UI guard (no Delete on the Other row); the visible 'Rules not saved' refusal is checked with a category in use
 - [Phase 02]: 02-16: browser tests stay offline with no Turnstile site key plus a container-bound passing TurnstileVerifier (UatFixtures::fakeTurnstile)
+- [Phase 03]: 03-01: Source.is_active not fillable; changes only via Create drafts/Pause actions (D-01)
+- [Phase 03]: 03-01: SourceRun fillable = mode, trigger only; SourceItem baseline/review columns forceFill-only
+- [Phase 03]: 03-01: sources.parser_config defaults to {"identity":"uid"}; ExtractionMethod::Ics label 'ICS feed'
 
 ### Pending Todos
 
@@ -180,6 +184,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-17T22:43:56.880Z
-Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-ingestion-backbone-ics-change-duplicate-handling/03-CONTEXT.md
+Last session: 2026-10-18T00:37:14.445Z
+Stopped at: Completed 03-01-PLAN.md
+Resume file: None
