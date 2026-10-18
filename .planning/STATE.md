@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 03
 current_phase_name: Ingestion Backbone, ICS & Change/Duplicate Handling
 status: executing
-stopped_at: Completed 03-16-PLAN.md
-last_updated: "2026-10-18T11:14:38.277Z"
+stopped_at: Completed 03-10-PLAN.md
+last_updated: "2026-10-18T11:30:37.603Z"
 last_activity: 2026-10-18
 last_activity_desc: Phase 2 complete, transitioned to Phase 3
-state_head: bf112d4189d3ad072bde82ba01a409a8804a5cf3
+state_head: c42c03c85d45b89ec81a00ccc4e648ad39af4edc
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 48
-  completed_plans: 40
+  completed_plans: 41
   percent: 40
 ---
 
@@ -28,9 +28,9 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 03 (Ingestion Backbone, ICS & Change/Duplicate Handling) — EXECUTING
-Plan: 12 of 17
+Plan: 13 of 17
 Status: Ready to execute
-Last activity: 2026-10-18 — Completed 03-16 (public source attribution: Listed by / Also listed by / Read more at / card via; SourceSeeder with three inactive ICS sources, dev DB seeded)
+Last activity: 2026-10-18 — Completed 03-10 (ApplySourceUpdate / IgnoreSourceChange / ConfirmSourceCancellation, SourceBaseline, RejectReason::Ignored, afterCommit status logs; confirmed dates kept in events.cancelled_dates)
 
 Progress: [█████████████████░░░] 40/48 planned plans ([████░░░░░░] 40%); phases complete: 2/5
 
@@ -97,6 +97,7 @@ Progress: [█████████████████░░░] 40/48 p
 | Phase 03 P09 | 24min | 3 tasks | 21 files |
 | Phase 03 P15 | 16min | 3 tasks | 13 files |
 | Phase 03 P16 | 12min | 3 tasks | 12 files |
+| Phase 03 P10 | 12min | 3 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -197,6 +198,9 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-15: Preview panel polls with a page-level wire:poll.3s only while a run is active so header actions update; run log uses table ->poll()
 - [Phase 03]: 03-16: attribution link chain item URL → source events page → https://{feed host}/ (never the .ics); with attribution the page drops 'More information' and the WOA fallback, the card shows plain-text 'via {short name}' instead of 'Source: {host}' (C10)
 - [Phase 03]: 03-16: SourceSeeder seeds Baptist Church, Town Council, Academy inactive (firstOrCreate on slug); organiser-site flag on Baptist/Academy only; default category School for the Academy; default venue only when VenueMatcher::exact finds a known venue
+- [Phase 03]: 03-10: ApplySourceUpdate skips diff keys without a published field (cancelled, moved_overrides, extra_dates) but still moves the baseline; venue = admin pick on the update draft, else VenueMatcher::exact, else refused
+- [Phase 03]: 03-10: ConfirmSourceCancellation appends confirmed keys to events.cancelled_dates; IgnoreSourceChange never writes events (ignored far dates stay Scheduled); cancellations move only the cancelled part of the baseline
+- [Phase 03]: 03-10: RejectReason::Ignored set only by IgnoreSourceChange (kept out of the Reject dialog); ChangeOccurrenceStatus/ChangeEventStatus log after commit (C9); REV-06/07 stay Pending until the 03-13 UI
 
 ### Pending Todos
 
@@ -232,6 +236,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-18T11:14:37.389Z
-Stopped at: Completed 03-16-PLAN.md
+Last session: 2026-10-18T11:30:36.747Z
+Stopped at: Completed 03-10-PLAN.md
 Resume file: None

@@ -108,7 +108,7 @@ Plans:
   4. Every fetch respects robots.txt (a disallow shows as a `blocked` run), sends the descriptive User-Agent and waits at least 5s per host. A bot wall or wrong content type is logged as a failed `content_invalid` run. After 3 / 5 consecutive failures the source shows as degraded / unhealthy (paused), a sudden zero-items run is flagged, and no previously published event disappears.
   5. Approved discovered events show visible source attribution with a link, plus an excerpt of at most 200 characters with phone numbers and emails stripped and a "Read more at {source}" link.
 
-**Plans**: 11/17 plans executed
+**Plans**: 12/17 plans executed
 
 Plans:
 **Wave 1**
@@ -135,7 +135,7 @@ Plans:
 - [x] 03-16-PLAN.md — Public attribution ("Listed by", "Also listed by", "Read more at", card "via") + SourceSeeder (wave 6)
 
 **Wave 7** *(blocked on Wave 6 completion)*
-- [ ] 03-10-PLAN.md — Apply update / Ignore / Confirm cancellation actions (wave 7)
+- [x] 03-10-PLAN.md — Apply update / Ignore / Confirm cancellation actions (wave 7)
 - [ ] 03-14-PLAN.md — Per-source category mappings (Rules screen, SaveRules, CategoryAssigner) (wave 7)
 
 **Wave 8** *(blocked on Wave 7 completion)*
@@ -197,7 +197,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Foundation & Published Calendar | 13/13 | Complete    | 2026-10-17 |
 | 2. Draft Model, Review Queue & Submissions | 16/16 | Complete    | 2026-10-17 |
-| 3. Ingestion Backbone, ICS & Change/Duplicate Handling | 11/17 | In Progress | - |
+| 3. Ingestion Backbone, ICS & Change/Duplicate Handling | 12/17 | In Progress | - |
 | 4. Extraction Ladder, Geofence & Live Sources | 0/TBD | Not started | - |
 | 5. Launch Readiness | 0/2+ | Not started | - |
 
