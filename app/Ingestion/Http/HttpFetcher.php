@@ -12,6 +12,7 @@ use GuzzleHttp\Handler\CurlHandler;
 use Illuminate\Http\Client\HttpClientException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Sleep;
 use League\Uri\Uri;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
@@ -21,14 +22,25 @@ use RuntimeException;
  *
  * For each hop (the first URL and every redirect target, at most
  * ingest.max_redirects): URL policy + SSRF guard on every resolved address
- * → beforeHop() (robots and host throttling, 03-03) → one GET with the
- * honest User-Agent, timeouts inside the overall fetch deadline, the checked
- * IP pinned with CURLOPT_RESOLVE and a decoded-byte cap → manual redirect /
- * 304 / 429-503 / >= 400 handling → BodyValidator.
+ * → beforeHop(): robots.txt for that URL's host (RobotsPolicy; a disallowed
+ * URL is a `blocked` result and is never requested) and a reserved host
+ * slot (HostThrottle, at least max(ingest.min_host_delay, Crawl-delay)
+ * after the host's previous request, slept inline with Sleep) → one GET
+ * with the honest User-Agent, timeouts inside the overall fetch deadline,
+ * the checked IP pinned with CURLOPT_RESOLVE and a decoded-byte cap →
+ * manual redirect / 304 / 429-503 / >= 400 handling → BodyValidator.
+ *
+ * robots.txt itself is fetched through the same guard, throttle, pinned
+ * transport, redirect limit and byte cap (fetchRobotsTxt()).
  *
  * It never throws for source problems: every remote failure is a typed
- * FetchResult. Programming errors (bad client options) still throw. It never evades bot protection: one User-Agent, no header
- * spoofing, no challenge solving; a wall is recorded as content_invalid.
+ * FetchResult. The one deliberate exception is HostBusy: when the host's
+ * next slot is further away than ingest.max_inline_wait, or the wait would
+ * leave less than one request timeout before the fetch deadline, the job
+ * must release itself instead of sleeping (RESEARCH Pitfall 7).
+ * Programming errors (bad client options) still throw. It never evades bot
+ * protection: one User-Agent, no header spoofing, no challenge solving; a
+ * wall is recorded as content_invalid.
  *
  * Transport: an explicit CurlHandler. Guzzle routes `stream => true`
  * requests to its PHP-stream handler, which ignores curl options, so the
@@ -46,9 +58,13 @@ class HttpFetcher
 
     public const string ACCEPT_ICS = 'text/calendar, text/plain;q=0.5, */*;q=0.1';
 
+    public const string ACCEPT_ROBOTS = 'text/plain, */*;q=0.1';
+
     public function __construct(
         private readonly SsrfGuard $guard,
         private readonly BodyValidator $validator,
+        private readonly RobotsPolicy $robots,
+        private readonly HostThrottle $throttle,
     ) {}
 
     /**
@@ -59,6 +75,9 @@ class HttpFetcher
         return config('ingest.user_agent_product').' (+'.config('ingest.contact_url').')';
     }
 
+    /**
+     * @throws HostBusy when the host cannot be requested within the inline wait
+     */
     public function fetch(FetchRequest $request): FetchResult
     {
         $clock = hrtime(true);
@@ -99,7 +118,7 @@ class HttpFetcher
             return $pin;
         }
 
-        $refusal = $this->beforeHop($url, $request);
+        $refusal = $this->beforeHop($url, $request, $startedAt);
 
         if ($refusal instanceof FetchResult) {
             return $refusal;
@@ -116,7 +135,7 @@ class HttpFetcher
         $headerTooLarge = false;
 
         try {
-            $response = $this->send($request, $url, $pin, $secondsLeft, $sink, $headerTooLarge);
+            $response = $this->send($url, $pin, $this->icsHeaders($request), $secondsLeft, $sink, $headerTooLarge);
         } catch (HttpClientException|TransferException $e) {
             $sink->close();
 
@@ -138,14 +157,131 @@ class HttpFetcher
     }
 
     /**
-     * Extension point called before every hop's GET (03-03 adds robots.txt
-     * and host throttling here). Return a FetchResult to stop the fetch, e.g.
-     * FetchResult::blocked(); null lets the request go ahead. Time spent here
-     * (inline host waits) counts against the fetch deadline.
+     * Called before every hop's GET, after the SSRF guard: robots.txt for the
+     * URL's host, then a reserved host slot. Returns a `blocked` result when
+     * robots.txt disallows the URL (nothing is sent), null to go ahead. Time
+     * spent here (the robots.txt request, inline host waits) counts against
+     * the fetch deadline.
+     *
+     * @throws HostBusy
      */
-    protected function beforeHop(string $url, FetchRequest $request): ?FetchResult
+    protected function beforeHop(string $url, FetchRequest $request, CarbonImmutable $startedAt): ?FetchResult
     {
+        // A spent deadline is this fetch's problem, not the host's: never let
+        // it pose as an unreachable robots.txt (which would cache disallow_all).
+        if ($this->secondsLeft($startedAt) <= 0) {
+            return FetchResult::failed(FetchFailureKind::Timeout, 'Fetch deadline reached', $url);
+        }
+
+        $verdict = $this->robots->check(
+            $url,
+            fn (string $robotsUrl): RobotsFetch => $this->fetchRobotsTxt($robotsUrl, $startedAt),
+        );
+
+        if (! $verdict->allowed) {
+            return FetchResult::blocked($verdict->reason ?? 'robots.txt disallows this URL', $url);
+        }
+
+        $this->waitForSlot($url, $verdict->crawlDelay, $startedAt);
+
         return null;
+    }
+
+    /**
+     * robots.txt through the same SSRF guard, host throttle, pinned transport
+     * and byte cap as every other request, following at most
+     * ingest.max_redirects redirects (RFC 9309 §2.3.1.2). robots.txt is
+     * always allowed, so it is never itself robots-checked. Anything that
+     * does not end in a response is RobotsFetch::unreachable().
+     *
+     * @throws HostBusy
+     */
+    protected function fetchRobotsTxt(string $robotsUrl, CarbonImmutable $startedAt): RobotsFetch
+    {
+        $maxRedirects = (int) config('ingest.max_redirects');
+        $maxBytes = (int) config('ingest.max_bytes');
+        $url = $robotsUrl;
+
+        for ($hop = 0; $hop <= $maxRedirects; $hop++) {
+            $pin = $this->guardHop($url);
+
+            if ($pin instanceof FetchResult) {
+                return RobotsFetch::unreachable();
+            }
+
+            $this->waitForSlot($url, null, $startedAt);
+
+            $secondsLeft = $this->secondsLeft($startedAt);
+
+            if ($secondsLeft <= 0) {
+                return RobotsFetch::unreachable();
+            }
+
+            $sink = new CappedSink($maxBytes);
+            $headerTooLarge = false;
+            $headers = ['User-Agent' => self::userAgent(), 'Accept' => self::ACCEPT_ROBOTS];
+
+            try {
+                $response = $this->send($url, $pin, $headers, $secondsLeft, $sink, $headerTooLarge);
+            } catch (HttpClientException|TransferException) {
+                $sink->close();
+
+                return RobotsFetch::unreachable();
+            }
+
+            try {
+                $status = $response->status();
+
+                if ($status >= 300 && $status < 400 && $status !== 304) {
+                    $location = $response->header('Location');
+
+                    if ($location === '') {
+                        return RobotsFetch::unreachable();
+                    }
+
+                    $url = Uri::new($url)->resolve($location)->toString();
+
+                    continue;
+                }
+
+                $body = $sink->overflowed() ? null : $this->readCapped($response, $maxBytes);
+
+                if ($body === null) {
+                    return RobotsFetch::unreachable();
+                }
+
+                return new RobotsFetch($status, $body, $this->headers($response));
+            } catch (RuntimeException) {
+                // The body stream broke mid-read (connection reset, timeout).
+                return RobotsFetch::unreachable();
+            } finally {
+                $sink->close();
+            }
+        }
+
+        return RobotsFetch::unreachable();
+    }
+
+    /**
+     * Reserve the host's next slot and sleep until it, or throw HostBusy when
+     * the wait is longer than ingest.max_inline_wait or would leave less
+     * than one request timeout (ingest.timeout) before the fetch deadline.
+     *
+     * @throws HostBusy
+     */
+    private function waitForSlot(string $url, ?int $crawlDelay, CarbonImmutable $startedAt): void
+    {
+        $delay = max((int) config('ingest.min_host_delay'), $crawlDelay ?? 0);
+        $maxWait = (int) min(
+            (int) config('ingest.max_inline_wait'),
+            floor($this->secondsLeft($startedAt) - (float) config('ingest.timeout')),
+        );
+
+        $wait = $this->throttle->reserve(HostThrottle::keyFor($url), $delay, $maxWait);
+
+        if ($wait > 0) {
+            Sleep::for($wait)->seconds();
+        }
     }
 
     /**
@@ -183,12 +319,13 @@ class HttpFetcher
     }
 
     /**
-     * @param  list<string>  $pin
+     * The feed request headers: honest User-Agent, Accept and conditional
+     * validators when the caller has them.
+     *
+     * @return array<string, string>
      */
-    private function send(FetchRequest $request, string $url, array $pin, float $secondsLeft, CappedSink $sink, bool &$headerTooLarge): Response
+    private function icsHeaders(FetchRequest $request): array
     {
-        $maxBytes = $sink->maxBytes;
-
         $headers = [
             'User-Agent' => self::userAgent(),
             'Accept' => self::ACCEPT_ICS,
@@ -201,6 +338,20 @@ class HttpFetcher
         if ($request->lastModified !== null && $request->lastModified !== '') {
             $headers['If-Modified-Since'] = $request->lastModified;
         }
+
+        return $headers;
+    }
+
+    /**
+     * One GET through the explicit curl handler: no redirects, the address
+     * pin, the capped sink and timeouts inside the time left.
+     *
+     * @param  list<string>  $pin
+     * @param  array<string, string>  $headers
+     */
+    private function send(string $url, array $pin, array $headers, float $secondsLeft, CappedSink $sink, bool &$headerTooLarge): Response
+    {
+        $maxBytes = $sink->maxBytes;
 
         $curl = $pin === [] ? [] : [CURLOPT_RESOLVE => $pin];
 

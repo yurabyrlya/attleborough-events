@@ -5,11 +5,19 @@ use App\Ingestion\Http\FetchRequest;
 use App\Ingestion\Http\FetchResult;
 use App\Ingestion\Http\HttpFetcher;
 use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Sleep;
 
 /*
  * The single polite fetch path (SRC-05, SRC-06). Offline: Http::fake for the
  * feed, the Pest fake HostResolver for DNS (tests/Pest.php).
+ *
+ * Every fetch now reads robots.txt and reserves a host slot first (03-03,
+ * covered in RobotsPolicyTest and HostThrottleTest). Here each host's
+ * robots.txt is already cached as allow-all, so the request counts below
+ * are the feed requests only, and Sleep is faked (moving the clock with
+ * each wait) so host spacing costs no real time.
  */
 
 const FETCHER_BAPTIST_ICS_URL = 'https://www.attleborough.church/Calendar/Calendar.ics';
@@ -23,6 +31,32 @@ function fetcherFetch(string $url, ?string $etag = null, ?string $lastModified =
 {
     return app(HttpFetcher::class)->fetch(new FetchRequest($url, $etag, $lastModified));
 }
+
+/**
+ * Cache an allow-all robots.txt for each host, as a 404 robots.txt leaves it.
+ * No earlier request is recorded, so tests that freeze the clock in the
+ * past still get the first request without a wait.
+ */
+function fetcherAllowAllRobots(string ...$hosts): void
+{
+    $now = now()->utc()->format('Y-m-d H:i:s');
+
+    foreach ($hosts as $host) {
+        DB::table('crawl_hosts')->insert([
+            'host' => $host,
+            'next_allowed_at' => '2000-01-01 00:00:00',
+            'robots_status' => 'allow_all',
+            'robots_fetched_at' => $now,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+    }
+}
+
+beforeEach(function () {
+    Sleep::fake(syncWithCarbon: true);
+    fetcherAllowAllRobots('www.attleborough.church', 'example.com', 'intranet.example');
+});
 
 it('fetches the Baptist Church ICS feed with the bot User-Agent and returns an ok result', function () {
     config()->set('ingest.contact_url', 'https://whatsonattleborough.co.uk/about-crawler');
@@ -168,6 +202,9 @@ it('blocks a redirect to a host that resolves privately', function () {
 });
 
 it('follows five redirects and fails on the sixth', function () {
+    // Same-host hops are spaced too (HostThrottleTest); here only the count matters.
+    config()->set('ingest.min_host_delay', 0);
+
     $hops = fn (int $count): array => collect(range(0, $count - 1))
         ->mapWithKeys(fn (int $i): array => ["https://example.com/r{$i}" => Http::response('', 302, ['Location' => 'https://example.com/r'.($i + 1)])])
         ->all();
@@ -182,6 +219,8 @@ it('follows five redirects and fails on the sixth', function () {
 });
 
 it('fails as http_status when there are more than five redirects', function () {
+    config()->set('ingest.min_host_delay', 0);
+
     Http::fake(fn (Request $request) => Http::response('', 302, [
         'Location' => 'https://example.com/r'.((int) substr((string) parse_url($request->url(), PHP_URL_PATH), 2) + 1),
     ]));
