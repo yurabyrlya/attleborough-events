@@ -108,7 +108,48 @@ Plans:
   4. Every fetch respects robots.txt (a disallow shows as a `blocked` run), sends the descriptive User-Agent and waits at least 5s per host. A bot wall or wrong content type is logged as a failed `content_invalid` run. After 3 / 5 consecutive failures the source shows as degraded / unhealthy (paused), a sudden zero-items run is flagged, and no previously published event disappears.
   5. Approved discovered events show visible source attribution with a link, plus an excerpt of at most 200 characters with phone numbers and emails stripped and a "Read more at {source}" link.
 
-**Plans**: TBD
+**Plans**: 17 plans
+
+Plans:
+**Wave 1**
+- [ ] 03-01-PLAN.md — Ingestion schema: sources, source_runs, source_items, draft/event columns, run enums, Source factory (wave 1)
+- [ ] 03-02-PLAN.md — HttpFetcher core: UA, timeouts, size cap, manual redirects, conditional GET, SSRF guard, body validation (wave 1)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 03-03-PLAN.md — Robots.txt (in-house RFC 9309), per-host throttle with Crawl-delay, raw body store (wave 2)
+- [ ] 03-04-PLAN.md — ICS extractor: one item per identity, DST/TZID rules, D-19 recurrence scope, hashes, 90-day window (wave 2)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+- [ ] 03-05-PLAN.md — Run pipeline end to end: job → fetch → extract → pending drafts, run counters, excerpts, title rules (wave 3)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+- [ ] 03-06-PLAN.md — Run now + daily scheduler, one run per source, janitor, raw pruning (wave 4)
+- [ ] 03-08-PLAN.md — Approve discovered drafts: event_sources links, accepted baseline, EXDATE publishing, rejected stays rejected (wave 4)
+
+**Wave 5** *(blocked on Wave 4 completion)*
+- [ ] 03-07-PLAN.md — Source health (3/5 failures, structure alert, abandoned runs), test-run preview, Create drafts with body reuse (wave 5)
+
+**Wave 6** *(blocked on Wave 5 completion)*
+- [ ] 03-09-PLAN.md — Change detection: update drafts with diff, cancellations, missing items over complete runs (wave 6)
+- [ ] 03-15-PLAN.md — Filament Sources resource: form, Test run / Create drafts / Run now / Pause, preview, run log, health (wave 6)
+- [ ] 03-16-PLAN.md — Public attribution ("Listed by", "Also listed by", "Read more at", card "via") + SourceSeeder (wave 6)
+
+**Wave 7** *(blocked on Wave 6 completion)*
+- [ ] 03-10-PLAN.md — Apply update / Ignore / Confirm cancellation actions (wave 7)
+- [ ] 03-14-PLAN.md — Per-source category mappings (Rules screen, SaveRules, CategoryAssigner) (wave 7)
+
+**Wave 8** *(blocked on Wave 7 completion)*
+- [ ] 03-11-PLAN.md — Duplicate detection, Mark as duplicate, Not a duplicate memory (wave 8)
+
+**Wave 9** *(blocked on Wave 8 completion)*
+- [ ] 03-12-PLAN.md — Queue: Approve all like this, urgent-first order, source filter on sources (wave 9)
+
+**Wave 10** *(blocked on Wave 9 completion)*
+- [ ] 03-13-PLAN.md — Review page: three-column diff, cancellation and duplicate panels, kind-aware actions (wave 10)
+
+**Wave 11** *(blocked on Wave 10 completion)*
+- [ ] 03-17-PLAN.md — Browser UAT flows F15-F20 in the runbook, automated in tests/Browser (wave 11)
+
 **UI hint**: yes
 
 ### Phase 4: Extraction Ladder, Geofence & Live Sources

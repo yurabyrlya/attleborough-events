@@ -768,7 +768,16 @@ it('rejects an unknown TZID', function () {
 | A11 | `Http::fake()` serves a readable PSR stream when `stream => true` is set, so chunked size-limit reading works in tests | Pitfall 9 | If not, read `$response->body()` with a Content-Length pre-check in tests only. Verify in Wave 1 with one test |
 | A12 | TEC iCal descriptions are plain text without HTML (only empty ones observed) | Pattern 12 | `strip_tags` handles HTML anyway: low risk |
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+All seven questions were answered by the owner on 2026-10-17 and recorded in 03-CONTEXT.md. Where an answer differs from the recommendation below, the decision wins:
+- Q1 recurrence scope → **D-19** (option B: one-offs + form-representable RRULE + `excluded_dates`; moved overrides and RDATE become parse errors).
+- Q2 horizon → **D-20** (keep `calendar.horizon_days` at 90; the import window is 90 days, *not* 400 as recommended below).
+- Q3 empty descriptions → **D-21** ("Details from {source name}." + "Read more at {source}").
+- Q4 venue confirmation → **D-22** (the source's default venue counts as confirmed).
+- Q5 rejected items → **D-23** (stay rejected unless facts change or the admin reopens).
+- Q6 preview body → **D-24** (reuse when under 60 minutes old).
+- Q7 primary attribution → **D-25** (per-source "Organiser's own site" flag).
 
 1. **How much ICS recurrence should be publishable in Phase 3?** (F1)
    - What we know: the real feeds have no RRULE/EXDATE/overrides. The published model holds one `recurrence_rule` limited to `ManualRecurrence` shapes. EXT-01 requires extraction, and success criterion 1 requires correct draft times "across DST, overrides and exclusions".
