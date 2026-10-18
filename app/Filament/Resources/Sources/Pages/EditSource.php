@@ -217,15 +217,21 @@ class EditSource extends EditRecord
             return '';
         }
 
-        $timed = CarbonImmutable::createFromFormat('!Y-m-d H:i', $starts, 'Europe/London');
+        // Carbon throws (rather than returning false) when the text does not
+        // fit the format, so pick the format by shape first.
+        if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/', $starts) === 1) {
+            $timed = CarbonImmutable::createFromFormat('!Y-m-d H:i', $starts, 'Europe/London');
 
-        if ($timed instanceof CarbonImmutable) {
-            return LondonFormatter::shortDate($timed).', '.LondonFormatter::time($timed);
+            return $timed instanceof CarbonImmutable ? LondonFormatter::shortDate($timed).', '.LondonFormatter::time($timed) : $starts;
         }
 
-        $day = CarbonImmutable::createFromFormat('!Y-m-d', $starts, 'Europe/London');
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $starts) === 1) {
+            $day = CarbonImmutable::createFromFormat('!Y-m-d', $starts, 'Europe/London');
 
-        return $day instanceof CarbonImmutable ? LondonFormatter::shortDate($day) : $starts;
+            return $day instanceof CarbonImmutable ? LondonFormatter::shortDate($day) : $starts;
+        }
+
+        return $starts;
     }
 
     private function crawlDelayDescription(): string

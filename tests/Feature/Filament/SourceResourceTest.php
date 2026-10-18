@@ -366,3 +366,25 @@ describe('source form (SRC-01)', function () {
             ->and(EventDraft::query()->sole()->venue_id)->toBe($after->id);
     });
 });
+
+it('shows a test run that previews all-day, timed and unreadable start values', function () {
+    $source = Source::factory()->create(['name' => 'Attleborough Academy']);
+    sourceResourceRun($source, '2026-10-17 08:00', [
+        'mode' => RunMode::Preview,
+        'preview' => [
+            'would_create' => 2,
+            'skipped' => [],
+            'rows' => [
+                ['title' => 'INSET day', 'starts' => '2026-10-07', 'verdict' => 'new', 'reason' => null],
+                ['title' => 'Open evening', 'starts' => '2026-10-15 19:00', 'verdict' => 'new', 'reason' => null],
+                ['title' => 'Odd row', 'starts' => 'not a date', 'verdict' => 'skipped', 'reason' => 'parse_error'],
+            ],
+        ],
+    ]);
+
+    livewire(EditSource::class, ['record' => $source->getRouteKey()])
+        ->assertOk()
+        ->assertSee('Wed 7 Oct')
+        ->assertSee('Thu 15 Oct, 7pm')
+        ->assertSee('not a date');
+});
