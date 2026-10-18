@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\EventDrafts\Pages;
 
 use App\Calendar\ManualRecurrence;
+use App\Enums\DraftKind;
 use App\Enums\ReviewStatus;
 use App\Filament\Resources\EventDrafts\Actions\ReviewActions;
 use App\Filament\Resources\EventDrafts\EventDraftResource;
@@ -104,20 +105,25 @@ class EditEventDraft extends EditRecord
     }
 
     /**
-     * Save, Save & approve, Cancel.
+     * Save, Save & approve, Cancel. A source update or cancellation has no
+     * Save & approve: it is saved here (e.g. the venue for a venue change)
+     * and decided with Apply changes / Confirm cancellation / Ignore on its
+     * review page (03-13).
      *
      * @return array<Action|ActionGroup>
      */
     protected function getFormActions(): array
     {
-        return [
+        $isNew = $this->draft($this->getRecord())->kind === DraftKind::New;
+
+        return array_values(array_filter([
             $this->getSaveFormAction()->label('Save'),
-            Action::make('saveAndApprove')
+            $isNew ? Action::make('saveAndApprove')
                 ->label('Save & approve')
                 ->color('success')
-                ->action(fn () => $this->saveAndApprove()),
+                ->action(fn () => $this->saveAndApprove()) : null,
             $this->getCancelFormAction(),
-        ];
+        ]));
     }
 
     protected function getSavedNotificationTitle(): ?string

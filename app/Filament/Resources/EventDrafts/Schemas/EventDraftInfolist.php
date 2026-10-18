@@ -52,6 +52,7 @@ class EventDraftInfolist
                 self::summary(),
                 self::changes(),
                 self::cancellation(),
+                self::duplicate(),
                 self::what(),
                 self::when(),
                 self::where(),
@@ -130,6 +131,21 @@ class EventDraftInfolist
                     ->state(fn (EventDraft $record): array => DiscoveredDraftDetails::cancelledDates($record))
                     ->listWithLineBreaks()
                     ->bulleted(),
+            ]);
+    }
+
+    /**
+     * The suspected duplicate side by side (D-13): a published event or
+     * another pending draft, with the reason and a link.
+     */
+    private static function duplicate(): Section
+    {
+        return Section::make(fn (EventDraft $record): string => $record->review_status === ReviewStatus::Duplicate ? 'Duplicate of' : 'Possible duplicate')
+            ->visible(fn (EventDraft $record): bool => $record->duplicate_of_event_id !== null || $record->duplicate_of_draft_id !== null)
+            ->schema([
+                ViewEntry::make('duplicate_match')
+                    ->hiddenLabel()
+                    ->view('filament.resources.event-drafts.entries.duplicate-match'),
             ]);
     }
 
@@ -283,14 +299,10 @@ class EventDraftInfolist
                     ->extraAttributes(self::WRAP),
                 TextEntry::make('duplicate')
                     ->label('Duplicate check')
-                    ->state(fn (EventDraft $record): string => $record->duplicateOf !== null
-                        ? 'Possible duplicate of '.$record->duplicateOf->title
+                    ->state(fn (EventDraft $record): string => ($title = DiscoveredDraftDetails::duplicateTitle($record)) !== null
+                        ? 'Possible duplicate of '.$title
                         : 'No duplicate found')
-                    // Links whatever the event's status: hidden and cancelled
-                    // events are still reachable on their admin page.
-                    ->url(fn (EventDraft $record): ?string => $record->duplicate_of_event_id !== null
-                        ? EventResource::getUrl('edit', ['record' => $record->duplicate_of_event_id])
-                        : null)
+                    ->url(fn (EventDraft $record): ?string => DiscoveredDraftDetails::duplicateUrl($record))
                     ->extraAttributes(self::WRAP),
             ]);
     }

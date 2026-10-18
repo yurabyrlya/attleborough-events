@@ -10,7 +10,6 @@ use App\Filament\Resources\EventDrafts\Actions\ReviewActions;
 use App\Filament\Resources\EventDrafts\EventDraftResource;
 use App\Models\EventDraft;
 use App\Models\User;
-use App\Publishing\Actions\ApproveAllLikeThis;
 use App\Publishing\Actions\ApproveDraft;
 use App\Publishing\Actions\RejectDraft;
 use App\Review\DraftPublishability;
@@ -33,7 +32,6 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\HtmlString;
 use Livewire\Component;
 
 class EventDraftsTable
@@ -120,10 +118,18 @@ class EventDraftsTable
                 SelectFilter::make('quality_band')
                     ->label('Quality')
                     ->options(QualityBand::class),
+                // PIPE-05: flagged against a published event or another
+                // pending draft (03-11 deferred item 3).
                 TernaryFilter::make('duplicate')
                     ->label('Possible duplicate')
-                    ->nullable()
-                    ->attribute('duplicate_of_event_id'),
+                    ->queries(
+                        true: fn (Builder $query): Builder => $query->where(fn (Builder $q): Builder => $q
+                            ->whereNotNull('duplicate_of_event_id')
+                            ->orWhereNotNull('duplicate_of_draft_id')),
+                        false: fn (Builder $query): Builder => $query
+                            ->whereNull('duplicate_of_event_id')
+                            ->whereNull('duplicate_of_draft_id'),
+                    ),
                 // start_date is the London wall-clock date, so the range is
                 // a plain inclusive date comparison. Drafts without a start
                 // date drop out only once a bound is set.
@@ -227,30 +233,11 @@ class EventDraftsTable
     }
 
     /**
-     * "Approve all like this" (D-03) on a pending new draft from a source:
-     * approves every pending draft from that source with the same title and
-     * venue through ApproveAllLikeThis. The confirmation names how many; the
-     * one notification afterwards reads "Approved {n} of {total}." with one
-     * line per skip reason (built here: reportBulkProcessingFailure() only
-     * counts for bulk actions, RESEARCH F7).
+     * "Approve all like this" (D-03): the same action as on the review page.
      */
     public static function approveAllLikeThis(): Action
     {
-        return Action::make('approveAllLikeThis')
-            ->label('Approve all like this')
-            ->icon('heroicon-o-check-badge')
-            ->color('success')
-            ->visible(fn (EventDraft $record): bool => ApproveAllLikeThis::applies($record))
-            ->requiresConfirmation()
-            ->modalHeading('Approve all drafts like this?')
-            ->modalDescription(fn (EventDraft $record): string => self::likeThisDescription($record))
-            ->modalSubmitActionLabel('Approve all')
-            ->modalCancelActionLabel(ReviewActions::KEEP_LABEL)
-            ->action(function (EventDraft $record): void {
-                $result = app(ApproveAllLikeThis::class)($record, self::actor());
-
-                self::likeThisNotification($result)->send();
-            });
+        return ReviewActions::approveAllLikeThis();
     }
 
     /**
@@ -301,42 +288,6 @@ class EventDraftsTable
             ->successNotificationTitle('Drafts rejected')
             ->failureNotificationTitle(fn (int $successCount, int $totalCount): string => "Rejected {$successCount} of {$totalCount}. The rest were skipped:")
             ->deselectRecordsAfterCompletion();
-    }
-
-    /**
-     * "{n} pending drafts from {source} titled "{title}" at {venue}." plus
-     * the skip rule, for the confirmation (counted with the same query the
-     * action runs).
-     */
-    private static function likeThisDescription(EventDraft $record): string
-    {
-        $count = app(ApproveAllLikeThis::class)->matching($record)->count();
-        $drafts = $count === 1 ? '1 pending draft' : "{$count} pending drafts";
-        $capped = $count >= ApproveAllLikeThis::LIMIT ? ' (the most one click approves)' : '';
-        $venue = $record->venue->name ?? 'no confirmed venue';
-
-        return "{$drafts}{$capped} from {$record->source?->name} titled \"{$record->title}\" at {$venue}. "
-            .'Drafts with problems are skipped and listed afterwards.';
-    }
-
-    /**
-     * @param  array{approved: int, total: int, skipped: array<string, int>}  $result
-     */
-    private static function likeThisNotification(array $result): Notification
-    {
-        $notification = Notification::make()->title("Approved {$result['approved']} of {$result['total']}.");
-
-        if ($result['skipped'] === []) {
-            return $notification->success();
-        }
-
-        $lines = array_map(
-            fn (string $key, int $count): string => '<p>'.e(DraftPublishability::skipMessage($key, $count)).'</p>',
-            array_keys($result['skipped']),
-            $result['skipped'],
-        );
-
-        return $notification->body(new HtmlString(implode('', $lines)))->warning();
     }
 
     /**

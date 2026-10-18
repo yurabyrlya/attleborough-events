@@ -4,7 +4,13 @@ namespace App\Filament\Resources\EventDrafts\Schemas;
 
 use App\Enums\DraftKind;
 use App\Enums\PriceType;
+use App\Enums\ReviewStatus;
+use App\Filament\Resources\EventDrafts\EventDraftResource;
+use App\Filament\Resources\Events\EventResource;
+use App\Ingestion\Data\DuplicateMatch;
+use App\Models\Event;
 use App\Models\EventDraft;
+use App\Models\EventOccurrence;
 use App\Support\LondonFormatter;
 use Carbon\CarbonImmutable;
 use Throwable;
@@ -21,7 +27,10 @@ use Throwable;
  *   (REV-07, D-08);
  * - sourceCancelledDates(): the dates a new series draft's source marks
  *   cancelled (raw_payload cancelled_keys, which ApproveDraft publishes as
- *   Cancelled).
+ *   Cancelled);
+ * - duplicate(): the suspected match side by side with the draft (D-13,
+ *   PIPE-05), for a published event (duplicate_of_event_id) or another
+ *   pending draft (duplicate_of_draft_id), with the reason in words.
  *
  * Feed values are never trusted to be well formed: anything that does not
  * parse as the expected date or time is shown as the text it is.
@@ -118,6 +127,146 @@ final class DiscoveredDraftDetails
         $keys = $draft->raw_payload['cancelled_keys'] ?? [];
 
         return is_array($keys) ? self::dates($keys) : [];
+    }
+
+    /**
+     * The draft and its suspected match side by side, or null when the
+     * draft has no duplicate warning.
+     *
+     * @return array{
+     *     reason: string,
+     *     matchHeading: string,
+     *     linkLabel: string,
+     *     linkUrl: string,
+     *     rows: list<array{label: string, draft: string, match: string}>
+     * }|null
+     */
+    public static function duplicate(EventDraft $draft): ?array
+    {
+        $event = $draft->duplicate_of_event_id !== null ? $draft->duplicateOf : null;
+        $other = $event === null && $draft->duplicate_of_draft_id !== null ? $draft->duplicateOfDraft : null;
+
+        if ($event === null && $other === null) {
+            return null;
+        }
+
+        $mine = self::draftFacts($draft);
+
+        if ($event instanceof Event) {
+            $theirs = self::eventFacts($event, $draft->start_date?->format('Y-m-d'));
+            $heading = 'Published event';
+            $linkLabel = 'Open the published event';
+            $linkUrl = EventResource::getUrl('edit', ['record' => $event]);
+        } else {
+            $theirs = self::draftFacts($other);
+            $heading = $other->review_status === ReviewStatus::PendingReview ? 'Pending draft '.$other->reference : 'Draft '.$other->reference;
+            $linkLabel = 'Open draft '.$other->reference;
+            $linkUrl = EventDraftResource::getUrl('review', ['record' => $other]);
+        }
+
+        $rows = [];
+
+        foreach (['date' => 'Date', 'time' => 'Time', 'venue' => 'Venue', 'title' => 'Title'] as $key => $label) {
+            $rows[] = ['label' => $label, 'draft' => $mine[$key], 'match' => $theirs[$key]];
+        }
+
+        return [
+            'reason' => self::duplicateReason($draft),
+            'matchHeading' => $heading,
+            'linkLabel' => $linkLabel,
+            'linkUrl' => $linkUrl,
+            'rows' => $rows,
+        ];
+    }
+
+    /**
+     * Why the draft was flagged: "Same web address", or "Same date, similar
+     * venue and title (similarity 0.78)".
+     */
+    public static function duplicateReason(EventDraft $draft): string
+    {
+        if ($draft->duplicate_reason === DuplicateMatch::URL) {
+            return 'Same web address';
+        }
+
+        if ($draft->duplicate_reason === DuplicateMatch::FUZZY) {
+            $score = DuplicateMatch::formatScore($draft->duplicate_score);
+
+            return 'Same date, similar venue and title'.($score !== null ? " (similarity {$score})" : '');
+        }
+
+        return 'Looks like the same event';
+    }
+
+    /**
+     * The title of whatever the draft is flagged against, or null.
+     */
+    public static function duplicateTitle(EventDraft $draft): ?string
+    {
+        if ($draft->duplicate_of_event_id !== null) {
+            return $draft->duplicateOf?->title;
+        }
+
+        return $draft->duplicate_of_draft_id !== null ? $draft->duplicateOfDraft?->title : null;
+    }
+
+    /**
+     * Where the duplicate warning's match lives in the admin, or null.
+     */
+    public static function duplicateUrl(EventDraft $draft): ?string
+    {
+        if ($draft->duplicate_of_event_id !== null) {
+            // Whatever the event's status: hidden and cancelled events are
+            // still reachable on their admin page.
+            return EventResource::getUrl('edit', ['record' => $draft->duplicate_of_event_id]);
+        }
+
+        return $draft->duplicate_of_draft_id !== null
+            ? EventDraftResource::getUrl('review', ['record' => $draft->duplicate_of_draft_id])
+            : null;
+    }
+
+    /**
+     * @return array{date: string, time: string, venue: string, title: string}
+     */
+    private static function draftFacts(EventDraft $draft): array
+    {
+        return [
+            'date' => $draft->start_date !== null ? self::date($draft->start_date->format('Y-m-d')) : 'Not given',
+            'time' => $draft->all_day ? 'All day' : ($draft->start_time !== null ? self::time($draft->start_time) : 'Not given'),
+            'venue' => $draft->venue->name ?? (trim((string) $draft->venue_name) !== '' ? (string) $draft->venue_name : 'Not given'),
+            'title' => $draft->title,
+        ];
+    }
+
+    /**
+     * The event on the draft's date when it has an occurrence then (the
+     * detector compares occurrences), otherwise its own start.
+     *
+     * @return array{date: string, time: string, venue: string, title: string}
+     */
+    private static function eventFacts(Event $event, ?string $onDate): array
+    {
+        $occurrence = $onDate === null ? null : EventOccurrence::query()
+            ->where('event_id', $event->id)
+            ->where('recurrence_key', $onDate)
+            ->first();
+
+        if ($occurrence instanceof EventOccurrence) {
+            $start = LondonFormatter::local($occurrence->starts_at);
+            $date = LondonFormatter::shortDate($start);
+            $time = $event->all_day ? 'All day' : LondonFormatter::time($start);
+        } else {
+            $date = self::date($event->start_date->format('Y-m-d'));
+            $time = $event->all_day ? 'All day' : self::time($event->start_time);
+        }
+
+        return [
+            'date' => $date,
+            'time' => $time,
+            'venue' => $event->venue->name ?? 'Not given',
+            'title' => $event->title,
+        ];
     }
 
     /**

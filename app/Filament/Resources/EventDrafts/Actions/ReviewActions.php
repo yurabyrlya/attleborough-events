@@ -10,12 +10,16 @@ use App\Filament\Resources\EventDrafts\EventDraftResource;
 use App\Filament\Resources\EventDrafts\Pages\EditEventDraft;
 use App\Filament\Resources\EventDrafts\Pages\ReviewEventDraft;
 use App\Filament\Resources\EventDrafts\Schemas\DiscoveredDraftDetails;
+use App\Models\Event;
 use App\Models\EventDraft;
 use App\Models\User;
 use App\Publishing\Actions\ApplySourceUpdate;
+use App\Publishing\Actions\ApproveAllLikeThis;
 use App\Publishing\Actions\ApproveDraft;
 use App\Publishing\Actions\ConfirmSourceCancellation;
 use App\Publishing\Actions\IgnoreSourceChange;
+use App\Publishing\Actions\MarkDraftDuplicate;
+use App\Publishing\Actions\RecordNotDuplicate;
 use App\Publishing\Actions\RejectDraft;
 use App\Publishing\Actions\ReopenDraft;
 use App\Review\DraftPublishability;
@@ -29,6 +33,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\HtmlString;
 use Livewire\Component;
 
 /**
@@ -57,6 +62,9 @@ use Livewire\Component;
  * "Confirm cancellation" and "Ignore" (REV-06, REV-07, D-07, D-08), so a
  * source change is never rejected without moving the item's accepted
  * baseline (which would raise the same change again on the next run).
+ * A flagged new draft offers "Mark as duplicate" and "Not a duplicate"
+ * (REV-05, D-13), and a sourced new draft "Approve all like this" (D-03),
+ * on the page as in the queue.
  */
 final class ReviewActions
 {
@@ -75,9 +83,12 @@ final class ReviewActions
             self::approve(),
             self::applyChanges(),
             self::confirmCancellation(),
+            self::approveAllLikeThis(),
             self::edit(),
             self::reject(),
             self::ignore(),
+            self::markDuplicate(),
+            self::notDuplicate(),
             self::skip(),
             self::previous(),
             self::reopen(),
@@ -306,6 +317,127 @@ final class ReviewActions
     }
 
     /**
+     * Mark a flagged new draft as a duplicate of its match (REV-05, D-10,
+     * D-13) through MarkDraftDuplicate: nothing is published, the feed item
+     * is linked to the event. Hidden while the match is a draft that has
+     * not been published (MarkDraftDuplicate needs an event to point at).
+     */
+    public static function markDuplicate(): Action
+    {
+        return Action::make('markDuplicate')
+            ->label('Mark as duplicate')
+            ->color('warning')
+            ->visible(fn (EventDraft $record, Component $livewire): bool => self::pendingOfKind($record, $livewire, DraftKind::New)
+                && self::canMarkDuplicate($record))
+            ->requiresConfirmation()
+            ->modalHeading('Mark as duplicate?')
+            ->modalDescription(fn (EventDraft $record): string => 'Mark this draft as a duplicate of '
+                .(DiscoveredDraftDetails::duplicateTitle($record) ?? 'the matching event').'? Nothing new is published.')
+            ->modalSubmitActionLabel('Mark as duplicate')
+            ->modalCancelActionLabel(self::KEEP_LABEL)
+            ->action(function (EventDraft $record, Component $livewire): void {
+                $target = self::duplicateTarget($record);
+
+                if ($target === null) {
+                    Notification::make()->title(self::ALREADY_REVIEWED)->body('Refresh the page to see its current state.')->danger()->send();
+                    self::resync($livewire);
+
+                    return;
+                }
+
+                $marked = self::run(
+                    fn (User $actor) => app(MarkDraftDuplicate::class)($record, $target, $actor),
+                    'Marked as duplicate',
+                    $livewire,
+                    refusalTitle: "Can't mark as duplicate",
+                );
+
+                if ($marked) {
+                    self::openNext($record, $livewire);
+                }
+            });
+    }
+
+    /**
+     * "Not a duplicate" (D-13) through RecordNotDuplicate: the pair is
+     * remembered and never flagged again; the draft stays pending.
+     */
+    public static function notDuplicate(): Action
+    {
+        return Action::make('notDuplicate')
+            ->label('Not a duplicate')
+            ->color('gray')
+            ->visible(fn (EventDraft $record, Component $livewire): bool => self::shownStatus($record, $livewire) === ReviewStatus::PendingReview
+                && ($record->duplicate_of_event_id !== null || $record->duplicate_of_draft_id !== null))
+            ->requiresConfirmation()
+            ->modalHeading('Not a duplicate?')
+            ->modalDescription('The warning is cleared and this pair is not flagged again. The draft stays in the queue.')
+            ->modalSubmitActionLabel('Not a duplicate')
+            ->modalCancelActionLabel(self::KEEP_LABEL)
+            ->action(fn (EventDraft $record, Component $livewire) => self::run(
+                fn (User $actor) => app(RecordNotDuplicate::class)($record, $actor),
+                'Noted: not a duplicate',
+                $livewire,
+            ));
+    }
+
+    /**
+     * "Approve all like this" (D-03) on a pending new draft from a source:
+     * approves every pending draft from that source with the same title and
+     * venue through ApproveAllLikeThis. The confirmation names how many; the
+     * one notification afterwards reads "Approved {n} of {total}." with one
+     * line per skip reason (built here: reportBulkProcessingFailure() only
+     * counts for bulk actions, RESEARCH F7). On the review page it then
+     * opens the next pending draft once this one was approved.
+     */
+    public static function approveAllLikeThis(): Action
+    {
+        return Action::make('approveAllLikeThis')
+            ->label('Approve all like this')
+            ->icon('heroicon-o-check-badge')
+            ->color('success')
+            ->visible(fn (EventDraft $record, Component $livewire): bool => ApproveAllLikeThis::applies($record)
+                && self::shownStatus($record, $livewire) === ReviewStatus::PendingReview)
+            ->requiresConfirmation()
+            ->modalHeading('Approve all drafts like this?')
+            ->modalDescription(fn (EventDraft $record): string => self::likeThisDescription($record))
+            ->modalSubmitActionLabel('Approve all')
+            ->modalCancelActionLabel(self::KEEP_LABEL)
+            ->action(function (EventDraft $record, Component $livewire): void {
+                $actor = auth()->user();
+
+                if (! $actor instanceof User) {
+                    throw new AuthorizationException('Only the admin can review drafts.');
+                }
+
+                if (! ApproveAllLikeThis::applies($record->refresh())) {
+                    Notification::make()->title(self::ALREADY_REVIEWED)->body('Refresh the page to see its current state.')->danger()->send();
+                    self::resync($livewire);
+
+                    return;
+                }
+
+                $result = app(ApproveAllLikeThis::class)($record, $actor);
+
+                self::likeThisNotification($result)->send();
+                self::resync($livewire);
+
+                if ($record->refresh()->review_status !== ReviewStatus::PendingReview) {
+                    self::openNext($record, $livewire);
+                }
+            });
+    }
+
+    /**
+     * Whether "Mark as duplicate" can act on the draft's warning: a
+     * published event, or a draft that was approved into one.
+     */
+    public static function canMarkDuplicate(EventDraft $record): bool
+    {
+        return self::duplicateTarget($record) !== null;
+    }
+
+    /**
      * Return a rejected draft to the queue (D-12).
      */
     public static function reopen(): Action
@@ -397,6 +529,56 @@ final class ReviewActions
 
         // Ignored belongs to IgnoreSourceChange, never to a Reject dialog.
         return $reason === RejectReason::Ignored ? null : $reason;
+    }
+
+    /**
+     * The event (or approved draft) "Mark as duplicate" links to, or null.
+     */
+    private static function duplicateTarget(EventDraft $record): Event|EventDraft|null
+    {
+        if ($record->duplicate_of_event_id !== null) {
+            return $record->duplicateOf;
+        }
+
+        $other = $record->duplicate_of_draft_id !== null ? $record->duplicateOfDraft : null;
+
+        return $other !== null && $other->review_status === ReviewStatus::Approved && $other->event_id !== null ? $other : null;
+    }
+
+    /**
+     * "{n} pending drafts from {source} titled "{title}" at {venue}." plus
+     * the skip rule, for the confirmation (counted with the same query the
+     * action runs).
+     */
+    private static function likeThisDescription(EventDraft $record): string
+    {
+        $count = app(ApproveAllLikeThis::class)->matching($record)->count();
+        $drafts = $count === 1 ? '1 pending draft' : "{$count} pending drafts";
+        $capped = $count >= ApproveAllLikeThis::LIMIT ? ' (the most one click approves)' : '';
+        $venue = $record->venue->name ?? 'no confirmed venue';
+
+        return "{$drafts}{$capped} from {$record->source?->name} titled \"{$record->title}\" at {$venue}. "
+            .'Drafts with problems are skipped and listed afterwards.';
+    }
+
+    /**
+     * @param  array{approved: int, total: int, skipped: array<string, int>}  $result
+     */
+    private static function likeThisNotification(array $result): Notification
+    {
+        $notification = Notification::make()->title("Approved {$result['approved']} of {$result['total']}.");
+
+        if ($result['skipped'] === []) {
+            return $notification->success();
+        }
+
+        $lines = array_map(
+            fn (string $key, int $count): string => '<p>'.e(DraftPublishability::skipMessage($key, $count)).'</p>',
+            array_keys($result['skipped']),
+            $result['skipped'],
+        );
+
+        return $notification->body(new HtmlString(implode('', $lines)))->warning();
     }
 
     /**
