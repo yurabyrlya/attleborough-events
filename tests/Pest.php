@@ -1,16 +1,26 @@
 <?php
 
+use App\Enums\RunMode;
+use App\Enums\RunStatus;
+use App\Enums\RunTrigger;
 use App\Ingestion\Http\HostResolver;
+use App\Jobs\FetchSourceJob;
 use App\Models\Category;
 use App\Models\Event;
+use App\Models\EventDraft;
 use App\Models\EventOccurrence;
+use App\Models\Source;
+use App\Models\SourceRun;
+use App\Models\User;
 use App\Models\Venue;
+use App\Publishing\Actions\ApproveDraft;
 use App\Submissions\Honeypot;
 use App\Submissions\TurnstileVerifier;
 use Carbon\CarbonImmutable;
 use Dom\HTMLDocument;
 use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Testing\TestResponse;
@@ -128,6 +138,89 @@ function icsFixture(string $name): string
     expect(is_file($file))->toBeTrue("Missing ICS fixture {$name}");
 
     return (string) file_get_contents($file);
+}
+
+/**
+ * Serves $body as the feed for every non-robots URL (robots.txt allows all).
+ * The first call registers one Http::fake for the test; later calls only
+ * swap the body (repeated Http::fake calls append, and the first wins).
+ */
+function ingestFeed(string $body): void
+{
+    if (app()->bound('ingest.test.feed')) {
+        app('ingest.test.feed')['body'] = $body;
+
+        return;
+    }
+
+    $state = new ArrayObject(['body' => $body]);
+    app()->instance('ingest.test.feed', $state);
+
+    Http::fake(function (Request $request) use ($state) {
+        if (str_ends_with((string) parse_url($request->url(), PHP_URL_PATH), '/robots.txt')) {
+            return Http::response("User-agent: *\nDisallow:\n", 200, ['Content-Type' => 'text/plain']);
+        }
+
+        return Http::response($state['body'], 200, ['Content-Type' => 'text/calendar; charset=utf-8']);
+    });
+}
+
+/**
+ * One queued live run of $source through FetchSourceJob (offline).
+ */
+function ingestLiveRun(Source $source): SourceRun
+{
+    $run = new SourceRun(['mode' => RunMode::Live, 'trigger' => RunTrigger::Manual]);
+    $run->forceFill(['source_id' => $source->id, 'status' => RunStatus::Queued])->save();
+
+    FetchSourceJob::dispatchSync($run->id);
+
+    return $run->refresh();
+}
+
+/**
+ * The configured admin (phpunit.xml ADMIN_EMAIL).
+ */
+function ingestAdmin(): User
+{
+    return User::query()->where('email', config('app.admin_email'))->first()
+        ?? User::factory()->create(['email' => config('app.admin_email')]);
+}
+
+/**
+ * Approves a discovered draft as the admin, giving it a venue first when it
+ * has none (the admin would pick it on the edit page).
+ */
+function ingestApprove(EventDraft $draft): Event
+{
+    if ($draft->venue_id === null) {
+        $draft->forceFill(['venue_id' => Venue::factory()->create(['name' => $draft->venue_name ?? 'Town Hall'])->id])->save();
+    }
+
+    return app(ApproveDraft::class)($draft->refresh(), ingestAdmin());
+}
+
+/**
+ * $ics with str_replace($search, $replace) applied inside the one VEVENT
+ * block that contains $needle (e.g. its UID).
+ *
+ * @param  array<string, string>  $replacements  search => replace
+ */
+function ingestEditEvent(string $ics, string $needle, array $replacements): string
+{
+    $blocks = explode('BEGIN:VEVENT', $ics);
+    $hits = 0;
+
+    foreach ($blocks as $index => $block) {
+        if ($index > 0 && str_contains($block, $needle)) {
+            $blocks[$index] = str_replace(array_keys($replacements), array_values($replacements), $block);
+            $hits++;
+        }
+    }
+
+    expect($hits)->toBe(1, "Expected one VEVENT containing {$needle}");
+
+    return implode('BEGIN:VEVENT', $blocks);
 }
 
 /*

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\SourceDiff;
 use App\Enums\DraftKind;
 use App\Enums\EventOrigin;
 use App\Enums\ExtractionMethod;
@@ -272,7 +273,7 @@ class EventDraft extends Model
             'raw_payload' => 'array',
             'consented_at' => 'immutable_datetime',
             'reviewed_at' => 'immutable_datetime',
-            'diff' => 'array',
+            'diff' => SourceDiff::class,
             'excluded_dates' => 'array',
             'relevant_starts_at' => 'immutable_datetime',
             'created_at' => 'immutable_datetime',

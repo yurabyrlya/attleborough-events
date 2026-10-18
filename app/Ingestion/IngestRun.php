@@ -7,6 +7,7 @@ use App\Enums\RunMode;
 use App\Enums\RunStatus;
 use App\Enums\RunTrigger;
 use App\Ingestion\Data\ExtractedItem;
+use App\Ingestion\Data\RecordOutcome;
 use App\Ingestion\Health\SourceHealthTracker;
 use App\Ingestion\Http\FetchRequest;
 use App\Ingestion\Http\FetchResult;
@@ -171,7 +172,7 @@ final class IngestRun
             $observedUntil = $this->laterDate($observedUntil, $item);
 
             try {
-                $bucket = $this->recorder->record($run, $source, $item, $nowLondon);
+                $outcome = $this->recorder->record($run, $source, $item, $nowLondon);
             } catch (Throwable $e) {
                 // Ids only: never feed text, URLs or SQL bindings (T-01-22).
                 Log::error('ingest: item failed', [
@@ -180,14 +181,13 @@ final class IngestRun
                     'item_index' => $index,
                     'exception' => $e::class,
                 ]);
-                $bucket = SourceItemRecorder::SKIPPED_PARSE_ERROR;
+                $outcome = new RecordOutcome(SourceItemRecorder::SKIPPED_PARSE_ERROR);
             }
 
-            $counters[SourceItemRecorder::COUNTER[$bucket]]++;
-
-            if ($bucket === SourceItemRecorder::NEW) {
-                $counters['drafts_created']++;
-            }
+            $counters[SourceItemRecorder::COUNTER[$outcome->bucket]]++;
+            $counters['drafts_created'] += $outcome->draftsCreated;
+            $counters['drafts_replaced'] += $outcome->draftsReplaced;
+            $counters['items_cancelled'] += $outcome->cancelled ? 1 : 0;
         }
 
         $run->forceFill([

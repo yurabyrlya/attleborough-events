@@ -472,6 +472,18 @@ final readonly class DraftData
     }
 
     /**
+     * A copy with some constructor values replaced (named as the
+     * constructor names them), e.g. the admin's choices a source replace
+     * keeps (Pitfall 3).
+     *
+     * @param  array<string, mixed>  $changes
+     */
+    public function with(array $changes): self
+    {
+        return new self(...array_merge(get_object_vars($this), $changes));
+    }
+
+    /**
      * The fillable content columns of EventDraft. Review state (reference,
      * origin, category, raw payload, consent ...) is never in here; the
      * DraftWriter forceFills it.

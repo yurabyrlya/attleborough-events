@@ -17,6 +17,7 @@ use App\Models\Source;
 use App\Models\SourceItem;
 use App\Models\SourceRun;
 use App\Models\Venue;
+use App\Publishing\Actions\RejectDraft;
 use App\Review\CategoryAssigner;
 use App\Review\DraftPublishability;
 use Carbon\CarbonImmutable;
@@ -410,9 +411,12 @@ it('marks a known item seen even when a new title rule now skips it', function (
     recorderServe(recorderIcs(icsFixture('series.ics')));
     $first = recorderRun($this->source);
     $item = SourceItem::query()->where('external_id', 's-moved@synthetic.invalid')->sole();
+    // Rejected, so the item is not tracked: tracked items (linked, or with a
+    // pending new draft) skip title rules and go to change detection (03-09).
+    app(RejectDraft::class)(EventDraft::query()->findOrFail($item->current_draft_id), ingestAdmin());
 
     $this->source->forceFill(['title_rules' => [['mode' => TitleRules::MODE_SKIP, 'keyword' => 'choir']]])->save();
-    $item->forceFill(['missing_runs' => 1])->save();
+    $item->refresh()->forceFill(['missing_runs' => 1])->save();
     $this->travel(30)->minutes();
     $second = recorderRun($this->source->refresh());
 

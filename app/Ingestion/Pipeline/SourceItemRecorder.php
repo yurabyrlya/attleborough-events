@@ -3,8 +3,15 @@
 namespace App\Ingestion\Pipeline;
 
 use App\Enums\DraftKind;
+use App\Enums\ReviewStatus;
 use App\Enums\SourceItemStatus;
+use App\Ingestion\Data\ChangeVerdict;
 use App\Ingestion\Data\ExtractedItem;
+use App\Ingestion\Data\NormalisedFacts;
+use App\Ingestion\Data\RecordOutcome;
+use App\Models\Event;
+use App\Models\EventDraft;
+use App\Models\EventSource;
 use App\Models\Source;
 use App\Models\SourceItem;
 use App\Models\SourceRun;
@@ -14,29 +21,39 @@ use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Records one extracted item of a live run (03-05): one DB transaction per
- * item, returning the single bucket the item is counted in (SRC-07).
- * verdict() returns the same bucket for a preview run (D-01) without
- * writing anything.
+ * Records one extracted item of a live run (03-05, 03-09): one DB
+ * transaction per item, returning the single bucket the item is counted in
+ * (SRC-07) and the drafts it wrote. verdict() returns the same bucket for a
+ * preview run (D-01) without writing anything.
  *
  * Order:
  * 1. A known identity is marked seen in this run first (last_seen_run_id,
  *    last_seen_at, missing_runs 0), whatever bucket follows, so an item the
- *    feed still lists is never treated as missing (PIPE-08 precondition).
- * 2. No usable facts → skipped_parse_error (the item's parse errors kept).
- * 3. A title the source's skip/keep rules drop (TitleRules, D-04) →
- *    skipped_rule, never drafted.
- * 4. Past / far future (WindowClassifier, calendar.horizon_days, D-20) →
- *    skipped_past / skipped_far_future, never drafted.
- * 5. Known item, same raw_hash → unchanged (touch only).
- * 6. Known item, different raw_hash → the new raw/content hash and payload
- *    are stored and the item counts as changed (draft decisions: 03-09).
- * 7. New identity → a source item (active, review pending) and one pending
- *    New draft (DraftWriter::createFromSource) whose description is the
- *    ExcerptBuilder excerpt, or the D-21 fallback when there is none.
+ *    feed still lists is never treated as missing (PIPE-08). An item that
+ *    had gone missing is active again and its pending missing-cancellation
+ *    draft is superseded.
+ * 2. No usable facts → skipped_parse_error (the item's parse errors kept,
+ *    no draft, also for linked items).
+ * 3. Tracked items (linked to an event through event_sources, or with a
+ *    pending new draft) skip the title-rule and window buckets: only a past
+ *    item is just touched; everything else goes to change detection, so a
+ *    linked event moved beyond the window or newly matching a skip rule is
+ *    still compared (counted changed / unchanged).
+ * 4. Other items: title rules (D-04) → skipped_rule; past / far future
+ *    (D-20) → skipped_past / skipped_far_future.
+ * 5. Known item → ChangeDetector when its raw_hash changed, or when it has
+ *    no pending draft and content_hash ≠ accepted_hash (a change held back
+ *    by a cancelled-part baseline move, 03-10, or an undecided item that
+ *    lost its draft); otherwise unchanged. Content and hashes are stored;
+ *    when content equals the baseline the accepted payload follows quietly
+ *    (D-06). The verdict is then acted on (act()).
+ * 6. New identity → a source item (active, review pending) and one pending
+ *    New draft, or, when the feed already marks it STATUS:CANCELLED, a
+ *    cancelled item and no draft (PIPE-07).
  *
  * Skipped identities that are not yet known get no source item: an item
  * far in the future today must still be drafted when it enters the window.
+ * Lock order inside the item transaction: source item → draft.
  */
 final class SourceItemRecorder
 {
@@ -70,14 +87,12 @@ final class SourceItemRecorder
     public function __construct(
         private readonly WindowClassifier $window,
         private readonly DraftWriter $drafts,
+        private readonly ChangeDetector $detector,
     ) {}
 
-    /**
-     * @return self::NEW|self::CHANGED|self::UNCHANGED|self::SKIPPED_PAST|self::SKIPPED_FAR_FUTURE|self::SKIPPED_RULE|self::SKIPPED_PARSE_ERROR
-     */
-    public function record(SourceRun $run, Source $source, ExtractedItem $item, CarbonImmutable $nowLondon): string
+    public function record(SourceRun $run, Source $source, ExtractedItem $item, CarbonImmutable $nowLondon): RecordOutcome
     {
-        return DB::transaction(function () use ($run, $source, $item, $nowLondon): string {
+        return DB::transaction(function () use ($run, $source, $item, $nowLondon): RecordOutcome {
             $nowUtc = $nowLondon->utc();
 
             $existing = SourceItem::query()
@@ -86,35 +101,52 @@ final class SourceItemRecorder
                 ->lockForUpdate()
                 ->first();
 
-            if ($existing !== null) {
-                $existing->forceFill([
-                    'last_seen_run_id' => $run->id,
-                    'last_seen_at' => $nowUtc,
-                    'missing_runs' => 0,
-                ]);
-            }
+            if ($existing === null) {
+                $bucket = $this->classify($source, $item, null, $nowLondon);
 
-            $bucket = $this->classify($source, $item, $existing, $nowLondon);
-
-            if ($existing !== null) {
-                if ($bucket === self::SKIPPED_PARSE_ERROR) {
-                    $existing->forceFill(['parse_errors' => $item->parseErrors]);
+                if ($bucket !== self::NEW) {
+                    return new RecordOutcome($bucket);
                 }
 
-                if ($bucket === self::CHANGED) {
-                    $this->storeContent($existing, $item);
+                return $this->createNew($run, $source, $item, $nowUtc);
+            }
+
+            $existing->forceFill([
+                'last_seen_run_id' => $run->id,
+                'last_seen_at' => $nowUtc,
+                'missing_runs' => 0,
+            ]);
+
+            $this->reappear($existing);
+
+            $facts = $item->facts;
+
+            if ($facts === null) {
+                $existing->forceFill(['parse_errors' => $item->parseErrors])->save();
+
+                return new RecordOutcome(self::SKIPPED_PARSE_ERROR);
+            }
+
+            $pending = self::pendingDraft($existing);
+            $link = self::link($existing);
+
+            if ($link !== null || $pending?->kind === DraftKind::New) {
+                if ($this->window->classify($facts, $nowLondon) === WindowClassifier::PAST) {
+                    $existing->save();
+
+                    return new RecordOutcome(self::SKIPPED_PAST);
                 }
+            } else {
+                $bucket = $this->classify($source, $item, $existing, $nowLondon);
 
-                $existing->save();
+                if (str_starts_with($bucket, 'skipped_')) {
+                    $existing->save();
 
-                return $bucket;
+                    return new RecordOutcome($bucket);
+                }
             }
 
-            if ($bucket === self::NEW) {
-                $this->createWithDraft($run, $source, $item, $nowUtc);
-            }
-
-            return $bucket;
+            return $this->detectChange($source, $item, $facts, $existing, $pending, $link, $nowLondon);
         });
     }
 
@@ -133,6 +165,208 @@ final class SourceItemRecorder
             ->first();
 
         return $this->classify($source, $item, $existing, $nowLondon);
+    }
+
+    /**
+     * Acts on a change verdict for a locked source item (03-09): writes,
+     * replaces or supersedes its draft. Shared by record() and
+     * MissingItemDetector. A pending draft decided meanwhile is never
+     * overwritten: the verdict is worked out again without it, once.
+     *
+     * @param  list<string>  $parseErrors
+     * @return array{created: int, replaced: int}
+     */
+    public function act(
+        SourceItem $item,
+        Source $source,
+        ChangeVerdict $verdict,
+        ?EventDraft $pending,
+        ?EventSource $link,
+        NormalisedFacts $facts,
+        array $parseErrors,
+        CarbonImmutable $nowLondon,
+        bool $retry = true,
+    ): array {
+        $none = ['created' => 0, 'replaced' => 0];
+        $event = $link?->event;
+
+        switch ($verdict->type) {
+            case ChangeVerdict::SUPERSEDE:
+                if ($pending !== null) {
+                    $this->drafts->supersedeFromSource($pending);
+                }
+
+                return $none;
+
+            case ChangeVerdict::REDRAFT:
+                $item->forceFill(['review_outcome' => 'pending'])->save();
+                $this->drafts->createFromSource($this->draftData($facts, $source, $parseErrors), DraftKind::New, $source, $item, $facts->categories);
+
+                return ['created' => 1, 'replaced' => 0];
+
+            case ChangeVerdict::REPLACE:
+                return $this->replace($item, $source, $verdict, $pending, $facts, $parseErrors, $nowLondon, $retry);
+
+            case ChangeVerdict::UPDATE:
+            case ChangeVerdict::CANCEL:
+                if (! $event instanceof Event) {
+                    return $none;
+                }
+
+                $kind = $verdict->type === ChangeVerdict::UPDATE ? DraftKind::Update : DraftKind::Cancellation;
+
+                if ($pending !== null && $pending->kind === $kind) {
+                    return $this->replace($item, $source, $verdict, $pending, $facts, $parseErrors, $nowLondon, $retry);
+                }
+
+                if ($pending !== null) {
+                    // A cancellation replaces a pending update (PIPE-07).
+                    $this->drafts->supersedeFromSource($pending);
+                }
+
+                $this->drafts->createChangeDraft(
+                    $this->draftData($facts, $source, $parseErrors),
+                    $kind,
+                    $source,
+                    $item,
+                    $event,
+                    $verdict->diff,
+                    $verdict->targetKeys[0] ?? null,
+                    $verdict->relevantStartsAt,
+                    $facts->categories,
+                );
+
+                return ['created' => 1, 'replaced' => 0];
+
+            default:
+                return $none;
+        }
+    }
+
+    /**
+     * The pending draft of a source item, locked (at most one: PIPE-06).
+     */
+    public static function pendingDraft(SourceItem $item): ?EventDraft
+    {
+        return EventDraft::query()
+            ->where('source_item_id', $item->id)
+            ->where('review_status', ReviewStatus::PendingReview)
+            ->lockForUpdate()
+            ->first();
+    }
+
+    /**
+     * The event link of a source item (approved or duplicate, D-11).
+     */
+    public static function link(SourceItem $item): ?EventSource
+    {
+        return EventSource::query()->with('event')->where('source_item_id', $item->id)->first();
+    }
+
+    /**
+     * @param  list<string>  $parseErrors
+     * @return array{created: int, replaced: int}
+     */
+    private function replace(
+        SourceItem $item,
+        Source $source,
+        ChangeVerdict $verdict,
+        ?EventDraft $pending,
+        NormalisedFacts $facts,
+        array $parseErrors,
+        CarbonImmutable $nowLondon,
+        bool $retry,
+    ): array {
+        if ($pending === null) {
+            return ['created' => 0, 'replaced' => 0];
+        }
+
+        $replaced = $this->drafts->replacePendingFromSource(
+            $pending,
+            $this->draftData($facts, $source, $parseErrors),
+            $facts->categories,
+            $pending->kind === DraftKind::New ? null : $verdict->diff,
+            $verdict->targetKeys[0] ?? null,
+            $verdict->relevantStartsAt,
+        );
+
+        if ($replaced !== null) {
+            return ['created' => 0, 'replaced' => 1];
+        }
+
+        if (! $retry) {
+            return ['created' => 0, 'replaced' => 0];
+        }
+
+        // Decided while this run was replacing it (PIPE-06 concurrency):
+        // never overwrite the decision; decide again from the fresh state.
+        $item->refresh();
+        $freshPending = self::pendingDraft($item);
+        $freshLink = self::link($item);
+        $again = $this->detector->detect($item, $facts, (string) $item->content_hash, $freshPending, $freshLink, $nowLondon);
+
+        return $this->act($item, $source, $again, $freshPending, $freshLink, $facts, $parseErrors, $nowLondon, false);
+    }
+
+    private function detectChange(
+        Source $source,
+        ExtractedItem $item,
+        NormalisedFacts $facts,
+        SourceItem $existing,
+        ?EventDraft $pending,
+        ?EventSource $link,
+        CarbonImmutable $nowLondon,
+    ): RecordOutcome {
+        $rawChanged = $existing->raw_hash !== $item->rawHash;
+        $deferred = $pending === null && $existing->content_hash !== $existing->accepted_hash;
+
+        if (! $rawChanged && ! $deferred) {
+            $existing->save();
+
+            return new RecordOutcome(self::UNCHANGED);
+        }
+
+        $contentHash = (string) $item->contentHash;
+        $verdict = $this->detector->detect($existing, $facts, $contentHash, $pending, $link, $nowLondon);
+        $wasCancelled = $existing->status === SourceItemStatus::Cancelled;
+
+        $this->storeContent($existing, $item);
+
+        if ($existing->accepted_hash !== null && $existing->accepted_hash === $contentHash) {
+            // D-06: only wording changed; the baseline follows quietly.
+            $existing->forceFill(['accepted_payload' => $existing->payload]);
+        }
+
+        $existing->save();
+
+        $written = $this->act($existing, $source, $verdict, $pending, $link, $facts, $item->parseErrors, $nowLondon);
+        $raised = $written['created'] + $written['replaced'] > 0;
+
+        return new RecordOutcome(
+            $rawChanged || $raised ? self::CHANGED : self::UNCHANGED,
+            $written['created'],
+            $written['replaced'],
+            $verdict->type === ChangeVerdict::CANCEL || ($facts->cancelled && ! $wasCancelled),
+        );
+    }
+
+    /**
+     * PIPE-08: a missing item listed again is active, and the cancellation
+     * its absence raised is withdrawn while still pending.
+     */
+    private function reappear(SourceItem $item): void
+    {
+        if ($item->status !== SourceItemStatus::Missing) {
+            return;
+        }
+
+        $item->forceFill(['status' => SourceItemStatus::Active]);
+
+        $pending = self::pendingDraft($item);
+
+        if ($pending !== null && $pending->kind === DraftKind::Cancellation && array_key_exists('status', $pending->diff ?? [])) {
+            $this->drafts->supersedeFromSource($pending);
+        }
     }
 
     /**
@@ -169,19 +403,23 @@ final class SourceItemRecorder
         return $existing->raw_hash === $item->rawHash ? self::UNCHANGED : self::CHANGED;
     }
 
-    private function createWithDraft(SourceRun $run, Source $source, ExtractedItem $item, CarbonImmutable $nowUtc): void
+    /**
+     * A first sighting: a source item and its New draft, or a cancelled
+     * item and no draft when the feed already cancels it (PIPE-07: nothing
+     * was published, so there is nothing to review).
+     */
+    private function createNew(SourceRun $run, Source $source, ExtractedItem $item, CarbonImmutable $nowUtc): RecordOutcome
     {
         $facts = $item->facts;
 
         if ($facts === null) {
-            return;
+            return new RecordOutcome(self::SKIPPED_PARSE_ERROR);
         }
 
         $sourceItem = new SourceItem;
         $sourceItem->forceFill([
             'source_id' => $source->id,
             'external_id' => $item->externalId,
-            'status' => SourceItemStatus::Active,
             'review_outcome' => 'pending',
             'first_seen_run_id' => $run->id,
             'last_seen_run_id' => $run->id,
@@ -192,15 +430,27 @@ final class SourceItemRecorder
         $this->storeContent($sourceItem, $item);
         $sourceItem->save();
 
-        $data = DraftData::fromSourceItem(
+        if ($facts->cancelled) {
+            return new RecordOutcome(self::NEW, cancelled: true);
+        }
+
+        $this->drafts->createFromSource($this->draftData($facts, $source, $item->parseErrors), DraftKind::New, $source, $sourceItem, $facts->categories);
+
+        return new RecordOutcome(self::NEW, draftsCreated: 1);
+    }
+
+    /**
+     * @param  list<string>  $parseErrors
+     */
+    private function draftData(NormalisedFacts $facts, Source $source, array $parseErrors): DraftData
+    {
+        return DraftData::fromSourceItem(
             $facts,
             $source,
             $this->description($facts->description, $source),
-            $item->parseErrors,
+            $parseErrors,
             $facts->toPayload(),
         );
-
-        $this->drafts->createFromSource($data, DraftKind::New, $source, $sourceItem, $facts->categories);
     }
 
     private function storeContent(SourceItem $sourceItem, ExtractedItem $item): void
@@ -212,6 +462,7 @@ final class SourceItemRecorder
             'payload' => $item->facts?->toPayload(),
             'parse_errors' => $item->parseErrors,
             'last_known_start_at' => $item->facts?->nextInstanceStartUtc,
+            'status' => $item->facts?->cancelled === true ? SourceItemStatus::Cancelled : SourceItemStatus::Active,
         ]);
     }
 
