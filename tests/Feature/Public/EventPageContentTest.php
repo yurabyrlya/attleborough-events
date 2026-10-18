@@ -7,9 +7,12 @@ use App\Enums\RepeatEnds;
 use App\Enums\RepeatPattern;
 use App\Models\Category;
 use App\Models\Event;
+use App\Models\EventSource;
+use App\Models\Source;
 use App\Models\User;
 use App\Models\Venue;
 use App\Publishing\Actions\ChangeEventStatus;
+use App\Publishing\Actions\LinkEventSource;
 use App\Publishing\Actions\PublishEvent;
 use App\Publishing\Data\PublishableEventData;
 use Dom\Element;
@@ -121,6 +124,25 @@ it('shows any other contact as plain text without a link', function () {
     foreach ($main->querySelectorAll('a') as $anchor) {
         expect(contentText($anchor))->not->toBe('ask at the bar');
     }
+});
+
+it('credits the source instead of "More information" and the fallback for a discovered event (C10)', function () {
+    $event = contentPublish($this->base, ['sourceNote' => null, 'organiserName' => null, 'organiserContact' => null]);
+    $source = Source::factory()->create([
+        'name' => 'Attleborough Town Council',
+        'events_page_url' => 'https://attleboroughtc.org.uk/events/',
+    ]);
+    app(LinkEventSource::class)($event, $source, null, EventSource::VIA_APPROVED, $this->admin);
+
+    $response = get('/events/quiz-night')->assertOk();
+    $text = contentText(contentMain($response));
+
+    expect($text)->toContain('Listed by Attleborough Town Council')
+        ->and($text)->toContain('Read more at Attleborough Town Council')
+        ->and($text)->not->toContain('More information')
+        ->and($text)->not->toContain("Listed by What's On Attleborough.");
+
+    assertLink($response, 'https://attleboroughtc.org.uk/events/', 'Attleborough Town Council');
 });
 
 it('never turns a non-http source URL into a link', function () {

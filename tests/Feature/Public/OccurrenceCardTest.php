@@ -3,7 +3,11 @@
 use App\Enums\PriceType;
 use App\Models\Category;
 use App\Models\EventOccurrence;
+use App\Models\EventSource;
+use App\Models\Source;
+use App\Models\User;
 use App\Models\Venue;
+use App\Publishing\Actions\LinkEventSource;
 use Carbon\CarbonImmutable;
 
 use function Pest\Laravel\get;
@@ -111,6 +115,20 @@ it('shows only the source link when both source and contact are set', function (
     $card = onlyCard(['source_url' => 'https://example.org/events/1', 'organiser_contact' => 'hello@example.org']);
 
     expect($card)->toContain('example.org</a>')->not->toContain('hello@example.org')->not->toContain('Contact:');
+});
+
+it('shows "via {source short name}" instead of "Source: {host}" for a discovered event (C10)', function () {
+    $occurrence = makeOccurrence(['source_url' => 'https://example.org/events/1', 'organiser_contact' => null], '2026-10-31 19:30');
+    $source = Source::factory()->create(['name' => 'Attleborough Town Council', 'short_name' => 'Town Council']);
+    $admin = User::factory()->create(['email' => config('app.admin_email')]);
+    app(LinkEventSource::class)($occurrence->event, $source, null, EventSource::VIA_APPROVED, $admin);
+
+    $cards = cardsIn(get('/')->assertOk());
+
+    expect($cards)->toHaveCount(1)
+        ->and($cards[0])->toContain('<p class="via text-sm text-muted">via Town Council</p>')
+        ->not->toContain('Source:')
+        ->not->toContain('example.org</a>');
 });
 
 it('renders no empty lines for missing optional fields', function () {
