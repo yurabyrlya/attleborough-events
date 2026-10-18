@@ -31,7 +31,13 @@ use Illuminate\Support\Facades\DB;
  *
  * is_complete (the only runs missing-item detection reads, 03-09): a live
  * succeeded run (so its body passed validation) with items_found > 0 and
- * items_found at least half of the previous complete run's.
+ * items_found at least half of the previous complete run's. WR-02: a feed
+ * that lastingly shrinks must not switch detection off for good, so a run
+ * is also complete when it is the STEADY_RUNS-th succeeded run in a row
+ * (previous ones incomplete) whose items_found are all within
+ * STEADY_TOLERANCE_PERCENT of this run's: the new level becomes the
+ * reference. A one-off short feed (or one that keeps shrinking) stays
+ * incomplete.
  *
  * Writes only the source's health columns and the run's two flags, inside
  * one transaction that locks the source row. Never touches items, drafts,
@@ -39,6 +45,12 @@ use Illuminate\Support\Facades\DB;
  */
 final class SourceHealthTracker
 {
+    /** Succeeded runs in a row at a steady new level that re-baseline completeness (WR-02). */
+    public const int STEADY_RUNS = 3;
+
+    /** How far (percent of the larger count) the steady runs may differ. */
+    public const int STEADY_TOLERANCE_PERCENT = 20;
+
     public function record(SourceRun $run): void
     {
         if ($run->mode !== RunMode::Live || in_array($run->status, [RunStatus::Queued, RunStatus::Running, RunStatus::Blocked], true)) {
@@ -80,7 +92,9 @@ final class SourceHealthTracker
             && $previousSuccess->items_found > 0;
 
         $isComplete = $run->items_found > 0
-            && ($previousComplete === null || $run->items_found * 2 >= $previousComplete->items_found);
+            && ($previousComplete === null
+                || $run->items_found * 2 >= $previousComplete->items_found
+                || $this->steadyNewLevel($run));
 
         $run->forceFill([
             'structure_alert' => $structureAlert,
@@ -92,6 +106,32 @@ final class SourceHealthTracker
         } elseif ($run->items_found > 0) {
             $source->forceFill(['structure_alert_at' => null]);
         }
+    }
+
+    /**
+     * WR-02: the STEADY_RUNS - 1 succeeded live runs before this one are all
+     * incomplete, found items, and are within STEADY_TOLERANCE_PERCENT of
+     * this run's count, so the feed has settled at a new, smaller size.
+     */
+    private function steadyNewLevel(SourceRun $run): bool
+    {
+        $earlier = $this->previousLive($run)
+            ->where('status', RunStatus::Succeeded)
+            ->limit(self::STEADY_RUNS - 1)
+            ->get(['id', 'items_found', 'is_complete']);
+
+        if ($earlier->count() < self::STEADY_RUNS - 1) {
+            return false;
+        }
+
+        return $earlier->every(fn (SourceRun $previous): bool => ! $previous->is_complete
+            && $previous->items_found > 0
+            && self::close($previous->items_found, $run->items_found));
+    }
+
+    private static function close(int $a, int $b): bool
+    {
+        return abs($a - $b) * 100 <= max($a, $b) * self::STEADY_TOLERANCE_PERCENT;
     }
 
     /**

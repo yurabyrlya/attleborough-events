@@ -9,6 +9,7 @@ use App\Enums\SourceHealth;
 use App\Filament\Resources\Sources\Actions\SourceActions;
 use App\Filament\Resources\Sources\Schemas\SourceForm;
 use App\Filament\Resources\Sources\SourceResource;
+use App\Ingestion\Health\SourceHealthTracker;
 use App\Ingestion\Http\HostThrottle;
 use App\Models\Source;
 use App\Models\SourceRun;
@@ -76,6 +77,10 @@ class EditSource extends EditRecord
                     ->description('The last check found no items after earlier checks found some. The feed may have moved or changed format.')
                     ->warning()
                     ->visible(fn (): bool => $this->source()->structure_alert_at !== null),
+                Callout::make('Missing-item detection paused')
+                    ->description(fn (): string => (string) $this->missingDetectionPaused())
+                    ->warning()
+                    ->visible(fn (): bool => $this->missingDetectionPaused() !== null),
                 Callout::make(fn (): string => (string) $this->crawlDelayWarning())
                     ->description(fn (): string => $this->crawlDelayDescription())
                     ->warning()
@@ -89,6 +94,45 @@ class EditSource extends EditRecord
                 $this->getFormContentComponent(),
                 $this->getRelationManagersContentComponent(),
             ]);
+    }
+
+    /**
+     * WR-02: why missing-item detection is not running, or null when it is
+     * (or the source does not use it). It pauses while the latest
+     * succeeded check found items but was not complete (fewer than half of
+     * the last complete check's), and resumes once the feed holds its new
+     * size for SourceHealthTracker::STEADY_RUNS checks in a row.
+     */
+    public function missingDetectionPaused(): ?string
+    {
+        $source = $this->source();
+
+        if (! $source->supports_missing_detection) {
+            return null;
+        }
+
+        $latest = $source->runs()
+            ->where('mode', RunMode::Live->value)
+            ->where('status', RunStatus::Succeeded->value)
+            ->orderByDesc('id')
+            ->first();
+
+        if ($latest === null || $latest->is_complete || $latest->items_found === 0) {
+            return null;
+        }
+
+        $lastComplete = $source->runs()
+            ->where('mode', RunMode::Live->value)
+            ->where('is_complete', true)
+            ->orderByDesc('id')
+            ->first();
+
+        $since = $lastComplete?->finished_at !== null
+            ? 'The last complete check was on '.LondonFormatter::shortDate($lastComplete->finished_at).'. '
+            : '';
+
+        return 'The last check found less than half as many items as the last complete check, so events that disappear from the feed are not reported as missing. '
+            .$since.'Detection resumes once the feed stays at its new size for '.SourceHealthTracker::STEADY_RUNS.' checks in a row.';
     }
 
     /**

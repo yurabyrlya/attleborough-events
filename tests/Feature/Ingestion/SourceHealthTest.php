@@ -8,6 +8,7 @@ use App\Enums\RunMode;
 use App\Enums\RunStatus;
 use App\Enums\RunTrigger;
 use App\Enums\SourceHealth;
+use App\Filament\Resources\Sources\Pages\EditSource;
 use App\Ingestion\RawBodyStore;
 use App\Jobs\FetchSourceJob;
 use App\Models\Category;
@@ -401,6 +402,59 @@ describe('health and completeness edges (SRC-08)', function () {
 
         $state['body'] = healthCalendar(30);
         expect(healthRun($this->source)->is_complete)->toBeFalse();
+    });
+
+    it('accepts a lastingly smaller feed as complete on the third steady run, so missing detection recovers (WR-02)', function () {
+        $state = new ArrayObject(['mode' => 'ok', 'body' => healthCalendar(64)]);
+        healthServeModes($state);
+        expect(healthRun($this->source)->is_complete)->toBeTrue();
+
+        $complete = [];
+        foreach ([20, 22, 19, 20] as $items) {
+            $state['body'] = healthCalendar($items);
+            $complete[] = healthRun($this->source)->is_complete;
+        }
+
+        // 20 and 22 are short of half of 64; the third steady run (19, within
+        // 20% of 20 and 22) becomes the new reference, and 20 then compares with 19.
+        expect($complete)->toBe([false, false, true, true]);
+    });
+
+    it('keeps a feed that keeps shrinking, or a one-off short feed, incomplete (WR-02)', function () {
+        $state = new ArrayObject(['mode' => 'ok', 'body' => healthCalendar(64)]);
+        healthServeModes($state);
+        healthRun($this->source);
+
+        $complete = [];
+        foreach ([30, 20, 14, 64, 10, 64] as $items) {
+            $state['body'] = healthCalendar($items);
+            $complete[] = healthRun($this->source)->is_complete;
+        }
+
+        expect($complete)->toBe([false, false, false, true, false, true]);
+    });
+
+    it('says on the source page that missing-item detection is paused, until the feed settles (WR-02)', function () {
+        $this->source->forceFill(['supports_missing_detection' => true])->save();
+        $state = new ArrayObject(['mode' => 'ok', 'body' => healthCalendar(64)]);
+        healthServeModes($state);
+        healthRun($this->source);
+        actingAs(OpsFixtures::admin());
+
+        $page = fn () => Livewire::test(EditSource::class, ['record' => $this->source->getRouteKey()]);
+        $page()->assertDontSee('Missing-item detection paused');
+
+        $state['body'] = healthCalendar(20);
+        healthRun($this->source);
+        healthRun($this->source);
+
+        $page()->assertSee('Missing-item detection paused')
+            ->assertSee('The last complete check was on Sat 17 Oct.')
+            ->assertSee('Detection resumes once the feed stays at its new size for 3 checks in a row.');
+
+        healthRun($this->source);
+
+        $page()->assertDontSee('Missing-item detection paused');
     });
 
     it('never marks a failed or blocked run complete', function () {
