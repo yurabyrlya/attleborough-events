@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 03
 current_phase_name: Ingestion Backbone, ICS & Change/Duplicate Handling
 status: executing
-stopped_at: Completed 03-11-PLAN.md
-last_updated: "2026-10-18T12:00:46.399Z"
+stopped_at: Completed 03-12-PLAN.md
+last_updated: "2026-10-18T12:14:02.400Z"
 last_activity: 2026-10-18
 last_activity_desc: Phase 2 complete, transitioned to Phase 3
-state_head: 54f2b4e39859f8ce138d50e445950f97a1650205
+state_head: fe1a4a775895e3ebb789e050615dfa48d19c8710
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 48
-  completed_plans: 43
+  completed_plans: 44
   percent: 40
 ---
 
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 03 (Ingestion Backbone, ICS & Change/Duplicate Handling) — EXECUTING
-Plan: 15 of 17
+Plan: 16 of 17
 Status: Ready to execute
-Last activity: 2026-10-18 — Completed 03-11 (duplicate warnings: duplicate_decisions table, CanonicalUrl, DuplicateDetector URL + pg_trgm fuzzy rule against events and other-source drafts; MarkDraftDuplicate links via event_sources and publishes nothing; RecordNotDuplicate remembered per source item)
+Last activity: 2026-10-18 — Completed 03-12 (queue: Approve all like this for same-source/title/venue drafts with counted skips; urgent update/cancellation drafts first with an Urgent badge, cutoff bound from the app clock; Source filter on the sources table, Origin filter kept)
 
-Progress: [█████████████████░░░] 42/48 planned plans ([████░░░░░░] 40%); phases complete: 2/5
+Progress: [██████████████████░░] 44/48 planned plans ([████░░░░░░] 40%); phases complete: 2/5
 
 ## Performance Metrics
 
@@ -100,6 +100,7 @@ Progress: [█████████████████░░░] 42/48 p
 | Phase 03 P10 | 12min | 3 tasks | 13 files |
 | Phase 03 P14 | 12min | 2 tasks | 9 files |
 | Phase 03 P11 | 16min | 3 tasks | 15 files |
+| Phase 03 P12 | 15min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -206,6 +207,9 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-14: category mappings can be scoped to one source (category_mappings.source_id, unique (coalesce(source_id,0), lower(source_value))); a matching source mapping always beats a global one and the reason names the source
 - [Phase 03]: 03-11: DuplicateDetector excludes same-source candidates for events too (event_sources link), runs on new/re-drafted/replaced New drafts; URL match (1.0) before fuzzy; ties → events, then lowest id
 - [Phase 03]: 03-11: MarkDraftDuplicate sets duplicate_of_event_id (never event_id), links sourced items via LinkEventSource (duplicate) and moves the baseline; pending-draft target refused; RecordNotDuplicate remembers the pair against the source item and moves the warning to the next match; PIPE-05/REV-05 stay Pending until the 03-13 UI
+- [Phase 03]: 03-12: urgency cutoff bound from the app clock (Carbon now + 48 elapsed hours), not PostgreSQL now(); one cutoff per query for keyset and order
+- [Phase 03]: 03-12: Approve all like this matches source + normalised title (SQL twin of CategoryAssigner::normalise) + venue, ReviewQueue order, cap 200; table row action only
+- [Phase 03]: 03-12: Urgent badge on the Kind column (list badges); Source column = source name or origin label; Source filter on source_id, old filter kept as Origin
 
 ### Pending Todos
 
@@ -241,6 +245,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-18T12:00:45.345Z
-Stopped at: Completed 03-11-PLAN.md
+Last session: 2026-10-18T12:14:01.543Z
+Stopped at: Completed 03-12-PLAN.md
 Resume file: None
