@@ -8,6 +8,7 @@ use App\Http\Requests\StoreSubmissionRequest;
 use App\Models\FailedJob;
 use App\Models\Heartbeat;
 use App\Models\Source;
+use App\Support\LondonFormatter;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterval;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,9 @@ use Illuminate\Support\Facades\DB;
  */
 class HealthReport
 {
+    /** Check intervals without a success before an active source counts as not checked (WR-05). */
+    public const int STALE_AFTER_INTERVALS = 2;
+
     public function scheduler(): HealthCheck
     {
         return $this->freshness(
@@ -107,10 +111,23 @@ class HealthReport
      * all(): a remote site's failure is not an app outage, so ops:health
      * prints this line as a warning and its exit code ignores it (T-03-21).
      * One aggregate query; "last seen" is the latest active source check.
+     *
+     * WR-05: blocked runs never move health, so a source that robots.txt or
+     * a bot wall blocks on every check (or whose runs are always abandoned
+     * in the queue) would stay "healthy" while its events go stale. So an
+     * active source also counts as not checked when its last success is
+     * older than STALE_AFTER_INTERVALS check intervals plus the schedule
+     * jitter, or when it has never succeeded and its first live run is
+     * that old.
      */
     public function sources(): HealthCheck
     {
-        $expectation = 'Every active source is healthy';
+        $expectation = 'Every active source is healthy and was checked successfully within two check intervals';
+
+        // Per source: STALE_AFTER_INTERVALS × (1 day, or 7 for weekly) + the jitter, before "now" (bound, so frozen test time applies).
+        $cutoff = "(?::timestamptz - (case when check_frequency = 'weekly' then 7 else 1 end) * ".self::STALE_AFTER_INTERVALS." * interval '1 day' - ? * interval '1 minute')";
+        $now = CarbonImmutable::now()->utc()->format('Y-m-d H:i:sP');
+        $jitter = max(1, (int) config('ingest.schedule.jitter_minutes', 20));
 
         $row = Source::query()
             ->where('is_active', true)
@@ -118,6 +135,11 @@ class HealthReport
             ->selectRaw('count(*) filter (where health = ?) as degraded', [SourceHealth::Degraded->value])
             ->selectRaw('count(*) filter (where health = ?) as unhealthy', [SourceHealth::Unhealthy->value])
             ->selectRaw('count(*) filter (where structure_alert_at is not null) as structure_alerts')
+            ->selectRaw("count(*) filter (where last_success_at < {$cutoff}) as not_checked", [$now, $jitter])
+            ->selectRaw("min(last_success_at) filter (where last_success_at < {$cutoff}) as not_checked_since", [$now, $jitter])
+            ->selectRaw("count(*) filter (where last_success_at is null and exists (
+                select 1 from source_runs r where r.source_id = sources.id and r.mode = 'live' and coalesce(r.queued_at, r.created_at) < {$cutoff}
+            )) as never_checked", [$now, $jitter])
             ->selectRaw('max(last_run_at) as last_run_at')
             ->toBase()
             ->first();
@@ -132,6 +154,8 @@ class HealthReport
             (int) $row->structure_alerts > 0
                 ? $row->structure_alerts.' possible structure '.((int) $row->structure_alerts === 1 ? 'change' : 'changes')
                 : null,
+            $this->notCheckedSince((int) $row->not_checked, $row->not_checked_since ?? null),
+            (int) $row->never_checked > 0 ? "{$row->never_checked} never checked successfully" : null,
         ]);
 
         if ($problems !== []) {
@@ -145,6 +169,23 @@ class HealthReport
         };
 
         return new HealthCheck('sources', 'Sources', HealthState::Ok, $lastRunAt, $age, $expectation, $detail);
+    }
+
+    /**
+     * "1 not checked successfully since Sat 10 Oct" / "2 not checked
+     * successfully, the oldest since Sat 10 Oct", or null for none.
+     */
+    private function notCheckedSince(int $count, mixed $oldest): ?string
+    {
+        if ($count === 0 || $oldest === null) {
+            return null;
+        }
+
+        $since = LondonFormatter::shortDate(CarbonImmutable::parse((string) $oldest)->utc());
+
+        return $count === 1
+            ? "1 not checked successfully since {$since}"
+            : "{$count} not checked successfully, the oldest since {$since}";
     }
 
     public function failedJobCount(): int

@@ -1,13 +1,20 @@
 <?php
 
 use App\Enums\HealthState;
+use App\Enums\RunMode;
+use App\Enums\RunStatus;
+use App\Enums\RunTrigger;
 use App\Enums\SourceHealth;
 use App\Filament\Pages\SystemHealth;
 use App\Models\Heartbeat;
 use App\Models\Source;
+use App\Models\SourceRun;
 use App\Ops\HealthReport;
+use App\Support\LondonFormatter;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Sleep;
 use Livewire\Livewire;
 use Tests\Feature\Ops\OpsFixtures;
 
@@ -255,5 +262,56 @@ describe('sources (SRC-08)', function () {
             ->expectsOutput('sources: OK')
             ->expectsOutput('HEALTHY')
             ->assertExitCode(0);
+    });
+
+    it('counts an active source not checked successfully for two intervals plus the jitter (WR-05)', function (string $frequency, string $lastSuccessUtc, bool $stale) {
+        // Now: Tue 20 Oct 09:00 UTC. Daily: stale before Sun 18 Oct 08:40 UTC (2 days + 20 minutes).
+        Source::factory()->ics()->active()->create(['check_frequency' => $frequency])
+            ->forceFill(['last_success_at' => CarbonImmutable::parse($lastSuccessUtc)])->save();
+
+        $check = app(HealthReport::class)->sources();
+
+        expect($check->state)->toBe($stale ? HealthState::Stale : HealthState::Ok)
+            ->and($check->detail)->toBe($stale ? '1 not checked successfully since '.LondonFormatter::shortDate(CarbonImmutable::parse($lastSuccessUtc)) : '1 active source, all healthy');
+    })->with([
+        'daily, 2 days 19 minutes ago' => ['daily', '2026-10-18T08:41:00Z', false],
+        'daily, 2 days 21 minutes ago' => ['daily', '2026-10-18T08:39:00Z', true],
+        'weekly, 10 days ago' => ['weekly', '2026-10-10T09:00:00Z', false],
+        'weekly, 15 days ago' => ['weekly', '2026-10-05T09:00:00Z', true],
+    ]);
+
+    it('names a source blocked on every check since it was activated, and keeps ops:health exit 0 (WR-05)', function () {
+        Sleep::fake(syncWithCarbon: true);
+        Storage::fake('local');
+        $source = Source::factory()->ics()->active()->create(['url' => 'https://blocked.example.org/events.ics']);
+        ingestFeed('', "User-agent: *\nDisallow: /\n");
+
+        // Blocked runs never move health: still "healthy" after three days of them.
+        foreach (range(1, 3) as $ignored) {
+            expect(ingestLiveRun($source)->status)->toBe(RunStatus::Blocked);
+            $this->travel(1)->days();
+        }
+
+        $check = app(HealthReport::class)->sources();
+
+        expect($source->refresh()->health)->toBe(SourceHealth::Healthy)
+            ->and($check->state)->toBe(HealthState::Stale)
+            ->and($check->detail)->toBe('1 never checked successfully');
+
+        OpsFixtures::beatAgo(Heartbeat::SCHEDULER, 30);
+        OpsFixtures::beatAgo(Heartbeat::QUEUE, 120, ['latency_seconds' => 1]);
+
+        $this->artisan('ops:health')
+            ->expectsOutputToContain('sources: STALE (warning): 1 never checked successfully')
+            ->expectsOutput('HEALTHY')
+            ->assertExitCode(0);
+    });
+
+    it('does not count a newly activated source whose first check is only hours old (WR-05)', function () {
+        $source = Source::factory()->ics()->active()->create();
+        $run = new SourceRun(['mode' => RunMode::Live, 'trigger' => RunTrigger::Activation]);
+        $run->forceFill(['source_id' => $source->id, 'status' => RunStatus::Blocked, 'queued_at' => now()->subHours(3)->utc()])->save();
+
+        expect(app(HealthReport::class)->sources()->state)->toBe(HealthState::Ok);
     });
 });
