@@ -110,7 +110,7 @@
 - [ ] **LEG-01**: Visitor can read a privacy notice covering organiser contact data (legitimate interests), with a Legitimate Interests Assessment kept in the repo
 - [ ] **LEG-02**: Visitor can send a takedown, correction or data-protection complaint through a public contact form
 - [ ] **LEG-03**: Site uses cookieless analytics (no cookie banner, self-hosted fonts) with custom events for source clicks, add-to-calendar, shares and submissions
-- [ ] **LEG-04**: Every discovered event shows visible source attribution with a link
+- [x] **LEG-04**: Every discovered event shows visible source attribution with a link
 
 ### Platform & Operations (OPS)
 
@@ -247,7 +247,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LEG-01 | Phase 5 | Pending |
 | LEG-02 | Phase 5 | Pending |
 | LEG-03 | Phase 5 | Pending |
-| LEG-04 | Phase 3 | Pending |
+| LEG-04 | Phase 3 | Complete |
 | OPS-01 | Phase 1 | Complete |
 | OPS-02 | Phase 5 | Pending |
 | OPS-03 | Phase 5 | Pending |

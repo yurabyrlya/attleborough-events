@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 03
 current_phase_name: Ingestion Backbone, ICS & Change/Duplicate Handling
 status: executing
-stopped_at: Completed 03-15-PLAN.md
-last_updated: "2026-10-18T10:57:57.913Z"
+stopped_at: Completed 03-16-PLAN.md
+last_updated: "2026-10-18T11:14:38.277Z"
 last_activity: 2026-10-18
 last_activity_desc: Phase 2 complete, transitioned to Phase 3
-state_head: dcdb519889e2b0075ff9edf8872e968cd4347ae7
+state_head: bf112d4189d3ad072bde82ba01a409a8804a5cf3
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 48
-  completed_plans: 39
+  completed_plans: 40
   percent: 40
 ---
 
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 03 (Ingestion Backbone, ICS & Change/Duplicate Handling) — EXECUTING
-Plan: 11 of 17
+Plan: 12 of 17
 Status: Ready to execute
-Last activity: 2026-10-18 — Completed 03-15 (Filament Sources admin: form, Test run / Create drafts / Run now / Pause, preview, run log, health)
+Last activity: 2026-10-18 — Completed 03-16 (public source attribution: Listed by / Also listed by / Read more at / card via; SourceSeeder with three inactive ICS sources, dev DB seeded)
 
-Progress: [████████████████░░░░] 39/48 planned plans ([████░░░░░░] 40%); phases complete: 2/5
+Progress: [█████████████████░░░] 40/48 planned plans ([████░░░░░░] 40%); phases complete: 2/5
 
 ## Performance Metrics
 
@@ -96,6 +96,7 @@ Progress: [████████████████░░░░] 39/48 p
 | Phase 03 P07 | 14min | 3 tasks | 16 files |
 | Phase 03 P09 | 24min | 3 tasks | 21 files |
 | Phase 03 P15 | 16min | 3 tasks | 13 files |
+| Phase 03 P16 | 12min | 3 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -194,9 +195,12 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-15: Create drafts is offered only while the source is inactive and its newest run is a succeeded test run, so re-enabling a paused source needs a fresh preview
 - [Phase 03]: 03-15: Crawl-delay warning also fires above the 2-hour queued-run limit (runs would be abandoned), since the check-interval comparison alone can never trigger for daily sources
 - [Phase 03]: 03-15: Preview panel polls with a page-level wire:poll.3s only while a run is active so header actions update; run log uses table ->poll()
+- [Phase 03]: 03-16: attribution link chain item URL → source events page → https://{feed host}/ (never the .ics); with attribution the page drops 'More information' and the WOA fallback, the card shows plain-text 'via {short name}' instead of 'Source: {host}' (C10)
+- [Phase 03]: 03-16: SourceSeeder seeds Baptist Church, Town Council, Academy inactive (firstOrCreate on slug); organiser-site flag on Baptist/Academy only; default category School for the Academy; default venue only when VenueMatcher::exact finds a known venue
 
 ### Pending Todos
 
+- [ ] [Phase 4] Extend database/seeders/SourceSeeder.php with the verified non-ICS List 1 sources (Heritage Group HTML, Attleborough Primary embedded JS array, Baptist Church dated RSS fallback, Town Council TEC REST, P2/P3 JSON-LD sources) once their extractors exist — same rules: inactive, create-only (firstOrCreate on slug), values that pass the Sources form (03-16)
 - [x] [Phase 2→3] Attleborough Primary School fixture captured 2026-10-18 09:21 BST (22 events embedded as a JS array in a server-rendered page; office email/phone redacted; Fixture index updated, "fixtures pending" dropped). Calendar was stale (autumn 2025 only); parser would be a small HTML extractor, not ICS (not in Phase 3 scope).
 
 ### Blockers/Concerns
@@ -228,6 +232,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-18T10:57:57.046Z
-Stopped at: Completed 03-15-PLAN.md
+Last session: 2026-10-18T11:14:37.389Z
+Stopped at: Completed 03-16-PLAN.md
 Resume file: None
