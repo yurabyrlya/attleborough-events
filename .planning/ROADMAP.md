@@ -154,8 +154,7 @@ Plans:
 
 ### Phase 4: Extraction Ladder, Geofence & Live Sources
 
-**Goal**: Every rung of the deterministic extraction ladder works and regional sources are geofenced to the Attleborough area. The admin can preview any source safely, and the real P0 sources are producing drafts in production.
-**Mode:** mvp
+**Goal**: Every rung of the deterministic extraction ladder works and regional sources are geofenced to the Attleborough area. The admin can preview any source safely, and the real P0 sources are producing drafts on schedule (on the local app; production follows in Phase 5).
 **Depends on**: Phase 3
 **Requirements**: EXT-02, EXT-03, EXT-04, EXT-05, EXT-06, EXT-08, PIPE-02, SRC-02, RES-04
 **Success Criteria** (what must be TRUE):
@@ -163,7 +162,7 @@ Plans:
   2. The admin can test-run any source and preview what it would extract (events, skips and parse errors) without creating a single draft.
   3. A listing date with an ambiguous format, or with no year where the year can't be resolved by the rules, arrives as a draft with a parse error and Low quality instead of a guessed date. Every extractor passes offline fixture tests built from real samples, including DST dates.
   4. Events from a regional (`filter`) source outside NR17 / NR16 / NR18 / IP24 and the allowlisted place names are skipped and counted, online-only events are skipped, and events with unknown locations arrive as flagged drafts.
-  5. The initial P0 sources from `docs/research/event-sources.md` are configured in production and producing pending drafts on schedule.
+  5. The initial P0 sources from `docs/research/event-sources.md` (Baptist Church ICS, Town Council TEC REST) are configured on the local app and producing pending drafts from scheduled runs. *(The production half moves to Phase 5, 04-CONTEXT D-01.)*
 
 **Plans**: TBD
 
@@ -181,6 +180,7 @@ Plans:
   5. Public pages pass a WCAG 2.2 AA check (automated and manual screen-reader pass). Nightly off-site backups run, and a full restore drill has succeeded.
   6. whatsonattleborough.co.uk is registered, on Cloudflare DNS (DNS-only) with hello@ email routing, and serves the app over HTTPS from the hardened Hetzner VPS (PHP 8.5, PostgreSQL 18, Caddy, apex canonical with www 301). Pushing to `main` deploys with zero downtime after CI passes (built assets uploaded from CI; rollback documented), and the production admin exists. *(Deferred from Phase 1.)*
   7. In production the systemd queue worker and cron scheduler run, `ops:health` reports HEALTHY within 7 minutes of a deploy, the ops drill (failed job visible, then retried) passes, production logs rotate daily for 14 days, and the event page/share/.ics checks and Rich Results Test pass against the live URL. *(Deferred from Phase 1.)*
+  8. The initial P0 sources (Baptist Church ICS, Town Council TEC REST) are configured in production and producing pending drafts on schedule (RES-04 production half, moved from Phase 4 by 04-CONTEXT D-01).
 
 **Plans**: 2 planned so far (more added when Phase 5 is planned)
 - [ ] 05-01-PLAN.md (server provisioning + owner infra checkpoints; moved from 01-02)

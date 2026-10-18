@@ -257,7 +257,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RES-01 | Phase 2 | Complete |
 | RES-02 | Phase 2 | Complete |
 | RES-03 | Phase 2 | Complete |
-| RES-04 | Phase 4 | Pending |
+| RES-04 | Phase 4 (local app, scheduled runs) + Phase 5 (production) | Pending |
 
 **Coverage:**
 - v1 requirements: 83 total (81 + OPS-01b, OPS-04b split out on 2026-10-16)
