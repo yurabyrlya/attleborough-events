@@ -2,17 +2,17 @@
 gsd_state_version: "1.0"
 current_phase: 03
 current_phase_name: Ingestion Backbone, ICS & Change/Duplicate Handling
-status: executing
-stopped_at: Completed 03-13-PLAN.md
-last_updated: "2026-10-18T12:36:38.321Z"
+status: verifying
+stopped_at: Completed 03-17-PLAN.md
+last_updated: "2026-10-18T13:00:20.435Z"
 last_activity: 2026-10-18
 last_activity_desc: Phase 2 complete, transitioned to Phase 3
-state_head: eb03cc60219715b0b1586d71f101afc0519cf67f
+state_head: 8fa5bb735196da2de5cf560cd4d5c33f49d72cdf
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 48
-  completed_plans: 45
+  completed_plans: 46
   percent: 40
 ---
 
@@ -29,8 +29,8 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 
 Phase: 03 (Ingestion Backbone, ICS & Change/Duplicate Handling) — EXECUTING
 Plan: 17 of 17
-Status: Ready to execute
-Last activity: 2026-10-18 — Completed 03-13 (review page for discovered drafts: three-column diff with Apply changes / Ignore, cancellation dates with Confirm cancellation / Ignore, side-by-side duplicate panel for event and draft matches with Mark as duplicate / Not a duplicate, Urgent badge, Approve all like this in the header; Approve/Reject/Save & approve for new drafts only; Next dates preview skips excluded dates)
+Status: Phase complete — ready for verification
+Last activity: 2026-10-18 — Completed 03-17 (browser UAT flows F15-F20 in docs/uat/browser-uat.md, automated offline in tests/Browser/SourcesTest.php and SourceReviewTest.php; full Browser suite 40/40 twice). All 17 Phase 3 plans have summaries; phase verification pending
 
 Progress: [███████████████████░] 45/48 planned plans ([████░░░░░░] 40%); phases complete: 2/5
 
@@ -102,6 +102,7 @@ Progress: [███████████████████░] 45/48 p
 | Phase 03 P11 | 16min | 3 tasks | 15 files |
 | Phase 03 P12 | 15min | 2 tasks | 6 files |
 | Phase 03 P13 | 25min | 2 tasks | 16 files |
+| Phase 03 P17 | 19min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -216,6 +217,7 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-13: Mark as duplicate shown only when the match is a published event or an approved draft with an event; the duplicate panel compares the event's occurrence on the draft's date
 - [Phase 03]: 03-13: Approve all like this is one ReviewActions definition shared by the queue row and the review header
 - [Phase 03]: 03-13: REV-05, REV-06, REV-07, PIPE-05 marked Complete (UI was the last missing part); 03-17 re-checks REV-05/06/07 in browser UAT
+- [Phase 03]: 03-17: browser UAT builds discovered-draft state only through ingestion (Uat::fakeIngestion + ingestedSource on the seeded sources + runSource on edited fixture copies), queue worked in-process with queue:work --once
 
 ### Pending Todos
 
@@ -251,6 +253,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-18T12:36:37.438Z
-Stopped at: Completed 03-13-PLAN.md
+Last session: 2026-10-18T13:00:19.547Z
+Stopped at: Completed 03-17-PLAN.md
 Resume file: None
