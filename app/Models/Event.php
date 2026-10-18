@@ -42,6 +42,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property CarbonImmutable|null $end_date
  * @property string|null $end_time
  * @property string|null $recurrence_rule
+ * @property list<string> $excluded_dates
  * @property EventStatus $status
  * @property EventOrigin $origin
  * @property int $approved_by
@@ -76,6 +77,8 @@ class Event extends Model
         'price_type' => 'unknown',
         // D-19: Phase 1 events and admin entry show the contact publicly.
         'contact_public' => true,
+        // D-19: London dates (Y-m-d) an ICS series skips (EXDATE).
+        'excluded_dates' => '[]',
     ];
 
     /**
@@ -86,6 +89,27 @@ class Event extends Model
     public function draft(): HasOne
     {
         return $this->hasOne(EventDraft::class)->where('kind', DraftKind::New);
+    }
+
+    /**
+     * Every source listing this event (REV-05, LEG-04), oldest link first.
+     *
+     * @return HasMany<EventSource, $this>
+     */
+    public function eventSources(): HasMany
+    {
+        return $this->hasMany(EventSource::class)->orderBy('linked_at')->orderBy('id');
+    }
+
+    /**
+     * The main attribution (D-12, D-25): at most one per event, enforced by
+     * the event_sources_one_primary index.
+     *
+     * @return HasOne<EventSource, $this>
+     */
+    public function primarySource(): HasOne
+    {
+        return $this->hasOne(EventSource::class)->where('is_primary', true);
     }
 
     /**
@@ -160,6 +184,7 @@ class Event extends Model
             'family_friendly' => 'boolean',
             'all_day' => 'boolean',
             'contact_public' => 'boolean',
+            'excluded_dates' => 'array',
             'price_type' => PriceType::class,
             'status' => EventStatus::class,
             'origin' => EventOrigin::class,

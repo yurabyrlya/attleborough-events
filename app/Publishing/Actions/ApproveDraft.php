@@ -5,6 +5,9 @@ namespace App\Publishing\Actions;
 use App\Enums\ReviewStatus;
 use App\Models\Event;
 use App\Models\EventDraft;
+use App\Models\EventSource;
+use App\Models\Source;
+use App\Models\SourceItem;
 use App\Models\User;
 use App\Publishing\AdminGate;
 use App\Publishing\Data\PublishableEventData;
@@ -28,12 +31,21 @@ use InvalidArgumentException;
  * Event rows; its own transaction becomes a savepoint) and stamps the draft
  * approved with the event, reviewer and time. If any step throws, neither the
  * draft change nor any events / event_occurrences row persists.
+ *
+ * A discovered draft (source_item_id set) is also, in the same transaction:
+ * linked to its source through LinkEventSource (linked_via approved, LEG-04,
+ * D-12, D-25), and its source item gets the accepted baseline
+ * (accepted_hash = content_hash, accepted_payload = payload, review_outcome
+ * approved, PIPE-06). Lock order: draft → event (PublishEvent,
+ * LinkEventSource) → source item last. Manual and submission drafts are
+ * untouched by this.
  */
 final class ApproveDraft
 {
     public function __construct(
         private PublishEvent $publish,
         private DraftPublishability $publishability,
+        private LinkEventSource $link,
     ) {}
 
     /**
@@ -65,12 +77,20 @@ final class ApproveDraft
 
             $event = ($this->publish)($data, $reviewer, $locked->origin);
 
+            if ($locked->source_item_id !== null) {
+                $this->linkSource($locked, $event, $reviewer);
+            }
+
             $locked->forceFill([
                 'review_status' => ReviewStatus::Approved,
                 'event_id' => $event->id,
                 'reviewed_by' => $reviewer->id,
                 'reviewed_at' => now()->utc(),
             ])->save();
+
+            if ($locked->source_item_id !== null) {
+                $this->acceptBaseline($locked->source_item_id);
+            }
 
             return [$locked, $event];
         });
@@ -84,5 +104,31 @@ final class ApproveDraft
         ]));
 
         return $event;
+    }
+
+    /**
+     * LEG-04: a discovered event always knows the source it came from.
+     */
+    private function linkSource(EventDraft $draft, Event $event, User $reviewer): void
+    {
+        $item = SourceItem::query()->findOrFail($draft->source_item_id);
+        $source = Source::query()->findOrFail($draft->source_id ?? $item->source_id);
+
+        ($this->link)($event, $source, $item, EventSource::VIA_APPROVED, $reviewer);
+    }
+
+    /**
+     * PIPE-06: what the admin approved becomes the item's baseline, so the
+     * next run only drafts a change to these facts. Item locked last.
+     */
+    private function acceptBaseline(int $sourceItemId): void
+    {
+        $item = SourceItem::query()->whereKey($sourceItemId)->lockForUpdate()->firstOrFail();
+
+        $item->forceFill([
+            'accepted_hash' => $item->content_hash,
+            'accepted_payload' => $item->payload,
+            'review_outcome' => 'approved',
+        ])->save();
     }
 }
