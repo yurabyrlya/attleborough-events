@@ -99,8 +99,7 @@ it('F12: reviews, edits and approves a submission, then lands on the next draft'
         ->waitForText('Edit draft: UAT Barn Social');
 
     // The only way a venue is created from a draft (D-05): pre-filled from what the organiser typed.
-    $page->click(Uat::role('button', 'Create new venue'));
-    Uat::waitUntil($page, "document.querySelector('".OPEN_MODAL."') !== null");
+    Uat::clickUntil($page, Uat::role('button', 'Create new venue'), "document.querySelector('".OPEN_MODAL."') !== null");
 
     $page->assertValue(OPEN_MODAL.' >> '.Uat::label('Name'), 'The Old Barn')
         ->assertValue(OPEN_MODAL.' >> '.Uat::label('Postcode'), 'NR17 2AA')

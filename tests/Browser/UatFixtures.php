@@ -392,6 +392,29 @@ final class UatFixtures
     }
 
     /**
+     * Click until a JavaScript expression is truthy. Right after a page
+     * load, Livewire may not have wired its handlers yet on a slow runner
+     * (PHP 8.5 CI), so the first click can be lost; click again only when
+     * nothing happened.
+     */
+    public static function clickUntil(mixed $page, string $selector, string $expression, int $attempts = 3, float $timeoutSeconds = 5.0): mixed
+    {
+        for ($attempt = 1; $attempt <= $attempts; $attempt++) {
+            $page->click($selector);
+
+            try {
+                return self::waitUntil($page, $expression, $timeoutSeconds);
+            } catch (RuntimeException $exception) {
+                if ($attempt === $attempts) {
+                    throw $exception;
+                }
+            }
+        }
+
+        return $page;
+    }
+
+    /**
      * Playwright role selector with an exact, case-sensitive accessible name.
      */
     public static function role(string $role, string $name): string
