@@ -2,9 +2,11 @@
 
 namespace App\Publishing\Actions;
 
+use App\Enums\OccurrenceStatus;
 use App\Enums\ReviewStatus;
 use App\Models\Event;
 use App\Models\EventDraft;
+use App\Models\EventOccurrence;
 use App\Models\EventSource;
 use App\Models\Source;
 use App\Models\SourceItem;
@@ -36,9 +38,13 @@ use InvalidArgumentException;
  * linked to its source through LinkEventSource (linked_via approved, LEG-04,
  * D-12, D-25), and its source item gets the accepted baseline
  * (accepted_hash = content_hash, accepted_payload = payload, review_outcome
- * approved, PIPE-06). Lock order: draft → event (PublishEvent,
- * LinkEventSource) → source item last. Manual and submission drafts are
- * untouched by this.
+ * approved, PIPE-06). A series' cancelled overrides
+ * (raw_payload cancelled_keys, the dates the admin saw on the draft) mark
+ * those occurrences Cancelled through ChangeOccurrenceStatus, so the dates
+ * stay visible as "Cancelled" (D-08, D-19); only dates already inside the
+ * occurrence horizon exist to be cancelled. Lock order: draft → event
+ * (PublishEvent, ChangeOccurrenceStatus, LinkEventSource) → source item
+ * last. Manual and submission drafts are untouched by this.
  */
 final class ApproveDraft
 {
@@ -46,6 +52,7 @@ final class ApproveDraft
         private PublishEvent $publish,
         private DraftPublishability $publishability,
         private LinkEventSource $link,
+        private ChangeOccurrenceStatus $occurrenceStatus,
     ) {}
 
     /**
@@ -78,6 +85,7 @@ final class ApproveDraft
             $event = ($this->publish)($data, $reviewer, $locked->origin);
 
             if ($locked->source_item_id !== null) {
+                $this->cancelOverrides($locked, $event, $reviewer);
                 $this->linkSource($locked, $event, $reviewer);
             }
 
@@ -104,6 +112,30 @@ final class ApproveDraft
         ]));
 
         return $event;
+    }
+
+    /**
+     * D-08/D-19: the feed's cancelled dates of a series publish as Cancelled
+     * occurrences (never deleted), so residents still see "Cancelled".
+     */
+    private function cancelOverrides(EventDraft $draft, Event $event, User $reviewer): void
+    {
+        $keys = $draft->raw_payload['cancelled_keys'] ?? [];
+
+        if ($event->recurrence_rule === null || ! is_array($keys) || $keys === []) {
+            return;
+        }
+
+        $occurrences = EventOccurrence::query()
+            ->where('event_id', $event->id)
+            ->whereIn('recurrence_key', array_values(array_filter($keys, is_string(...))))
+            ->where('status', OccurrenceStatus::Scheduled)
+            ->orderBy('recurrence_key')
+            ->get();
+
+        foreach ($occurrences as $occurrence) {
+            ($this->occurrenceStatus)($occurrence, OccurrenceStatus::Cancelled, $reviewer);
+        }
     }
 
     /**

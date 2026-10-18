@@ -23,6 +23,13 @@ final readonly class PublishableEventData
     /** HH:MM or HH:MM:SS, 00:00 to 23:59:59. */
     private const TIME_PATTERN = '/^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/';
 
+    /**
+     * @param  list<string>|null  $excludedDates  London dates (Y-m-d) a series
+     *                                            skips (ICS EXDATE, D-19). Null means "leave the event's
+     *                                            stored exclusions untouched": the edit form has no
+     *                                            such field, so fromForm() gives null and an admin edit
+     *                                            never wipes a published series' EXDATEs (conflict C2).
+     */
     public function __construct(
         public string $title,
         public string $description,
@@ -49,6 +56,7 @@ final readonly class PublishableEventData
         public RepeatEnds $repeatEnds = RepeatEnds::Never,
         public ?string $repeatUntil = null,
         public ?int $repeatCount = null,
+        public ?array $excludedDates = null,
     ) {
         // Validated here, not only in the form: Phase 2's approval path does
         // not go through Filament (T-01-17, WR-02). Mirrors the form's rules:
@@ -117,6 +125,12 @@ final readonly class PublishableEventData
             && ($this->endDate === null || $this->endDate === $this->startDate)
             && self::sameClockTime($this->startTime, $this->endTime)) {
             throw new InvalidArgumentException('The end time must be different from the start time.');
+        }
+
+        foreach ($this->excludedDates ?? [] as $excluded) {
+            if (! self::isRealDate($excluded, $this->timezone)) {
+                throw new InvalidArgumentException("Invalid excluded date [{$excluded}].");
+            }
         }
 
         if ($this->isRecurring() && $this->repeatEnds === RepeatEnds::OnDate
@@ -255,7 +269,23 @@ final readonly class PublishableEventData
             repeatEnds: $recurrence->ends,
             repeatUntil: $recurrence->untilDate,
             repeatCount: $recurrence->count,
+            excludedDates: self::sortedDates($draft->excluded_dates ?? []),
         );
+    }
+
+    /**
+     * Unique and sorted (real Y-m-d strings sort chronologically); the
+     * constructor refuses anything that is not a real date.
+     *
+     * @param  array<array-key, string>  $dates
+     * @return list<string>
+     */
+    private static function sortedDates(array $dates): array
+    {
+        $dates = array_values(array_unique($dates));
+        sort($dates);
+
+        return $dates;
     }
 
     /**
@@ -330,7 +360,7 @@ final readonly class PublishableEventData
     {
         $slug = Str::slug($this->title);
 
-        return [
+        $attributes = [
             'title' => $this->title,
             'slug' => $slug !== '' ? $slug : 'event',
             'description' => $this->description,
@@ -354,6 +384,15 @@ final readonly class PublishableEventData
             'end_time' => $this->allDay ? null : $this->endTime,
             'recurrence_rule' => $this->recurrence()->toRrule($this->startLocal(), $this->allDay),
         ];
+
+        // C2: written only when the caller knows them (fromDraft); null
+        // (an admin edit) leaves the stored exclusions as they are. A
+        // one-off has nothing to exclude.
+        if ($this->excludedDates !== null) {
+            $attributes['excluded_dates'] = $this->isRecurring() ? $this->excludedDates : [];
+        }
+
+        return $attributes;
     }
 
     private static function nullableString(mixed $value): ?string

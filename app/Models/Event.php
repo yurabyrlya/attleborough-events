@@ -60,7 +60,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
     'title', 'slug', 'description', 'category_id', 'venue_id', 'family_friendly',
     'price_type', 'price_text', 'organiser_name', 'organiser_contact', 'organiser_website',
     'contact_public', 'source_url', 'source_note', 'timezone', 'all_day', 'start_date', 'start_time', 'end_date',
-    'end_time', 'recurrence_rule',
+    'end_time', 'recurrence_rule', 'excluded_dates',
 ])]
 class Event extends Model
 {

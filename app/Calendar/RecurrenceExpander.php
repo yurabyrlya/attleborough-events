@@ -18,13 +18,15 @@ use Sabre\VObject\Recur\NoInstancesException;
  * The ONLY recurrence expansion engine (sabre/vobject 5).
  *
  * Builds a synthetic VEVENT (DTSTART;TZID=Europe/London, or DTSTART;VALUE=DATE
- * for all-day series) carrying the stored RRULE, then walks sabre's
- * EventIterator in the event's timezone. Returns the London local dates
- * (Y-m-d, the recurrence keys) of instances that START inside
- * [windowStart, windowEnd).
+ * for all-day series) carrying the stored RRULE and one EXDATE per
+ * events.excluded_dates entry (D-19, same TZID / VALUE=DATE form as
+ * DTSTART), then walks sabre's EventIterator in the event's timezone.
+ * Returns the London local dates (Y-m-d, the recurrence keys) of instances
+ * that START inside [windowStart, windowEnd).
  *
- * Reads only timezone, all_day, start_date, start_time and recurrence_rule,
- * so it also works on unsaved Event models (Filament "Next dates" preview).
+ * Reads only timezone, all_day, start_date, start_time, recurrence_rule and
+ * excluded_dates, so it also works on unsaved Event models (Filament "Next
+ * dates" preview).
  */
 final class RecurrenceExpander
 {
@@ -110,7 +112,77 @@ final class RecurrenceExpander
 
         $vevent->add('RRULE', $event->recurrence_rule);
 
+        // D-19: an excluded London date at the series' own start time.
+        foreach (self::excludedDates($event) as $excluded) {
+            if ($event->all_day) {
+                $vevent->add('EXDATE', $this->localDateTime($excluded, '00:00:00', $tz), ['VALUE' => 'DATE']);
+            } else {
+                $vevent->add('EXDATE', $this->localDateTime($excluded, (string) $event->start_time, $tz));
+            }
+        }
+
         return $dtStart;
+    }
+
+    /**
+     * The series in words, with the dates it skips (D-19), e.g. "Weekly on
+     * Wednesday, except Wed 21 Oct". Null for a one-off. A rule the form
+     * cannot represent reads "Repeats".
+     */
+    public function summary(Event $event): ?string
+    {
+        if ($event->recurrence_rule === null || trim($event->recurrence_rule) === '') {
+            return null;
+        }
+
+        $tz = $event->timezone ?: (string) config('calendar.timezone', 'Europe/London');
+        $start = CarbonImmutable::createFromFormat('!Y-m-d', $event->start_date->format('Y-m-d'), $tz);
+
+        if (! $start instanceof CarbonImmutable) {
+            return null;
+        }
+
+        $label = ManualRecurrence::tryFromStoredRule($event->recurrence_rule, $start, $event->all_day)?->label($start) ?? 'Repeats';
+
+        $excluded = array_map(function (string $date) use ($start, $tz): string {
+            $day = CarbonImmutable::createFromFormat('!Y-m-d', $date, $tz);
+
+            if (! $day instanceof CarbonImmutable) {
+                return $date;
+            }
+
+            return $day->format($day->year === $start->year ? 'D j M' : 'D j M Y');
+        }, self::excludedDates($event));
+
+        if ($excluded === []) {
+            return $label;
+        }
+
+        $last = array_pop($excluded);
+        $list = $excluded === [] ? $last : implode(', ', $excluded).' and '.$last;
+
+        return "{$label}, except {$list}";
+    }
+
+    /**
+     * events.excluded_dates in Y-m-d shape, unique and sorted.
+     *
+     * @return list<string>
+     */
+    private static function excludedDates(Event $event): array
+    {
+        // getAttribute: a model loaded without the column (or a preview
+        // model) simply has no exclusions.
+        $stored = $event->getAttribute('excluded_dates');
+
+        if (! is_array($stored)) {
+            return [];
+        }
+
+        $dates = array_values(array_unique(preg_grep('/^\d{4}-\d{2}-\d{2}$/', array_filter($stored, is_string(...)))));
+        sort($dates);
+
+        return $dates;
     }
 
     private function untilPrecedes(string $rule, DateTimeImmutable $dtStart, DateTimeZone $tz): bool
