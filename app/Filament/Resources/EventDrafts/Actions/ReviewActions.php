@@ -27,6 +27,7 @@ use App\Review\Exceptions\DraftNotPublishable;
 use App\Review\Exceptions\DraftNotReopenable;
 use App\Review\Exceptions\InvalidReviewTransition;
 use App\Review\ReviewQueue;
+use App\Support\ConcurrencyFailure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -34,7 +35,9 @@ use Filament\Notifications\Notification;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\HtmlString;
+use InvalidArgumentException;
 use Livewire\Component;
+use PDOException;
 
 /**
  * Review queue actions (REV-01, REV-04). Rule-free like StatusActions: every
@@ -71,6 +74,10 @@ final class ReviewActions
     public const KEEP_LABEL = 'Keep as is';
 
     public const ALREADY_REVIEWED = 'This draft was already reviewed';
+
+    public const BUSY_TITLE = 'Busy, please try again';
+
+    public const BUSY_BODY = 'Another change to this draft was being saved at the same moment, so nothing was changed. Try again.';
 
     /**
      * Header actions for the review page.
@@ -644,6 +651,24 @@ final class ReviewActions
             return false;
         } catch (DraftNotReopenable $e) {
             Notification::make()->title("Can't reopen this draft")->body($e->getMessage())->danger()->send();
+            self::resync($livewire);
+
+            return false;
+        } catch (InvalidArgumentException $e) {
+            // Review WR-08: a documented refusal (MarkDraftDuplicate,
+            // LinkEventSource, PublishableEventData); our own plain wording.
+            Notification::make()->title($refusalTitle)->body($e->getMessage())->danger()->send();
+            self::resync($livewire);
+
+            return false;
+        } catch (PDOException $e) {
+            // Review WR-08: a deadlock or serialization failure rolled the
+            // whole action back. Anything else is a real fault.
+            if (! ConcurrencyFailure::causedBy($e)) {
+                throw $e;
+            }
+
+            Notification::make()->title(self::BUSY_TITLE)->body(self::BUSY_BODY)->danger()->send();
             self::resync($livewire);
 
             return false;

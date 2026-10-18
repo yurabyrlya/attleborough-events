@@ -16,6 +16,7 @@ use App\Review\DraftPublishability;
 use App\Review\Exceptions\DraftNotPublishable;
 use App\Review\Exceptions\InvalidReviewTransition;
 use App\Review\ReviewQueue;
+use App\Support\ConcurrencyFailure;
 use App\Support\LondonFormatter;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
@@ -32,7 +33,9 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use InvalidArgumentException;
 use Livewire\Component;
+use PDOException;
 
 class EventDraftsTable
 {
@@ -222,8 +225,15 @@ class EventDraftsTable
                         $approve($record, $actor);
                     } catch (InvalidReviewTransition|ModelNotFoundException) {
                         self::skip($action, 'already_reviewed');
-                    } catch (DraftNotPublishable) {
+                    } catch (DraftNotPublishable|InvalidArgumentException) {
                         self::skip($action, 'blocked');
+                    } catch (PDOException $e) {
+                        // Review WR-08: skip a deadlock victim, carry on.
+                        if (! ConcurrencyFailure::causedBy($e)) {
+                            throw $e;
+                        }
+
+                        self::skip($action, 'busy');
                     }
                 }
             })

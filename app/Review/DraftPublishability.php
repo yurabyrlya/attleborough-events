@@ -35,6 +35,8 @@ final class DraftPublishability
         'end_time_same_as_start' => 'end time same as start time',
         'blocked' => 'not ready to publish',
         'already_reviewed' => 'already reviewed',
+        // WR-08: a deadlock or serialization failure rolled that approval back.
+        'busy' => 'another change was being saved at the same moment, so try again',
         'not_pending' => 'already reviewed',
         // Bulk reject: a source update or cancellation is applied, confirmed
         // or ignored on its own, so its baseline moves (03-13).

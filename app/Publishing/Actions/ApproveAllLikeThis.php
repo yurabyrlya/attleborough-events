@@ -12,9 +12,12 @@ use App\Review\DraftPublishability;
 use App\Review\Exceptions\DraftNotPublishable;
 use App\Review\Exceptions\InvalidReviewTransition;
 use App\Review\ReviewQueue;
+use App\Support\ConcurrencyFailure;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use InvalidArgumentException;
+use PDOException;
 
 /**
  * "Approve all like this" (D-03, EXT-01): approves every pending new draft
@@ -31,7 +34,10 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
  * DraftPublishability::bulkBlockerKeys() key skips it; otherwise it goes
  * through ApproveDraft in its own transaction, which re-checks it. A draft
  * decided in the meantime counts as already_reviewed, one ApproveDraft still
- * refuses as blocked. Nothing here writes a model itself.
+ * refuses (DraftNotPublishable or a documented InvalidArgumentException) as
+ * blocked, and one a deadlock or serialization failure rolled back as busy
+ * (review WR-08), so one draft never stops the rest or hides the summary.
+ * Nothing here writes a model itself.
  *
  * The caller builds its own notification from the result (RESEARCH F7: a
  * record action has no selection for reportBulkProcessingFailure()).
@@ -142,8 +148,17 @@ final class ApproveAllLikeThis
             ($this->approve)($draft, $actor);
         } catch (InvalidReviewTransition|ModelNotFoundException) {
             return 'already_reviewed';
-        } catch (DraftNotPublishable) {
+        } catch (DraftNotPublishable|InvalidArgumentException) {
+            // WR-08: a documented refusal skips this draft, never the rest.
             return 'blocked';
+        } catch (PDOException $e) {
+            // WR-08: a deadlock or serialization failure rolled this one
+            // approval back; report it and carry on with the others.
+            if (! ConcurrencyFailure::causedBy($e)) {
+                throw $e;
+            }
+
+            return 'busy';
         }
 
         return null;

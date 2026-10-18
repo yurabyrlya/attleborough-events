@@ -3,8 +3,11 @@
 use App\Enums\EventOrigin;
 use App\Enums\ExtractionMethod;
 use App\Enums\ReviewStatus;
+use App\Filament\Resources\EventDrafts\Actions\ReviewActions;
 use App\Filament\Resources\EventDrafts\Pages\ListEventDrafts;
+use App\Filament\Resources\EventDrafts\Pages\ReviewEventDraft;
 use App\Models\Category;
+use App\Models\Event;
 use App\Models\EventDraft;
 use App\Models\Source;
 use App\Models\User;
@@ -14,6 +17,7 @@ use Database\Seeders\CategorySeeder;
 use Filament\Actions\Testing\TestAction;
 use Filament\Notifications\NotificationMailbox;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Sleep;
@@ -218,4 +222,103 @@ it('refuses a non-admin before approving anything', function () {
 
     expect($this->yoga->map(fn (EventDraft $d) => $d->refresh()->review_status)->unique()->all())
         ->toBe([ReviewStatus::PendingReview]);
+});
+
+/**
+ * The exception PostgreSQL's deadlock (40P01) reaches Laravel as.
+ */
+function likeDeadlock(): QueryException
+{
+    $pdo = new PDOException('SQLSTATE[40P01]: Deadlock detected: 7 ERROR:  deadlock detected');
+    $pdo->errorInfo = ['40P01', 7, 'ERROR:  deadlock detected'];
+
+    return new QueryException('pgsql', 'insert into "events"', [], $pdo);
+}
+
+/**
+ * Publishing the $nth event from now on throws $exception (a stand-in for
+ * a deadlock victim or a documented refusal deep inside the action).
+ */
+function likeFailNthPublish(int $nth, Throwable $exception): void
+{
+    $calls = 0;
+    Event::creating(function () use (&$calls, $nth, $exception): void {
+        if (++$calls === $nth) {
+            throw $exception;
+        }
+    });
+}
+
+describe('failures part way through (review WR-08)', function () {
+    it('skips a deadlock victim, approves the rest and names it in the summary', function () {
+        likeFailNthPublish(2, likeDeadlock());
+
+        livewire(ListEventDrafts::class)
+            ->callAction(TestAction::make('approveAllLikeThis')->table($this->yoga->first()))
+            ->assertHasNoActionErrors();
+
+        [$first, $second, $third] = $this->yoga->all();
+
+        expect(likeNotificationLines())->toBe([
+            'Approved 2 of 3.',
+            '1 skipped: another change was being saved at the same moment, so try again',
+        ])
+            ->and($first->refresh()->review_status)->toBe(ReviewStatus::Approved)
+            ->and($second->refresh()->review_status)->toBe(ReviewStatus::PendingReview)
+            ->and($second->event_id)->toBeNull()
+            ->and($third->refresh()->review_status)->toBe(ReviewStatus::Approved);
+    });
+
+    it('counts a documented refusal as not ready to publish and carries on', function () {
+        likeFailNthPublish(1, new InvalidArgumentException('The feed item belongs to another source.'));
+
+        $result = app(ApproveAllLikeThis::class)($this->yoga->first(), $this->admin);
+
+        expect($result)->toBe(['approved' => 2, 'total' => 3, 'skipped' => ['blocked' => 1]])
+            ->and($this->yoga->first()->refresh()->review_status)->toBe(ReviewStatus::PendingReview);
+    });
+
+    it('still fails loudly on a database error that is not a concurrency conflict', function () {
+        $pdo = new PDOException('SQLSTATE[23502]: Not null violation');
+        $pdo->errorInfo = ['23502', 7, 'ERROR:  null value'];
+        likeFailNthPublish(1, new QueryException('pgsql', 'insert into "events"', [], $pdo));
+
+        expect(fn () => app(ApproveAllLikeThis::class)($this->yoga->first(), $this->admin))->toThrow(QueryException::class);
+    });
+
+    it('skips a deadlock victim in bulk approve and approves the rest', function () {
+        likeFailNthPublish(1, likeDeadlock());
+
+        livewire(ListEventDrafts::class)
+            ->callTableBulkAction('approveSelected', $this->yoga->all());
+
+        expect(likeNotificationLines())->toContain('Approved 2 of 3. The rest were skipped:')
+            ->toContain('1 skipped: another change was being saved at the same moment, so try again')
+            ->and($this->yoga->first()->refresh()->review_status)->toBe(ReviewStatus::PendingReview);
+    });
+
+    it('tells the admin to try again when a single approval is a deadlock victim, instead of a 500', function () {
+        likeFailNthPublish(1, likeDeadlock());
+        $draft = $this->yoga->first();
+
+        livewire(ReviewEventDraft::class, ['record' => $draft->id])
+            ->callAction('approve')
+            ->assertHasNoActionErrors();
+
+        expect(likeNotificationLines())->toBe([ReviewActions::BUSY_TITLE, ReviewActions::BUSY_BODY])
+            ->and($draft->refresh()->review_status)->toBe(ReviewStatus::PendingReview)
+            ->and($draft->event_id)->toBeNull();
+    });
+
+    it('shows a documented refusal from a single review action as a message, instead of a 500', function () {
+        likeFailNthPublish(1, new InvalidArgumentException('The feed item belongs to another source.'));
+        $draft = $this->yoga->first();
+
+        livewire(ReviewEventDraft::class, ['record' => $draft->id])
+            ->callAction('approve')
+            ->assertHasNoActionErrors();
+
+        expect(likeNotificationLines())->toBe(["Can't publish yet", 'The feed item belongs to another source.'])
+            ->and($draft->refresh()->review_status)->toBe(ReviewStatus::PendingReview);
+    });
 });
