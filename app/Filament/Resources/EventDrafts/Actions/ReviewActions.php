@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\EventDrafts\Actions;
 
+use App\Enums\DraftKind;
 use App\Enums\EventOrigin;
 use App\Enums\RejectReason;
 use App\Enums\ReviewStatus;
@@ -15,6 +16,7 @@ use App\Publishing\Actions\RejectDraft;
 use App\Publishing\Actions\ReopenDraft;
 use App\Review\DraftPublishability;
 use App\Review\Exceptions\DraftNotPublishable;
+use App\Review\Exceptions\DraftNotReopenable;
 use App\Review\Exceptions\InvalidReviewTransition;
 use App\Review\ReviewQueue;
 use Filament\Actions\Action;
@@ -204,7 +206,9 @@ final class ReviewActions
         return Action::make('reopen')
             ->label('Reopen')
             ->color('gray')
-            ->visible(fn (EventDraft $record, Component $livewire): bool => self::shownStatus($record, $livewire)->canTransitionTo(ReviewStatus::PendingReview))
+            // C14: an ignored update or cancellation draft stays ignored.
+            ->visible(fn (EventDraft $record, Component $livewire): bool => $record->kind === DraftKind::New
+                && self::shownStatus($record, $livewire)->canTransitionTo(ReviewStatus::PendingReview))
             ->requiresConfirmation()
             ->modalHeading('Reopen this draft?')
             ->modalDescription('It goes back into the review queue as pending. The rejection note is kept.')
@@ -320,6 +324,11 @@ final class ReviewActions
         } catch (DraftNotPublishable $e) {
             // Plain-text body: Filament escapes notification strings.
             Notification::make()->title("Can't publish yet")->body(implode(' ', $e->blockers))->danger()->send();
+            self::resync($livewire);
+
+            return false;
+        } catch (DraftNotReopenable $e) {
+            Notification::make()->title("Can't reopen this draft")->body($e->getMessage())->danger()->send();
             self::resync($livewire);
 
             return false;

@@ -2,9 +2,11 @@
 
 namespace App\Publishing\Actions;
 
+use App\Enums\DraftKind;
 use App\Enums\RejectReason;
 use App\Enums\ReviewStatus;
 use App\Models\EventDraft;
+use App\Models\SourceItem;
 use App\Models\User;
 use App\Publishing\AdminGate;
 use App\Review\Exceptions\InvalidReviewTransition;
@@ -20,6 +22,11 @@ use Illuminate\Support\Facades\Log;
  * SELECT ... FOR UPDATE and asserts pending_review -> rejected on that fresh
  * status, so a stale page cannot reject an approved draft. Writes review
  * state only. Sends nothing to the organiser (D-02).
+ *
+ * A discovered new-event draft also marks its source item rejected and moves
+ * the item's baseline to the current payload, so later runs do not re-draft
+ * it unless its facts change or the admin reopens it (D-23). The item is
+ * locked last (draft → item).
  *
  * A rejected draft is purged after the published retention (D-12): see
  * EventDraft::prunable().
@@ -51,6 +58,16 @@ final class RejectDraft
                 'reviewed_by' => $reviewer->id,
                 'reviewed_at' => now()->utc(),
             ])->save();
+
+            if ($locked->kind === DraftKind::New && $locked->source_item_id !== null) {
+                $item = SourceItem::query()->whereKey($locked->source_item_id)->lockForUpdate()->first();
+
+                $item?->forceFill([
+                    'review_outcome' => 'rejected',
+                    'accepted_hash' => $item->content_hash,
+                    'accepted_payload' => $item->payload,
+                ])->save();
+            }
 
             return [$locked, $from];
         });
