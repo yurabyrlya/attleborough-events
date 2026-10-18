@@ -3,9 +3,11 @@
 namespace App\Ops;
 
 use App\Enums\HealthState;
+use App\Enums\SourceHealth;
 use App\Http\Requests\StoreSubmissionRequest;
 use App\Models\FailedJob;
 use App\Models\Heartbeat;
+use App\Models\Source;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterval;
 use Illuminate\Support\Facades\DB;
@@ -96,6 +98,53 @@ class HealthReport
         }
 
         return new HealthCheck('spam-check', 'Submission spam check', HealthState::Ok, null, null, $expectation);
+    }
+
+    /**
+     * Crawled sources (SRC-08): OK when every active source is healthy and
+     * none has a structure alert, otherwise Stale with the counts of
+     * degraded, unhealthy (paused) and structure-alert sources. Not part of
+     * all(): a remote site's failure is not an app outage, so ops:health
+     * prints this line as a warning and its exit code ignores it (T-03-21).
+     * One aggregate query; "last seen" is the latest active source check.
+     */
+    public function sources(): HealthCheck
+    {
+        $expectation = 'Every active source is healthy';
+
+        $row = Source::query()
+            ->where('is_active', true)
+            ->selectRaw('count(*) as active')
+            ->selectRaw('count(*) filter (where health = ?) as degraded', [SourceHealth::Degraded->value])
+            ->selectRaw('count(*) filter (where health = ?) as unhealthy', [SourceHealth::Unhealthy->value])
+            ->selectRaw('count(*) filter (where structure_alert_at is not null) as structure_alerts')
+            ->selectRaw('max(last_run_at) as last_run_at')
+            ->toBase()
+            ->first();
+
+        $active = (int) ($row->active ?? 0);
+        $lastRunAt = isset($row->last_run_at) ? CarbonImmutable::parse((string) $row->last_run_at)->utc() : null;
+        $age = $lastRunAt !== null ? $this->ageOf($lastRunAt) : null;
+
+        $problems = array_filter([
+            (int) $row->degraded > 0 ? "{$row->degraded} degraded" : null,
+            (int) $row->unhealthy > 0 ? "{$row->unhealthy} unhealthy (paused)" : null,
+            (int) $row->structure_alerts > 0
+                ? $row->structure_alerts.' possible structure '.((int) $row->structure_alerts === 1 ? 'change' : 'changes')
+                : null,
+        ]);
+
+        if ($problems !== []) {
+            return new HealthCheck('sources', 'Sources', HealthState::Stale, $lastRunAt, $age, $expectation, implode(', ', $problems));
+        }
+
+        $detail = match ($active) {
+            0 => 'No active sources',
+            1 => '1 active source, all healthy',
+            default => "{$active} active sources, all healthy",
+        };
+
+        return new HealthCheck('sources', 'Sources', HealthState::Ok, $lastRunAt, $age, $expectation, $detail);
     }
 
     public function failedJobCount(): int

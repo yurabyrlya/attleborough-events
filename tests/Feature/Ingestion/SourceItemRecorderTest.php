@@ -4,6 +4,7 @@ use App\Enums\FetchFailureKind;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
 use App\Enums\RunTrigger;
+use App\Ingestion\Health\SourceHealthTracker;
 use App\Ingestion\Ics\IcsExtractor;
 use App\Ingestion\IngestRun;
 use App\Ingestion\Pipeline\TitleRules;
@@ -230,7 +231,7 @@ it('puts the run back to queued and releases the job when the host is busy', fun
     $run->forceFill(['source_id' => $this->source->id, 'status' => RunStatus::Queued])->save();
 
     $job = (new FetchSourceJob($run->id))->withFakeQueueInteractions();
-    $job->handle(app(IngestRun::class));
+    $job->handle(app(IngestRun::class), app(SourceHealthTracker::class));
 
     $job->assertReleased();
     expect($run->refresh()->status)->toBe(RunStatus::Queued)

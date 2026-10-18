@@ -23,7 +23,8 @@ use UnitEnum;
 
 /**
  * Admin-only System health page (OPS-04): heartbeat freshness for the
- * scheduler, the queue worker and the daily sync, plus failed jobs with
+ * scheduler, the queue worker and the daily sync, the crawled sources'
+ * health (SRC-08, a warning only), plus failed jobs with
  * Retry / Delete. Never renders, logs or notifies a failed job's payload.
  * Writes no heartbeat: only the scheduler, the worker and artisan do.
  */
@@ -83,7 +84,9 @@ class SystemHealth extends Page implements HasTable
      */
     public function checks(): array
     {
-        return app(HealthReport::class)->all();
+        $report = app(HealthReport::class);
+
+        return [...$report->all(), $report->sources()];
     }
 
     public function table(Table $table): Table

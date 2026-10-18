@@ -1,8 +1,10 @@
 <?php
 
 use App\Enums\HealthState;
+use App\Enums\SourceHealth;
 use App\Filament\Pages\SystemHealth;
 use App\Models\Heartbeat;
+use App\Models\Source;
 use App\Ops\HealthReport;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -193,5 +195,65 @@ describe('submission spam check (T-02-31)', function () {
             ->expectsOutputToContain('spam-check: FAILED')
             ->expectsOutput('UNHEALTHY')
             ->assertExitCode(1);
+    });
+});
+
+describe('sources (SRC-08)', function () {
+    it('is OK when every active source is healthy, ignoring inactive ones', function () {
+        Source::factory()->ics()->active()->create();
+        Source::factory()->ics()->create()->forceFill(['health' => SourceHealth::Unhealthy, 'consecutive_failures' => 7])->save();
+
+        $check = app(HealthReport::class)->sources();
+
+        expect($check->key)->toBe('sources')
+            ->and($check->title)->toBe('Sources')
+            ->and($check->state)->toBe(HealthState::Ok)
+            ->and($check->detail)->toBe('1 active source, all healthy');
+    });
+
+    it('is OK with no active sources', function () {
+        expect(app(HealthReport::class)->sources()->state)->toBe(HealthState::Ok)
+            ->and(app(HealthReport::class)->sources()->detail)->toBe('No active sources');
+    });
+
+    it('names the degraded, unhealthy and structure-alert counts', function () {
+        Source::factory()->ics()->active()->create();
+        Source::factory()->ics()->active()->create()->forceFill(['health' => SourceHealth::Degraded, 'consecutive_failures' => 3])->save();
+        Source::factory()->ics()->active()->count(2)->create()->each(fn (Source $source) => $source->forceFill(['health' => SourceHealth::Unhealthy, 'consecutive_failures' => 5])->save());
+        Source::factory()->ics()->active()->create()->forceFill(['structure_alert_at' => now()->utc()])->save();
+
+        $check = app(HealthReport::class)->sources();
+
+        expect($check->state)->toBe(HealthState::Stale)
+            ->and($check->detail)->toBe('1 degraded, 2 unhealthy (paused), 1 possible structure change');
+    });
+
+    it('lists the Sources line on the System health page after the other checks', function () {
+        actingAs(OpsFixtures::admin())
+            ->get('/admin/system-health')
+            ->assertOk()
+            ->assertSeeInOrder(['Submission spam check', 'Sources', 'No active sources']);
+    });
+
+    it('keeps ops:health exit 0 with an unhealthy source when the ops checks are healthy', function () {
+        OpsFixtures::beatAgo(Heartbeat::SCHEDULER, 30);
+        OpsFixtures::beatAgo(Heartbeat::QUEUE, 120, ['latency_seconds' => 1]);
+        Source::factory()->ics()->active()->create()->forceFill(['health' => SourceHealth::Unhealthy, 'consecutive_failures' => 5])->save();
+
+        $this->artisan('ops:health')
+            ->expectsOutputToContain('sources: STALE (warning): 1 unhealthy (paused)')
+            ->expectsOutput('HEALTHY')
+            ->assertExitCode(0);
+    });
+
+    it('prints the sources line as OK without a warning when all sources are healthy', function () {
+        OpsFixtures::beatAgo(Heartbeat::SCHEDULER, 30);
+        OpsFixtures::beatAgo(Heartbeat::QUEUE, 120, ['latency_seconds' => 1]);
+        Source::factory()->ics()->active()->create();
+
+        $this->artisan('ops:health')
+            ->expectsOutput('sources: OK')
+            ->expectsOutput('HEALTHY')
+            ->assertExitCode(0);
     });
 });

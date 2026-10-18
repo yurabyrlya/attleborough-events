@@ -6,6 +6,7 @@ use App\Enums\FetchFailureKind;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
 use App\Ingestion\Data\ExtractedItem;
+use App\Ingestion\Health\SourceHealthTracker;
 use App\Ingestion\Http\FetchRequest;
 use App\Ingestion\Http\FetchResult;
 use App\Ingestion\Http\HostBusy;
@@ -54,6 +55,7 @@ final class IngestRun
         private readonly RawBodyStore $raw,
         private readonly IcsExtractor $extractor,
         private readonly SourceItemRecorder $recorder,
+        private readonly SourceHealthTracker $health,
     ) {}
 
     /**
@@ -234,5 +236,8 @@ final class IngestRun
         }
 
         $source->forceFill($sourceState)->save();
+
+        // Health, structure alert and is_complete; before missing detection (03-09).
+        $this->health->record($run);
     }
 }

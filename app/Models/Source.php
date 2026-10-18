@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ExtractionMethod;
+use App\Enums\SourceHealth;
 use Carbon\CarbonImmutable;
 use Database\Factories\SourceFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -42,7 +43,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $check_time
  * @property list<array{mode: string, keyword: string}> $title_rules
  * @property bool $is_organiser_source
- * @property string $health
+ * @property SourceHealth $health
  * @property int $consecutive_failures
  * @property string|null $etag
  * @property string|null $last_modified
@@ -128,6 +129,7 @@ class Source extends Model
     {
         return [
             'extraction_method' => ExtractionMethod::class,
+            'health' => SourceHealth::class,
             'parser_config' => 'array',
             'title_rules' => 'array',
             'supports_missing_detection' => 'boolean',

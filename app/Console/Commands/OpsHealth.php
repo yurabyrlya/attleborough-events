@@ -9,7 +9,8 @@ use Illuminate\Console\Command;
 /**
  * One line per health check plus a final HEALTHY / UNHEALTHY line (OPS-04).
  * Exit 1 when the scheduler or queue is not OK, calendar-sync is Stale or
- * Failed, or any failed job exists. calendar-sync 'Not run yet' is a warning.
+ * Failed, or any failed job exists. calendar-sync 'Not run yet' and an
+ * unhealthy sources line (SRC-08) are warnings that never change the exit code.
  */
 class OpsHealth extends Command
 {
@@ -36,6 +37,13 @@ class OpsHealth extends Command
 
             $this->line($line);
         }
+
+        // Sources are a warning only: a remote site's failure is not an app
+        // outage and must not fail a deploy check (T-03-21).
+        $sources = $report->sources();
+        $this->line($sources->state->isHealthy()
+            ? 'sources: '.strtoupper($sources->state->label())
+            : 'sources: '.strtoupper($sources->state->label()).' (warning): '.$sources->detail);
 
         $failedJobs = $report->failedJobCount();
         $this->line("failed jobs: {$failedJobs}");

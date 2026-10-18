@@ -7,6 +7,7 @@ use App\Enums\ReviewStatus;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
 use App\Enums\RunTrigger;
+use App\Enums\SourceHealth;
 use App\Enums\SourceItemStatus;
 use App\Models\Event;
 use App\Models\EventDraft;
@@ -66,7 +67,7 @@ it('saves an ICS source with the safe defaults from the database', function () {
     expect($source->location_mode)->toBe('local')
         ->and($source->default_timezone)->toBe('Europe/London')
         ->and($source->year_policy)->toBe('none')
-        ->and($source->health)->toBe('healthy')
+        ->and($source->health)->toBe(SourceHealth::Healthy)
         ->and($source->consecutive_failures)->toBe(0)
         ->and($source->check_frequency)->toBe('daily')
         ->and($source->check_time)->toBe('05:30:00')
@@ -266,7 +267,7 @@ it('keeps pipeline-owned source fields out of mass assignment', function () {
         'next_check_at' => now()->utc(),
     ])->fresh();
 
-    expect($source->health)->toBe('healthy')
+    expect($source->health)->toBe(SourceHealth::Healthy)
         ->and($source->consecutive_failures)->toBe(0)
         ->and($source->is_active)->toBeFalse()
         ->and($source->etag)->toBeNull()

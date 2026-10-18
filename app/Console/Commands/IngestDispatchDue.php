@@ -5,6 +5,8 @@ namespace App\Console\Commands;
 use App\Enums\FetchFailureKind;
 use App\Enums\RunStatus;
 use App\Enums\RunTrigger;
+use App\Enums\SourceHealth;
+use App\Ingestion\Health\SourceHealthTracker;
 use App\Ingestion\RunAlreadyActive;
 use App\Ingestion\RunLauncher;
 use App\Models\Source;
@@ -19,7 +21,8 @@ use Throwable;
  *
  * First the janitor: a run still running 15 minutes after it started, or
  * still queued 2 hours after it was queued, is marked failed/abandoned so a
- * killed worker never holds a source's one active slot for ever (T-03-18).
+ * killed worker never holds a source's one active slot for ever (T-03-18);
+ * each abandoned live run counts towards the source's health (SRC-08).
  * Then every active, not unhealthy source whose next_check_at is unset or
  * at or before now gets a scheduled run, in next_check_at order then id.
  * A source that already has an active run is skipped but still moves to its
@@ -36,15 +39,15 @@ class IngestDispatchDue extends Command
 
     protected $description = 'Mark abandoned source runs failed and start a run for every due source';
 
-    public function handle(RunLauncher $launcher): int
+    public function handle(RunLauncher $launcher, SourceHealthTracker $health): int
     {
         $now = CarbonImmutable::now();
-        $abandoned = $this->sweepAbandonedRuns($now);
+        $abandoned = $this->sweepAbandonedRuns($now, $health);
         $only = array_values(array_filter(array_map('intval', (array) $this->option('source'))));
 
         $sources = Source::query()
             ->where('is_active', true)
-            ->where('health', '<>', 'unhealthy')
+            ->where('health', '<>', SourceHealth::Unhealthy->value)
             ->where(fn ($query) => $query
                 ->whereNull('next_check_at')
                 ->orWhere('next_check_at', '<=', $now->utc()))
@@ -90,23 +93,36 @@ class IngestDispatchDue extends Command
     }
 
     /**
+     * Each stale run is marked with its own guarded UPDATE (status and age
+     * re-checked, so a run that finished meanwhile is left alone) and then
+     * recorded with SourceHealthTracker: an abandoned live run counts as a
+     * failure (SRC-08); previews change nothing.
+     *
      * @return int how many runs were marked abandoned
      */
-    private function sweepAbandonedRuns(CarbonImmutable $now): int
+    private function sweepAbandonedRuns(CarbonImmutable $now, SourceHealthTracker $health): int
     {
         $nowUtc = $now->utc();
+        $sweeps = [
+            [RunStatus::Running, 'started_at', $nowUtc->subMinutes(self::RUNNING_TIMEOUT_MINUTES), 'The run stopped responding and was marked abandoned.'],
+            [RunStatus::Queued, 'queued_at', $nowUtc->subMinutes(self::QUEUED_TIMEOUT_MINUTES), 'The run waited in the queue too long and was marked abandoned.'],
+        ];
+        $abandoned = 0;
 
-        $running = SourceRun::query()
-            ->where('status', RunStatus::Running)
-            ->where('started_at', '<', $nowUtc->subMinutes(self::RUNNING_TIMEOUT_MINUTES))
-            ->update($this->abandonedColumns($nowUtc, 'The run stopped responding and was marked abandoned.'));
+        foreach ($sweeps as [$status, $column, $cutoff, $message]) {
+            $stale = fn () => SourceRun::query()->where('status', $status)->where($column, '<', $cutoff);
 
-        $queued = SourceRun::query()
-            ->where('status', RunStatus::Queued)
-            ->where('queued_at', '<', $nowUtc->subMinutes(self::QUEUED_TIMEOUT_MINUTES))
-            ->update($this->abandonedColumns($nowUtc, 'The run waited in the queue too long and was marked abandoned.'));
+            foreach ($stale()->orderBy('id')->pluck('id') as $runId) {
+                if ($stale()->whereKey($runId)->update($this->abandonedColumns($nowUtc, $message)) !== 1) {
+                    continue;
+                }
 
-        return $running + $queued;
+                $abandoned++;
+                $health->record(SourceRun::query()->findOrFail($runId));
+            }
+        }
+
+        return $abandoned;
     }
 
     /**

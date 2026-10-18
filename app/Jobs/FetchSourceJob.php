@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Enums\FetchFailureKind;
 use App\Enums\RunStatus;
+use App\Ingestion\Health\SourceHealthTracker;
 use App\Ingestion\Http\HostBusy;
 use App\Ingestion\IngestRun;
 use App\Models\SourceRun;
@@ -24,8 +25,10 @@ use Throwable;
  * to queued and releases the job for that many seconds. Released attempts
  * are not failures: retryUntil() (fixed at dispatch, 6 h) replaces --tries,
  * and maxExceptions = 1 fails the job on its first real exception (RESEARCH
- * F8, Pitfall 10). Any other Throwable marks the run failed/abandoned and is
- * rethrown. timeout 75 s stays below the database queue's retry_after (90).
+ * F8, Pitfall 10). Any other Throwable marks the run failed/abandoned,
+ * records it with SourceHealthTracker (a live run counts as a failure,
+ * SRC-08) and is rethrown. timeout 75 s stays below the database queue's
+ * retry_after (90).
  *
  * Properties, not attributes, like QueueHeartbeat (conflict C8). Unique per
  * source; the source_runs_one_active index is the real guarantee (SRC-04).
@@ -58,7 +61,7 @@ class FetchSourceJob implements ShouldBeUnique, ShouldQueue
         return CarbonImmutable::now()->addHours(6);
     }
 
-    public function handle(IngestRun $ingest): void
+    public function handle(IngestRun $ingest, SourceHealthTracker $health): void
     {
         $claimed = SourceRun::query()
             ->whereKey($this->runId)
@@ -89,7 +92,7 @@ class FetchSourceJob implements ShouldBeUnique, ShouldQueue
 
             $this->release(max(1, $busy->seconds));
         } catch (Throwable $e) {
-            SourceRun::query()
+            $abandoned = SourceRun::query()
                 ->whereKey($this->runId)
                 ->where('status', RunStatus::Running)
                 ->update([
@@ -99,6 +102,12 @@ class FetchSourceJob implements ShouldBeUnique, ShouldQueue
                     'finished_at' => CarbonImmutable::now()->utc(),
                     'updated_at' => CarbonImmutable::now()->utc(),
                 ]);
+
+            if ($abandoned === 1) {
+                // An abandoned live run counts towards health like any failure
+                // (SRC-08). A tracker error is reported, never hides $e.
+                rescue(fn () => $health->record(SourceRun::query()->findOrFail($this->runId)));
+            }
 
             throw $e;
         }
