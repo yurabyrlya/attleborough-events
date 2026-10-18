@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 03
 current_phase_name: Ingestion Backbone, ICS & Change/Duplicate Handling
 status: executing
-stopped_at: Completed 03-07-PLAN.md
-last_updated: "2026-10-18T10:12:19.433Z"
+stopped_at: Completed 03-09-PLAN.md
+last_updated: "2026-10-18T10:39:01.917Z"
 last_activity: 2026-10-18
 last_activity_desc: Phase 2 complete, transitioned to Phase 3
-state_head: 24c1e52b55582417656d80c5371d600c3eb15ae2
+state_head: d255351675c794b9896b5bccc6f7f7ac8d0a85b9
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 48
-  completed_plans: 37
+  completed_plans: 38
   percent: 40
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 03 (Ingestion Backbone, ICS & Change/Duplicate Handling) — EXECUTING
-Plan: 9 of 17
+Plan: 10 of 17
 Status: Ready to execute
 Last activity: 2026-10-18 — Completed 03-07 (source health, completeness, test-run preview and Create drafts)
 
@@ -94,6 +94,7 @@ Progress: [███████████████░░░░░] 36/48 p
 | Phase 03 P06 | 8min | 2 tasks | 9 files |
 | Phase 03 P08 | 13min | 3 tasks | 14 files |
 | Phase 03 P07 | 14min | 3 tasks | 16 files |
+| Phase 03 P09 | 24min | 3 tasks | 21 files |
 
 ## Accumulated Context
 
@@ -185,6 +186,9 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-07: preview runs write nothing on the source (no last_run_at, validators, next_check_at, health) and never send conditional headers
 - [Phase 03]: 03-07: D-24 reuse requires the latest preview succeeded, same URL (preview.url), < preview_reuse_minutes old and matching raw_sha256
 - [Phase 03]: 03-07: Sources health line is warning-only in ops:health; HealthReport::all() unchanged
+- [Phase 03]: 03-09: update/cancellation diffs: {field:{published,before,now}} in ChangeDetector::FIELDS order (SourceDiff cast restores it from jsonb); cancellations {cancelled}, {cancelled_keys asc} or {status active→missing}
+- [Phase 03]: 03-09: tracked items (linked or pending new draft) bypass title rules and the window; deferred detection when no pending draft and content_hash ≠ accepted_hash
+- [Phase 03]: 03-09: events.cancelled_dates (ApproveDraft) makes OccurrenceGenerator insert source-cancelled dates as Cancelled; 03-10 ConfirmSourceCancellation must append to it
 
 ### Pending Todos
 
@@ -219,6 +223,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-18T10:12:18.574Z
-Stopped at: Completed 03-07-PLAN.md
+Last session: 2026-10-18T10:39:01.049Z
+Stopped at: Completed 03-09-PLAN.md
 Resume file: None

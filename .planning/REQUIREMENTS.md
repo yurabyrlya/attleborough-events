@@ -95,9 +95,9 @@
 - [x] **PIPE-03**: Category is assigned deterministically: source default, then mapping of source values, then title keyword rules, else `Other` (flagged)
 - [x] **PIPE-04**: Each draft gets a 0-100 quality score with band (High 80+, Medium 50-79, Low <50) and the reasons behind it
 - [ ] **PIPE-05**: Likely duplicates (same canonical URL, or same date + similar venue + `pg_trgm` title similarity above a configured threshold, against published events and pending drafts) produce a duplicate warning. Same source + external ID is treated as the same item
-- [ ] **PIPE-06**: A changed known item creates an update draft only when its normalised fields differ from the accepted baseline. Unchanged raw content is skipped. Only one pending draft exists per source item (replaced in place)
+- [x] **PIPE-06**: A changed known item creates an update draft only when its normalised fields differ from the accepted baseline. Unchanged raw content is skipped. Only one pending draft exists per source item (replaced in place)
 - [ ] **PIPE-07**: Items marked cancelled at the source (`STATUS:CANCELLED`, `eventStatus: EventCancelled`) create a cancellation draft
-- [ ] **PIPE-08**: An item missing from its source creates a cancellation draft only after 2 consecutive complete runs, and only if its last known start is in the future, inside the run's observed date window, and the source supports missing detection
+- [x] **PIPE-08**: An item missing from its source creates a cancellation draft only after 2 consecutive complete runs, and only if its last known start is in the future, inside the run's observed date window, and the source supports missing detection
 - [x] **PIPE-09**: Public descriptions of discovered events are excerpts of up to 200 characters with phone numbers and emails stripped. The full text is kept internally for review
 
 ### Recurrence & Time (REC)
@@ -238,9 +238,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PIPE-03 | Phase 2 | Complete |
 | PIPE-04 | Phase 2 | Complete |
 | PIPE-05 | Phase 3 | Pending |
-| PIPE-06 | Phase 3 | Pending |
+| PIPE-06 | Phase 3 | Complete |
 | PIPE-07 | Phase 3 | Pending |
-| PIPE-08 | Phase 3 | Pending |
+| PIPE-08 | Phase 3 | Complete |
 | PIPE-09 | Phase 3 | Complete |
 | REC-01 | Phase 1 | Complete |
 | REC-02 | Phase 1 | Complete |
