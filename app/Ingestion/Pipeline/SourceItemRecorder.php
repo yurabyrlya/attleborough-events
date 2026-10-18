@@ -10,7 +10,6 @@ use App\Models\SourceItem;
 use App\Models\SourceRun;
 use App\Review\Data\DraftData;
 use App\Review\DraftWriter;
-use App\Support\TextLimit;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
@@ -23,13 +22,16 @@ use Illuminate\Support\Facades\DB;
  *    last_seen_at, missing_runs 0), whatever bucket follows, so an item the
  *    feed still lists is never treated as missing (PIPE-08 precondition).
  * 2. No usable facts → skipped_parse_error (the item's parse errors kept).
- * 3. Past / far future (WindowClassifier, calendar.horizon_days, D-20) →
+ * 3. A title the source's skip/keep rules drop (TitleRules, D-04) →
+ *    skipped_rule, never drafted.
+ * 4. Past / far future (WindowClassifier, calendar.horizon_days, D-20) →
  *    skipped_past / skipped_far_future, never drafted.
- * 4. Known item, same raw_hash → unchanged (touch only).
- * 5. Known item, different raw_hash → the new raw/content hash and payload
+ * 5. Known item, same raw_hash → unchanged (touch only).
+ * 6. Known item, different raw_hash → the new raw/content hash and payload
  *    are stored and the item counts as changed (draft decisions: 03-09).
- * 6. New identity → a source item (active, review pending) and one pending
- *    New draft (DraftWriter::createFromSource).
+ * 7. New identity → a source item (active, review pending) and one pending
+ *    New draft (DraftWriter::createFromSource) whose description is the
+ *    ExcerptBuilder excerpt, or the D-21 fallback when there is none.
  *
  * Skipped identities that are not yet known get no source item: an item
  * far in the future today must still be drafted when it enters the window.
@@ -63,9 +65,6 @@ final class SourceItemRecorder
         self::SKIPPED_PARSE_ERROR => 'skipped_parse_error',
     ];
 
-    /** Grapheme limit of a draft description (PIPE-09, D-15). */
-    public const int EXCERPT_LIMIT = 200;
-
     public function __construct(
         private readonly WindowClassifier $window,
         private readonly DraftWriter $drafts,
@@ -93,7 +92,7 @@ final class SourceItemRecorder
                 ]);
             }
 
-            $bucket = $this->classify($item, $existing, $nowLondon);
+            $bucket = $this->classify($source, $item, $existing, $nowLondon);
 
             if ($existing !== null) {
                 if ($bucket === self::SKIPPED_PARSE_ERROR) {
@@ -120,12 +119,16 @@ final class SourceItemRecorder
     /**
      * The bucket for an item, without writing anything.
      */
-    private function classify(ExtractedItem $item, ?SourceItem $existing, CarbonImmutable $nowLondon): string
+    private function classify(Source $source, ExtractedItem $item, ?SourceItem $existing, CarbonImmutable $nowLondon): string
     {
         $facts = $item->facts;
 
         if ($facts === null) {
             return self::SKIPPED_PARSE_ERROR;
+        }
+
+        if (! TitleRules::allows($source->title_rules, $facts->title)) {
+            return self::SKIPPED_RULE;
         }
 
         $windowClass = $this->window->classify($facts, $nowLondon);
@@ -192,14 +195,12 @@ final class SourceItemRecorder
     }
 
     /**
-     * The draft description: the feed text cut to the excerpt limit, or the
-     * D-21 fallback when the feed gives none.
+     * The draft description: the excerpt (PIPE-09), or the D-21 fallback
+     * when the feed text is empty or nothing is left after stripping.
      */
     private function description(?string $full, Source $source): string
     {
-        $excerpt = $full === null ? '' : TextLimit::graphemes($full, self::EXCERPT_LIMIT);
-
-        return $excerpt !== '' ? $excerpt : self::fallbackDescription($source);
+        return ExcerptBuilder::make($full) ?? self::fallbackDescription($source);
     }
 
     /**
