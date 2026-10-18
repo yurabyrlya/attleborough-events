@@ -3,11 +3,11 @@ gsd_state_version: "1.0"
 current_phase: 4
 current_phase_name: Extraction Ladder, Geofence & Live Sources
 status: planning
-stopped_at: Phase 3 complete, ready to discuss/plan Phase 4
-last_updated: "2026-10-18T14:32:37.575Z"
+stopped_at: Phase 4 context gathered
+last_updated: "2026-10-18T17:05:16.995Z"
 last_activity: 2026-10-18
 last_activity_desc: Phase 3 complete, transitioned to Phase 4
-state_head: 8beb45dc329963a77824ecdb07d3edf484f0b7f8
+state_head: e39f528c375a4300f0fe08fa6b834e01689b0139
 progress:
   total_phases: 5
   completed_phases: 3
@@ -32,7 +32,7 @@ Plan: Not started
 Status: Ready to plan
 Last activity: 2026-10-18 — Phase 3 complete, transitioned to Phase 4
 
-Progress: [███████████████████░] 46/48 planned plans (96%); phases complete: 3/5
+Progress: [███████████████████░] 46/48 planned plans ([██████░░░░] 60%); phases complete: 3/5
 
 ## Performance Metrics
 
@@ -242,7 +242,7 @@ Recent decisions affecting current work:
 - [Before launch]: Honour Retry-After on 429/503 (Phase 3 review WR-04, deferred; low risk with daily checks)
 - [Phase 5]: Configure trusted proxies (Caddy / Cloudflare) so per-IP rate limiting on /submit and Turnstile hostname/remoteip checks see the real client IP (Phase 2 research)
 - [Phase 5]: Crawling needs a real User-Agent contact/about URL. Phase 3 ships the placeholder (`CRAWLER_CONTACT_URL`, default `{APP_URL}/about-crawler` in config/ingest.php); publish the about-crawler page and set the live URL at launch
-- [Phase 4]: Success criterion 5 / RES-04 say P0 sources are configured "in production", but production now arrives in Phase 5. Until then P0 sources run on the local app; revisit the wording when planning Phase 4 (or move the production half to Phase 5)
+- [Phase 4]: RESOLVED 2026-10-18 (04-CONTEXT D-01, agent default): Phase 4 SC5 / RES-04 now mean P0 sources live on the local app with scheduled runs; the production half moved to Phase 5 (new SC8, RES-04 traceability split)
 
 ### Quick Tasks Completed
 
@@ -262,6 +262,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-18
-Stopped at: Phase 3 complete, ready to discuss/plan Phase 4
-Resume file: None
+Last session: 2026-10-18T17:05:09.150Z
+Stopped at: Phase 4 context gathered
+Resume file: .planning/phases/04-extraction-ladder-geofence-live-sources/04-CONTEXT.md
