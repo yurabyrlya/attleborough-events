@@ -1,0 +1,2 @@
+# Synthetic ICS fixtures keep RFC 5545 CRLF line endings: never normalise.
+*.ics -text

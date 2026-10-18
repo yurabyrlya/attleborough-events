@@ -117,6 +117,19 @@ function sourceFixture(string $path): string
     return (string) file_get_contents($file);
 }
 
+/**
+ * The raw bytes of a synthetic ICS fixture in tests/Fixtures/ics (outside the
+ * source-manifest scan, C12), e.g. icsFixture('series.ics').
+ */
+function icsFixture(string $name): string
+{
+    $file = base_path('tests/Fixtures/ics/'.$name);
+
+    expect(is_file($file))->toBeTrue("Missing ICS fixture {$name}");
+
+    return (string) file_get_contents($file);
+}
+
 /*
 |--------------------------------------------------------------------------
 | Calendar fixtures
