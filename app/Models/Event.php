@@ -43,6 +43,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string|null $end_time
  * @property string|null $recurrence_rule
  * @property list<string> $excluded_dates
+ * @property list<string> $cancelled_dates
  * @property EventStatus $status
  * @property EventOrigin $origin
  * @property int $approved_by
@@ -54,7 +55,10 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * approved_by and approved_at are written only via forceFill by
  * App\Publishing\Actions\PublishEvent (WR-07); status after publish,
  * status_changed_at and status_changed_by only via forceFill by
- * App\Publishing\Actions\ChangeEventStatus.
+ * App\Publishing\Actions\ChangeEventStatus. cancelled_dates (a series'
+ * source-cancelled London dates, inserted as Cancelled by
+ * OccurrenceGenerator) only via forceFill by the Publishing actions
+ * (ApproveDraft today).
  */
 #[Fillable([
     'title', 'slug', 'description', 'category_id', 'venue_id', 'family_friendly',
@@ -79,6 +83,8 @@ class Event extends Model
         'contact_public' => true,
         // D-19: London dates (Y-m-d) an ICS series skips (EXDATE).
         'excluded_dates' => '[]',
+        // London dates of a series the source cancelled (03-09).
+        'cancelled_dates' => '[]',
     ];
 
     /**
@@ -185,6 +191,7 @@ class Event extends Model
             'all_day' => 'boolean',
             'contact_public' => 'boolean',
             'excluded_dates' => 'array',
+            'cancelled_dates' => 'array',
             'price_type' => PriceType::class,
             'status' => EventStatus::class,
             'origin' => EventOrigin::class,

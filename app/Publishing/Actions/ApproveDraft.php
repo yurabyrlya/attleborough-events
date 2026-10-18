@@ -42,7 +42,9 @@ use InvalidArgumentException;
  * (raw_payload cancelled_keys, the dates the admin saw on the draft) mark
  * those occurrences Cancelled through ChangeOccurrenceStatus, so the dates
  * stay visible as "Cancelled" (D-08, D-19); only dates already inside the
- * occurrence horizon exist to be cancelled. Lock order: draft → event
+ * occurrence horizon exist to be cancelled, so every listed date is also
+ * stored in events.cancelled_dates and OccurrenceGenerator inserts a later
+ * one as Cancelled when the horizon reaches it. Lock order: draft → event
  * (PublishEvent, ChangeOccurrenceStatus, LinkEventSource) → source item
  * last. Manual and submission drafts are untouched by this.
  */
@@ -126,9 +128,16 @@ final class ApproveDraft
             return;
         }
 
+        $keys = array_values(array_unique(array_filter($keys, is_string(...))));
+        sort($keys, SORT_STRING);
+
+        // Kept on the event so a date beyond the occurrence horizon is
+        // inserted as Cancelled when the nightly sync reaches it.
+        $event->forceFill(['cancelled_dates' => $keys])->save();
+
         $occurrences = EventOccurrence::query()
             ->where('event_id', $event->id)
-            ->whereIn('recurrence_key', array_values(array_filter($keys, is_string(...))))
+            ->whereIn('recurrence_key', $keys)
             ->where('status', OccurrenceStatus::Scheduled)
             ->orderBy('recurrence_key')
             ->get();

@@ -16,8 +16,10 @@ use Illuminate\Support\Facades\DB;
  * exclusive end, expanded only by RecurrenceExpander (sabre/vobject).
  *
  * Upserts on (event_id, recurrence_key) and updates ONLY the instants, never
- * `status`, so admin-set cancellations/hides survive re-syncs. Future rows the
- * schedule no longer produces are deleted; past rows are never touched.
+ * `status`, so admin-set cancellations/hides survive re-syncs. A new row for
+ * a date in events.cancelled_dates is inserted as Cancelled (03-09), so a
+ * source-cancelled date beyond the horizon never appears as Scheduled. Future
+ * rows the schedule no longer produces are deleted; past rows are never touched.
  */
 final class OccurrenceGenerator
 {
@@ -32,6 +34,10 @@ final class OccurrenceGenerator
         $windowStart = ($now ?? CarbonImmutable::now())->setTimezone($tz)->startOfDay();
         $windowEnd = $windowStart->addDays((int) config('calendar.horizon_days', 90));
 
+        // getAttribute(): a model loaded with a partial select has no value (none cancelled).
+        $listed = $event->getAttribute('cancelled_dates');
+        $cancelled = is_array($listed) ? array_flip(array_filter($listed, is_string(...))) : [];
+
         $rows = array_map(fn (OccurrenceTiming $t): array => [
             'event_id' => $event->id,
             'recurrence_key' => $t->key,
@@ -39,7 +45,9 @@ final class OccurrenceGenerator
             'starts_at' => $t->startsAt->utc()->format('Y-m-d H:i:s'),
             'ends_at' => $t->endsAt?->utc()->format('Y-m-d H:i:s'),
             'expires_at' => $t->expiresAt->utc()->format('Y-m-d H:i:s'),
-            'status' => OccurrenceStatus::Scheduled->value, // used on INSERT only
+            // Used on INSERT only: a date the source cancelled (events.cancelled_dates)
+            // arrives Cancelled; existing rows keep their status.
+            'status' => (isset($cancelled[$t->key]) ? OccurrenceStatus::Cancelled : OccurrenceStatus::Scheduled)->value,
         ], $this->instances($event, $windowStart, $windowEnd));
 
         DB::transaction(function () use ($event, $rows, $windowStart): void {
