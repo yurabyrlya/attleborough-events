@@ -1,5 +1,6 @@
 <?php
 
+use App\Ingestion\Http\HostResolver;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\EventOccurrence;
@@ -21,7 +22,10 @@ use Tests\TestCase;
 |--------------------------------------------------------------------------
 |
 | Tests run on PostgreSQL (phpunit.xml -> attleborough_testing), never SQLite.
-| No test may make a real HTTP request.
+| No test may make a real HTTP request, and none may perform real DNS:
+| every suite binds a fake HostResolver (every host -> 93.184.215.14, a
+| public address) for the ingestion SSRF guard. ingestFakeResolver() changes
+| the map for one test.
 |
 */
 
@@ -29,6 +33,7 @@ pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
     ->beforeEach(function () {
         Http::preventStrayRequests();
+        $this->app->instance(HostResolver::class, ingestResolverFake());
         $this->withoutVite();
     })
     ->in('Feature');
@@ -36,6 +41,7 @@ pest()->extend(TestCase::class)
 pest()->extend(TestCase::class)
     ->beforeEach(function () {
         Http::preventStrayRequests();
+        $this->app->instance(HostResolver::class, ingestResolverFake());
     })
     ->in('Unit');
 
@@ -53,9 +59,63 @@ pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
     ->beforeEach(function () {
         Http::preventStrayRequests();
+        $this->app->instance(HostResolver::class, ingestResolverFake());
         $this->app['events']->listen(RequestHandled::class, fn () => app()->forgetScopedInstances());
     })
     ->in('Browser');
+
+/*
+|--------------------------------------------------------------------------
+| Ingestion fixtures (Phase 3)
+|--------------------------------------------------------------------------
+*/
+
+/**
+ * A HostResolver that never touches DNS. Hosts in $map resolve to the
+ * listed addresses (an empty list = the host does not resolve); every other
+ * host resolves to 93.184.215.14, a public address.
+ *
+ * @param  array<string, list<string>>  $map
+ */
+function ingestResolverFake(array $map = []): HostResolver
+{
+    return new class($map) implements HostResolver
+    {
+        /**
+         * @param  array<string, list<string>>  $map
+         */
+        public function __construct(private readonly array $map) {}
+
+        public function resolve(string $host): array
+        {
+            return $this->map[strtolower($host)] ?? ['93.184.215.14'];
+        }
+    };
+}
+
+/**
+ * Override the fake resolver's map for this test, e.g.
+ * ingestFakeResolver(['intranet.example' => ['10.0.0.5']]).
+ *
+ * @param  array<string, list<string>>  $map
+ */
+function ingestFakeResolver(array $map = []): void
+{
+    app()->instance(HostResolver::class, ingestResolverFake($map));
+}
+
+/**
+ * The raw bytes of a captured source fixture, e.g.
+ * sourceFixture('attleborough-baptist-church/2026-10-17-ical.ics').
+ */
+function sourceFixture(string $path): string
+{
+    $file = base_path('tests/Fixtures/sources/'.$path);
+
+    expect(is_file($file))->toBeTrue("Missing source fixture {$path}");
+
+    return (string) file_get_contents($file);
+}
 
 /*
 |--------------------------------------------------------------------------
