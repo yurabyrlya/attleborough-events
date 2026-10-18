@@ -293,9 +293,13 @@ final class UatFixtures
      */
     public static function dismissNotifications(mixed $page): mixed
     {
-        $page->script("() => document.querySelectorAll('.fi-no-notification-close-btn').forEach((button) => button.click())");
-
-        return self::waitUntil($page, "document.querySelector('.fi-no-notification-close-btn') === null");
+        // Keep clicking: a notification can arrive (or still be animating in)
+        // after the first sweep on a slow runner.
+        return self::waitUntil(
+            $page,
+            "(() => { const buttons = [...document.querySelectorAll('.fi-no-notification-close-btn')]; buttons.forEach((button) => button.click()); return buttons.length === 0; })()",
+            15.0,
+        );
     }
 
     /**
