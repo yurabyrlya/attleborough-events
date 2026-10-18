@@ -264,6 +264,54 @@ Selectors: header actions and dialog buttons by role and name (`getByRole('butto
 
 Public effect: none. Drafts wait in the review queue until approved (F16–F19); a test run and Pause change nothing on `/`.
 
+## F16. Update draft: three-column diff and Apply changes
+
+Start from a live source with a published event, e.g. the Town Council's "[name removed] ~ Yoga" on Sun 25 Oct, 10am to 11am at the Town Hall (approved from its new draft). The source then moves the session an hour later and a check runs (**Run now**, F15).
+
+1. **Review queue → Pending**: the change arrives as one row with Kind **Update** (search the table for "Yoga" if the queue is long; it shows 10 rows a page). Click it.
+2. The review page reads "Changes from Attleborough Town Council" above a table **Field / Published now / Source before / Source now** with one row per changed field: "Start time · 10am · 10am · 11am" and "End time · 11am · 11am · 12pm". The header has **Apply changes** and **Ignore (R)**; there is no Approve, no Reject and no "Before you can publish" (source changes are applied or ignored, never rejected, so the accepted baseline always moves).
+3. **Apply changes** → "Apply these changes to the published event?" → **Apply changes**. Expected: "Changes applied", and the next pending draft opens. Fields the source did not change keep their published values.
+4. **Ignore** on another update → "Ignore this change from Attleborough Town Council?" → **Ignore change** → "Change ignored": the event stays as it is and the same change is not raised again (a later one is).
+
+Selectors: `tr.fi-ta-row:has-text("Update")`, the diff is the table with the caption "Changes from the source, field by field", `getByRole('button', { name: 'Apply changes' })` then `.fi-modal-open` → `getByRole('button', { name: 'Apply changes' })`. Dialogs dismiss with **Keep as is**.
+
+Public effect: `/events/<slug>` shows "Sun 25 Oct, 11am" (25 Oct is the day the clocks go back: stored as 11:00 UTC); nothing shows "10am" for that date any more.
+
+## F17. Cancellation draft: Confirm cancellation and Ignore
+
+Start from two published one-off Town Council sessions (Yoga on Wed 21 Oct and Sun 25 Oct). The source marks both `STATUS:CANCELLED` and a check runs.
+
+1. **Review queue → Pending** shows two rows with Kind **Cancellation**, soonest first. Open the 21 Oct one: "Cancelled at Attleborough Town Council" and **The whole event** (a series lists the cancelled dates instead, e.g. "Wed 4 Nov"). The header has **Confirm cancellation** and **Ignore (R)**; no Approve or Reject.
+2. **Confirm cancellation** → "Confirm this cancellation?" → **Confirm cancellation**. Expected: "Cancellation confirmed"; the next pending draft opens.
+3. Open the 25 Oct cancellation → **Ignore (R)** → "Ignore this change from Attleborough Town Council?" → **Ignore change**. Expected: "Change ignored"; no Cancellation rows are left in **Pending** (it is under **Rejected** with the reason "Ignored (source change)").
+
+Selectors: `tr.fi-ta-row:has-text("Cancellation")`, `getByRole('button', { name: 'Confirm cancellation' })`, `getByRole('button', { name: 'Ignore (R)' })`, then the dialog's submit button inside `.fi-modal-open`.
+
+Public effect: the 21 Oct event page shows **Cancelled** in its heading and "This event has been cancelled."; its card on `/` says Cancelled until the date has passed. The 25 Oct event is unchanged (no "Cancelled" anywhere on its page).
+
+## F18. Duplicate warning: side-by-side panel, Not a duplicate, Mark as duplicate
+
+Start with hand-entered "Yoga with [name removed]" events at the Town Hall on Sun 18 and Sun 25 Oct at 10am, published before the Town Council feed is read. Its "[name removed] ~ Yoga" drafts for those dates are flagged.
+
+1. Open the 25 Oct draft's review page. A **Possible duplicate** panel shows **This draft** and **Published event** side by side (Date, Time, Venue, Title) with the reason in words, "Same date, similar venue and title (similarity 0.78)", and a link to the event. The header has **Mark as duplicate** and **Not a duplicate**. (A match against another pending draft also shows here, but Mark as duplicate stays hidden until that draft is published.)
+2. **Not a duplicate** → "Not a duplicate?" ("The warning is cleared and this pair is not flagged again. The draft stays in the queue.") → **Not a duplicate**. Expected: "Noted: not a duplicate"; you stay on the draft, the reason line and **Mark as duplicate** are gone, and the draft is still pending.
+3. Open the 18 Oct draft → **Mark as duplicate** → "Mark this draft as a duplicate of Yoga with [name removed]? Nothing new is published." → **Mark as duplicate**. Expected: "Marked as duplicate"; the next pending draft opens; the draft's status is Duplicate and no new event exists.
+
+Selectors: `getByRole('button', { name: 'Not a duplicate' })`, `getByRole('button', { name: 'Mark as duplicate' })`, then the same names inside `.fi-modal-open`. The queue's **Possible duplicate** filter lists every flagged draft.
+
+Public effect: `/` still lists only "Yoga with [name removed]" on those dates, never "[name removed] ~ Yoga". The marked event now credits the source (F20, "Listed by" / "Also listed by").
+
+## F19. Approve all like this and the Urgent badge
+
+Start from the live Town Council source with its default venue (Town Hall) and category (Community) set on the source form, so its weekly Yoga drafts (Sun 18 Oct 10am, Wed 21 Oct 6pm, Sun 25 Oct 10am) are publishable.
+
+1. Open the 18 Oct "[name removed] ~ Yoga" draft → **Approve all like this** (also on the queue row) → "Approve all drafts like this?" (it names how many) → **Approve all**. Expected: "Approved 3 of 3." Any draft that can't be approved is named by its reason ("1 skipped: possible duplicate", "1 skipped: has parse errors", …) and the rest are approved.
+2. Urgent first: the source then moves Sunday's sessions an hour later (18 Oct and 25 Oct) and a check runs. On Sat 17 Oct the 18 Oct change starts within 48 hours: its row in **Pending** carries an **Urgent** badge next to "Update" and is the first row, ahead of sooner new drafts (Book Sale at 9am today). The 25 Oct change has no badge and sits in date order. The review page of the urgent draft shows **Urgent** too.
+
+Selectors: `getByRole('button', { name: 'Approve all like this' })` then `.fi-modal-open` → `getByRole('button', { name: 'Approve all' })`; the first queue row is `tr.fi-ta-row >> nth=0`.
+
+Public effect: `/` shows three "[name removed] ~ Yoga" cards (18, 21, 25 Oct), each with "via Town Council". Update drafts change nothing on `/` until applied (F16).
+
 ## F20. Public attribution of discovered events
 
 Start from a Baptist draft published through its review page (**Approve & next (A)** → "Publish this event?" → **Publish**), e.g. "Women's Creative Club" on Sat 31 Oct.
@@ -305,6 +353,7 @@ F0–F20 are automated as Pest browser tests in [`tests/Browser`](../../tests/Br
 | `ReviewQueueTest.php` | F12 (queue, review page reasons, Raw content, edit with Create new venue and a weekly repeat, Save & approve opens the next draft, four dates on `/`) and F13 (bulk approve skip reasons, bulk reject with Spam, Reopen) |
 | `ApproveAndNextKeyboardTest.php` | F12 keyboard shortcuts: A then Enter, the guards while typing or in a dialog, ?, J / K, the remembered off switch, A on a blocked draft |
 | `RulesTest.php` | F14: a keyword rule decides the next submission's category; Other has no Delete; a category in use is refused with "Rules not saved" |
+| `SourceReviewTest.php` | F16 (Update row → three-column diff, Apply changes, new time on the event page), F17 (Confirm cancellation → "Cancelled" on the event page; Ignore → off Pending), F18 (side-by-side panel with the 0.78 reason, Not a duplicate, Mark as duplicate publishes nothing) and F19 (Approve all like this → "Approved 3 of 3.", three cards with "via Town Council", the urgent update first with the Urgent badge) |
 | `SourcesTest.php` | F15 (the "?" field help, New source saved inactive, Test run preview, Create drafts, run log, Run now, Pause, Healthy in the table, drafts in the queue; a seeded source's all-day rows show the date only) and F20 (Listed by with the item link, Also listed by after Mark as duplicate, Read more at, card "via") |
 
 How they differ from the manual run:
