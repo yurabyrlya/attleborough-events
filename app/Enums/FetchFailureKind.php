@@ -29,7 +29,7 @@ enum FetchFailureKind: string implements HasLabel
             self::HttpStatus => 'HTTP error',
             self::RateLimited => 'Rate limited by the site',
             self::TooLarge => 'Response too large',
-            self::ContentInvalid => 'Not a valid feed',
+            self::ContentInvalid => 'Content invalid (not a feed)',
             self::ParseError => 'Could not be read',
             self::SsrfBlocked => 'Address not allowed',
             self::Abandoned => 'Abandoned',
