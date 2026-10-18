@@ -332,6 +332,22 @@ final readonly class PublishableEventData
         return ManualRecurrence::tryFromStoredRule($event->recurrence_rule, $start, $event->all_day);
     }
 
+    /**
+     * A copy with the given excluded dates (null leaves the event's stored
+     * exclusions untouched, C2). Used by ApplySourceUpdate, whose form
+     * state comes from fromEvent()/fromForm(), which carry no exclusions.
+     * The copy is validated like any other instance.
+     *
+     * @param  list<string>|null  $dates
+     */
+    public function withExcludedDates(?array $dates): self
+    {
+        return new self(...[
+            ...get_object_vars($this),
+            'excludedDates' => $dates === null ? null : self::sortedDates($dates),
+        ]);
+    }
+
     public function recurrence(): ManualRecurrence
     {
         return new ManualRecurrence($this->repeats, $this->repeatEnds, $this->repeatUntil, $this->repeatCount);
