@@ -12,6 +12,7 @@
         x-data="{
             enabled: localStorage.getItem('woa-shortcuts') !== 'off',
             editUrl: @js($this->editUrl()),
+            rejectAction: @js($this->rejectActionName()),
             save() {
                 localStorage.setItem('woa-shortcuts', this.enabled ? 'on' : 'off');
             },
@@ -28,7 +29,7 @@
                 if (this.typing(event.target) || this.dialogOpen()) return;
 
                 const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
-                const actions = { r: 'reject', s: 'skip', j: 'skip', k: 'previous', '?': 'help' };
+                const actions = { r: this.rejectAction, s: 'skip', j: 'skip', k: 'previous', '?': 'help' };
 
                 if (key === 'a') {
                     event.preventDefault();
@@ -53,7 +54,7 @@
                 x-model="enabled"
                 x-on:change="save()"
             />
-            <span>Keyboard shortcuts (A approve · E edit · R reject · S/J next · K previous · ? help)</span>
+            <span>Keyboard shortcuts (A approve · E edit · R {{ $this->rejectActionName() === 'reject' ? 'reject' : 'ignore' }} · S/J next · K previous · ? help)</span>
         </label>
 
         @php($blockers = $this->blockers())

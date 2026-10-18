@@ -33,6 +33,9 @@ final class DraftPublishability
         'blocked' => 'not ready to publish',
         'already_reviewed' => 'already reviewed',
         'not_pending' => 'already reviewed',
+        // Bulk reject: a source update or cancellation is applied, confirmed
+        // or ignored on its own, so its baseline moves (03-13).
+        'source_change' => 'source change (use Apply, Confirm or Ignore)',
     ];
 
     /**

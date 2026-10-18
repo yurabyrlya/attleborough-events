@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\EventDrafts\Pages;
 
+use App\Enums\DraftKind;
 use App\Enums\ReviewStatus;
 use App\Filament\Resources\EventDrafts\Actions\ReviewActions;
 use App\Filament\Resources\EventDrafts\EventDraftResource;
@@ -69,8 +70,13 @@ class ReviewEventDraft extends Page
         return 'Review';
     }
 
+    public const USE_APPLY = 'Use Apply changes for source updates.';
+
+    public const USE_CONFIRM = 'Use Confirm cancellation for source cancellations.';
+
     /**
-     * What stops Approve, shown only while the draft is pending.
+     * What stops Approve, shown only while a new-event draft is pending
+     * (source changes have no Approve: Apply / Confirm / Ignore instead).
      *
      * @return list<string>
      */
@@ -78,7 +84,7 @@ class ReviewEventDraft extends Page
     {
         $draft = $this->draft();
 
-        if ($draft->review_status !== ReviewStatus::PendingReview) {
+        if ($draft->review_status !== ReviewStatus::PendingReview || $draft->kind !== DraftKind::New) {
             return [];
         }
 
@@ -90,10 +96,20 @@ class ReviewEventDraft extends Page
      * visible warning listing what blocks it; otherwise the approve
      * confirmation opens and Enter publishes. ApproveDraft re-checks on the
      * server either way. Does nothing once the draft is no longer pending.
+     * A source update or cancellation is never approved from the keyboard:
+     * the admin is pointed at its own button (03-13).
      */
     public function approveFromKeyboard(): void
     {
         if ($this->shownStatus() !== ReviewStatus::PendingReview) {
+            return;
+        }
+
+        $kind = $this->draft()->kind;
+
+        if ($kind !== DraftKind::New) {
+            Notification::make()->info()->title($kind === DraftKind::Update ? self::USE_APPLY : self::USE_CONFIRM)->send();
+
             return;
         }
 
@@ -107,6 +123,15 @@ class ReviewEventDraft extends Page
         }
 
         $this->mountAction('approve');
+    }
+
+    /**
+     * The action the keyboard "R" opens: Reject for a new-event draft,
+     * Ignore for a source update or cancellation (which have no Reject).
+     */
+    public function rejectActionName(): string
+    {
+        return $this->draft()->kind === DraftKind::New ? 'reject' : 'ignore';
     }
 
     /**

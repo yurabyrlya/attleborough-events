@@ -256,7 +256,8 @@ class EventDraftsTable
     /**
      * Bulk reject with one optional reason and note (REV-04, REV-08). Any
      * draft may be selected; drafts that are no longer pending are reported
-     * as already reviewed.
+     * as already reviewed, and source updates and cancellations as source
+     * changes (they are applied, confirmed or ignored one by one).
      */
     public static function rejectSelected(): BulkAction
     {
@@ -278,6 +279,14 @@ class EventDraftsTable
                 foreach ($records as $record) {
                     if ($record->review_status !== ReviewStatus::PendingReview) {
                         self::skip($action, 'not_pending');
+
+                        continue;
+                    }
+
+                    // Rejecting would leave the accepted baseline where it
+                    // was, so the next run would raise the change again.
+                    if ($record->kind !== DraftKind::New) {
+                        self::skip($action, 'source_change');
 
                         continue;
                     }

@@ -3,7 +3,7 @@
     <ul class="space-y-1">
         <li><kbd>A</kbd> Approve &amp; next</li>
         <li><kbd>E</kbd> Edit</li>
-        <li><kbd>R</kbd> Reject</li>
+        <li><kbd>R</kbd> Reject (Ignore on a source update or cancellation)</li>
         <li><kbd>S</kbd> or <kbd>J</kbd> Skip</li>
         <li><kbd>K</kbd> Previous</li>
         <li><kbd>?</kbd> Show this help</li>

@@ -3,10 +3,13 @@
 namespace App\Filament\Resources\EventDrafts\Schemas;
 
 use App\Calendar\ManualRecurrence;
+use App\Enums\DraftKind;
 use App\Enums\ReviewStatus;
 use App\Filament\Resources\EventDrafts\Actions\ReviewActions;
+use App\Filament\Resources\EventDrafts\Tables\EventDraftsTable;
 use App\Filament\Resources\Events\EventResource;
 use App\Models\EventDraft;
+use App\Review\ReviewQueue;
 use App\Review\VenueMatcher;
 use App\Support\LondonFormatter;
 use App\Support\SafeLinks;
@@ -28,6 +31,12 @@ use Filament\Schemas\Schema;
  * (T-02-33), and organiser links go through SafeLinks (T-02-34). A venue
  * suggestion is shown, never applied: approval needs a venue the admin
  * picked or created (D-05, D-21).
+ *
+ * Discovered drafts (03-13): an update draft leads with "Changes from
+ * {source}" (the three-column diff, REV-06, D-07), a cancellation draft
+ * with "Cancelled at {source}" (REV-07, D-08); an update or cancellation
+ * due within 48 hours carries the "Urgent" badge (D-09, the same rule
+ * that orders the queue).
  */
 class EventDraftInfolist
 {
@@ -41,6 +50,8 @@ class EventDraftInfolist
             ->columns(1)
             ->components([
                 self::summary(),
+                self::changes(),
+                self::cancellation(),
                 self::what(),
                 self::when(),
                 self::where(),
@@ -58,6 +69,14 @@ class EventDraftInfolist
             ->schema([
                 TextEntry::make('kind')->label('Kind'),
                 TextEntry::make('review_status')->label('Review status')->badge(),
+                // D-09: text, not colour alone; hidden once decided.
+                TextEntry::make('urgent')
+                    ->hiddenLabel()
+                    ->state(EventDraftsTable::URGENT)
+                    ->badge()
+                    ->color('danger')
+                    ->visible(fn (EventDraft $record): bool => $record->review_status === ReviewStatus::PendingReview
+                        && ReviewQueue::isUrgent($record, CarbonImmutable::now())),
                 TextEntry::make('reference')->label('Reference')->copyable(),
                 // Band first, number second (D-22); the band is text, not
                 // colour alone.
@@ -80,6 +99,37 @@ class EventDraftInfolist
                     ->placeholder('Nothing to fix')
                     ->extraAttributes(self::WRAP)
                     ->columnSpanFull(),
+            ]);
+    }
+
+    /**
+     * An update draft's changes, field by field (REV-06, D-07).
+     */
+    private static function changes(): Section
+    {
+        return Section::make(fn (EventDraft $record): string => 'Changes from '.self::sourceName($record))
+            ->visible(fn (EventDraft $record): bool => $record->kind === DraftKind::Update)
+            ->schema([
+                ViewEntry::make('diff')
+                    ->hiddenLabel()
+                    ->view('filament.resources.event-drafts.entries.source-diff'),
+            ]);
+    }
+
+    /**
+     * What a cancellation draft cancels: its dates, or the whole event
+     * (REV-07, D-08).
+     */
+    private static function cancellation(): Section
+    {
+        return Section::make(fn (EventDraft $record): string => 'Cancelled at '.self::sourceName($record))
+            ->visible(fn (EventDraft $record): bool => $record->kind === DraftKind::Cancellation)
+            ->schema([
+                TextEntry::make('cancelled_dates')
+                    ->label('Cancelled')
+                    ->state(fn (EventDraft $record): array => DiscoveredDraftDetails::cancelledDates($record))
+                    ->listWithLineBreaks()
+                    ->bulleted(),
             ]);
     }
 
@@ -141,6 +191,13 @@ class EventDraftInfolist
                     ->label('No repeat rule needed')
                     ->state('Yes')
                     ->visible(fn (EventDraft $record): bool => $record->repeats_acknowledged),
+                // Dates the source marks cancelled on a new series; approval
+                // publishes them as Cancelled (03-09).
+                TextEntry::make('source_cancelled_dates')
+                    ->label('Cancelled at source')
+                    ->state(fn (EventDraft $record): array => DiscoveredDraftDetails::sourceCancelledDates($record))
+                    ->listWithLineBreaks()
+                    ->visible(fn (EventDraft $record): bool => DiscoveredDraftDetails::sourceCancelledDates($record) !== []),
             ]);
     }
 
@@ -192,7 +249,11 @@ class EventDraftInfolist
         return Section::make('Source')
             ->columns(2)
             ->schema([
-                TextEntry::make('origin')->label('Source'),
+                TextEntry::make('origin')->label('Origin'),
+                TextEntry::make('source.name')
+                    ->label('Source')
+                    ->visible(fn (EventDraft $record): bool => $record->source_id !== null)
+                    ->extraAttributes(self::WRAP),
                 TextEntry::make('extraction_method')->label('Extraction method'),
                 ViewEntry::make('source_url')
                     ->label('Source link')
@@ -264,6 +325,11 @@ class EventDraftInfolist
                     ->visible(fn (EventDraft $record): bool => $record->event_id !== null)
                     ->extraAttributes(self::WRAP),
             ]);
+    }
+
+    private static function sourceName(EventDraft $record): string
+    {
+        return $record->source->name ?? 'the source';
     }
 
     private static function ends(EventDraft $record): string

@@ -9,9 +9,13 @@ use App\Enums\ReviewStatus;
 use App\Filament\Resources\EventDrafts\EventDraftResource;
 use App\Filament\Resources\EventDrafts\Pages\EditEventDraft;
 use App\Filament\Resources\EventDrafts\Pages\ReviewEventDraft;
+use App\Filament\Resources\EventDrafts\Schemas\DiscoveredDraftDetails;
 use App\Models\EventDraft;
 use App\Models\User;
+use App\Publishing\Actions\ApplySourceUpdate;
 use App\Publishing\Actions\ApproveDraft;
+use App\Publishing\Actions\ConfirmSourceCancellation;
+use App\Publishing\Actions\IgnoreSourceChange;
 use App\Publishing\Actions\RejectDraft;
 use App\Publishing\Actions\ReopenDraft;
 use App\Review\DraftPublishability;
@@ -47,6 +51,12 @@ use Livewire\Component;
  * shows its key and carries aria-keyshortcuts; the keys themselves are a
  * guarded Alpine handler in the page view, never Filament's key bindings
  * (Mousetrap's global bindings fire inside text inputs).
+ *
+ * Kind-aware (03-13): Approve and Reject are for new-event drafts only. A
+ * source update offers "Apply changes" and "Ignore", a source cancellation
+ * "Confirm cancellation" and "Ignore" (REV-06, REV-07, D-07, D-08), so a
+ * source change is never rejected without moving the item's accepted
+ * baseline (which would raise the same change again on the next run).
  */
 final class ReviewActions
 {
@@ -63,8 +73,11 @@ final class ReviewActions
     {
         return [
             self::approve(),
+            self::applyChanges(),
+            self::confirmCancellation(),
             self::edit(),
             self::reject(),
+            self::ignore(),
             self::skip(),
             self::previous(),
             self::reopen(),
@@ -81,7 +94,10 @@ final class ReviewActions
     public static function forTable(): array
     {
         return [
+            self::applyChanges(),
+            self::confirmCancellation(),
             self::reject(),
+            self::ignore(),
             self::reopen(),
         ];
     }
@@ -92,7 +108,7 @@ final class ReviewActions
             ->label('Approve & next (A)')
             ->extraAttributes(['aria-keyshortcuts' => 'A'])
             ->color('success')
-            ->visible(fn (EventDraft $record, Component $livewire): bool => self::shownStatus($record, $livewire) === ReviewStatus::PendingReview)
+            ->visible(fn (EventDraft $record, Component $livewire): bool => self::pendingOfKind($record, $livewire, DraftKind::New))
             ->disabled(fn (EventDraft $record): bool => app(DraftPublishability::class)->blockers($record) !== [])
             ->requiresConfirmation()
             ->modalHeading('Publish this event?')
@@ -181,7 +197,8 @@ final class ReviewActions
             ->label(fn (Component $livewire): string => $livewire instanceof ReviewEventDraft ? 'Reject (R)' : 'Reject')
             ->extraAttributes(fn (Component $livewire): array => $livewire instanceof ReviewEventDraft ? ['aria-keyshortcuts' => 'R'] : [])
             ->color('danger')
-            ->visible(fn (EventDraft $record, Component $livewire): bool => self::shownStatus($record, $livewire) === ReviewStatus::PendingReview)
+            // Source changes are ignored, not rejected (03-10 handoff).
+            ->visible(fn (EventDraft $record, Component $livewire): bool => self::pendingOfKind($record, $livewire, DraftKind::New))
             ->modalHeading('Reject this draft?')
             ->modalDescription('It leaves the queue and nothing is published. The organiser is not told. Rejected drafts are deleted after the retention period.')
             ->schema(self::rejectFields())
@@ -193,6 +210,96 @@ final class ReviewActions
                 $rejected = self::run(fn (User $actor) => app(RejectDraft::class)($record, $actor, $reason, $note), 'Draft rejected', $livewire);
 
                 if ($rejected) {
+                    self::openNext($record, $livewire);
+                }
+            });
+    }
+
+    /**
+     * Apply a source update's changes to the published event (REV-06,
+     * D-07) through ApplySourceUpdate, then open the next pending draft.
+     */
+    public static function applyChanges(): Action
+    {
+        return Action::make('applyChanges')
+            ->label('Apply changes')
+            ->color('success')
+            ->visible(fn (EventDraft $record, Component $livewire): bool => self::pendingOfKind($record, $livewire, DraftKind::Update))
+            ->requiresConfirmation()
+            ->modalHeading('Apply these changes to the published event?')
+            ->modalDescription('The public calendar shows the new details straight away. Fields the source did not change keep their published values.')
+            ->modalSubmitActionLabel('Apply changes')
+            ->modalCancelActionLabel(self::KEEP_LABEL)
+            ->action(function (EventDraft $record, Component $livewire): void {
+                $applied = self::run(
+                    fn (User $actor) => app(ApplySourceUpdate::class)($record, $actor),
+                    'Changes applied',
+                    $livewire,
+                    refusalTitle: "Can't apply this change",
+                );
+
+                if ($applied) {
+                    self::openNext($record, $livewire);
+                }
+            });
+    }
+
+    /**
+     * Confirm a source cancellation (REV-07, D-08): the listed dates, or
+     * the whole event, show "Cancelled" on the public calendar.
+     */
+    public static function confirmCancellation(): Action
+    {
+        return Action::make('confirmCancellation')
+            ->label('Confirm cancellation')
+            ->color('danger')
+            ->visible(fn (EventDraft $record, Component $livewire): bool => self::pendingOfKind($record, $livewire, DraftKind::Cancellation))
+            ->requiresConfirmation()
+            ->modalHeading('Confirm this cancellation?')
+            ->modalDescription(fn (EventDraft $record): string => self::cancellationDescription($record))
+            ->modalSubmitActionLabel('Confirm cancellation')
+            ->modalCancelActionLabel(self::KEEP_LABEL)
+            ->action(function (EventDraft $record, Component $livewire): void {
+                $confirmed = self::run(
+                    fn (User $actor) => app(ConfirmSourceCancellation::class)($record, $actor),
+                    'Cancellation confirmed',
+                    $livewire,
+                    refusalTitle: "Can't confirm this cancellation",
+                );
+
+                if ($confirmed) {
+                    self::openNext($record, $livewire);
+                }
+            });
+    }
+
+    /**
+     * Ignore a source update or cancellation (D-07, D-08) through
+     * IgnoreSourceChange: the published event stays as it is and the
+     * accepted baseline moves, so the same change is not raised again.
+     * On the review page it takes the R key that Reject has on new drafts.
+     */
+    public static function ignore(): Action
+    {
+        return Action::make('ignore')
+            ->label(fn (Component $livewire): string => $livewire instanceof ReviewEventDraft ? 'Ignore (R)' : 'Ignore')
+            ->extraAttributes(fn (Component $livewire): array => $livewire instanceof ReviewEventDraft ? ['aria-keyshortcuts' => 'R'] : [])
+            ->color('gray')
+            ->visible(fn (EventDraft $record, Component $livewire): bool => self::pendingOfKind($record, $livewire, DraftKind::Update, DraftKind::Cancellation))
+            ->requiresConfirmation()
+            ->modalHeading(fn (EventDraft $record): string => 'Ignore this change from '.($record->source->name ?? 'the source').'?')
+            ->modalDescription('The published event stays as it is. This change is not raised again; a later change from the source is.')
+            ->modalSubmitActionLabel('Ignore change')
+            ->modalCancelActionLabel(self::KEEP_LABEL)
+            ->action(function (EventDraft $record, Component $livewire): void {
+                $ignored = self::run(
+                    fn (User $actor) => app(IgnoreSourceChange::class)($record, $actor),
+                    'Change ignored',
+                    $livewire,
+                    refusalTitle: "Can't ignore this change",
+                );
+
+                if ($ignored) {
                     self::openNext($record, $livewire);
                 }
             });
@@ -293,6 +400,27 @@ final class ReviewActions
     }
 
     /**
+     * Shown (not re-read) status is pending, and the draft is one of $kinds.
+     * The kind never changes after a draft is written.
+     */
+    private static function pendingOfKind(EventDraft $record, Component $livewire, DraftKind ...$kinds): bool
+    {
+        return in_array($record->kind, $kinds, true)
+            && self::shownStatus($record, $livewire) === ReviewStatus::PendingReview;
+    }
+
+    private static function cancellationDescription(EventDraft $record): string
+    {
+        $dates = DiscoveredDraftDetails::cancelledDates($record);
+
+        if (in_array($dates, [[DiscoveredDraftDetails::WHOLE_EVENT], [DiscoveredDraftDetails::NOT_LISTED]], true)) {
+            return 'The whole event is shown as Cancelled on the public calendar.';
+        }
+
+        return 'Shown as Cancelled on the public calendar: '.implode(', ', $dates).'. The other dates stay as they are.';
+    }
+
+    /**
      * The status the admin is looking at: the page's snapshot on the review
      * page, the row's own status in the table.
      */
@@ -309,7 +437,7 @@ final class ReviewActions
      *
      * @throws AuthorizationException
      */
-    private static function run(callable $decide, string $successTitle, Component $livewire): bool
+    private static function run(callable $decide, string $successTitle, Component $livewire, string $refusalTitle = "Can't publish yet"): bool
     {
         $actor = auth()->user();
 
@@ -326,7 +454,7 @@ final class ReviewActions
             return false;
         } catch (DraftNotPublishable $e) {
             // Plain-text body: Filament escapes notification strings.
-            Notification::make()->title("Can't publish yet")->body(implode(' ', $e->blockers))->danger()->send();
+            Notification::make()->title($refusalTitle)->body(implode(' ', $e->blockers))->danger()->send();
             self::resync($livewire);
 
             return false;
