@@ -255,7 +255,7 @@ final class ReviewActions
         return [
             Select::make('reject_reason')
                 ->label('Reason (optional)')
-                ->options(RejectReason::class)
+                ->options(RejectReason::rejectOptions())
                 ->placeholder('No reason'),
             Textarea::make('review_notes')
                 ->label('Note (optional)')
@@ -283,10 +283,13 @@ final class ReviewActions
     private static function rejectReason(mixed $value): ?RejectReason
     {
         if ($value instanceof RejectReason) {
-            return $value;
+            $reason = $value;
+        } else {
+            $reason = is_string($value) && $value !== '' ? RejectReason::tryFrom($value) : null;
         }
 
-        return is_string($value) && $value !== '' ? RejectReason::tryFrom($value) : null;
+        // Ignored belongs to IgnoreSourceChange, never to a Reject dialog.
+        return $reason === RejectReason::Ignored ? null : $reason;
     }
 
     /**

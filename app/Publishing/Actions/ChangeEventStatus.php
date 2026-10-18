@@ -50,13 +50,16 @@ final class ChangeEventStatus
             return [$locked, $from];
         });
 
-        // Ids only: never titles or contact details.
-        Log::info('event status changed', [
+        // Ids only: never titles or contact details. After the outermost
+        // commit, so a status change rolled back with a caller's
+        // transaction (ConfirmSourceCancellation, C9) is never logged.
+        // Outside a transaction it runs at once.
+        DB::afterCommit(fn () => Log::info('event status changed', [
             'event_id' => $changed->id,
             'from' => $from->value,
             'to' => $to->value,
             'user_id' => $actor->id,
-        ]);
+        ]));
 
         return $changed->refresh();
     }

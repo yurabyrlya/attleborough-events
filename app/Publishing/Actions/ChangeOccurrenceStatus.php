@@ -53,14 +53,17 @@ final class ChangeOccurrenceStatus
             return [$locked, $from];
         });
 
-        // Ids only: never titles or contact details.
-        Log::info('occurrence status changed', [
+        // Ids only: never titles or contact details. After the outermost
+        // commit, so a status change rolled back with a caller's
+        // transaction (ConfirmSourceCancellation, C9) is never logged.
+        // Outside a transaction it runs at once.
+        DB::afterCommit(fn () => Log::info('occurrence status changed', [
             'occurrence_id' => $changed->id,
             'event_id' => $changed->event_id,
             'from' => $from->value,
             'to' => $to->value,
             'user_id' => $actor->id,
-        ]);
+        ]));
 
         return $changed->refresh();
     }

@@ -171,7 +171,7 @@ it('refuses to reopen update and cancellation drafts', function (DraftKind $kind
     $draft = linkTestDraft($source, $item, $kind, [
         'event_id' => $this->event->id,
         'review_status' => ReviewStatus::Rejected,
-        'reject_reason' => RejectReason::Other,
+        'reject_reason' => RejectReason::Ignored,
         'reviewed_at' => now()->utc(),
     ]);
 
