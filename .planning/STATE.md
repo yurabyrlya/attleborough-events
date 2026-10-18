@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 03
 current_phase_name: Ingestion Backbone, ICS & Change/Duplicate Handling
 status: executing
-stopped_at: Completed 03-10-PLAN.md
-last_updated: "2026-10-18T11:30:37.603Z"
+stopped_at: Completed 03-14-PLAN.md
+last_updated: "2026-10-18T11:39:11.687Z"
 last_activity: 2026-10-18
 last_activity_desc: Phase 2 complete, transitioned to Phase 3
-state_head: c42c03c85d45b89ec81a00ccc4e648ad39af4edc
+state_head: 31a0cfa62cca57728db8c73019fabc3ced1a6b2a
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 48
-  completed_plans: 41
+  completed_plans: 42
   percent: 40
 ---
 
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 03 (Ingestion Backbone, ICS & Change/Duplicate Handling) — EXECUTING
-Plan: 13 of 17
+Plan: 14 of 17
 Status: Ready to execute
-Last activity: 2026-10-18 — Completed 03-10 (ApplySourceUpdate / IgnoreSourceChange / ConfirmSourceCancellation, SourceBaseline, RejectReason::Ignored, afterCommit status logs; confirmed dates kept in events.cancelled_dates)
+Last activity: 2026-10-18 — Completed 03-14 (per-source category mappings: category_mappings.source_id + coalesced unique index, source-preferring CategoryAssigner with source-named reason, Rules screen Source column, SaveRules per-source uniqueness)
 
-Progress: [█████████████████░░░] 40/48 planned plans ([████░░░░░░] 40%); phases complete: 2/5
+Progress: [█████████████████░░░] 42/48 planned plans ([████░░░░░░] 40%); phases complete: 2/5
 
 ## Performance Metrics
 
@@ -98,6 +98,7 @@ Progress: [█████████████████░░░] 40/48 p
 | Phase 03 P15 | 16min | 3 tasks | 13 files |
 | Phase 03 P16 | 12min | 3 tasks | 12 files |
 | Phase 03 P10 | 12min | 3 tasks | 13 files |
+| Phase 03 P14 | 12min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -201,6 +202,7 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-10: ApplySourceUpdate skips diff keys without a published field (cancelled, moved_overrides, extra_dates) but still moves the baseline; venue = admin pick on the update draft, else VenueMatcher::exact, else refused
 - [Phase 03]: 03-10: ConfirmSourceCancellation appends confirmed keys to events.cancelled_dates; IgnoreSourceChange never writes events (ignored far dates stay Scheduled); cancellations move only the cancelled part of the baseline
 - [Phase 03]: 03-10: RejectReason::Ignored set only by IgnoreSourceChange (kept out of the Reject dialog); ChangeOccurrenceStatus/ChangeEventStatus log after commit (C9); REV-06/07 stay Pending until the 03-13 UI
+- [Phase 03]: 03-14: category mappings can be scoped to one source (category_mappings.source_id, unique (coalesce(source_id,0), lower(source_value))); a matching source mapping always beats a global one and the reason names the source
 
 ### Pending Todos
 
@@ -236,6 +238,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-18T11:30:36.747Z
-Stopped at: Completed 03-10-PLAN.md
+Last session: 2026-10-18T11:39:10.687Z
+Stopped at: Completed 03-14-PLAN.md
 Resume file: None
