@@ -5,6 +5,7 @@ namespace App\Ingestion;
 use App\Enums\FetchFailureKind;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
+use App\Enums\RunTrigger;
 use App\Ingestion\Data\ExtractedItem;
 use App\Ingestion\Health\SourceHealthTracker;
 use App\Ingestion\Http\FetchRequest;
@@ -17,7 +18,6 @@ use App\Models\Source;
 use App\Models\SourceRun;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Log;
-use LogicException;
 use Throwable;
 
 /**
@@ -37,13 +37,25 @@ use Throwable;
  * fails the run. error_message is built from enum labels, status codes and
  * our own wording only, never response text, and is at most 500 characters.
  *
- * Live runs only for now: the D-01 preview arrives in 03-07, health in 03-07
- * and change/missing decisions in 03-09.
+ * Preview runs (D-01) go through the same fetch, validation, extraction and
+ * classification (SourceItemRecorder::verdict, shared with live runs) but
+ * write nothing except the run itself: no source items, drafts, source
+ * state or health. Their would-be outcome is stored in run.preview (≤ 200
+ * rows) and their body in RawBodyStore. A live activation run ("Create
+ * drafts") reuses the latest preview's body when that preview succeeded,
+ * fetched the same URL and finished under ingest.preview_reuse_minutes ago
+ * (D-24), so the site is not asked twice.
+ *
+ * Every finished live run is handed to SourceHealthTracker (health,
+ * structure alert, is_complete) before missing detection (03-09).
  */
 final class IngestRun
 {
     /** source_runs.error_message length (characters). */
     public const int ERROR_MESSAGE_LIMIT = 500;
+
+    /** Rows kept in a preview run's `preview` (D-01). */
+    public const int PREVIEW_ROW_LIMIT = 200;
 
     /** source_runs.final_url length (characters). */
     private const int FINAL_URL_LIMIT = 2048;
@@ -64,12 +76,9 @@ final class IngestRun
      */
     public function execute(SourceRun $run): void
     {
-        if ($run->mode !== RunMode::Live) {
-            throw new LogicException('Test runs (previews) are not supported yet.');
-        }
-
         $source = $run->source()->firstOrFail();
-        $result = $this->fetcher->fetch($this->request($run, $source));
+        $result = $this->reusablePreviewBody($run, $source)
+            ?? $this->fetcher->fetch($this->request($run, $source));
 
         $run->forceFill([
             'http_status' => $result->httpStatus,
@@ -109,10 +118,15 @@ final class IngestRun
     /**
      * The fetch for this run. The conditional validators are sent only on a
      * live run whose previous live run succeeded (or was not modified), so a
-     * run that failed half way is never answered with a 304.
+     * run that failed half way is never answered with a 304. A preview never
+     * sends them: it needs the body.
      */
     private function request(SourceRun $run, Source $source): FetchRequest
     {
+        if ($run->mode !== RunMode::Live) {
+            return new FetchRequest(url: $source->url, etag: null, lastModified: null, startedAt: $run->started_at);
+        }
+
         $previous = SourceRun::query()
             ->where('source_id', $source->id)
             ->where('mode', RunMode::Live)
@@ -139,6 +153,12 @@ final class IngestRun
         if ($extraction->failed()) {
             $message = FetchFailureKind::ParseError->getLabel().': '.$extraction->fatalError;
             $this->finish($run, $source, RunStatus::Failed, FetchFailureKind::ParseError, $message);
+
+            return;
+        }
+
+        if ($run->mode === RunMode::Preview) {
+            $this->preview($run, $source, $extraction->items, $nowLondon, $result);
 
             return;
         }
@@ -180,6 +200,133 @@ final class IngestRun
     }
 
     /**
+     * D-01: classify every item exactly as a live run would (verdict()),
+     * write nothing but the run: counters as "would be", drafts_created 0,
+     * and run.preview = {url, would_create, skipped, rows (≤ 200)}.
+     *
+     * @param  list<ExtractedItem>  $items
+     */
+    private function preview(SourceRun $run, Source $source, array $items, CarbonImmutable $nowLondon, FetchResult $result): void
+    {
+        $counters = array_fill_keys(SourceRun::COUNTERS, 0);
+        $observedUntil = null;
+        $rows = [];
+
+        foreach ($items as $index => $item) {
+            $counters['items_found']++;
+            $observedUntil = $this->laterDate($observedUntil, $item);
+
+            try {
+                $bucket = $this->recorder->verdict($source, $item, $nowLondon);
+            } catch (Throwable $e) {
+                Log::error('ingest: preview item failed', [
+                    'run_id' => $run->id,
+                    'source_id' => $source->id,
+                    'item_index' => $index,
+                    'exception' => $e::class,
+                ]);
+                $bucket = SourceItemRecorder::SKIPPED_PARSE_ERROR;
+            }
+
+            $counters[SourceItemRecorder::COUNTER[$bucket]]++;
+
+            if (count($rows) < self::PREVIEW_ROW_LIMIT) {
+                $rows[] = $this->previewRow($item, $bucket);
+            }
+        }
+
+        $run->forceFill([
+            ...$counters,
+            'observed_from' => $nowLondon->toDateString(),
+            'observed_until' => $observedUntil,
+            'preview' => [
+                // The address fetched: D-24 reuses the body only for the same URL.
+                'url' => $source->url,
+                'would_create' => $counters['items_new'],
+                'skipped' => [
+                    'past' => $counters['skipped_past'],
+                    'far_future' => $counters['skipped_far_future'],
+                    'rule' => $counters['skipped_rule'],
+                    'parse_error' => $counters['skipped_parse_error'],
+                ],
+                'rows' => $rows,
+            ],
+        ]);
+
+        $this->finish($run, $source, RunStatus::Succeeded, null, null, $result);
+    }
+
+    /**
+     * One preview row: title (≤ 255 characters), London start ("Y-m-d" or
+     * "Y-m-d H:i", the next instance for a series), verdict new / changed /
+     * unchanged / skipped, and the skip reason past / far_future / rule /
+     * parse_error (null otherwise).
+     *
+     * @return array{title: string|null, starts: string|null, verdict: string, reason: string|null}
+     */
+    private function previewRow(ExtractedItem $item, string $bucket): array
+    {
+        $facts = $item->facts;
+        $starts = null;
+
+        if ($facts !== null) {
+            $next = $facts->nextInstanceStartUtc?->setTimezone(self::LONDON);
+            $date = $next?->toDateString() ?? $facts->startDate;
+            $time = $next?->format('H:i') ?? ($facts->startTime !== null ? substr($facts->startTime, 0, 5) : null);
+            $starts = $facts->allDay || $time === null ? $date : $date.' '.$time;
+        }
+
+        $skipped = str_starts_with($bucket, 'skipped_');
+
+        return [
+            'title' => $facts !== null ? mb_substr($facts->title, 0, 255, 'UTF-8') : null,
+            'starts' => $starts,
+            'verdict' => $skipped ? 'skipped' : $bucket,
+            'reason' => $skipped ? substr($bucket, strlen('skipped_')) : null,
+        ];
+    }
+
+    /**
+     * D-24: for a live activation run, the latest preview's body as a fetch
+     * result, when that preview succeeded, fetched the source's current URL,
+     * finished under ingest.preview_reuse_minutes ago and its stored body
+     * still matches its fingerprint. Null means fetch politely as usual.
+     */
+    private function reusablePreviewBody(SourceRun $run, Source $source): ?FetchResult
+    {
+        if ($run->mode !== RunMode::Live || $run->trigger !== RunTrigger::Activation) {
+            return null;
+        }
+
+        $preview = SourceRun::query()
+            ->where('source_id', $source->id)
+            ->where('mode', RunMode::Preview)
+            ->where('id', '<', $run->id)
+            ->whereNotIn('status', [RunStatus::Queued, RunStatus::Running])
+            ->orderByDesc('id')
+            ->first();
+
+        $cutoff = CarbonImmutable::now()->subMinutes((int) config('ingest.preview_reuse_minutes', 60));
+
+        if ($preview === null
+            || $preview->status !== RunStatus::Succeeded
+            || $preview->raw_path === null
+            || $preview->finished_at === null
+            || ! $preview->finished_at->greaterThan($cutoff)
+            || ($preview->preview['url'] ?? null) !== $source->url) {
+            return null;
+        }
+
+        $body = $this->raw->get($source->id, $preview->id);
+
+        if ($body === null || hash('sha256', $body) !== $preview->raw_sha256) {
+            return null;
+        }
+
+        return FetchResult::ok($body, $preview->final_url ?? $source->url, $preview->http_status ?? 200);
+    }
+
+    /**
      * The later of $current and the item's London start date (its next
      * instance, else its first date).
      */
@@ -217,6 +364,11 @@ final class IngestRun
             'error_message' => self::errorMessage($message),
             'finished_at' => $nowUtc,
         ])->save();
+
+        if ($run->mode !== RunMode::Live) {
+            // A preview is not a check: no source state, validators or health.
+            return;
+        }
 
         $sourceState = ['last_run_at' => $nowUtc];
 

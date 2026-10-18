@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\DB;
 /**
  * Records one extracted item of a live run (03-05): one DB transaction per
  * item, returning the single bucket the item is counted in (SRC-07).
+ * verdict() returns the same bucket for a preview run (D-01) without
+ * writing anything.
  *
  * Order:
  * 1. A known identity is marked seen in this run first (last_seen_run_id,
@@ -117,7 +119,26 @@ final class SourceItemRecorder
     }
 
     /**
+     * The bucket record() would put this item in, without writing or
+     * locking anything: the D-01 preview's verdict. Shares classify() with
+     * record(), so a preview and the live run that follows cannot drift.
+     *
+     * @return self::NEW|self::CHANGED|self::UNCHANGED|self::SKIPPED_PAST|self::SKIPPED_FAR_FUTURE|self::SKIPPED_RULE|self::SKIPPED_PARSE_ERROR
+     */
+    public function verdict(Source $source, ExtractedItem $item, CarbonImmutable $nowLondon): string
+    {
+        $existing = SourceItem::query()
+            ->where('source_id', $source->id)
+            ->where('external_id', $item->externalId)
+            ->first();
+
+        return $this->classify($source, $item, $existing, $nowLondon);
+    }
+
+    /**
      * The bucket for an item, without writing anything.
+     *
+     * @return self::NEW|self::CHANGED|self::UNCHANGED|self::SKIPPED_PAST|self::SKIPPED_FAR_FUTURE|self::SKIPPED_RULE|self::SKIPPED_PARSE_ERROR
      */
     private function classify(Source $source, ExtractedItem $item, ?SourceItem $existing, CarbonImmutable $nowLondon): string
     {

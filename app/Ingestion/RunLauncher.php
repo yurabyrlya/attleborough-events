@@ -13,8 +13,10 @@ use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Starts live runs and works out when a source is next due (SRC-03, SRC-04,
- * D-02). Shared by the "Run now" action (03-15) and ingest:dispatch-due.
+ * Starts runs and works out when a source is next due (SRC-03, SRC-04,
+ * D-02): live runs for "Run now" (03-15) and ingest:dispatch-due, preview
+ * runs for "Test run" and the activation run for "Create drafts" (D-01,
+ * D-24).
  *
  * The source_runs_one_active partial unique index is the guarantee that a
  * source never has two queued or running runs: the insert runs in its own
@@ -31,7 +33,59 @@ final class RunLauncher
      */
     public function runNow(Source $source, RunTrigger $trigger = RunTrigger::Manual): SourceRun
     {
-        $run = new SourceRun(['mode' => RunMode::Live, 'trigger' => $trigger]);
+        return $this->queue($source, RunMode::Live, $trigger);
+    }
+
+    /**
+     * D-01 "Test run": queue a preview run. It fetches, validates, extracts
+     * and classifies like a live run but writes no source items, drafts,
+     * source state or health; what it would do is kept in run.preview.
+     * Works on inactive sources (that is the point).
+     *
+     * @throws RunAlreadyActive when the source already has a queued or running run
+     */
+    public function testRun(Source $source): SourceRun
+    {
+        return $this->queue($source, RunMode::Preview, RunTrigger::Manual);
+    }
+
+    /**
+     * D-01/D-24 "Create drafts": turn the source live (is_active, next
+     * check tomorrow) and queue a live activation run. That run reuses the
+     * latest preview's stored body when it is under
+     * ingest.preview_reuse_minutes old (IngestRun), so the site sees no
+     * second request. Activation and insert share one transaction: when a
+     * run is already active nothing changes and RunAlreadyActive is thrown.
+     *
+     * @throws RunAlreadyActive when the source already has a queued or running run
+     */
+    public function createDrafts(Source $source): SourceRun
+    {
+        try {
+            return DB::transaction(function () use ($source): SourceRun {
+                $source->forceFill([
+                    'is_active' => true,
+                    'next_check_at' => $this->nextCheckAt($source, CarbonImmutable::now('Europe/London')),
+                ])->save();
+
+                return $this->queue($source, RunMode::Live, RunTrigger::Activation);
+            });
+        } catch (RunAlreadyActive $e) {
+            // The activation was rolled back; drop the in-memory change too.
+            $source->refresh();
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Insert a queued run in its own savepoint and queue its job after commit.
+     *
+     * @throws RunAlreadyActive when the source already has a queued or running run
+     */
+    private function queue(Source $source, RunMode $mode, RunTrigger $trigger): SourceRun
+    {
+        $run = new SourceRun(['mode' => $mode, 'trigger' => $trigger]);
         $run->forceFill([
             'source_id' => $source->id,
             'status' => RunStatus::Queued,
