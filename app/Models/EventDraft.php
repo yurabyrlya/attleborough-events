@@ -74,6 +74,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $review_notes
  * @property int|null $reviewed_by
  * @property CarbonImmutable|null $reviewed_at
+ * @property int|null $source_id
+ * @property int|null $source_item_id
+ * @property string|null $target_recurrence_key
+ * @property array<string, mixed>|null $diff
+ * @property CarbonImmutable|null $relevant_starts_at
+ * @property int|null $duplicate_of_draft_id
+ * @property string|null $duplicate_reason
+ * @property string|null $duplicate_score
+ * @property list<string> $excluded_dates
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  *
@@ -82,14 +91,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * submitted_category_id, quality_*, parse_errors, reject_reason,
  * review_notes, reviewed_by, reviewed_at, event_id, duplicate_of_event_id,
  * raw_payload and consented_at are written only via forceFill by DraftWriter
- * and the Publishing review actions (WR-07 pattern).
+ * and the Publishing review actions (WR-07 pattern). The ingestion links
+ * (source_id, source_item_id, target_recurrence_key, diff,
+ * relevant_starts_at, duplicate_of_draft_id, duplicate_reason,
+ * duplicate_score) are written only via forceFill by DraftWriter's
+ * source-aware methods. excluded_dates (ICS EXDATE London dates, D-19) is
+ * content and fillable.
  */
 #[Fillable([
     'title', 'description', 'venue_id', 'venue_name', 'venue_address', 'venue_postcode',
     'venue_town', 'timezone', 'all_day', 'start_date', 'start_time', 'end_date', 'end_time',
     'recurrence_rule', 'repeats_text', 'repeats_acknowledged', 'family_friendly', 'price_type',
     'price_text', 'organiser_name', 'organiser_contact', 'organiser_website', 'contact_public',
-    'source_url', 'source_note',
+    'source_url', 'source_note', 'excluded_dates',
 ])]
 class EventDraft extends Model
 {
@@ -115,6 +129,7 @@ class EventDraft extends Model
         'contact_public' => false,
         'quality_reasons' => '[]',
         'parse_errors' => '[]',
+        'excluded_dates' => '[]',
     ];
 
     /**
@@ -133,6 +148,36 @@ class EventDraft extends Model
     public function duplicateOf(): BelongsTo
     {
         return $this->belongsTo(Event::class, 'duplicate_of_event_id');
+    }
+
+    /**
+     * The source an ingested draft came from.
+     *
+     * @return BelongsTo<Source, $this>
+     */
+    public function source(): BelongsTo
+    {
+        return $this->belongsTo(Source::class);
+    }
+
+    /**
+     * The source item an ingested draft proposes (or changes).
+     *
+     * @return BelongsTo<SourceItem, $this>
+     */
+    public function sourceItem(): BelongsTo
+    {
+        return $this->belongsTo(SourceItem::class);
+    }
+
+    /**
+     * A pending draft this one may duplicate (url or fuzzy match).
+     *
+     * @return BelongsTo<EventDraft, $this>
+     */
+    public function duplicateOfDraft(): BelongsTo
+    {
+        return $this->belongsTo(EventDraft::class, 'duplicate_of_draft_id');
     }
 
     /**
@@ -227,6 +272,9 @@ class EventDraft extends Model
             'raw_payload' => 'array',
             'consented_at' => 'immutable_datetime',
             'reviewed_at' => 'immutable_datetime',
+            'diff' => 'array',
+            'excluded_dates' => 'array',
+            'relevant_starts_at' => 'immutable_datetime',
             'created_at' => 'immutable_datetime',
             'updated_at' => 'immutable_datetime',
         ];
