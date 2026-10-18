@@ -38,6 +38,8 @@ use Livewire\Component;
 
 class EventDraftsTable
 {
+    public const URGENT = 'Urgent';
+
     public static function configure(Table $table): Table
     {
         return $table
@@ -75,10 +77,20 @@ class EventDraftsTable
                     ->label('Category')
                     ->state(fn (EventDraft $record): ?string => self::categoryLabel($record))
                     ->placeholder('No category'),
-                TextColumn::make('origin')
-                    ->label('Source'),
+                // The source's name for discovered drafts, the origin label
+                // (Manual entry, Public submission) otherwise (REV-09).
+                TextColumn::make('source')
+                    ->label('Source')
+                    ->state(fn (EventDraft $record): string => self::sourceLabel($record))
+                    ->wrap(),
+                // The kind, plus an "Urgent" badge for an update or
+                // cancellation due within 48 hours (D-09), judged by the same
+                // rule that puts it first in the queue.
                 TextColumn::make('kind')
-                    ->label('Kind'),
+                    ->label('Kind')
+                    ->state(fn (EventDraft $record): array => self::kindBadges($record))
+                    ->badge()
+                    ->color(fn (string $state): string => $state === self::URGENT ? 'danger' : 'gray'),
                 TextColumn::make('created_at')
                     ->label('Received')
                     ->dateTime('D j M Y, H:i')
@@ -91,16 +103,19 @@ class EventDraftsTable
             ])
             ->modifyQueryUsing(
                 /** @param Builder<EventDraft> $query */
-                fn (Builder $query): Builder => $query->with(['venue', 'category']),
+                fn (Builder $query): Builder => $query->with(['venue', 'category', 'source']),
             )
             ->filters([
                 SelectFilter::make('kind')
                     ->label('Kind')
                     ->options(DraftKind::class),
-                // "Source" is the draft's origin until Phase 3 adds
-                // per-source records (D-20).
-                SelectFilter::make('origin')
+                // REV-09: the real sources; manual entries and submissions
+                // have none, so the Origin filter finds those.
+                SelectFilter::make('source_id')
                     ->label('Source')
+                    ->relationship('source', 'name'),
+                SelectFilter::make('origin')
+                    ->label('Origin')
                     ->options(EventOrigin::class),
                 SelectFilter::make('quality_band')
                     ->label('Quality')
@@ -328,6 +343,25 @@ class EventDraftsTable
         $typed = trim((string) $record->venue_name);
 
         return $typed === '' ? null : "{$typed} (not confirmed)";
+    }
+
+    private static function sourceLabel(EventDraft $record): string
+    {
+        return $record->source->name ?? $record->origin->getLabel();
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function kindBadges(EventDraft $record): array
+    {
+        $badges = [$record->kind->getLabel()];
+
+        if (ReviewQueue::isUrgent($record, CarbonImmutable::now())) {
+            $badges[] = self::URGENT;
+        }
+
+        return $badges;
     }
 
     /**

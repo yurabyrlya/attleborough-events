@@ -170,7 +170,8 @@ describe('urgent changes first', function () {
     });
 
     it('shows the table in the same urgent-first order', function () {
-        $records = EventDraft::query()->findMany($this->urgentExpected)->sortBy(fn (EventDraft $d) => array_search($d->id, $this->urgentExpected, true))->values();
+        // The first page (10 rows) of the 11 pending drafts.
+        $records = EventDraft::query()->findMany($this->urgentExpected)->sortBy(fn (EventDraft $d) => array_search($d->id, $this->urgentExpected, true))->values()->take(10);
 
         livewire(ListEventDrafts::class)
             ->assertCanSeeTableRecords($records, inOrder: true);

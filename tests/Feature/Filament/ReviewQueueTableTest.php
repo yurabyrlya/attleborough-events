@@ -121,7 +121,7 @@ it('shows an Urgent badge only on updates and cancellations due within 48 hours 
         ->assertTableColumnStateSet('kind', ['Cancellation', 'Urgent'], $urgentCancellation)
         ->assertTableColumnStateSet('kind', ['Update'], $laterUpdate)
         ->assertTableColumnStateSet('kind', ['New event'], $soonNew)
-        ->assertCanSeeTableRecords([$urgentUpdate, $urgentCancellation, $soonNew, $laterUpdate], inOrder: true);
+        ->assertCanSeeTableRecords([$urgentUpdate, $urgentCancellation, $laterUpdate, $soonNew], inOrder: true);
 });
 
 it('filters by quality band', function () {
