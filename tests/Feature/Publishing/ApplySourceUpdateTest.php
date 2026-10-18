@@ -4,12 +4,20 @@ use App\Enums\DraftKind;
 use App\Enums\ReviewStatus;
 use App\Models\Event;
 use App\Models\EventDraft;
+use App\Models\EventOccurrence;
 use App\Models\Source;
 use App\Models\SourceItem;
 use App\Models\User;
+use App\Models\Venue;
 use App\Publishing\Actions\ApplySourceUpdate;
+use App\Publishing\Actions\ConfirmSourceCancellation;
+use App\Publishing\Actions\IgnoreSourceChange;
 use App\Publishing\Actions\UpdatePublishedEvent;
 use App\Publishing\Data\PublishableEventData;
+use App\Review\Data\DraftData;
+use App\Review\DraftWriter;
+use App\Review\Exceptions\DraftNotPublishable;
+use App\Review\Exceptions\InvalidReviewTransition;
 use Database\Seeders\CategorySeeder;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
@@ -90,6 +98,35 @@ function applyEventSnapshot(Event $event): array
         'title', 'slug', 'start_date', 'start_time', 'end_date', 'end_time', 'venue_id',
         'recurrence_rule', 'excluded_dates', 'status', 'updated_at',
     ]);
+}
+
+/**
+ * The admin's review save on the update draft with a venue picked
+ * (DraftWriter::update, as the edit page does).
+ */
+function applyPickVenue(EventDraft $draft, Venue $venue): EventDraft
+{
+    return app(DraftWriter::class)->update($draft, new DraftData(
+        origin: $draft->origin,
+        extractionMethod: $draft->extraction_method,
+        title: $draft->title,
+        description: $draft->description,
+        preferredCategoryId: $draft->category_id,
+        venueId: $venue->id,
+        venueName: $draft->venue_name,
+        venueAddress: $draft->venue_address,
+        venuePostcode: $draft->venue_postcode,
+        allDay: $draft->all_day,
+        startDate: $draft->start_date?->format('Y-m-d'),
+        startTime: $draft->start_time,
+        endDate: $draft->end_date?->format('Y-m-d'),
+        endTime: $draft->end_time,
+        recurrenceRule: $draft->recurrence_rule,
+        repeatsText: $draft->repeats_text,
+        repeatsAcknowledged: $draft->repeats_acknowledged,
+        organiserContact: $draft->organiser_contact,
+        sourceUrl: $draft->source_url,
+    ));
 }
 
 beforeEach(function () {
@@ -181,4 +218,199 @@ it('refuses a non-admin and changes nothing', function () {
     expect(applyEventSnapshot($event))->toEqual($before)
         ->and($update->refresh()->review_status)->toBe(ReviewStatus::PendingReview)
         ->and(applyYogaItem()->accepted_hash)->toBe($baseline);
+});
+
+it('refuses a second Apply of the same draft and leaves the event as the first Apply left it (REV-06 idempotency)', function () {
+    $event = ingestApprove(applyYogaNewDraft());
+    $update = applyRaiseUpdate($this->tc, applyYogaMovedLater());
+
+    ($this->apply)($update, $this->admin);
+    $after = applyEventSnapshot($event);
+
+    expect(fn () => ($this->apply)($update, $this->admin))
+        ->toThrow(InvalidReviewTransition::class, 'already reviewed');
+
+    expect(applyEventSnapshot($event))->toEqual($after);
+});
+
+it('lets only the first of Apply and Ignore win on the same draft (REV-06 concurrency, draft row lock)', function () {
+    $event = ingestApprove(applyYogaNewDraft());
+    $update = applyRaiseUpdate($this->tc, applyYogaMovedLater());
+
+    ($this->apply)($update, $this->admin);
+
+    expect(fn () => app(IgnoreSourceChange::class)($update, $this->admin))
+        ->toThrow(InvalidReviewTransition::class);
+    expect($update->refresh()->review_status)->toBe(ReviewStatus::Approved)
+        ->and($update->reject_reason)->toBeNull()
+        ->and(substr((string) $event->refresh()->start_time, 0, 5))->toBe('11:00');
+
+    // And the other way round: Ignore first, then Apply is refused.
+    $this->travel(1)->hours();
+    ingestFeed(applyTcFixture());
+    ingestLiveRun($this->tc->refresh());
+    $back = EventDraft::query()->where('kind', DraftKind::Update)->where('review_status', ReviewStatus::PendingReview)->sole();
+    app(IgnoreSourceChange::class)($back, $this->admin);
+
+    expect(fn () => ($this->apply)($back, $this->admin))->toThrow(InvalidReviewTransition::class)
+        ->and(substr((string) $event->refresh()->start_time, 0, 5))->toBe('11:00');
+});
+
+it('refuses a venue change to an unknown venue until the admin picks the venue on the draft', function () {
+    $event = ingestApprove(applyYogaNewDraft());
+    $update = applyRaiseUpdate($this->tc, applyYogaEdited(['LOCATION:Town Hall' => 'LOCATION:Connaught Hall']));
+    expect(array_keys($update->diff ?? []))->toBe(['venue'])
+        ->and($update->venue_id)->toBeNull();
+
+    $before = applyEventSnapshot($event);
+    $baseline = applyYogaItem()->accepted_hash;
+
+    expect(fn () => ($this->apply)($update, $this->admin))
+        ->toThrow(DraftNotPublishable::class, ApplySourceUpdate::VENUE_NEEDED);
+    expect(applyEventSnapshot($event))->toEqual($before)
+        ->and($update->refresh()->review_status)->toBe(ReviewStatus::PendingReview)
+        ->and(applyYogaItem()->accepted_hash)->toBe($baseline);
+
+    $connaught = Venue::factory()->create(['name' => 'Connaught Hall (main hall)']);
+    $picked = applyPickVenue($update, $connaught);
+    expect($picked->diff)->toEqual($update->diff);
+
+    $applied = ($this->apply)($picked, $this->admin);
+
+    expect($applied->venue_id)->toBe($connaught->id)
+        ->and(applyYogaItem()->accepted_hash)->toBe(applyYogaItem()->content_hash);
+});
+
+it('applies a venue change straight away when the new venue matches a known venue exactly', function () {
+    ingestApprove(applyYogaNewDraft());
+    $connaught = Venue::factory()->create(['name' => 'Connaught Hall']);
+    $update = applyRaiseUpdate($this->tc, applyYogaEdited(['LOCATION:Town Hall' => 'LOCATION:Connaught Hall']));
+
+    expect(($this->apply)($update, $this->admin)->venue_id)->toBe($connaught->id);
+});
+
+it('refuses an update that would turn a one-off into a series, and Ignore still works', function () {
+    $event = ingestApprove(applyYogaNewDraft());
+    $update = applyRaiseUpdate($this->tc, applyYogaEdited(['LOCATION:Town Hall' => "LOCATION:Town Hall\r\nRRULE:FREQ=WEEKLY;BYDAY=SU;COUNT=4"]));
+    expect(array_keys($update->diff ?? []))->toContain('rrule');
+    $before = applyEventSnapshot($event);
+
+    expect(fn () => ($this->apply)($update, $this->admin))
+        ->toThrow(DraftNotPublishable::class, ApplySourceUpdate::NOT_AUTOMATIC."An event can't switch between one-off and repeating.");
+    expect(applyEventSnapshot($event))->toEqual($before)
+        ->and($update->refresh()->review_status)->toBe(ReviewStatus::PendingReview);
+
+    $ignored = app(IgnoreSourceChange::class)($update, $this->admin);
+    $item = applyYogaItem();
+
+    expect($ignored->review_status)->toBe(ReviewStatus::Rejected)
+        ->and($item->accepted_hash)->toBe($item->content_hash)
+        ->and(applyEventSnapshot($event))->toEqual($before);
+});
+
+it('refuses an update draft carrying a parse error with that error, and Ignore moves the baseline', function () {
+    $series = Source::factory()->ics()->active()->create(['name' => 'Synthetic series', 'url' => 'https://feed.example.org/series.ics']);
+    ingestFeed(icsFixture('series.ics'));
+    ingestLiveRun($series);
+    $event = ingestApprove(EventDraft::query()->where('source_id', $series->id)->where('title', 'Wednesday Folk Club')->sole());
+
+    $override = implode("\r\n", [
+        'BEGIN:VEVENT', 'UID:s-exdate@synthetic.invalid', 'DTSTAMP:20261017T050000Z',
+        'RECURRENCE-ID;TZID=Europe/London:20261028T190000', 'SUMMARY:Wednesday Folk Club',
+        'DTSTART;TZID=Europe/London:20261028T193000', 'DTEND;TZID=Europe/London:20261028T213000',
+        'LOCATION:Town Hall\\, Queens Square\\, Attleborough\\, NR17 2AF', 'END:VEVENT',
+    ])."\r\n";
+    $update = applyRaiseUpdate($series, str_replace('END:VCALENDAR', $override.'END:VCALENDAR', icsFixture('series.ics')));
+    $error = $update->parse_errors[0];
+    $before = applyEventSnapshot($event);
+
+    expect(fn () => ($this->apply)($update, $this->admin))
+        ->toThrow(DraftNotPublishable::class, ApplySourceUpdate::NOT_AUTOMATIC.$error);
+    expect(applyEventSnapshot($event))->toEqual($before);
+
+    app(IgnoreSourceChange::class)($update, $this->admin);
+    $item = SourceItem::query()->findOrFail($update->source_item_id);
+
+    expect($item->accepted_hash)->toBe($item->content_hash)
+        ->and(applyEventSnapshot($event))->toEqual($before);
+
+    $this->travel(1)->hours();
+    expect(ingestLiveRun($series->refresh())->drafts_created)->toBe(0);
+});
+
+it('skips diff keys with no published counterpart and still moves the baseline past them', function () {
+    $event = ingestApprove(applyYogaNewDraft());
+    $update = applyRaiseUpdate($this->tc, applyYogaMovedLater());
+
+    // An extra RDATE and a moved override shown beside the time change:
+    // events cannot hold either (D-19), so only the time is written.
+    $update->forceFill(['diff' => [
+        ...$update->diff,
+        'moved_overrides' => ['published' => [], 'before' => [], 'now' => [['key' => '2026-11-01', 'start' => '2026-11-01 12:00', 'end' => '2026-11-01 13:00']]],
+        'extra_dates' => ['published' => [], 'before' => [], 'now' => ['2026-11-08']],
+    ]])->save();
+
+    $applied = ($this->apply)($update->refresh(), $this->admin);
+    $item = applyYogaItem();
+
+    expect(substr((string) $applied->start_time, 0, 5))->toBe('11:00')
+        ->and($applied->recurrence_rule)->toBeNull()
+        ->and(EventOccurrence::query()->where('event_id', $event->id)->pluck('recurrence_key')->all())->toBe(['2026-10-25'])
+        ->and($item->accepted_hash)->toBe($item->content_hash);
+});
+
+it('refuses Apply on new and cancellation drafts and Confirm on an update draft, with a plain message', function () {
+    ingestApprove(applyYogaNewDraft());
+    $new = EventDraft::query()->where('kind', DraftKind::New)->where('review_status', ReviewStatus::PendingReview)->orderBy('id')->firstOrFail();
+
+    expect(fn () => ($this->apply)($new, $this->admin))
+        ->toThrow(DraftNotPublishable::class, ApplySourceUpdate::WRONG_KIND);
+
+    $update = applyRaiseUpdate($this->tc, applyYogaMovedLater());
+
+    expect(fn () => app(ConfirmSourceCancellation::class)($update, $this->admin))
+        ->toThrow(DraftNotPublishable::class, ConfirmSourceCancellation::WRONG_KIND);
+
+    ingestFeed(applyYogaEdited(["SUMMARY:[name removed] ~ Yoga\r\n" => "SUMMARY:[name removed] ~ Yoga\r\nSTATUS:CANCELLED\r\n"]));
+    ingestLiveRun($this->tc->refresh());
+    $cancellation = EventDraft::query()->where('kind', DraftKind::Cancellation)->where('review_status', ReviewStatus::PendingReview)->sole();
+
+    expect(fn () => ($this->apply)($cancellation, $this->admin))
+        ->toThrow(DraftNotPublishable::class, ApplySourceUpdate::WRONG_KIND)
+        ->and($new->refresh()->review_status)->toBe(ReviewStatus::PendingReview)
+        ->and($cancellation->refresh()->review_status)->toBe(ReviewStatus::PendingReview);
+});
+
+it('refuses non-admins on all three decisions', function (string $action) {
+    ingestApprove(applyYogaNewDraft());
+    $update = applyRaiseUpdate($this->tc, applyYogaMovedLater());
+
+    expect(fn () => app($action)($update, User::factory()->create()))
+        ->toThrow(AuthorizationException::class);
+    expect($update->refresh()->review_status)->toBe(ReviewStatus::PendingReview);
+})->with([ApplySourceUpdate::class, IgnoreSourceChange::class, ConfirmSourceCancellation::class]);
+
+it('applies a changed repeat rule and excluded dates to a series', function () {
+    $series = Source::factory()->ics()->active()->create(['name' => 'Synthetic series', 'url' => 'https://feed.example.org/series.ics']);
+    ingestFeed(icsFixture('series.ics'));
+    ingestLiveRun($series);
+    $event = ingestApprove(EventDraft::query()->where('source_id', $series->id)->where('title', 'Wednesday Folk Club')->sole());
+
+    $changed = str_replace(
+        "RRULE:FREQ=WEEKLY;BYDAY=WE;COUNT=6\r\nEXDATE;TZID=Europe/London:20261021T190000\r\n",
+        "RRULE:FREQ=WEEKLY;BYDAY=WE;COUNT=8\r\nEXDATE;TZID=Europe/London:20261021T190000,20261111T190000\r\n",
+        icsFixture('series.ics'),
+    );
+    expect($changed)->not->toBe(icsFixture('series.ics'));
+
+    $update = applyRaiseUpdate($series, $changed);
+    expect(array_keys($update->diff ?? []))->toBe(['rrule', 'excluded_dates']);
+
+    $applied = ($this->apply)($update, $this->admin);
+    $keys = EventOccurrence::query()->where('event_id', $event->id)->orderBy('recurrence_key')->pluck('recurrence_key')->all();
+
+    expect($applied->recurrence_rule)->toBe('FREQ=WEEKLY;BYDAY=WE;COUNT=8')
+        ->and($applied->excluded_dates)->toBe(['2026-10-21', '2026-11-11'])
+        ->and($keys)->toContain('2026-11-25', '2026-12-02')
+        ->and($keys)->not->toContain('2026-11-11');
 });
