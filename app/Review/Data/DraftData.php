@@ -8,8 +8,11 @@ use App\Enums\ExtractionMethod;
 use App\Enums\PriceType;
 use App\Enums\RepeatEnds;
 use App\Enums\RepeatPattern;
+use App\Ingestion\Data\NormalisedFacts;
 use App\Models\EventDraft;
+use App\Models\Source;
 use App\Publishing\Data\PublishableEventData;
+use App\Review\VenueMatcher;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use InvalidArgumentException;
@@ -38,6 +41,8 @@ final readonly class DraftData
 
     /**
      * @param  array<string, mixed>|null  $rawPayload
+     * @param  list<string>  $excludedDates
+     * @param  list<string>  $parseErrors
      */
     public function __construct(
         public EventOrigin $origin,
@@ -73,6 +78,11 @@ final readonly class DraftData
         public ?string $sourceNote = null,
         public ?array $rawPayload = null,
         public ?CarbonImmutable $consentedAt = null,
+        // ICS EXDATE London dates (Y-m-d, D-19). Content: kept by review saves.
+        public array $excludedDates = [],
+        // Item parse errors (D-19) written on creation by DraftWriter's
+        // source-aware method; never part of toAttributes().
+        public array $parseErrors = [],
     ) {}
 
     /**
@@ -234,7 +244,81 @@ final readonly class DraftData
             sourceNote: self::nullableString($data['source_note'] ?? null),
             rawPayload: $draft->raw_payload,
             consentedAt: $draft->consented_at,
+            excludedDates: $draft->excluded_dates ?? [],
         );
+    }
+
+    /**
+     * A feed item a live ingestion run has just seen for the first time
+     * (03-05).
+     *
+     * Privacy (D-17): organiser fields are never copied from a feed; the
+     * feed organiser stays in raw_payload only, and contact_public is
+     * false. The description is the ExcerptBuilder output (or the D-21
+     * fallback) the recorder passes in; the full text lives in
+     * raw_payload['description'].
+     *
+     * Venue (D-22): the source's default venue counts as confirmed when
+     * LOCATION is empty or exactly names that venue (VenueMatcher::exact);
+     * any other LOCATION keeps venue_id null and the typed venue, so the
+     * admin confirms it (Phase 2 D-21). The source's default category is
+     * the preferred category; its ICS CATEGORIES reach CategoryAssigner
+     * through DraftWriter::createFromSource().
+     *
+     * @param  list<string>  $parseErrors
+     * @param  array<string, mixed>  $rawPayload
+     */
+    public static function fromSourceItem(NormalisedFacts $facts, Source $source, string $description, array $parseErrors, array $rawPayload): self
+    {
+        return new self(
+            origin: EventOrigin::Discovered,
+            extractionMethod: ExtractionMethod::Ics,
+            title: $facts->title,
+            description: self::nullableString($description),
+            preferredCategoryId: $source->default_category_id,
+            venueId: self::sourceVenueId($facts, $source),
+            venueName: $facts->venueName,
+            venueAddress: $facts->venueAddress,
+            venuePostcode: $facts->postcode,
+            timezone: (string) config('calendar.timezone', 'Europe/London'),
+            allDay: $facts->allDay,
+            startDate: $facts->startDate,
+            startTime: $facts->allDay ? null : self::formWallClockTime($facts->startTime),
+            endDate: $facts->endDate,
+            endTime: $facts->allDay ? null : self::formWallClockTime($facts->endTime),
+            recurrenceRule: $facts->rrule,
+            familyFriendly: $facts->familyFriendly,
+            priceType: $facts->priceType,
+            organiserName: null,
+            organiserContact: null,
+            organiserWebsite: null,
+            contactPublic: false,
+            sourceUrl: $facts->url ?? self::nullableString($source->events_page_url) ?? $source->url,
+            rawPayload: $rawPayload,
+            excludedDates: $facts->excludedDates,
+            parseErrors: $parseErrors,
+        );
+    }
+
+    /**
+     * D-22: the source's default venue when the item names no venue, or
+     * names exactly that venue; otherwise null (the admin confirms).
+     */
+    private static function sourceVenueId(NormalisedFacts $facts, Source $source): ?int
+    {
+        $defaultVenueId = $source->default_venue_id;
+
+        if ($defaultVenueId === null) {
+            return null;
+        }
+
+        if ($facts->venueName === null && $facts->venueAddress === null && $facts->postcode === null) {
+            return $defaultVenueId;
+        }
+
+        $match = app(VenueMatcher::class)->exact($facts->venueName, $facts->postcode);
+
+        return $match?->id === $defaultVenueId ? $defaultVenueId : null;
     }
 
     /**
@@ -387,6 +471,7 @@ final readonly class DraftData
             'contact_public' => $this->contactPublic,
             'source_url' => $this->sourceUrl,
             'source_note' => $this->sourceNote,
+            'excluded_dates' => $this->excludedDates,
         ];
     }
 

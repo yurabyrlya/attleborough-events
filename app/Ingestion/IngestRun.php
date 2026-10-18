@@ -1,0 +1,238 @@
+<?php
+
+namespace App\Ingestion;
+
+use App\Enums\FetchFailureKind;
+use App\Enums\RunMode;
+use App\Enums\RunStatus;
+use App\Ingestion\Data\ExtractedItem;
+use App\Ingestion\Http\FetchRequest;
+use App\Ingestion\Http\FetchResult;
+use App\Ingestion\Http\HostBusy;
+use App\Ingestion\Http\HttpFetcher;
+use App\Ingestion\Ics\IcsExtractor;
+use App\Ingestion\Pipeline\SourceItemRecorder;
+use App\Models\Source;
+use App\Models\SourceRun;
+use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Log;
+use LogicException;
+use Throwable;
+
+/**
+ * One source run, end to end (03-05): fetch politely → validate → store the
+ * raw body → extract → record each item → counters and source state.
+ *
+ * Source problems are recorded on the run, never thrown (Pitfall 10):
+ * robots.txt refusal → blocked; 304 → not_modified; a fetch failure or a
+ * BodyValidator rejection → failed with its FetchFailureKind (a bot wall is
+ * content_invalid, SRC-06); a fatal extraction error → failed parse_error.
+ * None of these writes items or drafts, but any body that arrived is stored
+ * with RawBodyStore for inspection. HostBusy is the one exception that
+ * escapes: FetchSourceJob releases itself on it.
+ *
+ * Each item is recorded in its own transaction; an item that throws counts
+ * as skipped_parse_error and is logged by ids only, so one bad item never
+ * fails the run. error_message is built from enum labels, status codes and
+ * our own wording only, never response text, and is at most 500 characters.
+ *
+ * Live runs only for now: the D-01 preview arrives in 03-07, health in 03-07
+ * and change/missing decisions in 03-09.
+ */
+final class IngestRun
+{
+    /** source_runs.error_message length (characters). */
+    public const int ERROR_MESSAGE_LIMIT = 500;
+
+    /** source_runs.final_url length (characters). */
+    private const int FINAL_URL_LIMIT = 2048;
+
+    private const string LONDON = 'Europe/London';
+
+    public function __construct(
+        private readonly HttpFetcher $fetcher,
+        private readonly RawBodyStore $raw,
+        private readonly IcsExtractor $extractor,
+        private readonly SourceItemRecorder $recorder,
+    ) {}
+
+    /**
+     * @throws HostBusy when the host's next slot is too far away; nothing on
+     *                  the run has been written yet
+     */
+    public function execute(SourceRun $run): void
+    {
+        if ($run->mode !== RunMode::Live) {
+            throw new LogicException('Test runs (previews) are not supported yet.');
+        }
+
+        $source = $run->source()->firstOrFail();
+        $result = $this->fetcher->fetch($this->request($run, $source));
+
+        $run->forceFill([
+            'http_status' => $result->httpStatus,
+            'final_url' => mb_substr($result->finalUrl, 0, self::FINAL_URL_LIMIT),
+            'bytes' => $result->bytes,
+            'duration_ms' => $result->durationMs,
+        ]);
+
+        if ($result->body !== null) {
+            $run->forceFill([
+                'raw_path' => $this->raw->put($source->id, $run->id, $result->body),
+                'raw_sha256' => hash('sha256', $result->body),
+            ]);
+        }
+
+        match (true) {
+            $result->isBlocked() => $this->finish($run, $source, RunStatus::Blocked, null, $result->message),
+            $result->isNotModified() => $this->finish($run, $source, RunStatus::NotModified, null, null, $result),
+            $result->isFailed() => $this->finish($run, $source, RunStatus::Failed, $result->failureKind ?? FetchFailureKind::Network, $result->message),
+            default => $this->process($run, $source, $result),
+        };
+    }
+
+    /**
+     * An error message safe for source_runs.error_message: at most 500
+     * characters, cut on a character boundary (never mid UTF-8 sequence).
+     */
+    public static function errorMessage(?string $message): ?string
+    {
+        if ($message === null || trim($message) === '') {
+            return null;
+        }
+
+        return mb_substr(trim($message), 0, self::ERROR_MESSAGE_LIMIT, 'UTF-8');
+    }
+
+    /**
+     * The fetch for this run. The conditional validators are sent only on a
+     * live run whose previous live run succeeded (or was not modified), so a
+     * run that failed half way is never answered with a 304.
+     */
+    private function request(SourceRun $run, Source $source): FetchRequest
+    {
+        $previous = SourceRun::query()
+            ->where('source_id', $source->id)
+            ->where('mode', RunMode::Live)
+            ->where('id', '<', $run->id)
+            ->whereNotIn('status', [RunStatus::Queued, RunStatus::Running])
+            ->orderByDesc('id')
+            ->first();
+
+        $conditional = $previous !== null && in_array($previous->status, [RunStatus::Succeeded, RunStatus::NotModified], true);
+
+        return new FetchRequest(
+            url: $source->url,
+            etag: $conditional ? $source->etag : null,
+            lastModified: $conditional ? $source->last_modified : null,
+            startedAt: $run->started_at,
+        );
+    }
+
+    private function process(SourceRun $run, Source $source, FetchResult $result): void
+    {
+        $nowLondon = CarbonImmutable::now(self::LONDON);
+        $extraction = $this->extractor->extract((string) $result->body, $source, $nowLondon);
+
+        if ($extraction->failed()) {
+            $message = FetchFailureKind::ParseError->getLabel().': '.$extraction->fatalError;
+            $this->finish($run, $source, RunStatus::Failed, FetchFailureKind::ParseError, $message);
+
+            return;
+        }
+
+        $counters = array_fill_keys(SourceRun::COUNTERS, 0);
+        $observedUntil = null;
+
+        foreach ($extraction->items as $index => $item) {
+            $counters['items_found']++;
+            $observedUntil = $this->laterDate($observedUntil, $item);
+
+            try {
+                $bucket = $this->recorder->record($run, $source, $item, $nowLondon);
+            } catch (Throwable $e) {
+                // Ids only: never feed text, URLs or SQL bindings (T-01-22).
+                Log::error('ingest: item failed', [
+                    'run_id' => $run->id,
+                    'source_id' => $source->id,
+                    'item_index' => $index,
+                    'exception' => $e::class,
+                ]);
+                $bucket = SourceItemRecorder::SKIPPED_PARSE_ERROR;
+            }
+
+            $counters[SourceItemRecorder::COUNTER[$bucket]]++;
+
+            if ($bucket === SourceItemRecorder::NEW) {
+                $counters['drafts_created']++;
+            }
+        }
+
+        $run->forceFill([
+            ...$counters,
+            'observed_from' => $nowLondon->toDateString(),
+            'observed_until' => $observedUntil,
+        ]);
+
+        $this->finish($run, $source, RunStatus::Succeeded, null, null, $result);
+    }
+
+    /**
+     * The later of $current and the item's London start date (its next
+     * instance, else its first date).
+     */
+    private function laterDate(?string $current, ExtractedItem $item): ?string
+    {
+        $facts = $item->facts;
+
+        if ($facts === null) {
+            return $current;
+        }
+
+        $date = $facts->nextInstanceStartUtc?->setTimezone(self::LONDON)->toDateString() ?? $facts->startDate;
+
+        return $current === null || strcmp($date, $current) > 0 ? $date : $current;
+    }
+
+    private static function fits(?string $value, int $length): ?string
+    {
+        return $value !== null && $value !== '' && strlen($value) <= $length ? $value : null;
+    }
+
+    private function finish(
+        SourceRun $run,
+        Source $source,
+        RunStatus $status,
+        ?FetchFailureKind $failureKind = null,
+        ?string $message = null,
+        ?FetchResult $result = null,
+    ): void {
+        $nowUtc = CarbonImmutable::now()->utc();
+
+        $run->forceFill([
+            'status' => $status,
+            'failure_kind' => $failureKind?->value,
+            'error_message' => self::errorMessage($message),
+            'finished_at' => $nowUtc,
+        ])->save();
+
+        $sourceState = ['last_run_at' => $nowUtc];
+
+        if ($status === RunStatus::Succeeded || $status === RunStatus::NotModified) {
+            $sourceState['last_success_at'] = $nowUtc;
+        }
+
+        if ($status === RunStatus::Succeeded) {
+            $sourceState['last_items_found'] = $run->items_found;
+        }
+
+        if ($result !== null && ($status === RunStatus::Succeeded || $status === RunStatus::NotModified)) {
+            // A validator too long for its column is dropped, never cut:
+            // a cut validator would never match.
+            $sourceState['etag'] = self::fits($result->etag, 255);
+            $sourceState['last_modified'] = self::fits($result->lastModified, 64);
+        }
+
+        $source->forceFill($sourceState)->save();
+    }
+}

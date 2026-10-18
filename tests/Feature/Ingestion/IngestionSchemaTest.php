@@ -7,6 +7,7 @@ use App\Enums\ReviewStatus;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
 use App\Enums\RunTrigger;
+use App\Enums\SourceItemStatus;
 use App\Models\Event;
 use App\Models\EventDraft;
 use App\Models\Source;
@@ -162,7 +163,7 @@ it('links a source, a run, an item and a pending ICS draft', function () {
         ->and($draft->excluded_dates)->toBe([])
         ->and($item->currentDraft->is($draft))->toBeTrue()
         ->and($item->firstSeenRun->is($run))->toBeTrue()
-        ->and($item->status)->toBe('active')
+        ->and($item->status)->toBe(SourceItemStatus::Active)
         ->and($item->missing_runs)->toBe(0)
         ->and($item->parse_errors)->toBe([])
         ->and($source->items()->count())->toBe(1);

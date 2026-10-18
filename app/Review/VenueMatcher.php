@@ -15,6 +15,9 @@ use App\Review\Data\VenueSuggestion;
  *
  * Read-only: it never creates a venue and never sets a draft's venue_id;
  * the suggestion only pre-selects the venue for the admin to confirm.
+ * (Ingestion's D-22 rule compares exact() with the source's admin-set
+ * default venue in DraftData::fromSourceItem(); the venue_id then comes
+ * from that admin configuration, never from this matcher.)
  * Organiser text reaches SQL only as bound parameters.
  */
 final class VenueMatcher

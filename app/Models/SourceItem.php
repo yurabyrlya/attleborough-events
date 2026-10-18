@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\SourceItemStatus;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
@@ -22,7 +23,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $source_id
  * @property string $external_id
- * @property string $status
+ * @property SourceItemStatus $status
  * @property string|null $raw_fragment
  * @property string|null $raw_hash
  * @property string|null $content_hash
@@ -99,6 +100,7 @@ class SourceItem extends Model
     protected function casts(): array
     {
         return [
+            'status' => SourceItemStatus::class,
             'payload' => 'array',
             'accepted_payload' => 'array',
             'parse_errors' => 'array',
