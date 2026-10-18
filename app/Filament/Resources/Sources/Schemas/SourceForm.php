@@ -93,14 +93,17 @@ class SourceForm
                     ->columns(2)
                     ->schema([
                         TextInput::make('name')
+                            ->hintAction(SourceFieldHelp::action('name'))
                             ->label('Name')
                             ->required()
                             ->maxLength(self::NAME_MAX_LENGTH),
                         TextInput::make('short_name')
+                            ->hintAction(SourceFieldHelp::action('short_name'))
                             ->label('Short name')
                             ->maxLength(self::SHORT_NAME_MAX_LENGTH)
                             ->helperText('Shown next to events from this source. Left empty, the first 40 characters of the name are used.'),
                         TextInput::make('url')
+                            ->hintAction(SourceFieldHelp::action('url'))
                             ->label('Feed URL')
                             ->required()
                             ->maxLength(self::URL_MAX_LENGTH)
@@ -108,12 +111,14 @@ class SourceForm
                             ->helperText('The ICS calendar address the crawler fetches.')
                             ->columnSpanFull(),
                         TextInput::make('events_page_url')
+                            ->hintAction(SourceFieldHelp::action('events_page_url'))
                             ->label('Events page URL')
                             ->maxLength(self::URL_MAX_LENGTH)
                             ->rule(static fn (): Closure => self::urlRule())
                             ->helperText('The page people visit to see these events. Optional.')
                             ->columnSpanFull(),
                         Toggle::make('is_organiser_source')
+                            ->hintAction(SourceFieldHelp::action('is_organiser_source'))
                             ->label("Organiser's own site")
                             ->helperText('When two sources list the same event, this one is credited first.')
                             ->columnSpanFull(),
@@ -122,12 +127,14 @@ class SourceForm
                     ->columns(2)
                     ->schema([
                         Select::make('extraction_method')
+                            ->hintAction(SourceFieldHelp::action('extraction_method'))
                             ->label('Extraction method')
                             ->options([ExtractionMethod::Ics->value => ExtractionMethod::Ics->getLabel()])
                             ->default(ExtractionMethod::Ics->value)
                             ->selectablePlaceholder(false)
                             ->required(),
                         Select::make('adapter')
+                            ->hintAction(SourceFieldHelp::action('adapter'))
                             ->label('Adapter')
                             ->options([])
                             ->placeholder('None')
@@ -135,6 +142,7 @@ class SourceForm
                             ->dehydrated(false)
                             ->helperText('ICS feeds need no adapter.'),
                         Select::make('parser_config.identity')
+                            ->hintAction(SourceFieldHelp::action('parser_config.identity'))
                             ->label('Item identity')
                             // Plain string options: parser_config is json, so its
                             // state stays a string rather than an enum cast.
@@ -144,6 +152,7 @@ class SourceForm
                             ->required()
                             ->helperText('How the same event is recognised from one check to the next. Use "Title and start time" when the feed\'s UIDs change on every fetch.'),
                         Select::make('default_timezone')
+                            ->hintAction(SourceFieldHelp::action('default_timezone'))
                             ->label('Default time zone')
                             ->options(fn (): array => array_combine(DateTimeZone::listIdentifiers(), DateTimeZone::listIdentifiers()))
                             ->default('Europe/London')
@@ -151,22 +160,26 @@ class SourceForm
                             ->required()
                             ->helperText('Used for times the feed gives without a time zone.'),
                         Select::make('year_policy')
+                            ->hintAction(SourceFieldHelp::action('year_policy'))
                             ->label('Year policy')
                             ->options(self::YEAR_POLICIES)
                             ->default('none')
                             ->selectablePlaceholder(false)
                             ->required(),
                         Select::make('location_mode')
+                            ->hintAction(SourceFieldHelp::action('location_mode'))
                             ->label('Location')
                             ->options(self::LOCATION_MODES)
                             ->default('local')
                             ->selectablePlaceholder(false)
                             ->required(),
                         Select::make('default_category_id')
+                            ->hintAction(SourceFieldHelp::action('default_category_id'))
                             ->label('Default category')
                             ->options(fn (): array => Category::query()->orderBy('sort')->orderBy('id')->pluck('name', 'id')->all())
                             ->placeholder('Work it out from the title'),
                         Select::make('default_venue_id')
+                            ->hintAction(SourceFieldHelp::action('default_venue_id'))
                             ->label('Default venue')
                             ->options(fn (): array => Venue::query()->orderBy('name')->orderBy('id')->pluck('name', 'id')->all())
                             ->searchable()
@@ -177,23 +190,28 @@ class SourceForm
                     ->columns(2)
                     ->schema([
                         Select::make('check_frequency')
+                            ->hintAction(SourceFieldHelp::action('check_frequency'))
                             ->label('Check frequency')
                             ->options(self::CHECK_FREQUENCIES)
                             ->default('daily')
                             ->selectablePlaceholder(false)
                             ->required(),
                         TimePicker::make('check_time')
+                            ->hintAction(SourceFieldHelp::action('check_time'))
                             ->label('Check time')
                             ->seconds(false)
                             ->default('05:30')
                             ->required()
                             ->helperText('UK time. Each source starts a few minutes after this, so they do not all start at once.'),
                         Toggle::make('supports_missing_detection')
+                            ->hintAction(SourceFieldHelp::action('supports_missing_detection'))
                             ->label('Missing-item detection')
                             ->helperText('Suggest cancelling an approved event when it disappears from two complete checks in a row. Only for feeds that always list every upcoming event.')
                             ->columnSpanFull(),
                     ]),
                 Section::make('Title rules')
+                    ->key('title-rules-section')
+                    ->headerActions([SourceFieldHelp::action('title_rules')])
                     ->description('Skip drops items whose title contains the word. If there is any "Keep only" rule, an item must match one of them. Words match whole words in any case. With no rules every item is kept.')
                     ->schema([
                         Repeater::make('title_rules')
@@ -222,11 +240,13 @@ class SourceForm
                 Section::make('Legal basis and notes')
                     ->schema([
                         Textarea::make('legal_basis')
+                            ->hintAction(SourceFieldHelp::action('legal_basis'))
                             ->label('Legal basis')
                             ->rows(3)
                             ->maxLength(5000)
                             ->helperText('Why we may list these events (for example the robots.txt rules and the site\'s terms).'),
                         Textarea::make('notes')
+                            ->hintAction(SourceFieldHelp::action('notes'))
                             ->label('Notes')
                             ->rows(3)
                             ->maxLength(5000),
