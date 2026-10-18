@@ -3,7 +3,7 @@ gsd_state_version: "1.0"
 current_phase: 4
 current_phase_name: Extraction Ladder, Geofence & Live Sources
 status: planning
-stopped_at: Phase 3 complete, ready to plan Phase 4
+stopped_at: Phase 3 complete, ready to discuss/plan Phase 4
 last_updated: "2026-10-18T14:32:37.575Z"
 last_activity: 2026-10-18
 last_activity_desc: Phase 3 complete, transitioned to Phase 4
@@ -20,10 +20,10 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-10-17)
+See: .planning/PROJECT.md (updated 2026-10-18)
 
 **Core value:** Residents can open one trustworthy, up-to-date calendar on their phone and see what's on in Attleborough. Nothing reaches it without admin approval.
-**Current focus:** Phase 3 — Ingestion Backbone, ICS & Change/Duplicate Handling
+**Current focus:** Phase 4 — Extraction Ladder, Geofence & Live Sources
 
 ## Current Position
 
@@ -32,7 +32,7 @@ Plan: Not started
 Status: Ready to plan
 Last activity: 2026-10-18 — Phase 3 complete, transitioned to Phase 4
 
-Progress: [███████████████████░] 45/48 planned plans ([██████░░░░] 60%); phases complete: 2/5
+Progress: [███████████████████░] 46/48 planned plans (96%); phases complete: 3/5
 
 ## Performance Metrics
 
@@ -120,6 +120,10 @@ Recent decisions affecting current work:
 - [Testing]: Browser UAT flows (F0–F10) live in docs/uat/browser-uat.md; every phase runs them before sign-off and adds flows for new UI
 - [Phase 1]: Complete 2026-10-17. Verification passed (168/173 + owner-accepted backstops and prohibitions); security verified (0 open); UI review 17/24 with top 3 fixed (261017-hp9); open advisory review items WR-15, IN-09..16 in 01-REVIEW-DISPOSITION.md
 - [Phase 2]: Complete 2026-10-17. 16 plans; verification passed (owner override: Attleborough Primary fixture pending, capture before Phase 3 planning); security verified (45 threats, 0 open; T-02-24/T-02-29 production halves → Phase 5); code review CR-01/CR-02 fixed, 6 warnings deferred (02-REVIEW-DISPOSITION.md; WR-06 and WR-08 worth fixing before launch)
+- [Phase 3]: Complete 2026-10-18. 17 plans; verification passed (5/5 SC, 10/10 prohibitions; human items resolved or accepted on tests while the owner was away, see Owner check below); security verified (47 threats, 0 open; production halves → Phase 5); code review CR-01..CR-03 and 6 more fixed, 5 deferred (03-REVIEW-DISPOSITION.md; WR-04 and WR-06 before launch); VER-01 fixed (discovered descriptions ≤200 chars, no contacts, even after edit)
+- [Phase 3]: Import window = the 90-day horizon; source item identity (uid / tec_post_id / summary_start) and time zone are frozen once a source has items
+- [Phase 3]: Source changes reach the site only through update/cancellation drafts (Apply / Ignore / Confirm all move the accepted baseline); duplicates = canonical URL, or same London date + start within 60 min + similar venue + pg_trgm ≥ 0.3
+- [Phase 3]: SRC-02 partly delivered (ICS test-run preview, D-26); Phase 4 extends the preview to every rung and adds JSON-LD eventStatus cancellations (PIPE-07 second half)
 - [Testing]: Browser suite runs in CI; tests/Pest.php forgets scoped instances after each in-process request; use Uat::settleFields() after filling Livewire forms
 - [Phase 02]: [02-01]: Manual entry is a manual draft approved at once through ApproveDraft (D-07); PublishEvent is called only by ApproveDraft
 - [Phase 02]: [02-01]: ApproveDraft logs via DB::afterCommit so nested approvals log only after the outermost commit; fromDraft blocks a missing start date
@@ -223,12 +227,11 @@ Recent decisions affecting current work:
 ### Pending Todos
 
 - [ ] [Phase 4] Extend database/seeders/SourceSeeder.php with the verified non-ICS List 1 sources (Heritage Group HTML, Attleborough Primary embedded JS array, Baptist Church dated RSS fallback, Town Council TEC REST, P2/P3 JSON-LD sources) once their extractors exist — same rules: inactive, create-only (firstOrCreate on slug), values that pass the Sources form (03-16)
-- [x] [Phase 2→3] Attleborough Primary School fixture captured 2026-10-18 09:21 BST (22 events embedded as a JS array in a server-rendered page; office email/phone redacted; Fixture index updated, "fixtures pending" dropped). Calendar was stale (autumn 2025 only); parser would be a small HTML extractor, not ICS (not in Phase 3 scope).
 
 ### Blockers/Concerns
 
 - [Phase 5]: Domain registration + VPS deferred (name decided: whatsonattleborough.co.uk; .co.uk availability unconfirmed)
-- [Phase 2→3]: Inventory verified (02-02 + owner decisions D-23..D-26): List 1 has 10 sources (P0: Baptist Church ICS/RSS, Town Council TEC; P1: Academy ICS, Heritage Group selectors, Primary pending Crawl-delay) with redacted fixtures; 4 Cloudflare sites stay List 2 (D-25 routes). Open with the owner: Primary capture via ops/probe-sources.sh, optional clerk email (Town Council may block the Hetzner datacenter IP), local URLs for empty categories
+- [Phase 4]: Inventory verified (02-02 + owner decisions D-23..D-26): List 1 has 10 sources (P0: Baptist Church ICS/RSS, Town Council TEC; P1: Academy ICS, Heritage Group selectors, Attleborough Primary embedded JS array, fixture captured 2026-10-18 but its calendar is stale, autumn 2025 only) with redacted fixtures; 4 Cloudflare sites stay List 2 (D-25 routes). Open with the owner: optional clerk email (Town Council may block the Hetzner datacenter IP), local URLs for empty categories
 - [Phase 5]: Umami Cloud UK GDPR data region / DPA unverified (fallback: Plausible)
 - [Phase 5]: Apply for Cloudflare Verified Bots (BotBase) once the production crawler is public: bot info page, distinct UA + contact URL, published IP list or reverse DNS (or Web Bot Auth), robots/Crawl-delay compliance. Unlocks Breckland, Norfolk CC, Norfolk Museums, TicketSource public pages (D-25)
 - [Phase 5]: Set TURNSTILE_HOSTNAMES=whatsonattleborough.co.uk in production (hostname check is skipped when empty; T-02-24 / review WR-03)
@@ -238,7 +241,7 @@ Recent decisions affecting current work:
 - [Before launch]: Decide a retention period for feed personal data kept in source_items (organiser names/emails, full descriptions) — Phase 3 review WR-06, deferred; implement pruning before go-live
 - [Before launch]: Honour Retry-After on 429/503 (Phase 3 review WR-04, deferred; low risk with daily checks)
 - [Phase 5]: Configure trusted proxies (Caddy / Cloudflare) so per-IP rate limiting on /submit and Turnstile hostname/remoteip checks see the real client IP (Phase 2 research)
-- [Phase 3]: Crawling needs a real User-Agent contact/about URL; until Phase 5 is live use a config placeholder (e.g. CRAWLER_CONTACT_URL in config/site.php / .env) and swap in the live URL at launch
+- [Phase 5]: Crawling needs a real User-Agent contact/about URL. Phase 3 ships the placeholder (`CRAWLER_CONTACT_URL`, default `{APP_URL}/about-crawler` in config/ingest.php); publish the about-crawler page and set the live URL at launch
 - [Phase 4]: Success criterion 5 / RES-04 say P0 sources are configured "in production", but production now arrives in Phase 5. Until then P0 sources run on the local app; revisit the wording when planning Phase 4 (or move the production half to Phase 5)
 
 ### Quick Tasks Completed
@@ -259,6 +262,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-18T13:00:19.547Z
-Stopped at: Phase 3 complete, ready to plan Phase 4
+Last session: 2026-10-18
+Stopped at: Phase 3 complete, ready to discuss/plan Phase 4
 Resume file: None
