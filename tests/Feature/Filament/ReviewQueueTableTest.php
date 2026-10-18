@@ -1,6 +1,8 @@
 <?php
 
 use App\Enums\DraftKind;
+use App\Enums\EventOrigin;
+use App\Enums\ExtractionMethod;
 use App\Enums\QualityBand;
 use App\Enums\RejectReason;
 use App\Enums\ReviewStatus;
@@ -8,6 +10,7 @@ use App\Filament\Resources\EventDrafts\Pages\ListEventDrafts;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\EventDraft;
+use App\Models\Source;
 use App\Models\User;
 use App\Models\Venue;
 use App\Publishing\Actions\ApproveDraft;
@@ -70,7 +73,7 @@ it('filters by kind', function () {
         ->assertCanNotSeeTableRecords([$update]);
 });
 
-it('filters by source', function () {
+it('filters by origin', function () {
     $manual = EventDraft::factory()->manual()->create();
     $submission = EventDraft::factory()->submission()->create();
 
@@ -78,6 +81,47 @@ it('filters by source', function () {
         ->filterTable('origin', 'submission')
         ->assertCanSeeTableRecords([$submission])
         ->assertCanNotSeeTableRecords([$manual]);
+});
+
+it('filters by source on the sources table and shows the source name or the origin', function () {
+    $baptist = Source::factory()->ics()->active()->create(['name' => 'Attleborough Baptist Church']);
+    $council = Source::factory()->ics()->active()->create(['name' => 'Attleborough Town Council']);
+    $fromBaptist = EventDraft::factory()->create(['origin' => EventOrigin::Discovered, 'extraction_method' => ExtractionMethod::Ics, 'source_id' => $baptist->id]);
+    $fromCouncil = EventDraft::factory()->create(['origin' => EventOrigin::Discovered, 'extraction_method' => ExtractionMethod::Ics, 'source_id' => $council->id]);
+    $submission = EventDraft::factory()->submission()->create();
+    $manual = EventDraft::factory()->manual()->create();
+
+    $filters = livewire(ListEventDrafts::class)->instance()->getTable()->getFilters();
+
+    expect($filters['source_id']->getLabel())->toBe('Source')
+        ->and($filters['origin']->getLabel())->toBe('Origin');
+
+    livewire(ListEventDrafts::class)
+        ->assertTableColumnStateSet('source', 'Attleborough Baptist Church', $fromBaptist)
+        ->assertTableColumnStateSet('source', 'Public submission', $submission)
+        ->assertTableColumnStateSet('source', 'Manual entry', $manual)
+        ->filterTable('source_id', $baptist->id)
+        ->assertCanSeeTableRecords([$fromBaptist])
+        ->assertCanNotSeeTableRecords([$fromCouncil, $submission, $manual])
+        ->resetTableFilters()
+        ->filterTable('origin', EventOrigin::Submission->value)
+        ->assertCanSeeTableRecords([$submission])
+        ->assertCanNotSeeTableRecords([$fromBaptist, $fromCouncil, $manual]);
+});
+
+it('shows an Urgent badge only on updates and cancellations due within 48 hours (D-09)', function () {
+    $now = CarbonImmutable::now();
+    $urgentUpdate = EventDraft::factory()->create(['kind' => DraftKind::Update, 'relevant_starts_at' => $now->addHours(3)]);
+    $urgentCancellation = EventDraft::factory()->create(['kind' => DraftKind::Cancellation, 'relevant_starts_at' => $now->addHours(47)]);
+    $laterUpdate = EventDraft::factory()->create(['kind' => DraftKind::Update, 'relevant_starts_at' => $now->addHours(72)]);
+    $soonNew = EventDraft::factory()->create(['relevant_starts_at' => $now->addHour()]);
+
+    livewire(ListEventDrafts::class)
+        ->assertTableColumnStateSet('kind', ['Update', 'Urgent'], $urgentUpdate)
+        ->assertTableColumnStateSet('kind', ['Cancellation', 'Urgent'], $urgentCancellation)
+        ->assertTableColumnStateSet('kind', ['Update'], $laterUpdate)
+        ->assertTableColumnStateSet('kind', ['New event'], $soonNew)
+        ->assertCanSeeTableRecords([$urgentUpdate, $urgentCancellation, $soonNew, $laterUpdate], inOrder: true);
 });
 
 it('filters by quality band', function () {
