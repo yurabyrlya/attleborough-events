@@ -1,0 +1,34 @@
+{
+    "source": "visit-wymondham",
+    "name": "Visit Wymondham",
+    "files": [
+        {
+            "file": "2026-10-18-events-page.html",
+            "type": "events-page",
+            "url": "https://visitwymondham.org.uk/whats-on/",
+            "fetched_at": "2026-10-18T17:59:46Z",
+            "http_status": 200,
+            "headers": {
+                "content-type": "text/html; charset=UTF-8",
+                "etag": "",
+                "last-modified": "",
+                "cache-control": ""
+            },
+            "robots_status": "allowed (robots.txt 200, fetched 2026-10-18T17:59:39Z)",
+            "robots_rules": [],
+            "legal_basis": "factual_extract_only (robots allows everything, terms silent, owner decision D-23, polite crawling, attribution and link back)",
+            "sha256_raw": "75576cf3ff75907c20820333826a0092f67402b78c3443b8088fd0fa34f89e73",
+            "redactions": {
+                "email": 6,
+                "phone": 3,
+                "name": 6
+            },
+            "modified": true,
+            "events": 12,
+            "window": "the 12 upcoming events the listing showed on 2026-10-18 (19 Oct to 28 Oct 2026), spanning the BST end on Sun 25 Oct 2026",
+            "captured_by": "ops/probe-sources.sh",
+            "network": "owner laptop (agent research run, 2026-10-18); no challenge seen",
+            "notes": "Reviewed 2026-10-18 (Phase 4 research, D-11). WordPress + Modern Events Calendar Lite. 13 application/ld+json blocks; 12 carry one top-level schema.org Event each (all @type \"Event\", no subtypes), plus WebSite/BreadcrumbList/Organization blocks. startDate/endDate are ISO 8601 with offsets: +01:00 up to 23 Oct, +00:00 from 25 Oct (BST ends). Every event has eventStatus https://schema.org/EventScheduled and eventAttendanceMode https://schema.org/OfflineEventAttendanceMode, location @type Place with name and a free-text address (some with NR18 postcodes, some empty name and address), organizer @type Person, offers.url, and names with HTML entities (&#8217;, &amp;). Redacted: all emails (including Wymondham Town Council role addresses and a form placeholder) to redacted@example.invalid, phone numbers to 01632 960000, private first names in organizer Person nodes and one description to [name removed]. JSON-LD still parses after redaction (13/13 blocks). Visit Wymondham is a filter (regional) source: most events pass the geofence through NR18 or the Wymondham place name."
+        }
+    ]
+}

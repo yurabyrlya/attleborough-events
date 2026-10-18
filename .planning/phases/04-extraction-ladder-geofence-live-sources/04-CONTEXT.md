@@ -194,6 +194,37 @@ On top of the extractors:
 - Parse-error and skip-reason wording, within the Phase 1 brand voice.
 - The exact Event-subtype list and the online-location keywords.
 
+### Revisions after research (2026-10-18, 04-RESEARCH.md; agent defaults, owner away)
+These override the decisions they name. Where an R-item and an earlier D-item disagree, **the R-item wins**.
+
+- **R-01 (supersedes D-04): no in-place method switch.**
+  - Why: ICS and REST ids differ for single (non-recurring) Town Council events: 10 of 72 in the fixtures, e.g. REST `23254` vs ICS `10006470` for the same URL. The dev database's Town Council ICS source is also active with 25 items.
+  - The Phase 3 rule stays: extraction method, identity and time zone are all refused once a source has items.
+  - SourceSeeder adds a **new** source `attleborough-town-council-api` (TEC REST, inactive). The existing `attleborough-town-council` ICS seed stays, with its notes updated to "fallback: activate only if the API source fails" (the D-07 pattern).
+  - Dev database: the owner pauses the ICS source, test-runs the API source, then activates it. Approved or pending Town Council events get cross-source duplicate warnings (same per-occurrence URL) and are linked with "Mark as duplicate". No database reset is needed.
+- **R-02 (amends D-05): all-day TEC events use the local `start_date` / `end_date` dates** in the event's time zone (for these the UTC fields are shifted to the previous day in summer). Timed events use `utc_start_date` / `utc_end_date`. `timezone_abbr` is ignored.
+- **R-03 (amends D-03): `rest_no_route` detection.** The fetcher currently turns any status of 400 or above into an HTTP error before body validation. The TEC rung needs the 404 body so it can report "this site doesn't run The Events Calendar" (`content_invalid`). A rung-specific allowance; the general error handling is unchanged.
+- **R-04 (amends D-08): selectors are validated and run with PHP 8.4's built-in `\Dom\HTMLDocument::querySelectorAll`.** No `symfony/css-selector` (only an indirect dependency today) and **no dependency changes** in this phase.
+- **R-05 (amends D-10): JSON-LD nodes are merged before extraction.**
+  - Merge `Event` nodes that share an `@id`, or failing that the same `url` + `name`. Visit Norfolk has two nodes for one event, one of them without a date.
+  - JSON-LD item identity is `summary_start` (title + start), not the URL: Visit Wymondham reuses one URL for several dates.
+  - "Read more" uses the item `url` only when it is on the source's own host. Off-site URLs are kept in the payload, and the link falls back to the source's events page.
+- **R-06 (amends D-13): the `fse_school_calendar` adapter is built, fixture-tested and seeded inactive, but can't run live under the current throttle.** The robots.txt request counts toward the 12000 s Crawl-delay, so the page request would wait past the 120-minute queued-run abandon limit. No throttle change in Phase 4. "Don't count robots.txt toward Crawl-delay spacing" is a deferred owner decision.
+- **R-07 (SC3): an item with an unreadable or ambiguous date, or a missing start time, becomes a draft with a parse error and Low quality instead of being skipped.**
+  - The start becomes optional along the item → draft path, and the window, past and far-future checks treat an unknown date as "draft it, flagged" (today these items are skipped, or crash the timing code).
+  - **Exception: RSS `date_required`.** An item whose title and description contain no date matching the pattern at all is not an event: it is skipped and counted as "no event date", because feeds mix news posts and events. A date that matches the pattern but is invalid or ambiguous is still a parse-error draft.
+- **R-08: a strict date toolkit is the only date-parsing code in `app/Ingestion`.**
+  - It uses `DateTimeImmutable::createFromFormat` with `!`, requires zero warnings and errors, and checks that the result formats back to the input.
+  - It checks the weekday separately, because PHP silently moves the date when the weekday is wrong.
+  - It rejects floating local times that fall in the missing clocks-forward hour.
+  - Existing violations in `NormalisedFacts`, `DuplicateDetector`, `RobotsPolicy` and `HostThrottle` are refactored.
+  - The architecture test uses `expect('App\Ingestion')->not->toUse([...])` for functions, plus a source scan for `Carbon::parse` / `Carbon::createFromFormat` misuse. The `->not->toBeUsedIn()` form is banned because it can never fail.
+- **R-09: `sources.year_policy` is `varchar(16)`, so it is widened** (migration) for `infer_with_weekday`. The planner may choose a shorter value name instead; the behaviour is the EXT-06 rule either way.
+- **R-10 (amends D-02): the P0 sources for RES-04 are the Baptist Church ICS and the new Town Council API source.**
+  - The local scheduled-run evidence is a **human checkpoint** at the end of the phase: the owner's laptop on the home network (the Town Council blocks the corporate network), with `php artisan schedule:work` and a queue worker running, and a `source_runs` row with `trigger` = scheduled for each P0 source.
+- **R-11: geofence order is confirmed.** A postcode decides first; the known-venue match only counts when no postcode is present (D-14 steps 1-2).
+- **R-12: Rosecroft wasn't fetched** (its Crawl-delay pushed the request to 22:19 BST). Optional owner action: `bash ops/probe-sources.sh rosecroft-primary-school`, then redact. Rosecroft isn't seeded in Phase 4 unless that capture shows the same array.
+
 </decisions>
 
 <canonical_refs>

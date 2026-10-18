@@ -76,6 +76,9 @@ breckland-council|https://www.breckland.gov.uk|/events,/whats-on|attleborough
 norfolk-county-council-libraries|https://www.norfolk.gov.uk|/libraries-local-history-and-archives/libraries/your-local-library/attleborough-library|attleborough
 norfolk-museums|https://www.museums.norfolk.gov.uk|/gressenhall-farm-and-workhouse/whats-on,/whats-on|gressenhall
 ticketsource|https://www.ticketsource.co.uk|/attleborough-players|attleborough
+visit-wymondham|https://visitwymondham.org.uk|/whats-on/|
+visit-norfolk|https://visitnorfolk.co.uk|/events/parkrun-23|
+rosecroft-primary-school|https://www.rosecroftprimary.org|/parents/school-calendar|
 '
 
 say() { printf '%s\n' "$*"; }
@@ -334,6 +337,7 @@ probe_target() {
         case "$p" in
             *ical=1*) t=ical ;;
             */wp-json/tribe/*) t=tec-p1 ;;
+            /events/?*) t=event-page ;;
             *) t="events-page$([ "$i" -gt 1 ] && printf -- '-%s' "$i")" ;;
         esac
         fetch_and_save "$slug" "$t" "$base$p"

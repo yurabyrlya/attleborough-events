@@ -420,8 +420,12 @@ One row per candidate; "-" means the rung did not apply (not WordPress, no feed 
 | attleborough-academy | P1 | 2026-10-17-ical.ics |
 | attleborough-heritage-group | P1 | 2026-10-17-events-page.html |
 | attleborough-primary-school | P1 | 2026-10-18-events-page.html |
+| visit-wymondham | P2 | 2026-10-18-events-page.html (12 JSON-LD Events, offsets across the 25 Oct 2026 clock change; redacted) |
+| visit-norfolk | P2 | 2026-10-18-event-page.html (JSON-LD `@graph` with two Event nodes for one event; fixture only, not a live source, 04-CONTEXT D-12; redacted) |
 
-**Pending (not in the index until captured):** none. Attleborough Primary School was captured on 2026-10-18 at 09:21 BST, after its 12000 s crawl delay (owner override in 02-VERIFICATION.md).
+The two P2 captures were taken on 2026-10-18 for the Phase 4 JSON-LD extractor (04-CONTEXT D-11) with `ops/probe-sources.sh visit-wymondham visit-norfolk`.
+
+**Pending (not in the index until captured):** Rosecroft Primary School (`rosecroft-primary-school`, optional, 04-CONTEXT D-13). Its robots.txt (fetched 2026-10-18T17:59:56Z) allows `/parents/school-calendar` with `Crawl-delay: 12000`, so the probe deferred the page request until 22:19 BST. Run `ops/probe-sources.sh rosecroft-primary-school` after then to see whether it embeds the same `json = [[...]]` array as Attleborough Primary. Attleborough Primary School was captured on 2026-10-18 at 09:21 BST, after its 12000 s crawl delay (owner override in 02-VERIFICATION.md).
 
 ## Risks (technical and legal)
 

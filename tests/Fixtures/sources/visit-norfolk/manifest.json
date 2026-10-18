@@ -1,0 +1,40 @@
+{
+    "source": "visit-norfolk",
+    "name": "Visit Norfolk (Visit East of England)",
+    "files": [
+        {
+            "file": "2026-10-18-event-page.html",
+            "type": "event-page",
+            "url": "https://visitnorfolk.co.uk/events/parkrun-23",
+            "fetched_at": "2026-10-18T17:59:55Z",
+            "http_status": 200,
+            "headers": {
+                "content-type": "text/html; charset=UTF-8",
+                "etag": "",
+                "last-modified": "",
+                "cache-control": "no-cache, no-store, must-revalidate"
+            },
+            "robots_status": "allowed (robots.txt 200, fetched 2026-10-18T17:59:46Z)",
+            "robots_rules": [
+                "disallow /cpresources/",
+                "disallow /vendor/",
+                "disallow /.env",
+                "disallow /cache/"
+            ],
+            "legal_basis": "factual_extract_only (robots allows /events/, terms silent, owner decision D-23). Used only as a JSON-LD @graph fixture; not configured as a live source (04-CONTEXT D-12).",
+            "sha256_raw": "b860fa2e6242e27141e212d88b8ace5c0818d649a3fd9e58401548810e34838e",
+            "redactions": {
+                "email": 2,
+                "phone": 4,
+                "name": 0,
+                "token": 1
+            },
+            "modified": true,
+            "events": 1,
+            "window": "one event page (Parkrun at Holkham, Sat 28 Nov 2026 09:00-12:00 GMT)",
+            "captured_by": "ops/probe-sources.sh",
+            "network": "owner laptop (agent research run, 2026-10-18); no challenge seen",
+            "notes": "Reviewed 2026-10-18 (Phase 4 research, D-11). Craft CMS. One application/ld+json block: {\"@context\", \"@graph\": [Event, LocalBusiness #identity, Organization #creator, BreadcrumbList, Event]}. The @graph holds TWO Event nodes for the same event with the same url: the first is SEO metadata (name, description, image, mainEntityOfPage, url, NO startDate), the second has startDate/endDate (+00:00 offsets), location Place {name \"Holkham\", address \"Holkham, Norfolk, England, United Kingdom\"} and url. Neither has eventStatus or eventAttendanceMode. An extractor must merge Event nodes that share a url/@id instead of reading each node as its own item. The location has no postcode and Holkham is not an allowlisted place, so a filter source skips it as out of area (geofence step 4). Redacted the Holkham and Visit East of England emails and phone numbers (business contacts, redacted because the guard test allows only placeholders). Page is ~960 KB, mostly markup. Also redacted the site's embedded Mapbox browser access token (mapboxgl.accessToken → REDACTED_MAPBOX_TOKEN): third-party credential, blocked by GitHub push protection."
+        }
+    ]
+}
