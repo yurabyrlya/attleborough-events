@@ -58,7 +58,7 @@ On top of the extractors:
   - A page cap (agent's discretion, about 20) or the run deadline ends the run as **incomplete**: missing-item detection doesn't run, and no validators are stored (Phase 3 WR-01).
   - A `404 rest_no_route` means "this site doesn't run The Events Calendar": the run fails as `content_invalid` with that message.
   - TEC REST sends `no-store`, so no conditional GET; unchanged content is skipped through the raw hash.
-- **D-04 [agent default]: switch the Town Council from its ICS export to TEC REST, in place.**
+- **D-04 [informational]: (SUPERSEDED by R-01; not implemented) switch the Town Council from its ICS export to TEC REST, in place.**
   - Why switch: the ICS export lists only about 30 items, which makes missing-item detection unreliable. REST gives the full window with structured venue, all-day, cost and categories.
   - Why in place: both methods use the `tec_post_id` identity. In the 17 Oct fixtures, all 24 overlapping ICS UIDs carry the same post id as the REST `id`; the 6 ICS-only ids fall before the REST capture window.
   - Changing the extraction method on a source that has items is therefore allowed **only between methods with the same identity keys** (ICS with `tec_post_id` → TEC REST). Every other method change stays refused once items exist, like identity and time zone (Phase 3 WR-03).

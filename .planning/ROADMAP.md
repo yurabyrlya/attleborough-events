@@ -2,7 +2,7 @@
 
 ## Overview
 
-The build starts with a local-dev public calendar fed by admin manual entry, with CI on PostgreSQL, so the published model, recurrence and DST handling, and app-level ops visibility are proven before anything is crawled. Infrastructure (domain registration, Cloudflare DNS, the Hetzner VPS, provisioning and zero-downtime deploys) is deferred to Phase 5 (scope change 2026-10-16); the brand domain whatsonattleborough.co.uk stays the intended name. Next comes the draft model and a fast review queue, fed first by organiser submissions, while the owner finishes the local source inventory. Then the ingestion backbone arrives with ICS as the first rung, including polite fetching, source health, and update/cancellation/duplicate handling. After that, the rest of the extraction ladder (The Events Calendar, JSON-LD, CSS selectors, RSS) plus the geofence and test-run tooling, ending with real P0 sources producing drafts in production. The last phase covers launch readiness: SEO lifecycle, outbound feeds, legal and complaints handling, analytics, dashboard, accessibility and a backup restore drill. Each phase ends with something usable and verifiable on the local app with green CI; Phase 5 takes it live.
+The build starts with a local-dev public calendar fed by admin manual entry, with CI on PostgreSQL, so the published model, recurrence and DST handling, and app-level ops visibility are proven before anything is crawled. Infrastructure (domain registration, Cloudflare DNS, the Hetzner VPS, provisioning and zero-downtime deploys) is deferred to Phase 5 (scope change 2026-10-16); the brand domain whatsonattleborough.co.uk stays the intended name. Next comes the draft model and a fast review queue, fed first by organiser submissions, while the owner finishes the local source inventory. Then the ingestion backbone arrives with ICS as the first rung, including polite fetching, source health, and update/cancellation/duplicate handling. After that, the rest of the extraction ladder (The Events Calendar, JSON-LD, CSS selectors, RSS) plus the geofence and test-run tooling, ending with real P0 sources producing drafts on schedule on the local app (their production run moves to Phase 5). The last phase covers launch readiness: SEO lifecycle, outbound feeds, legal and complaints handling, analytics, dashboard, accessibility and a backup restore drill. Each phase ends with something usable and verifiable on the local app with green CI; Phase 5 takes it live.
 
 ## Phases
 
@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation & Published Calendar** - Local-dev mobile-first calendar (CI on PostgreSQL) fed by admin manual entry, with recurrence, detail pages, add-to-calendar and share (completed 2026-10-17)
 - [x] **Phase 2: Draft Model, Review Queue & Submissions** - Organiser submissions become drafts that the admin triages in a fast review queue; source research completed (completed 2026-10-17)
 - [x] **Phase 3: Ingestion Backbone, ICS & Change/Duplicate Handling** - Polite scheduled fetching of ICS sources producing new/update/cancellation drafts with duplicate warnings and source health (completed 2026-10-18)
-- [ ] **Phase 4: Extraction Ladder, Geofence & Live Sources** - TEC, JSON-LD, selector and RSS rungs, geofence and test run; P0 sources producing drafts in production
+- [ ] **Phase 4: Extraction Ladder, Geofence & Live Sources** - TEC, JSON-LD, selector and RSS rungs, geofence and test run; P0 sources producing drafts on schedule (local; production in Phase 5)
 - [ ] **Phase 5: Launch Readiness** - Domain, VPS and zero-downtime deploy (deferred from Phase 1), production ops, SEO lifecycle, public feeds, privacy and complaints, analytics, dashboard, accessibility and restore drill
 
 ## Phase Details
@@ -164,14 +164,41 @@ Plans:
   4. Events from a regional (`filter`) source outside NR17 / NR16 / NR18 / IP24 and the allowlisted place names are skipped and counted, online-only events are skipped, and events with unknown locations arrive as flagged drafts.
   5. The initial P0 sources from `docs/research/event-sources.md` (Baptist Church ICS, Town Council TEC REST) are configured on the local app and producing pending drafts from scheduled runs. *(The production half moves to Phase 5, 04-CONTEXT D-01.)*
 
-**Plans**: TBD
+**Plans**: 14 plans
+
+Plans:
+**Wave 1**
+- [ ] 04-01-PLAN.md — StrictDate (the only date parser) through the ICS pipeline + date-parsing arch ban (wave 1)
+- [ ] 04-02-PLAN.md — Geofence, online skip and "Location unknown" flag on filter sources, with preview/run-log counts (wave 1)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 04-03-PLAN.md — Year inference, time finder and admin date-format policy (wave 2)
+- [ ] 04-04-PLAN.md — Tracer: extractor/reader seam (ICS through the registries) + schema, enum, drafts and factory for every rung (wave 2)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+- [ ] 04-05-PLAN.md — Tracer: The Events Calendar REST end to end; envelope, text normaliser, per-rung validators and Accept headers (wave 3)
+- [ ] 04-06-PLAN.md — Undated items as Low drafts (R-07); failure kinds, raw rows, online/status facts for extractors (wave 3)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+- [ ] 04-07-PLAN.md — TEC fidelity (all-day, DST, prices, online, undated), early-stop incomplete runs, rest_no_route, multi-page reuse (wave 4)
+- [ ] 04-08-PLAN.md — Schema.org JSON-LD rung incl. @graph, subtypes, node merge, eventStatus cancellations (wave 4)
+- [ ] 04-09-PLAN.md — CSS-selector listing rung on Heritage markup (12-row SC1, SC3 parse-error drafts, raw rows) (wave 4)
+- [ ] 04-10-PLAN.md — fse_school_calendar platform adapter (Attleborough Primary) (wave 4)
+- [ ] 04-11-PLAN.md — RSS/Atom date_required rung, safe XML, "no event date" skips (wave 4)
+
+**Wave 5** *(blocked on Wave 4 completion)*
+- [ ] 04-12-PLAN.md — RSS/Atom link_follow into the JSON-LD rung (wave 5)
+- [ ] 04-13-PLAN.md — Sources admin UI for every rung (selector/RSS sections, method lock, help) + browser UAT F21-F23 (wave 5)
+
+**Wave 6** *(blocked on Wave 5 completion)*
+- [ ] 04-14-PLAN.md — Seed the new sources, docs, RES-04 wording, owner checkpoint for local scheduled-run evidence (wave 6)
 
 ### Phase 5: Launch Readiness
 
 **Goal**: The site is discoverable, legally compliant, measurable and operationally safe enough to launch publicly in Attleborough
 **Mode:** mvp
 **Depends on**: Phase 4
-**Requirements**: EVT-04, EVT-05, EVT-08, CAL-09, FEED-01, FEED-02, LEG-01, LEG-02, LEG-03, ADM-05, ADM-07, OPS-03, OPS-02, OPS-01b, OPS-04b
+**Requirements**: EVT-04, EVT-05, EVT-08, CAL-09, FEED-01, FEED-02, LEG-01, LEG-02, LEG-03, ADM-05, ADM-07, OPS-03, OPS-02, OPS-01b, OPS-04b, RES-04 (production half)
 **Success Criteria** (what must be TRUE):
   1. A visitor can read the privacy notice and send a takedown, correction or data-protection complaint through the contact form, or use "Report a problem" from an event page with the event reference prefilled. The admin manages these requests with a visible 30-day acknowledgement deadline.
   2. `sitemap.xml` lists upcoming published events. An expired event page still loads with an "ended" banner, becomes `noindex` after 30 days, and returns 410 after 12 months or when hidden or rejected as wrong. Merged duplicates 301 to the kept event.
@@ -198,7 +225,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Foundation & Published Calendar | 13/13 | Complete    | 2026-10-17 |
 | 2. Draft Model, Review Queue & Submissions | 16/16 | Complete    | 2026-10-17 |
 | 3. Ingestion Backbone, ICS & Change/Duplicate Handling | 17/17 | Complete    | 2026-10-18 |
-| 4. Extraction Ladder, Geofence & Live Sources | 0/TBD | Not started | - |
+| 4. Extraction Ladder, Geofence & Live Sources | 0/14 | Not started | - |
 | 5. Launch Readiness | 0/2+ | Not started | - |
 
 ## Planning Notes
@@ -207,7 +234,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 - **Source research track:** RES-01..03 is mostly owner-collected URLs plus live checks. It runs alongside Phases 1-2 and must be complete before Phase 3 starts, because ICS and later rungs need real fixtures.
 - **EXT-05 (RSS/Atom)** is only part of the Definition of Done if source research finds a qualifying feed. Otherwise it ships as "supported, unused" with fixture tests.
 - **Split rule:** if Phase 3 proves too large during planning, split out "Change & Duplicates" (REV-05..07, PIPE-05..08) as an inserted Phase 3.1 rather than re-cutting the other phases.
-- **Scope change 2026-10-16:** infrastructure/domain deferred to Phase 5 (plans 01-02/01-03 moved to 05-01/05-02). Phase 1 is local-dev + CI only. Note: Phase 4 success criterion 5 and RES-04 say "in production"; until Phase 5 is live, P0 sources run on the local app (see STATE concerns).
+- **Scope change 2026-10-16:** infrastructure/domain deferred to Phase 5 (plans 01-02/01-03 moved to 05-01/05-02). Phase 1 is local-dev + CI only. Resolved 2026-10-18 (04-CONTEXT D-01): Phase 4 SC5 / RES-04 cover P0 sources on the local app with scheduled runs; the production half is Phase 5 SC8.
 
 ## Backlog
 

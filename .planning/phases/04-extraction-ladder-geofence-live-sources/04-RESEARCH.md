@@ -632,12 +632,12 @@ for ($page = 1; $url !== null; $page++) {
 | A7 | Online keyword list and the location-unknown weight | Geofence | Wording / UX only |
 | A8 | The geofence "venue exact match only without a postcode" refinement is acceptable within D-14 | Geofence | Slight deviation from D-14 step 2; the owner may prefer the literal D-14 |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **How should the owner's dev DB move the Town Council to REST?** We know in-place re-keying breaks 10/72 items. Unclear: whether the dev DB holds Town Council items worth keeping. Recommendation: plan "seed REST for fresh DBs + document the dev options"; owner chooses (O-1).
-2. **Make Attleborough Primary fetchable?** Options: (a) accept, inactive; (b) don't count the robots.txt request towards Crawl-delay spacing; (c) a longer robots cache for long-delay hosts. Recommendation: (a) for Phase 4 (O-3).
-3. **RSS `date_required` items without dates: skip or draft?** Recommendation: skip and count (feeds mix posts and events). Confirm with the owner (O-5).
-4. **Should Visit Wymondham's off-site event URLs be used for "Read more"?** Recommendation: same-host only; external URL kept in the payload.
+1. **RESOLVED: R-01.** **How should the owner's dev DB move the Town Council to REST?** We know in-place re-keying breaks 10/72 items. Unclear: whether the dev DB holds Town Council items worth keeping. Recommendation: plan "seed REST for fresh DBs + document the dev options"; owner chooses (O-1).
+2. **RESOLVED: R-06.** **Make Attleborough Primary fetchable?** Options: (a) accept, inactive; (b) don't count the robots.txt request towards Crawl-delay spacing; (c) a longer robots cache for long-delay hosts. Recommendation: (a) for Phase 4 (O-3).
+3. **RESOLVED: R-07 exception.** **RSS `date_required` items without dates: skip or draft?** Recommendation: skip and count (feeds mix posts and events). Confirm with the owner (O-5).
+4. **RESOLVED: R-05.** **Should Visit Wymondham's off-site event URLs be used for "Read more"?** Recommendation: same-host only; external URL kept in the payload.
 
 ## Environment Availability
 
