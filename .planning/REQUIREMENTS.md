@@ -71,9 +71,9 @@
 - [ ] **SRC-02**: Admin can test-run a source and preview the extracted events without creating drafts
 - [ ] **SRC-03**: Admin can trigger "Run now" for a source
 - [ ] **SRC-04**: The scheduler fetches each due active source automatically, never running two fetches of the same source at once
-- [ ] **SRC-05**: All fetching goes through one fetcher that checks robots.txt for every URL (disallowed means a `blocked` run, not a failure), sends a descriptive User-Agent with contact URL, waits at least 5 seconds per host, uses timeouts, size limits, conditional GET and an SSRF guard
-- [ ] **SRC-06**: Fetched content is validated for the extraction method. Bot walls and wrong content types count as a failed `content_invalid` run, not a successful empty run
-- [ ] **SRC-07**: Each run is logged with status, items found / new / changed, skipped (past, far future, out of area), drafts created and error message
+- [x] **SRC-05**: All fetching goes through one fetcher that checks robots.txt for every URL (disallowed means a `blocked` run, not a failure), sends a descriptive User-Agent with contact URL, waits at least 5 seconds per host, uses timeouts, size limits, conditional GET and an SSRF guard
+- [x] **SRC-06**: Fetched content is validated for the extraction method. Bot walls and wrong content types count as a failed `content_invalid` run, not a successful empty run
+- [x] **SRC-07**: Each run is logged with status, items found / new / changed, skipped (past, far future, out of area), drafts created and error message
 - [ ] **SRC-08**: A source becomes `degraded` after 3 consecutive failures and `unhealthy` (paused, flagged on dashboard) after 5. Zero items after previously returning items is flagged as a possible structure change
 - [ ] **SRC-09**: Source failures never delete or hide previously discovered events
 
@@ -90,7 +90,7 @@
 
 ### Processing Pipeline (PIPE)
 
-- [ ] **PIPE-01**: Past events and events more than 12 months ahead are skipped and counted, not drafted
+- [x] **PIPE-01**: Past events and events more than 12 months ahead are skipped and counted, not drafted
 - [ ] **PIPE-02**: Events from `filter` sources are kept only if they match postcode districts NR17, NR16, NR18 or IP24 or an allowlisted place name. Online-only events are skipped and unknown locations become flagged drafts. `local` sources skip this filter
 - [x] **PIPE-03**: Category is assigned deterministically: source default, then mapping of source values, then title keyword rules, else `Other` (flagged)
 - [x] **PIPE-04**: Each draft gets a 0-100 quality score with band (High 80+, Medium 50-79, Low <50) and the reasons behind it
@@ -98,7 +98,7 @@
 - [ ] **PIPE-06**: A changed known item creates an update draft only when its normalised fields differ from the accepted baseline. Unchanged raw content is skipped. Only one pending draft exists per source item (replaced in place)
 - [ ] **PIPE-07**: Items marked cancelled at the source (`STATUS:CANCELLED`, `eventStatus: EventCancelled`) create a cancellation draft
 - [ ] **PIPE-08**: An item missing from its source creates a cancellation draft only after 2 consecutive complete runs, and only if its last known start is in the future, inside the run's observed date window, and the source supports missing detection
-- [ ] **PIPE-09**: Public descriptions of discovered events are excerpts of up to 200 characters with phone numbers and emails stripped. The full text is kept internally for review
+- [x] **PIPE-09**: Public descriptions of discovered events are excerpts of up to 200 characters with phone numbers and emails stripped. The full text is kept internally for review
 
 ### Recurrence & Time (REC)
 
@@ -220,9 +220,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SRC-02 | Phase 4 | Pending |
 | SRC-03 | Phase 3 | Pending |
 | SRC-04 | Phase 3 | Pending |
-| SRC-05 | Phase 3 | Pending |
-| SRC-06 | Phase 3 | Pending |
-| SRC-07 | Phase 3 | Pending |
+| SRC-05 | Phase 3 | Complete |
+| SRC-06 | Phase 3 | Complete |
+| SRC-07 | Phase 3 | Complete |
 | SRC-08 | Phase 3 | Pending |
 | SRC-09 | Phase 3 | Pending |
 | EXT-01 | Phase 3 | Pending |
@@ -233,7 +233,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EXT-06 | Phase 4 | Pending |
 | EXT-07 | Phase 3 | Pending |
 | EXT-08 | Phase 4 | Pending |
-| PIPE-01 | Phase 3 | Pending |
+| PIPE-01 | Phase 3 | Complete |
 | PIPE-02 | Phase 4 | Pending |
 | PIPE-03 | Phase 2 | Complete |
 | PIPE-04 | Phase 2 | Complete |
@@ -241,7 +241,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PIPE-06 | Phase 3 | Pending |
 | PIPE-07 | Phase 3 | Pending |
 | PIPE-08 | Phase 3 | Pending |
-| PIPE-09 | Phase 3 | Pending |
+| PIPE-09 | Phase 3 | Complete |
 | REC-01 | Phase 1 | Complete |
 | REC-02 | Phase 1 | Complete |
 | LEG-01 | Phase 5 | Pending |

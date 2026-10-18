@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 03
 current_phase_name: Ingestion Backbone, ICS & Change/Duplicate Handling
 status: executing
-stopped_at: Completed 03-04-PLAN.md
-last_updated: "2026-10-18T09:12:11.972Z"
+stopped_at: Completed 03-05-PLAN.md
+last_updated: "2026-10-18T09:29:39.863Z"
 last_activity: 2026-10-18
 last_activity_desc: Phase 2 complete, transitioned to Phase 3
-state_head: c6e895bbaf1136586c2ea2692ba940be970a72bb
+state_head: 5103b9fc069367651790f5d244ab062371e985f4
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 48
-  completed_plans: 33
+  completed_plans: 34
   percent: 40
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 03 (Ingestion Backbone, ICS & Change/Duplicate Handling) — EXECUTING
-Plan: 5 of 17
+Plan: 6 of 17
 Status: Ready to execute
 Last activity: 2026-10-18 — Completed 03-04 (ICS extractor, hashes, window classifier)
 
@@ -90,6 +90,7 @@ Progress: [█████████████░░░░░░░] 32/48 p
 | Phase 03 P02 | 40min | 2 tasks | 17 files |
 | Phase 03 P03 | 25min | 2 tasks | 14 files |
 | Phase 03 P04 | 13min | 2 tasks | 15 files |
+| Phase 03 P05 | 15min | 3 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -165,6 +166,10 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-04: Feed RRULEs are rebuilt into ManualRecurrence's exact shape (part order, implicit weekly BYDAY, timed UNTIL to London end of day) and kept only if tryFromStoredRule round-trips; otherwise a D-19 parse error
 - [Phase 03]: 03-04: Items with no readable facts (unknown TZID, end before start, sabre recurrence error) carry contentHash null; Greenwich Standard Time keeps facts plus a check-the-times parse error
 - [Phase 03]: 03-04: summary_start identity = raw DTSTART value | normalised SUMMARY; content_hash venue covers the whole LOCATION
+- [Phase 03]: 03-05: Skipped unknown identities (past/far future/rule/parse error) get no source_items row, so far-future items are drafted once they enter the 90-day window
+- [Phase 03]: 03-05: Conditional GET validators sent only after a succeeded/not_modified live run; over-long validators dropped, never cut
+- [Phase 03]: 03-05: FetchSourceJob uses properties (uniqueFor 900, timeout 75, maxExceptions 1, retryUntil +6h); HostBusy → run back to queued + release(seconds); other errors → failed/abandoned + rethrow
+- [Phase 03]: 03-05: Feed title/venue/URL fitted to draft columns (grapheme-safe) so a long value never loses the item; excerpt labels removed only with their contact
 
 ### Pending Todos
 
@@ -199,6 +204,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-18T09:12:11.162Z
-Stopped at: Completed 03-04-PLAN.md
+Last session: 2026-10-18T09:29:39.038Z
+Stopped at: Completed 03-05-PLAN.md
 Resume file: None
