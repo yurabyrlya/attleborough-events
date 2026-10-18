@@ -19,7 +19,7 @@
   - P1: 3 (Attleborough Academy, Attleborough Heritage Group, Attleborough Primary School)
   - P2: 2 (Visit Norfolk, Visit Wymondham)
   - P3: 3 (Attleborough Players, Attleborough Summer Carnival, Banham Zoo). These are legally cleared, but no deterministic method exists, so they come in by manual entry.
-- **Fixtures (P0/P1):** Town Council (TEC REST pages 1-2 plus TEC iCal, redacted), Baptist Church (ICS plus dated RSS), Academy (ICS) and Heritage Group (server-rendered events page). Attleborough Primary's are still pending: `Crawl-delay: 12000`, so `ops/probe-sources.sh attleborough-primary-school` must run after the delay.
+- **Fixtures (P0/P1):** Town Council (TEC REST pages 1-2 plus TEC iCal, redacted), Baptist Church (ICS plus dated RSS), Academy (ICS) and Heritage Group (server-rendered events page). Attleborough Primary's calendar page was captured on 2026-10-18 after its `Crawl-delay: 12000` (events embedded as a JavaScript array).
 - **List 2 (Not crawlable): 9 sources.** Bot wall 4 (Breckland, Norfolk County Council, Norfolk Museums, TicketSource: they challenge automated clients on every network), Facebook 1, JS-rendered 1, robots-disallowed 1, ToS-prohibited 2.
 - **Rungs needed first:**
   1. **ICS** (EXT-01): three P0/P1 sources with three different dialects.
@@ -60,7 +60,7 @@ Every spec §14 category, including the ones where nothing was found.
 |---|---|---|
 | Town Council | Attleborough Town Council (**List 1, P0**, TEC) | Wikipedia external link `attleboroughtc.org.uk`; DNS for `attleboroughtowncouncil.gov.uk`, `attleborough-tc.gov.uk`, `attleborough.gov.uk` (none resolve); probed from both networks |
 | Breckland Council | Breckland Council (List 2, bot wall) | `www.breckland.gov.uk/robots.txt` from both networks |
-| Schools (and PTAs) | Attleborough Academy (**List 1, P1**, ICS, permission); Attleborough Primary School (**List 1, P1**, calendar pending, Crawl-delay 12000) | Wikipedia Education section (Academy, Rosecroft Primary, Attleborough Primary, Wymondham College); DNS for 9 Rosecroft / Attleborough Primary domain shapes (only `attleboroughprimary.org` resolves). Rosecroft Primary: none found. PTA: Attleborough Primary links a "Friends of APS" page (not probed, same host crawl-delay) |
+| Schools (and PTAs) | Attleborough Academy (**List 1, P1**, ICS, permission); Attleborough Primary School (**List 1, P1**, embedded JS event array, Crawl-delay 12000) | Wikipedia Education section (Academy, Rosecroft Primary, Attleborough Primary, Wymondham College); DNS for 9 Rosecroft / Attleborough Primary domain shapes (only `attleboroughprimary.org` resolves). Rosecroft Primary: none found. PTA: Attleborough Primary links a "Friends of APS" page (not probed, same host crawl-delay) |
 | Churches | Attleborough Baptist Church (**List 1, P0**); Eastern Baptist Association church page (Excluded, directory page) | Wikipedia Churches section; St Mary's (parish church): none found (DNS for 5 domain shapes; A Church Near You search is JS-rendered, `achurchnearyou.com/robots.txt` allows `/`); Methodist church: domain from Wikipedia no longer resolves and the church "has stopped holding normal services" (Wikipedia). St Mary's Church Hall appears as a venue in Heritage Group events |
 | Halls (e.g. Connaught Hall) | Town Hall bookings come through the Town Council TEC feed (List 1); Trinity Hall, Besthorpe (Excluded, no event listing) | DNS for 6 Connaught Hall domain shapes (none resolve); Connaught Hall: none found |
 | Sports clubs | Attleborough Town FC (List 2, robots-disallowed; its home games also appear in the Town Council feed); Attleborough Athletics Academy (in the Town Council feed) | Spec note (Squarespace); DNS for rugby, cricket and bowls club domain shapes (none resolve) |
@@ -177,28 +177,28 @@ Ordered by priority, then name. **10 sources:** P0 2, P1 3, P2 2, P3 3. The orig
 | Fixture files | `tests/Fixtures/sources/attleborough-heritage-group/2026-10-17-events-page.html` (1 event; no personal data, unmodified) |
 | Rung / config notes | One request a day is plenty. Overlaps with the Town Council feed, where the group's Tuesday sessions appear, so dedupe across sources. |
 
-### Attleborough Primary School (P1, fixtures pending)
+### Attleborough Primary School (P1)
 
 | Field | Value |
 |---|---|
 | Name | Attleborough Primary School |
-| Verified URL | https://www.attleboroughprimary.org/key-information/school-calendar (linked from the homepage; page not yet fetched) |
+| Verified URL | https://www.attleboroughprimary.org/key-information/school-calendar (linked from the homepage; fetched 2026-10-18 09:21 BST, HTTP 200) |
 | Coverage | Attleborough (primary school, PTA "Friends of APS") |
-| Platform | school website CMS (not identified) |
-| Ladder rung | unknown until the calendar page is fetched |
-| Extraction method | unknown (pending) |
-| Server-rendered | unknown |
-| Frequency | unknown |
-| Est. events/month | unknown |
+| Platform | FSE Design school website (same provider as Rosecroft Primary) |
+| Ladder rung | embedded structured data in a server-rendered page (no ICS or JSON endpoint seen; the "download ics" link is built in the browser) |
+| Extraction method | `html` with a source-specific parser: the page embeds every event as a JavaScript array `json = [[id, ?, "20251017T170000", "20251017T181500", all_day, "title", ...], ...]` inside a `<script>` block. The visible calendar needs JavaScript; the data does not. |
+| Server-rendered | yes (data embedded in the HTML) |
+| Frequency | updated per school term; at capture time (18 Oct 2026) the 22 entries were all 29 Sep to 19 Dec 2025, so the calendar had not been updated for 2026/27 |
+| Est. events/month | about 7 during term (22 over Sep-Dec 2025), mostly school-internal (trips, parents' evenings, nativities, PTA discos) |
 | Access method / endpoint | `GET /key-information/school-calendar`, at most one request per 3 h 20 min |
 | Robots status | allowed, fetched 2026-10-17T18:10Z: `User-agent: *`, `Crawl-delay: 12000`, `Disallow: /page-not-found`, `/server-error`, `/admin` |
 | ToS finding | No terms link on the homepage |
 | legal_basis | `factual_extract_only`: robots allows, terms silent, owner decision D-23, `Crawl-delay: 12000` honoured |
-| Feasibility | low-medium (one request per run at most; method unknown) |
+| Feasibility | medium (one request per run at most; parser needs a small source-specific extractor, not ICS) |
 | Legal risk | low |
-| Priority | P1, provisional; re-rank once the calendar is seen |
-| Example event URL | unknown (pending) |
-| Fixture files | **pending:** run `ops/probe-sources.sh attleborough-primary-school` after the crawl delay. On 2026-10-17 the script deferred it until 23:05 BST. |
+| Priority | P1 kept for now; consider P2 because most entries are pupil-only and the calendar was stale at capture |
+| Example event URL | none: entries have no individual pages; link back to the calendar page |
+| Fixture files | `tests/Fixtures/sources/attleborough-primary-school/2026-10-18-events-page.html` (22 events; office email and phone redacted) |
 | Rung / config notes | Phase 3 must schedule this source at most every 3 h 20 min (daily is fine). |
 
 ### Visit Norfolk (P2)
@@ -419,8 +419,9 @@ One row per candidate; "-" means the rung did not apply (not WordPress, no feed 
 | attleborough-town-council | P0 | 2026-10-17-ical.ics, 2026-10-17-tec-p1.json, 2026-10-17-tec-p2.json |
 | attleborough-academy | P1 | 2026-10-17-ical.ics |
 | attleborough-heritage-group | P1 | 2026-10-17-events-page.html |
+| attleborough-primary-school | P1 | 2026-10-18-events-page.html |
 
-**Pending (not in the index until captured):** `attleborough-primary-school` (P1, provisional). Its `Crawl-delay: 12000` means `ops/probe-sources.sh attleborough-primary-school` was deferred by the script at 23:19 BST and has to run after 02:39 BST on 2026-10-18 or later. Then add it to the table above and drop "fixtures pending" from its List 1 heading; the guard test then requires its manifest. Owner override recorded in 02-VERIFICATION.md: capture before Phase 3 planning.
+**Pending (not in the index until captured):** none. Attleborough Primary School was captured on 2026-10-18 at 09:21 BST, after its 12000 s crawl delay (owner override in 02-VERIFICATION.md).
 
 ## Risks (technical and legal)
 
@@ -472,7 +473,7 @@ How to add a URL later, without re-running this whole plan:
 
 These replace answers 3 and 4 above.
 
-- **D-23:** ToS-unclear sources are accepted as crawlable when robots allows. Heritage Group (P1), Attleborough Primary (P1, fixtures pending), Visit Norfolk (P2), Visit Wymondham (P2), Players (P3), Summer Carnival (P3) and Banham Zoo (P3) moved to List 1 with `legal_basis` `factual_extract_only`. The basis is robots allows + terms silent + owner decision + polite crawling + attribution and a link back. The permission asks for these are no longer needed.
+- **D-23:** ToS-unclear sources are accepted as crawlable when robots allows. Heritage Group (P1), Attleborough Primary (P1), Visit Norfolk (P2), Visit Wymondham (P2), Players (P3), Summer Carnival (P3) and Banham Zoo (P3) moved to List 1 with `legal_basis` `factual_extract_only`. The basis is robots allows + terms silent + owner decision + polite crawling + attribution and a link back. The permission asks for these are no longer needed.
 - **D-24:** Attleborough Academy is crawlable under written permission held by the owner (not committed). It moved to List 1 as P1 with `permission_granted`, and its ICS fixture is captured.
 - **D-25 (revised):** Breckland Council, Norfolk County Council, Norfolk Museums and TicketSource challenge our honest User-Agent from the home network as well. They stay on List 2 (bot wall), with legitimate routes only: official feeds/APIs (none exist for these four; see "Official routes"), Cloudflare Verified Bots in Phase 5, allowlist requests, and hand-captured browser fixtures (`capture: hand`). The home-network check asked for in answer 4 is done: still blocked.
 - **D-26 (revised):** the Town Council serves normally to a residential network. It moved to List 1 as P0 (TEC REST + iCal) and its fixtures are captured, redacted. The clerk email is kept as a courtesy note and a contingency in case the production server is blocked: `docs/research/town-council-feed-request.md`.

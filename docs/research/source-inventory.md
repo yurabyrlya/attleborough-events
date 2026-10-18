@@ -73,10 +73,10 @@ No feed, but robots.txt allows the pages and the dates can be read reliably from
 ### Attleborough Primary School (P1)
 
 - **Events page:** https://www.attleboroughprimary.org/key-information/school-calendar
-- **Method:** decided after the first fetch.
+- **Method:** read the page. The calendar looks like it needs JavaScript, but every event is written into the page itself, so we can read it without a browser. There is no feed.
 - **Legal basis:** robots.txt allows it, the terms are silent, owner decision (D-23).
-- **Watch out for:** robots.txt asks for 3 hours 20 minutes between requests.
-- **Owner action:** run `ops/probe-sources.sh attleborough-primary-school` after 23:05 on 17 October, then redact personal data before committing.
+- **Watch out for:** robots.txt asks for 3 hours 20 minutes between requests. Most entries are for pupils and parents only (trips, parents' evenings, nativities). When captured on 18 October 2026 the calendar still showed autumn 2025, so it may not be kept up to date.
+- **Sample:** captured on 18 October 2026 (22 events, office contact details removed).
 
 ### Visit Norfolk (P2)
 
@@ -129,7 +129,7 @@ Crawling is allowed, but these sites give no dates that a parser can read reliab
 - **Website:** https://www.rosecroftprimary.org
 - **Calendar page:** https://www.rosecroftprimary.org/parents/school-calendar
 - **Why manual:** the calendar only shows with JavaScript ("Sorry - Javascript is required to view the calendar"). Term dates are on https://www.rosecroftprimary.org/parents/term-dates.
-- **Watch out for:** robots.txt asks for 3 hours 20 minutes between requests (same school website provider as Attleborough Primary).
+- **Watch out for:** robots.txt asks for 3 hours 20 minutes between requests (same school website provider as Attleborough Primary). Attleborough Primary's page turned out to contain its events without needing JavaScript, so Rosecroft's may be readable the same way; check it with one polite fetch before treating it as manual.
 - **Next step:** manual entry for public events; check later whether the calendar has a feed behind it.
 
 ---
@@ -250,13 +250,12 @@ Searched on 17 October (web search, domain checks, Wikipedia, national directori
 
 ## Owner actions
 
-1. **Tonight after 23:05:** run `ops/probe-sources.sh attleborough-primary-school` (steps in `tests/Fixtures/sources/README.md`), and redact personal data before committing.
-2. **Send the Town Clerk email** in [town-council-feed-request.md](./town-council-feed-request.md). It asks for an explicit yes to republishing event facts and, if needed, allowlisting for our server.
-3. **Ask for event data directly:**
+1. **Send the Town Clerk email** in [town-council-feed-request.md](./town-council-feed-request.md). It asks for an explicit yes to republishing event facts and, if needed, allowlisting for our server.
+2. **Ask for event data directly:**
    - Breckland (email alerts and the submission form)
    - Norfolk Libraries (a calendar feed or monthly list)
    - Norfolk Museums (send us their events)
    - local TicketSource organisers such as Attleborough Players
-4. **Add local URLs** for the gaps above (Facebook page names are fine; they become manual-entry sources).
-5. **Ask St Mary's** to tag its events in the Diocese of Norwich calendar.
-6. **Phase 5:** apply for Cloudflare Verified Bots once the production crawler is public. We need a page about the crawler, a distinct crawler name with a contact URL, a published IP list or reverse DNS, and robots.txt compliance. This could unlock the public pages of Breckland, Norfolk Libraries, Norfolk Museums and TicketSource.
+3. **Add local URLs** for the gaps above (Facebook page names are fine; they become manual-entry sources).
+4. **Ask St Mary's** to tag its events in the Diocese of Norwich calendar.
+5. **Phase 5:** apply for Cloudflare Verified Bots once the production crawler is public. We need a page about the crawler, a distinct crawler name with a contact URL, a published IP list or reverse DNS, and robots.txt compliance. This could unlock the public pages of Breckland, Norfolk Libraries, Norfolk Museums and TicketSource.

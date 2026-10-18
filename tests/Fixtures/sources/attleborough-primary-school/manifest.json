@@ -1,0 +1,35 @@
+{
+    "source": "attleborough-primary-school",
+    "files": [
+        {
+            "file": "2026-10-18-events-page.html",
+            "type": "events-page",
+            "url": "https://www.attleboroughprimary.org/key-information/school-calendar",
+            "fetched_at": "2026-10-18T08:21:33Z",
+            "http_status": 200,
+            "headers": {
+                "content-type": "text/html; charset=utf-8",
+                "etag": "\"559606f8bd7bff7c640a31ac7ea72434\"",
+                "last-modified": "",
+                "cache-control": "no-cache, must-revalidate"
+            },
+            "robots_status": "allowed (robots.txt 200, fetched 2026-10-17T22:19:13Z)",
+            "robots_rules": [
+                "delay 12000",
+                "disallow /page-not-found",
+                "disallow /server-error",
+                "disallow /admin"
+            ],
+            "sha256_raw": "d7c21018b540a7b468dc6c6b722b3be881d363defc3109f739523ad340f51a27",
+            "redactions": {
+                "email": 2,
+                "phone": 2,
+                "name": 0
+            },
+            "modified": true,
+            "events": 22,
+            "captured_by": "ops/probe-sources.sh",
+            "notes": "Reviewed 2026-10-18. The visible calendar needs JavaScript, but all events are embedded in the page as a JavaScript array (json = [[id, ?, start YYYYMMDDTHHMMSS, end, all_day, title, ...]]), so it is parseable without a browser. 22 events, all dated 29 Sep to 19 Dec 2025 (the calendar had not been updated for 2026/27 at capture time). Titles contain no personal names. Redacted the school office email and phone (footer text and mailto/tel attributes) because the guard test allows only placeholders. Robots.txt sets Crawl-delay 12000 s: at most one request per 3h20m."
+        }
+    ]
+}

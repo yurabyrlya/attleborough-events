@@ -158,7 +158,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- [Phase 2→3] Capture the Attleborough Primary School fixture after 02:39 BST 2026-10-18: `ops/probe-sources.sh attleborough-primary-school`, redact, add to the Fixture index and drop "fixtures pending" from its List 1 heading (owner override in 02-VERIFICATION.md; must be done before Phase 3 planning) — owner chose to plan Phase 3 first; capture during Phase 3 execution, before the first ingestion plan runs against it.
+- [x] [Phase 2→3] Attleborough Primary School fixture captured 2026-10-18 09:21 BST (22 events embedded as a JS array in a server-rendered page; office email/phone redacted; Fixture index updated, "fixtures pending" dropped). Calendar was stale (autumn 2025 only); parser would be a small HTML extractor, not ICS (not in Phase 3 scope).
 
 ### Blockers/Concerns
 
