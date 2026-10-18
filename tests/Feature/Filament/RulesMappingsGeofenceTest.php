@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\CategoryKeywordRule;
 use App\Models\CategoryMapping;
 use App\Models\GeofenceTerm;
+use App\Models\Source;
 use App\Models\User;
 use App\Review\CategoryAssigner;
 use App\Review\Exceptions\RulesNotSaved;
@@ -37,7 +38,7 @@ beforeEach(function () {
             ->map(fn (CategoryKeywordRule $r): array => ['id' => $r->id, 'keyword' => $r->keyword, 'category_id' => $r->category_id, 'priority' => $r->priority])
             ->all(),
         'category_mappings' => CategoryMapping::orderBy('id')->get()
-            ->map(fn (CategoryMapping $m): array => ['id' => $m->id, 'source_value' => $m->source_value, 'category_id' => $m->category_id])
+            ->map(fn (CategoryMapping $m): array => ['id' => $m->id, 'source_value' => $m->source_value, 'category_id' => $m->category_id, 'source_id' => $m->source_id])
             ->all(),
         'geofence' => [
             'postcode_districts' => GeofenceTerm::where('type', GeofenceTerm::POSTCODE_DISTRICT)->orderBy('id')->pluck('value')->all(),
@@ -252,6 +253,121 @@ it('shows stored mappings and geofence terms on the Rules screen', function () {
 
     // The Select holds the category id as a string; SaveRules accepts both.
     expect(array_values($page->get('data.category_mappings')))->toEqual([
-        ['id' => CategoryMapping::sole()->id, 'source_value' => 'Quiz Night', 'category_id' => (string) $this->community->id],
+        ['id' => CategoryMapping::sole()->id, 'source_value' => 'Quiz Night', 'category_id' => (string) $this->community->id, 'source_id' => null],
     ])->and($page->get('data.geofence.postcode_districts'))->toBe(['NR17']);
+});
+
+/*
+ * EXT-01 / C11: a mapping can be scoped to one source. SaveRules uses the
+ * same key as the database index: (source or all sources, normalised value).
+ */
+describe('per-source mappings', function () {
+    beforeEach(function () {
+        $this->baptist = Source::factory()->create(['name' => 'Attleborough Baptist Church']);
+        $this->council = Source::factory()->create(['name' => 'Attleborough Town Council']);
+        $this->row = fn (string $value, ?Source $source, ?int $id = null, string $slug = 'community'): array => [
+            'id' => $id,
+            'source_value' => $value,
+            'category_id' => ($this->category)($slug)->id,
+            'source_id' => $source?->id,
+        ];
+    });
+
+    it('saves a mapping for one source and one for all sources from the Rules screen', function () {
+        actingAs($this->admin);
+
+        livewire(Rules::class)
+            ->set('data.category_mappings', [
+                'new-1' => ['id' => null, 'source_value' => 'Worship', 'category_id' => (string) $this->community->id, 'source_id' => (string) $this->baptist->id],
+                'new-2' => ['id' => null, 'source_value' => 'Quiz Night', 'category_id' => (string) $this->community->id, 'source_id' => null],
+            ])
+            ->callAction('save')
+            ->assertHasNoFormErrors()
+            ->assertNotified('Rules saved');
+
+        expect(CategoryMapping::orderBy('id')->get(['source_value', 'source_id'])->map(fn (CategoryMapping $m): array => [$m->source_value, $m->source_id])->all())
+            ->toBe([['Worship', $this->baptist->id], ['Quiz Night', null]]);
+    });
+
+    it('shows a stored per-source mapping with its source on the Rules screen', function () {
+        actingAs($this->admin);
+        CategoryMapping::create(($this->row)('Worship', $this->baptist));
+
+        $page = livewire(Rules::class)->assertSee('All sources');
+
+        expect((string) array_values($page->get('data.category_mappings'))[0]['source_id'])->toBe((string) $this->baptist->id);
+    });
+
+    it('refuses the same value twice for one source, naming the source, and saves nothing', function () {
+        $state = ($this->state)();
+        $state['category_mappings'] = [($this->row)('Worship', $this->baptist), ($this->row)('WORSHIP ', $this->baptist, null, 'music')];
+        $before = ($this->counts)();
+
+        expect(fn () => ($this->save)($state))
+            ->toThrow(RulesNotSaved::class, "Rules not saved: 'worship' is mapped twice for Attleborough Baptist Church.");
+
+        expect(($this->counts)())->toBe($before);
+    });
+
+    it('shows the per-source refusal on the Rules screen', function () {
+        actingAs($this->admin);
+
+        livewire(Rules::class)
+            ->set('data.category_mappings', [
+                'a' => ['id' => null, 'source_value' => 'Worship', 'category_id' => (string) $this->community->id, 'source_id' => (string) $this->baptist->id],
+                'b' => ['id' => null, 'source_value' => 'worship', 'category_id' => (string) $this->community->id, 'source_id' => (string) $this->baptist->id],
+            ])
+            ->callAction('save')
+            ->assertNotified('Rules not saved');
+
+        expect(CategoryMapping::count())->toBe(0);
+    });
+
+    it('saves the same value for different sources and for all sources', function () {
+        $state = ($this->state)();
+        $state['category_mappings'] = [
+            ($this->row)('Worship', null, null, 'music'),
+            ($this->row)('Worship', $this->baptist),
+            ($this->row)('worship', $this->council, null, 'charity'),
+        ];
+
+        ($this->save)($state);
+
+        expect(CategoryMapping::count())->toBe(3)
+            ->and(($this->assign)(['Worship'], 'Anything')->reason)->toBe("Mapped from 'Worship'");
+    });
+
+    it('refuses a mapping for a source that no longer exists', function () {
+        $state = ($this->state)();
+        $row = ($this->row)('Worship', $this->baptist);
+        $row['source_id'] = $this->baptist->id + 1000;
+        $state['category_mappings'] = [$row];
+
+        expect(fn () => ($this->save)($state))
+            ->toThrow(RulesNotSaved::class, "Rules not saved: 'Worship' points at a source that no longer exists.");
+
+        expect(CategoryMapping::count())->toBe(0);
+    });
+
+    it('moves a mapping between sources in place and can swap two mappings\' sources in one save', function () {
+        $global = CategoryMapping::create(($this->row)('Worship', null, null, 'music'));
+        $baptist = CategoryMapping::create(($this->row)('Worship', $this->baptist));
+        $state = ($this->state)();
+        $state['category_mappings'][0]['source_id'] = $this->baptist->id;
+        $state['category_mappings'][1]['source_id'] = null;
+
+        ($this->save)($state);
+
+        expect($global->refresh()->source_id)->toBe($this->baptist->id)
+            ->and($baptist->refresh()->source_id)->toBeNull()
+            ->and(CategoryMapping::count())->toBe(2);
+    });
+
+    it('keeps a per-source mapping when the state is resubmitted unchanged', function () {
+        $mapping = CategoryMapping::create(($this->row)('Worship', $this->baptist));
+
+        ($this->save)(($this->state)());
+
+        expect(CategoryMapping::sole())->id->toBe($mapping->id)->source_id->toBe($this->baptist->id);
+    });
 });

@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\CategoryKeywordRule;
 use App\Models\CategoryMapping;
 use App\Models\GeofenceTerm;
+use App\Models\Source;
 use App\Models\User;
 use App\Review\Exceptions\RulesNotSaved;
 use App\Review\SaveRules;
@@ -154,10 +155,11 @@ class Rules extends Page
                             ->schema([
                                 Repeater::make('category_mappings')
                                     ->hiddenLabel()
-                                    ->helperText("Used when a source labels its own events, e.g. 'Quiz Night' → Community. Sources arrive in a later phase.")
+                                    ->helperText("Used when a source labels its own events, e.g. 'Worship' → Community. 'All sources' applies the mapping to every source; a mapping for one source wins over an 'All sources' one for that source's events.")
                                     ->table([
                                         TableColumn::make('Source value'),
                                         TableColumn::make('Category'),
+                                        TableColumn::make('Source'),
                                     ])
                                     ->schema([
                                         Hidden::make('id'),
@@ -169,6 +171,10 @@ class Rules extends Page
                                             ->label('Category')
                                             ->options(fn (): array => Category::query()->orderBy('sort')->orderBy('id')->pluck('name', 'id')->all())
                                             ->required(),
+                                        Select::make('source_id')
+                                            ->label('Source')
+                                            ->placeholder('All sources')
+                                            ->options(fn (): array => Source::query()->orderBy('name')->orderBy('id')->pluck('name', 'id')->all()),
                                     ])
                                     ->reorderable(false)
                                     ->addActionLabel('Add mapping')
@@ -275,6 +281,7 @@ class Rules extends Page
                     'id' => $mapping->id,
                     'source_value' => $mapping->source_value,
                     'category_id' => $mapping->category_id,
+                    'source_id' => $mapping->source_id,
                 ])
                 ->all(),
             'geofence' => [

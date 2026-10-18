@@ -8,6 +8,7 @@ use App\Models\CategoryMapping;
 use App\Models\Event;
 use App\Models\EventDraft;
 use App\Models\GeofenceTerm;
+use App\Models\Source;
 use App\Models\User;
 use App\Publishing\AdminGate;
 use App\Review\Exceptions\RulesNotSaved;
@@ -37,8 +38,11 @@ use Normalizer;
  *   name on create (unique, -2/-3 on collision) and never change, because
  *   public filter URLs use them. 'other' can't be removed.
  * - 'keyword_rules' (rows: id?, keyword, category_id, priority).
- * - 'category_mappings' (rows: id?, source_value, category_id). Source
- *   values are unique by CategoryAssigner::normalise().
+ * - 'category_mappings' (rows: id?, source_value, category_id, source_id?).
+ *   source_id scopes a row to one source (EXT-01); null or missing means
+ *   every source. Source values are unique per source (or once for every
+ *   source) by CategoryAssigner::normalise(), the same key as the database
+ *   index (coalesce(source_id, 0), lower(source_value)).
  * - 'geofence' (postcode_districts: list<string>, place_names:
  *   list<string>). Districts are stored upper-case without spaces and must
  *   look like NR17; place names are trimmed and unique by
@@ -107,7 +111,7 @@ final class SaveRules
             $problems = [
                 ...($categories === null ? [] : $this->categoryProblems($categories, $removed, $keywordRules, $mappings)),
                 ...($keywordRules === null ? [] : $this->keywordProblems($keywordRules, $stored->keys()->all())),
-                ...($mappings === null ? [] : $this->mappingProblems($mappings, $stored->keys()->all())),
+                ...($mappings === null ? [] : $this->mappingProblems($mappings, $stored->keys()->all(), self::lockedSourceNames())),
                 ...$this->geofenceProblems($geofence),
             ];
 
@@ -432,7 +436,7 @@ final class SaveRules
     }
 
     /**
-     * @return list<array{id: int|null, source_value: string, category_id: int|null}>
+     * @return list<array{id: int|null, source_value: string, category_id: int|null, source_id: int|null}>
      */
     private function mappingRows(mixed $rows): array
     {
@@ -451,6 +455,7 @@ final class SaveRules
                 'id' => self::positiveInt($row['id'] ?? null),
                 'source_value' => self::cleanText(is_scalar($row['source_value'] ?? null) ? (string) $row['source_value'] : ''),
                 'category_id' => self::positiveInt($row['category_id'] ?? null),
+                'source_id' => self::positiveInt($row['source_id'] ?? null),
             ];
         }
 
@@ -458,11 +463,12 @@ final class SaveRules
     }
 
     /**
-     * @param  list<array{id: int|null, source_value: string, category_id: int|null}>  $rows
+     * @param  list<array{id: int|null, source_value: string, category_id: int|null, source_id: int|null}>  $rows
      * @param  list<int>  $categoryIds  every stored category (a removed one is refused on the category itself)
+     * @param  array<int, string>  $sourceNames  every stored source's name, by id
      * @return list<string>
      */
-    private function mappingProblems(array $rows, array $categoryIds): array
+    private function mappingProblems(array $rows, array $categoryIds, array $sourceNames): array
     {
         $problems = [];
         $seen = [];
@@ -484,14 +490,23 @@ final class SaveRules
                 $problems[] = "{$label} points at a category that no longer exists.";
             }
 
+            $sourceId = $row['source_id'];
+
+            if ($sourceId !== null && ! array_key_exists($sourceId, $sourceNames)) {
+                $problems[] = "{$label} points at a source that no longer exists.";
+            }
+
             if ($value !== '') {
                 $normalised = CategoryAssigner::normalise($value);
+                $key = self::mappingKey($sourceId, $value);
 
-                if (isset($seen[$normalised])) {
-                    $problems[] = "'{$normalised}' is mapped twice.";
+                if (isset($seen[$key])) {
+                    $problems[] = $sourceId === null || ! array_key_exists($sourceId, $sourceNames)
+                        ? "'{$normalised}' is mapped twice."
+                        : "'{$normalised}' is mapped twice for {$sourceNames[$sourceId]}.";
                 }
 
-                $seen[$normalised] = true;
+                $seen[$key] = true;
             }
         }
 
@@ -499,10 +514,31 @@ final class SaveRules
     }
 
     /**
-     * Same approach as syncKeywordRules(): delete, park changed values,
-     * update, then insert in the order submitted.
+     * Every source's name by id, locked FOR KEY SHARE so a source can't be
+     * deleted between the check and the write, while ingestion can still
+     * update its health and run columns.
      *
-     * @param  list<array{id: int|null, source_value: string, category_id: int|null}>  $rows
+     * @return array<int, string>
+     */
+    private static function lockedSourceNames(): array
+    {
+        return Source::query()->lock('for key share')->orderBy('id')->pluck('name', 'id')->all();
+    }
+
+    /**
+     * The uniqueness key a mapping is judged by, matching the database index
+     * (coalesce(source_id, 0), lower(source_value)) on the normalised value.
+     */
+    private static function mappingKey(?int $sourceId, string $value): string
+    {
+        return ($sourceId ?? 0).'|'.CategoryAssigner::normalise($value);
+    }
+
+    /**
+     * Same approach as syncKeywordRules(): delete, park rows whose key
+     * (source, value) changes, update, then insert in the order submitted.
+     *
+     * @param  list<array{id: int|null, source_value: string, category_id: int|null, source_id: int|null}>  $rows
      */
     private function syncMappings(array $rows): void
     {
@@ -516,7 +552,7 @@ final class SaveRules
         foreach ($kept as $row) {
             $mapping = $existing->get($row['id']);
 
-            if ($mapping !== null && mb_strtolower($mapping->source_value) !== mb_strtolower($row['source_value'])) {
+            if ($mapping !== null && ($mapping->source_id !== $row['source_id'] || mb_strtolower($mapping->source_value) !== mb_strtolower($row['source_value']))) {
                 $mapping->forceFill(['source_value' => "\u{2060}parked-{$mapping->id}"])->save();
             }
         }
@@ -525,6 +561,7 @@ final class SaveRules
             $existing->get($row['id'])?->forceFill([
                 'source_value' => $row['source_value'],
                 'category_id' => $row['category_id'],
+                'source_id' => $row['source_id'],
             ])->save();
         }
 
@@ -536,6 +573,7 @@ final class SaveRules
             CategoryMapping::query()->create([
                 'source_value' => $row['source_value'],
                 'category_id' => $row['category_id'],
+                'source_id' => $row['source_id'],
             ]);
         }
     }
