@@ -3,14 +3,18 @@
 namespace App\Models;
 
 use App\Enums\ExtractionMethod;
+use App\Enums\RunMode;
+use App\Enums\RunStatus;
 use App\Enums\SourceHealth;
 use Carbon\CarbonImmutable;
 use Database\Factories\SourceFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * An external site the crawler checks for events (SRC-01).
@@ -96,6 +100,29 @@ class Source extends Model
     public function runs(): HasMany
     {
         return $this->hasMany(SourceRun::class);
+    }
+
+    /**
+     * The newest live run (previews are not checks): the sources table's
+     * "Last run" column and the needs-attention badge.
+     *
+     * @return HasOne<SourceRun, $this>
+     */
+    public function latestLiveRun(): HasOne
+    {
+        return $this->hasOne(SourceRun::class)->ofMany(
+            ['id' => 'max'],
+            fn (Builder $query) => $query->where('mode', RunMode::Live->value),
+        );
+    }
+
+    /**
+     * True while the source has a queued or running run (the one active slot
+     * of source_runs_one_active).
+     */
+    public function hasActiveRun(): bool
+    {
+        return $this->runs()->whereIn('status', [RunStatus::Queued->value, RunStatus::Running->value])->exists();
     }
 
     /**
