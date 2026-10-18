@@ -16,9 +16,11 @@ use Normalizer;
  * The chain, first match wins:
  * 1. the preferred category (the admin's, the organiser's or the source's
  *    default), when it exists;
- * 2. source-value mappings: the first mapping (by id) whose normalised
- *    source value equals a normalised source value the caller passed.
- *    Phase 2 callers pass none; Phase 3 ingestion does;
+ * 2. source-value mappings: the first mapping whose normalised source value
+ *    equals a normalised source value the caller passed. Mappings scoped to
+ *    the draft's source come first, then global ones, each by id; another
+ *    source's mappings never apply (EXT-01). Phase 2 callers pass no values;
+ *    Phase 3 ingestion passes the item's ICS CATEGORIES and its source id;
  * 3. title keyword rules, by (priority asc, id asc): the first keyword found
  *    as a whole word in the normalised title;
  * 4. Other, flagged for the admin to check.
@@ -30,8 +32,9 @@ final class CategoryAssigner
 {
     /**
      * @param  list<string>  $sourceValues  The source's own category labels
+     * @param  int|null  $sourceId  The discovered draft's source; null uses global mappings only
      */
-    public function assign(?int $preferredCategoryId, EventOrigin $origin, array $sourceValues, string $title): CategoryDecision
+    public function assign(?int $preferredCategoryId, EventOrigin $origin, array $sourceValues, string $title, ?int $sourceId = null): CategoryDecision
     {
         if ($preferredCategoryId !== null && Category::query()->whereKey($preferredCategoryId)->exists()) {
             return new CategoryDecision(
@@ -45,7 +48,7 @@ final class CategoryAssigner
             );
         }
 
-        $mappingDecision = $this->matchMapping($sourceValues);
+        $mappingDecision = $this->matchMapping($sourceValues, $sourceId);
 
         if ($mappingDecision !== null) {
             return $mappingDecision;
@@ -82,13 +85,14 @@ final class CategoryAssigner
     }
 
     /**
-     * The first mapping (by id) whose normalised source value equals any
-     * given source value's normalised form. The reason quotes the value as
-     * the source gave it.
+     * The first mapping whose normalised source value equals any given
+     * source value's normalised form: the source's own mappings first, then
+     * global ones, each by id. The reason quotes the value as the source
+     * gave it, and names the source when its own mapping won.
      *
      * @param  list<string>  $sourceValues
      */
-    private function matchMapping(array $sourceValues): ?CategoryDecision
+    private function matchMapping(array $sourceValues, ?int $sourceId): ?CategoryDecision
     {
         $given = [];
 
@@ -104,7 +108,14 @@ final class CategoryAssigner
             return null;
         }
 
-        $mappings = CategoryMapping::query()->with('category')->orderBy('id')->get();
+        $mappings = CategoryMapping::query()
+            ->with(['category', 'source'])
+            ->where(fn ($query) => $sourceId === null
+                ? $query->whereNull('source_id')
+                : $query->whereNull('source_id')->orWhere('source_id', $sourceId))
+            ->orderByRaw('source_id is null')
+            ->orderBy('id')
+            ->get();
 
         foreach ($mappings as $mapping) {
             $value = $given[self::normalise($mapping->source_value)] ?? null;
@@ -112,7 +123,9 @@ final class CategoryAssigner
             if ($value !== null && $mapping->category !== null) {
                 return new CategoryDecision(
                     categoryId: $mapping->category_id,
-                    reason: "Mapped from '{$value}'",
+                    reason: $mapping->source === null
+                        ? "Mapped from '{$value}'"
+                        : "Mapped from '{$value}' ({$mapping->source->name})",
                     flagged: false,
                 );
             }

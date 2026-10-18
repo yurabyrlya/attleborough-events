@@ -335,7 +335,9 @@ final class DraftWriter
         // The admin's pick on the review form reads "Chosen by admin" for
         // any origin; the draft's own origin is never rewritten.
         $chooser = $data->categoryChosenByAdmin ? EventOrigin::Manual : $data->origin;
-        $decision = $this->categories->assign($data->preferredCategoryId, $chooser, $sourceValues, $draft->title);
+        // A discovered draft's source can have its own mappings (EXT-01);
+        // manual and submitted drafts have no source, so global ones only.
+        $decision = $this->categories->assign($data->preferredCategoryId, $chooser, $sourceValues, $draft->title, $draft->source_id);
 
         $draft->forceFill([
             'category_id' => $decision->categoryId,

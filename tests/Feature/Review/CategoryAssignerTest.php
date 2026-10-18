@@ -1,13 +1,20 @@
 <?php
 
+use App\Enums\DraftKind;
 use App\Enums\EventOrigin;
+use App\Enums\ExtractionMethod;
 use App\Models\Category;
 use App\Models\CategoryKeywordRule;
+use App\Models\CategoryMapping;
+use App\Models\Source;
 use App\Models\User;
 use App\Review\CategoryAssigner;
+use App\Review\Data\DraftData;
+use App\Review\DraftWriter;
 use App\Review\Exceptions\RulesNotSaved;
 use App\Review\SaveRules;
 use Database\Seeders\CategorySeeder;
+use Illuminate\Database\UniqueConstraintViolationException;
 
 /*
  * PIPE-03 keyword link: deterministic, whole-word, Unicode- and
@@ -175,4 +182,115 @@ it('updates kept rules, deletes dropped ones and can swap two keywords in one sa
         $quiz->id => 'bingo',
         $bingo->id => 'quiz',
     ])->and(CategoryKeywordRule::find($gone->id))->toBeNull();
+});
+
+/*
+ * EXT-01 / C11: a mapping can be scoped to one source, so a feed's own
+ * words ('Worship') map for that source without affecting the others.
+ */
+describe('per-source mappings', function () {
+    beforeEach(function () {
+        $this->baptist = Source::factory()->create(['name' => 'Attleborough Baptist Church']);
+        $this->council = Source::factory()->create(['name' => 'Attleborough Town Council']);
+        $this->mapping = fn (string $value, string $slug, ?Source $source = null): CategoryMapping => CategoryMapping::create([
+            'source_value' => $value,
+            'category_id' => ($this->category)($slug)->id,
+            'source_id' => $source?->id,
+        ]);
+        $this->assignFor = fn (array $sourceValues, ?Source $source, EventOrigin $origin = EventOrigin::Discovered) => app(CategoryAssigner::class)
+            ->assign(null, $origin, $sourceValues, 'Sunday service', $source?->id);
+    });
+
+    it("lets a source's own mapping beat a global one and names the source; other sources and submissions keep the global mapping", function () {
+        // The global row is older (lower id), so only the source preference can pick Community.
+        ($this->mapping)('Worship', 'music');
+        ($this->mapping)('worship', 'community', $this->baptist);
+
+        $baptist = ($this->assignFor)(['Worship'], $this->baptist);
+        $council = ($this->assignFor)(['Worship'], $this->council);
+        $submission = ($this->assignFor)(['Worship'], null, EventOrigin::Submission);
+
+        expect($baptist->categoryId)->toBe(($this->category)('community')->id)
+            ->and($baptist->reason)->toBe("Mapped from 'Worship' (Attleborough Baptist Church)")
+            ->and($baptist->flagged)->toBeFalse()
+            ->and($council->categoryId)->toBe(($this->category)('music')->id)
+            ->and($council->reason)->toBe("Mapped from 'Worship'")
+            ->and($submission->categoryId)->toBe(($this->category)('music')->id)
+            ->and($submission->reason)->toBe("Mapped from 'Worship'");
+    });
+
+    it('never uses a mapping scoped to another source', function () {
+        ($this->mapping)('Worship', 'community', $this->baptist);
+
+        expect(($this->assignFor)(['Worship'], $this->council)->reason)->toBe('No match → Other')
+            ->and(($this->assignFor)(['Worship'], null, EventOrigin::Submission)->reason)->toBe('No match → Other');
+    });
+
+    it("prefers the source's mapping even for a different label than a matching global one", function () {
+        ($this->mapping)('Community events', 'music');
+        ($this->mapping)('Worship', 'community', $this->baptist);
+
+        $decision = ($this->assignFor)(['Community events', 'Worship'], $this->baptist);
+
+        expect($decision->reason)->toBe("Mapped from 'Worship' (Attleborough Baptist Church)");
+    });
+
+    it("writes the source's mapping on a discovered draft through DraftWriter, also after an admin edit", function () {
+        ($this->mapping)('Worship', 'music');
+        ($this->mapping)('Worship', 'community', $this->baptist);
+        $item = $this->baptist->items()->create([
+            'external_id' => 'worship-1@synthetic.invalid',
+            'raw_fragment' => "BEGIN:VEVENT\r\nUID:worship-1@synthetic.invalid\r\nEND:VEVENT",
+            'raw_hash' => hash('sha256', 'worship-1'),
+            'content_hash' => hash('sha256', 'worship-1-content'),
+            'payload' => ['title' => 'Sunday service', 'categories' => ['Worship']],
+        ]);
+        $data = new DraftData(
+            origin: EventOrigin::Discovered,
+            extractionMethod: ExtractionMethod::Ics,
+            title: 'Sunday service',
+            startDate: '2026-10-25',
+            startTime: '10:30',
+            rawPayload: ['categories' => ['Worship']],
+        );
+
+        $draft = app(DraftWriter::class)->createFromSource($data, DraftKind::New, $this->baptist, $item, ['Worship']);
+
+        expect($draft->category_id)->toBe(($this->category)('community')->id)
+            ->and($draft->category_reason)->toBe("Mapped from 'Worship' (Attleborough Baptist Church)");
+
+        $edited = app(DraftWriter::class)->update($draft, $data->with(['title' => 'Sunday morning service']));
+
+        expect($edited->category_id)->toBe(($this->category)('community')->id);
+    });
+
+    it('allows the same value once globally and once per source', function () {
+        ($this->mapping)('Worship', 'music');
+        ($this->mapping)('Worship', 'community', $this->baptist);
+        ($this->mapping)('Worship', 'charity', $this->council);
+
+        expect(CategoryMapping::count())->toBe(3);
+    });
+
+    // One violation per test: the first aborts the PostgreSQL transaction.
+    it('refuses two global rows with the same value in the database', function () {
+        ($this->mapping)('Worship', 'music');
+
+        expect(fn () => ($this->mapping)('WORSHIP', 'other'))->toThrow(UniqueConstraintViolationException::class);
+    });
+
+    it('refuses two rows with the same value for one source in the database', function () {
+        ($this->mapping)('Worship', 'community', $this->baptist);
+
+        expect(fn () => ($this->mapping)('worship', 'other', $this->baptist))->toThrow(UniqueConstraintViolationException::class);
+    });
+
+    it("deletes a source's mappings with the source", function () {
+        ($this->mapping)('Worship', 'music');
+        ($this->mapping)('Worship', 'community', $this->baptist);
+
+        $this->baptist->delete();
+
+        expect(CategoryMapping::sole()->source_id)->toBeNull();
+    });
 });
