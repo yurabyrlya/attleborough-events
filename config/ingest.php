@@ -19,7 +19,7 @@ return [
     'user_agent_product' => 'AttleboroughEventsBot/1.0',
 
     // Public page that explains the crawler. A placeholder until the Phase 5
-    // about page exists; production sets CRAWLER_CONTACT_URL. An empty value
+    // about page exists; production sets the env value. An empty value
     // (as in .env.example) also falls back to the placeholder.
     'contact_url' => env('CRAWLER_CONTACT_URL') ?: rtrim((string) env('APP_URL', 'http://localhost'), '/').'/about-crawler',
 
