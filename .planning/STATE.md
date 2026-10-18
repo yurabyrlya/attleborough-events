@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 03
 current_phase_name: Ingestion Backbone, ICS & Change/Duplicate Handling
 status: executing
-stopped_at: Completed 03-05-PLAN.md
-last_updated: "2026-10-18T09:29:39.863Z"
+stopped_at: Completed 03-06-PLAN.md
+last_updated: "2026-10-18T09:40:22.205Z"
 last_activity: 2026-10-18
 last_activity_desc: Phase 2 complete, transitioned to Phase 3
-state_head: 5103b9fc069367651790f5d244ab062371e985f4
+state_head: c377dddd0db602bdbe3b06fee56e107c3bbc231a
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 48
-  completed_plans: 34
+  completed_plans: 35
   percent: 40
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 03 (Ingestion Backbone, ICS & Change/Duplicate Handling) — EXECUTING
-Plan: 6 of 17
+Plan: 7 of 17
 Status: Ready to execute
 Last activity: 2026-10-18 — Completed 03-04 (ICS extractor, hashes, window classifier)
 
@@ -91,6 +91,7 @@ Progress: [█████████████░░░░░░░] 32/48 p
 | Phase 03 P03 | 25min | 2 tasks | 14 files |
 | Phase 03 P04 | 13min | 2 tasks | 15 files |
 | Phase 03 P05 | 15min | 3 tasks | 15 files |
+| Phase 03 P06 | 8min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -170,6 +171,9 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-05: Conditional GET validators sent only after a succeeded/not_modified live run; over-long validators dropped, never cut
 - [Phase 03]: 03-05: FetchSourceJob uses properties (uniqueFor 900, timeout 75, maxExceptions 1, retryUntil +6h); HostBusy → run back to queued + release(seconds); other errors → failed/abandoned + rethrow
 - [Phase 03]: 03-05: Feed title/venue/URL fitted to draft columns (grapheme-safe) so a long value never loses the item; excerpt labels removed only with their contact
+- [Phase 03]: 03-06: next_check_at advances only after the run insert succeeds or is refused as already active; other errors leave the source due for the next 10-minute pass
+- [Phase 03]: 03-06: nextCheckAt = London date + 1/7 days at check_time + (id*7) mod 20 min, stored UTC
+- [Phase 03]: 03-06: run logs older than a year are pruned except each source's latest; raw_path cleared only when the body file is really gone
 
 ### Pending Todos
 
@@ -204,6 +208,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-18T09:29:39.038Z
-Stopped at: Completed 03-05-PLAN.md
+Last session: 2026-10-18T09:40:21.430Z
+Stopped at: Completed 03-06-PLAN.md
 Resume file: None

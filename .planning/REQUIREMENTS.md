@@ -70,7 +70,7 @@
 - [ ] **SRC-01**: Admin can create and edit sources: name, URL, extraction method, adapter, parser config, default category, default venue, location mode, default timezone, year policy, legal basis, missing-detection support, active flag, check frequency, notes
 - [ ] **SRC-02**: Admin can test-run a source and preview the extracted events without creating drafts
 - [ ] **SRC-03**: Admin can trigger "Run now" for a source
-- [ ] **SRC-04**: The scheduler fetches each due active source automatically, never running two fetches of the same source at once
+- [x] **SRC-04**: The scheduler fetches each due active source automatically, never running two fetches of the same source at once
 - [x] **SRC-05**: All fetching goes through one fetcher that checks robots.txt for every URL (disallowed means a `blocked` run, not a failure), sends a descriptive User-Agent with contact URL, waits at least 5 seconds per host, uses timeouts, size limits, conditional GET and an SSRF guard
 - [x] **SRC-06**: Fetched content is validated for the extraction method. Bot walls and wrong content types count as a failed `content_invalid` run, not a successful empty run
 - [x] **SRC-07**: Each run is logged with status, items found / new / changed, skipped (past, far future, out of area), drafts created and error message
@@ -219,7 +219,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SRC-01 | Phase 3 | Pending |
 | SRC-02 | Phase 4 | Pending |
 | SRC-03 | Phase 3 | Pending |
-| SRC-04 | Phase 3 | Pending |
+| SRC-04 | Phase 3 | Complete |
 | SRC-05 | Phase 3 | Complete |
 | SRC-06 | Phase 3 | Complete |
 | SRC-07 | Phase 3 | Complete |
