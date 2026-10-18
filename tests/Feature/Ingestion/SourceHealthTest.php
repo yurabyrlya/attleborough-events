@@ -1,20 +1,29 @@
 <?php
 
+use App\Enums\EventStatus;
 use App\Enums\FetchFailureKind;
 use App\Enums\HealthState;
+use App\Enums\ReviewStatus;
 use App\Enums\RunMode;
 use App\Enums\RunStatus;
 use App\Enums\RunTrigger;
 use App\Enums\SourceHealth;
 use App\Ingestion\RawBodyStore;
 use App\Jobs\FetchSourceJob;
+use App\Models\Category;
+use App\Models\Event;
+use App\Models\EventDraft;
 use App\Models\Heartbeat;
 use App\Models\Source;
 use App\Models\SourceRun;
+use App\Models\Venue;
 use App\Ops\HealthReport;
+use App\Publishing\Actions\ApproveDraft;
+use App\Review\DraftPublishability;
 use Carbon\CarbonImmutable;
 use Database\Seeders\CategorySeeder;
 use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
@@ -217,4 +226,272 @@ it('counts a run the job abandons on an unexpected error as a failure', function
     expect($run->refresh()->failure_kind)->toBe(FetchFailureKind::Abandoned->value)
         ->and($this->source->refresh()->consecutive_failures)->toBe(3)
         ->and($this->source->health)->toBe(SourceHealth::Degraded);
+});
+
+/**
+ * Serve the feed according to $state['mode']: ok (calendar $state['body']
+ * with an ETag), fail (500), blocked (robots.txt disallows everything) or
+ * not_modified (304 when the ETag is sent back).
+ */
+function healthServeModes(ArrayObject $state): void
+{
+    Http::fake(function (Request $request) use ($state) {
+        if (str_ends_with(parse_url($request->url(), PHP_URL_PATH) ?? '', '/robots.txt')) {
+            $rules = $state['mode'] === 'blocked' ? "User-agent: *\nDisallow: /\n" : "User-agent: *\nDisallow:\n";
+
+            return Http::response($rules, 200, ['Content-Type' => 'text/plain']);
+        }
+
+        return match ($state['mode']) {
+            'fail' => Http::response('Internal error', 500),
+            'not_modified' => $request->hasHeader('If-None-Match', '"v1"')
+                ? Http::response('', 304, ['ETag' => '"v1"'])
+                : Http::response($state['body'], 200, ['Content-Type' => 'text/calendar; charset=utf-8', 'ETag' => '"v1"']),
+            default => Http::response($state['body'], 200, ['Content-Type' => 'text/calendar; charset=utf-8', 'ETag' => '"v1"']),
+        };
+    });
+}
+
+/**
+ * Every row of the tables a run must never change (SRC-09), as JSON.
+ *
+ * @return array<string, string>
+ */
+function healthSnapshot(): array
+{
+    return collect(['events', 'event_occurrences', 'event_drafts', 'source_items', 'event_sources'])
+        ->mapWithKeys(fn (string $table) => [$table => DB::table($table)->orderBy('id')->get()->toJson()])
+        ->all();
+}
+
+/**
+ * Ingest five events from the source and approve one of them, so a
+ * published event came from an earlier run. Later modes go through the
+ * same $state: a second Http::fake would append, and the first one wins.
+ */
+function healthPublishFromRun(Source $source, ArrayObject $state): Event
+{
+    $state['mode'] = 'ok';
+    $state['body'] = healthCalendar(5);
+    healthServeModes($state);
+    expect(healthRun($source)->status)->toBe(RunStatus::Succeeded);
+
+    // The latest one: healthRun() moves the clock a day per run.
+    $draft = EventDraft::query()->whereNotNull('source_item_id')->orderByDesc('start_date')->orderBy('id')->firstOrFail();
+    $draft->forceFill([
+        'venue_id' => Venue::factory()->create()->id,
+        'category_id' => Category::query()->orderBy('id')->value('id'),
+    ])->save();
+    expect(app(DraftPublishability::class)->blockers($draft->refresh()))->toBe([]);
+
+    return app(ApproveDraft::class)($draft, OpsFixtures::admin());
+}
+
+describe('health and completeness edges (SRC-08)', function () {
+    it('maps consecutive failures to health at the 3 and 5 boundaries', function (int $failures, SourceHealth $health) {
+        healthServeModes(new ArrayObject(['mode' => 'fail', 'body' => '']));
+
+        foreach (range(1, $failures) as $ignored) {
+            healthRun($this->source);
+        }
+
+        expect($this->source->refresh()->consecutive_failures)->toBe($failures)
+            ->and($this->source->health)->toBe($health);
+    })->with([
+        '2 failures' => [2, SourceHealth::Healthy],
+        '3 failures' => [3, SourceHealth::Degraded],
+        '4 failures' => [4, SourceHealth::Degraded],
+        '5 failures' => [5, SourceHealth::Unhealthy],
+    ]);
+
+    it('neither resets nor counts a blocked run between failures', function () {
+        $state = new ArrayObject(['mode' => 'fail', 'body' => '']);
+        healthServeModes($state);
+
+        $statuses = [];
+        foreach (['fail', 'fail', 'blocked', 'fail'] as $mode) {
+            $state['mode'] = $mode;
+            $statuses[] = healthRun($this->source)->status;
+        }
+
+        expect($statuses)->toBe([RunStatus::Failed, RunStatus::Failed, RunStatus::Blocked, RunStatus::Failed])
+            ->and($this->source->refresh()->consecutive_failures)->toBe(3)
+            ->and($this->source->health)->toBe(SourceHealth::Degraded);
+    });
+
+    it('resets the failure count on a not-modified run', function () {
+        $state = new ArrayObject(['mode' => 'ok', 'body' => healthCalendar(3)]);
+        healthServeModes($state);
+        healthRun($this->source);
+        $this->source->refresh()->forceFill(['consecutive_failures' => 4, 'health' => SourceHealth::Degraded])->save();
+
+        $state['mode'] = 'not_modified';
+        $run = healthRun($this->source);
+
+        expect($run->status)->toBe(RunStatus::NotModified)
+            ->and($run->is_complete)->toBeFalse()
+            ->and($this->source->refresh()->consecutive_failures)->toBe(0)
+            ->and($this->source->health)->toBe(SourceHealth::Healthy);
+    });
+
+    it('raises a structure alert for zero items after a run with items, and clears it when items return', function () {
+        $state = new ArrayObject(['mode' => 'ok', 'body' => sourceFixture('attleborough-baptist-church/2026-10-17-ical.ics')]);
+        healthServeModes($state);
+        $first = healthRun($this->source);
+
+        $state['body'] = healthCalendar(0);
+        $empty = healthRun($this->source);
+        $alertAt = $this->source->refresh()->structure_alert_at;
+
+        expect($first->items_found)->toBe(64)
+            ->and($first->is_complete)->toBeTrue()
+            ->and($empty->status)->toBe(RunStatus::Succeeded)
+            ->and($empty->structure_alert)->toBeTrue()
+            ->and($empty->is_complete)->toBeFalse()
+            ->and($alertAt)->not->toBeNull()
+            ->and($this->source->health)->toBe(SourceHealth::Healthy)
+            ->and(app(HealthReport::class)->sources()->detail)->toBe('1 possible structure change');
+
+        $state['body'] = healthCalendar(40);
+        $back = healthRun($this->source);
+
+        expect($back->structure_alert)->toBeFalse()
+            ->and($this->source->refresh()->structure_alert_at)->toBeNull();
+    });
+
+    it('raises no structure alert for zero items after zero items, or on a first-ever run', function () {
+        $state = new ArrayObject(['mode' => 'ok', 'body' => healthCalendar(0)]);
+        healthServeModes($state);
+
+        $firstEver = healthRun($this->source);
+        $again = healthRun($this->source);
+
+        expect($firstEver->structure_alert)->toBeFalse()
+            ->and($again->structure_alert)->toBeFalse()
+            ->and($firstEver->is_complete)->toBeFalse()
+            ->and($again->is_complete)->toBeFalse()
+            ->and($this->source->refresh()->structure_alert_at)->toBeNull();
+    });
+
+    it('marks a run complete only at half or more of the previous complete run', function (int $items, bool $complete) {
+        $state = new ArrayObject(['mode' => 'ok', 'body' => healthCalendar(64)]);
+        healthServeModes($state);
+        expect(healthRun($this->source)->is_complete)->toBeTrue();
+
+        $state['body'] = healthCalendar($items);
+        $run = healthRun($this->source);
+
+        expect($run->items_found)->toBe($items)
+            ->and($run->is_complete)->toBe($complete)
+            ->and($run->structure_alert)->toBeFalse();
+    })->with([
+        '30 of 64' => [30, false],
+        '31 of 64' => [31, false],
+        '32 of 64 (exactly half)' => [32, true],
+        '40 of 64' => [40, true],
+    ]);
+
+    it('compares with the previous complete run, not an incomplete one in between', function () {
+        $state = new ArrayObject(['mode' => 'ok', 'body' => healthCalendar(64)]);
+        healthServeModes($state);
+        healthRun($this->source);
+
+        $state['body'] = healthCalendar(20);
+        expect(healthRun($this->source)->is_complete)->toBeFalse();
+
+        $state['body'] = healthCalendar(30);
+        expect(healthRun($this->source)->is_complete)->toBeFalse();
+    });
+
+    it('never marks a failed or blocked run complete', function () {
+        $state = new ArrayObject(['mode' => 'fail', 'body' => '']);
+        healthServeModes($state);
+
+        expect(healthRun($this->source)->is_complete)->toBeFalse();
+
+        $state['mode'] = 'blocked';
+        expect(healthRun($this->source)->is_complete)->toBeFalse();
+    });
+});
+
+describe('failure isolation (SRC-09)', function () {
+    it('leaves every event, occurrence, draft and item unchanged on each repeated failing run', function () {
+        $state = new ArrayObject;
+        $event = healthPublishFromRun($this->source, $state);
+        $before = healthSnapshot();
+
+        $state['mode'] = 'fail';
+        expect(healthRun($this->source)->status)->toBe(RunStatus::Failed)
+            ->and(healthSnapshot())->toBe($before);
+
+        expect(healthRun($this->source)->status)->toBe(RunStatus::Failed)
+            ->and(healthSnapshot())->toBe($before);
+
+        $state['mode'] = 'blocked';
+        expect(healthRun($this->source)->status)->toBe(RunStatus::Blocked)
+            ->and(healthSnapshot())->toBe($before);
+
+        $this->get('/')->assertOk()->assertSee($event->title);
+    });
+
+    it('keeps the published event visible after five failed runs pause the source', function () {
+        $state = new ArrayObject;
+        $event = healthPublishFromRun($this->source, $state);
+        $before = healthSnapshot();
+        $state['mode'] = 'fail';
+
+        foreach (range(1, 5) as $ignored) {
+            healthRun($this->source);
+        }
+
+        expect($this->source->refresh()->health)->toBe(SourceHealth::Unhealthy)
+            ->and(healthSnapshot())->toBe($before)
+            ->and(Event::query()->findOrFail($event->id)->status)->toBe(EventStatus::Published);
+        $this->get('/')->assertOk()->assertSee($event->title);
+        $this->get('/events/'.$event->slug)->assertOk();
+    });
+
+    it('keeps an approval intact when a failed run is recorded in the same open transaction', function (bool $runFirst) {
+        $state = new ArrayObject(['mode' => 'ok', 'body' => healthCalendar(5)]);
+        healthServeModes($state);
+        healthRun($this->source);
+
+        $draft = EventDraft::query()->whereNotNull('source_item_id')->orderBy('start_date')->orderBy('id')->firstOrFail();
+        $draft->forceFill([
+            'venue_id' => Venue::factory()->create()->id,
+            'category_id' => Category::query()->orderBy('id')->value('id'),
+        ])->save();
+        $admin = OpsFixtures::admin();
+        $state['mode'] = 'fail';
+
+        $run = new SourceRun(['mode' => RunMode::Live, 'trigger' => RunTrigger::Manual]);
+        $run->forceFill(['source_id' => $this->source->id, 'status' => RunStatus::Queued])->save();
+
+        $event = DB::transaction(function () use ($runFirst, $run, $draft, $admin): Event {
+            if ($runFirst) {
+                FetchSourceJob::dispatchSync($run->id);
+            }
+
+            $event = app(ApproveDraft::class)($draft, $admin);
+            $afterApproval = healthSnapshot();
+
+            if (! $runFirst) {
+                FetchSourceJob::dispatchSync($run->id);
+            }
+
+            expect(healthSnapshot())->toBe($afterApproval);
+
+            return $event;
+        });
+
+        expect($run->refresh()->status)->toBe(RunStatus::Failed)
+            ->and($this->source->refresh()->consecutive_failures)->toBe(1)
+            ->and($draft->refresh()->review_status)->toBe(ReviewStatus::Approved)
+            ->and($draft->event_id)->toBe($event->id)
+            ->and(Event::query()->findOrFail($event->id)->status)->toBe(EventStatus::Published);
+        $this->get('/')->assertOk()->assertSee($event->title);
+    })->with([
+        'run recorded before the approval' => [true],
+        'run recorded after the approval' => [false],
+    ]);
 });
