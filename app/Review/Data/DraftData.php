@@ -13,6 +13,7 @@ use App\Models\EventDraft;
 use App\Models\Source;
 use App\Publishing\Data\PublishableEventData;
 use App\Review\VenueMatcher;
+use App\Support\TextLimit;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use InvalidArgumentException;
@@ -273,13 +274,13 @@ final readonly class DraftData
         return new self(
             origin: EventOrigin::Discovered,
             extractionMethod: ExtractionMethod::Ics,
-            title: $facts->title,
+            title: self::fit($facts->title, 255) ?? '',
             description: self::nullableString($description),
             preferredCategoryId: $source->default_category_id,
             venueId: self::sourceVenueId($facts, $source),
-            venueName: $facts->venueName,
-            venueAddress: $facts->venueAddress,
-            venuePostcode: $facts->postcode,
+            venueName: self::fit($facts->venueName, 120),
+            venueAddress: self::fit($facts->venueAddress, 255),
+            venuePostcode: $facts->postcode !== null && mb_strlen($facts->postcode) <= 10 ? $facts->postcode : null,
             timezone: (string) config('calendar.timezone', 'Europe/London'),
             allDay: $facts->allDay,
             startDate: $facts->startDate,
@@ -293,11 +294,45 @@ final readonly class DraftData
             organiserContact: null,
             organiserWebsite: null,
             contactPublic: false,
-            sourceUrl: $facts->url ?? self::nullableString($source->events_page_url) ?? $source->url,
+            sourceUrl: self::sourceUrl($facts, $source),
             rawPayload: $rawPayload,
             excludedDates: $facts->excludedDates,
             parseErrors: $parseErrors,
         );
+    }
+
+    /**
+     * The item's own page (D-16), else the source's events page, else the
+     * feed URL; a URL too long for the column is skipped, never cut.
+     */
+    private static function sourceUrl(NormalisedFacts $facts, Source $source): ?string
+    {
+        foreach ([$facts->url, self::nullableString($source->events_page_url), $source->url] as $url) {
+            if ($url !== null && strlen($url) <= 2048) {
+                return $url;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Feed text cut to fit its column (in characters), on a grapheme
+     * boundary with an ellipsis, so one long title never loses the item.
+     */
+    private static function fit(?string $value, int $max): ?string
+    {
+        if ($value === null || mb_strlen($value) <= $max) {
+            return $value;
+        }
+
+        $limit = $max;
+
+        do {
+            $cut = TextLimit::graphemes($value, $limit--);
+        } while (mb_strlen($cut) > $max && $limit > 1);
+
+        return $cut;
     }
 
     /**
