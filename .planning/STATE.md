@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 03
 current_phase_name: Ingestion Backbone, ICS & Change/Duplicate Handling
 status: executing
-stopped_at: Completed 03-09-PLAN.md
-last_updated: "2026-10-18T10:39:01.917Z"
+stopped_at: Completed 03-15-PLAN.md
+last_updated: "2026-10-18T10:57:57.913Z"
 last_activity: 2026-10-18
 last_activity_desc: Phase 2 complete, transitioned to Phase 3
-state_head: d255351675c794b9896b5bccc6f7f7ac8d0a85b9
+state_head: dcdb519889e2b0075ff9edf8872e968cd4347ae7
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 48
-  completed_plans: 38
+  completed_plans: 39
   percent: 40
 ---
 
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 03 (Ingestion Backbone, ICS & Change/Duplicate Handling) — EXECUTING
-Plan: 10 of 17
+Plan: 11 of 17
 Status: Ready to execute
-Last activity: 2026-10-18 — Completed 03-07 (source health, completeness, test-run preview and Create drafts)
+Last activity: 2026-10-18 — Completed 03-15 (Filament Sources admin: form, Test run / Create drafts / Run now / Pause, preview, run log, health)
 
-Progress: [███████████████░░░░░] 36/48 planned plans ([████░░░░░░] 40%); phases complete: 2/5
+Progress: [████████████████░░░░] 39/48 planned plans ([████░░░░░░] 40%); phases complete: 2/5
 
 ## Performance Metrics
 
@@ -95,6 +95,7 @@ Progress: [███████████████░░░░░] 36/48 p
 | Phase 03 P08 | 13min | 3 tasks | 14 files |
 | Phase 03 P07 | 14min | 3 tasks | 16 files |
 | Phase 03 P09 | 24min | 3 tasks | 21 files |
+| Phase 03 P15 | 16min | 3 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -189,6 +190,10 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-09: update/cancellation diffs: {field:{published,before,now}} in ChangeDetector::FIELDS order (SourceDiff cast restores it from jsonb); cancellations {cancelled}, {cancelled_keys asc} or {status active→missing}
 - [Phase 03]: 03-09: tracked items (linked or pending new draft) bypass title rules and the window; deferred detection when no pending draft and content_hash ≠ accepted_hash
 - [Phase 03]: 03-09: events.cancelled_dates (ApproveDraft) makes OccurrenceGenerator insert source-cancelled dates as Cancelled; 03-10 ConfirmSourceCancellation must append to it
+- [Phase 03]: 03-15: Sources use default Filament create/edit saves (C18); SourceForm::prepareForSave whitelists fillable configuration columns, so is_active only moves via Create drafts / Pause
+- [Phase 03]: 03-15: Create drafts is offered only while the source is inactive and its newest run is a succeeded test run, so re-enabling a paused source needs a fresh preview
+- [Phase 03]: 03-15: Crawl-delay warning also fires above the 2-hour queued-run limit (runs would be abandoned), since the check-interval comparison alone can never trigger for daily sources
+- [Phase 03]: 03-15: Preview panel polls with a page-level wire:poll.3s only while a run is active so header actions update; run log uses table ->poll()
 
 ### Pending Todos
 
@@ -223,6 +228,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-18T10:39:01.049Z
-Stopped at: Completed 03-09-PLAN.md
+Last session: 2026-10-18T10:57:57.046Z
+Stopped at: Completed 03-15-PLAN.md
 Resume file: None
