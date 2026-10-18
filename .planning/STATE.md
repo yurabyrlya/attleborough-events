@@ -231,6 +231,9 @@ Recent decisions affecting current work:
 - [Phase 5]: Umami Cloud UK GDPR data region / DPA unverified (fallback: Plausible)
 - [Phase 5]: Apply for Cloudflare Verified Bots (BotBase) once the production crawler is public: bot info page, distinct UA + contact URL, published IP list or reverse DNS (or Web Bot Auth), robots/Crawl-delay compliance. Unlocks Breckland, Norfolk CC, Norfolk Museums, TicketSource public pages (D-25)
 - [Phase 5]: Set TURNSTILE_HOSTNAMES=whatsonattleborough.co.uk in production (hostname check is skipped when empty; T-02-24 / review WR-03)
+- [Phase 5]: Queue worker for ingestion: `--timeout` ≥ 300 (05-01 now says 330) and systemd TimeoutStopSec > --timeout (360); any production DB_QUEUE_RETRY_AFTER must exceed 300 (Phase 3 WR-07: FetchSourceJob timeout 300 s, run deadline 240 s, fetch deadline 55 s)
+- [Before launch]: Decide a retention period for feed personal data kept in source_items (organiser names/emails, full descriptions) — Phase 3 review WR-06, deferred; implement pruning before go-live
+- [Before launch]: Honour Retry-After on 429/503 (Phase 3 review WR-04, deferred; low risk with daily checks)
 - [Phase 5]: Configure trusted proxies (Caddy / Cloudflare) so per-IP rate limiting on /submit and Turnstile hostname/remoteip checks see the real client IP (Phase 2 research)
 - [Phase 3]: Crawling needs a real User-Agent contact/about URL; until Phase 5 is live use a config placeholder (e.g. CRAWLER_CONTACT_URL in config/site.php / .env) and swap in the live URL at launch
 - [Phase 4]: Success criterion 5 / RES-04 say P0 sources are configured "in production", but production now arrives in Phase 5. Until then P0 sources run on the local app; revisit the wording when planning Phase 4 (or move the production half to Phase 5)
