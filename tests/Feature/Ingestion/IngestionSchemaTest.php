@@ -12,6 +12,7 @@ use App\Models\EventDraft;
 use App\Models\Source;
 use App\Models\SourceItem;
 use App\Models\SourceRun;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
@@ -235,4 +236,65 @@ it('refuses an unknown duplicate reason on a draft', function () {
 
 it('labels the ICS extraction method', function () {
     expect(ExtractionMethod::Ics->getLabel())->toBe('ICS feed');
+});
+
+it('stores run instants in UTC whatever the process timezone', function () {
+    $run = ingestionRun(Source::factory()->ics()->create(), RunStatus::Running);
+    // Sat 24 Oct 2026 23:30 London is still BST (UTC+1); clocks change on the 25th.
+    $run->forceFill([
+        'started_at' => CarbonImmutable::parse('2026-10-24 23:30', 'Europe/London')->utc(),
+    ])->save();
+
+    $stored = DB::selectOne("select started_at at time zone 'UTC' as s from source_runs where id = ?", [$run->id]);
+
+    expect(substr((string) $stored->s, 0, 19))->toBe('2026-10-24 22:30:00')
+        ->and($run->fresh()->started_at->setTimezone('Europe/London')->format('Y-m-d H:i'))->toBe('2026-10-24 23:30');
+});
+
+it('keeps pipeline-owned source fields out of mass assignment', function () {
+    $source = Source::create([
+        'name' => 'Attleborough Baptist Church',
+        'slug' => 'attleborough-baptist-church',
+        'short_name' => 'Baptist Church',
+        'url' => 'https://example.org/calendar.ics',
+        'extraction_method' => ExtractionMethod::Ics,
+        'health' => 'unhealthy',
+        'consecutive_failures' => 9,
+        'is_active' => true,
+        'etag' => '"abc"',
+        'next_check_at' => now()->utc(),
+    ])->fresh();
+
+    expect($source->health)->toBe('healthy')
+        ->and($source->consecutive_failures)->toBe(0)
+        ->and($source->is_active)->toBeFalse()
+        ->and($source->etag)->toBeNull()
+        ->and($source->next_check_at)->toBeNull()
+        ->and($source->short_name)->toBe('Baptist Church');
+});
+
+it('keeps run status and counters out of mass assignment', function () {
+    $run = Source::factory()->ics()->create()->runs()->create([
+        'mode' => RunMode::Preview,
+        'trigger' => RunTrigger::Manual,
+        'status' => RunStatus::Succeeded,
+        'items_found' => 5,
+        'failure_kind' => 'network',
+    ])->fresh();
+
+    expect($run->mode)->toBe(RunMode::Preview)
+        ->and($run->status)->toBe(RunStatus::Queued)
+        ->and($run->items_found)->toBe(0)
+        ->and($run->failure_kind)->toBeNull();
+});
+
+it('accepts a 120-character multibyte source name and refuses 121', function () {
+    $name = str_repeat('Café ', 24);
+    expect(mb_strlen($name))->toBe(120);
+
+    $source = Source::factory()->create(['name' => $name]);
+    expect($source->fresh()->name)->toBe($name);
+
+    expect(fn () => Source::factory()->create(['name' => $name.'x']))
+        ->toThrow(QueryException::class, 'value too long');
 });
