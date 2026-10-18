@@ -445,6 +445,31 @@ it('fails the extraction when the feed has more events than ingest.max_events', 
         ->and($result->fatalError)->toContain('5001');
 });
 
+it('fails the extraction when folded BEGIN:VEVENT lines hide events from the pre-count (T-03-11)', function () {
+    config(['ingest.max_events' => 2]);
+    // RFC 5545 folding: CRLF + space continues the line, so the raw-text pre-count sees no BEGIN:VEVENT.
+    $event = "BEGIN:VEV\r\n ENT\r\nUID:%d@synthetic.invalid\r\nDTSTART:20261120T190000Z\r\nSUMMARY:Item %d\r\nEND:VEVENT\r\n";
+    $events = implode('', array_map(fn (int $n) => sprintf($event, $n, $n), range(1, 3)));
+
+    $result = ingestExtract("BEGIN:VCALENDAR\r\nVERSION:2.0\r\n{$events}END:VCALENDAR\r\n");
+
+    expect($result->failed())->toBeTrue()
+        ->and($result->items)->toBe([])
+        ->and($result->eventCount)->toBe(3)
+        ->and($result->fatalError)->toBe('The feed lists 3 events, more than the 2 we read in one go.');
+});
+
+it('reads folded BEGIN:VEVENT lines when the parsed count is within ingest.max_events', function () {
+    config(['ingest.max_events' => 3]);
+    $event = "BEGIN:VEV\r\n ENT\r\nUID:%d@synthetic.invalid\r\nDTSTART:20261120T190000Z\r\nSUMMARY:Item %d\r\nEND:VEVENT\r\n";
+    $events = implode('', array_map(fn (int $n) => sprintf($event, $n, $n), range(1, 3)));
+
+    $result = ingestExtract("BEGIN:VCALENDAR\r\nVERSION:2.0\r\n{$events}END:VCALENDAR\r\n");
+
+    expect($result->failed())->toBeFalse()
+        ->and($result->eventCount)->toBe(3);
+});
+
 it('returns items sorted by next start then external id whatever the VEVENT order', function (string $fixture, string $identity) {
     $body = str_contains($fixture, '/') ? sourceFixture($fixture) : icsFixture($fixture);
 

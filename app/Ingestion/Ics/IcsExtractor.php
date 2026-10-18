@@ -79,7 +79,7 @@ final class IcsExtractor
         $maxEvents = (int) config('ingest.max_events', 5000);
 
         if ($declared > $maxEvents) {
-            return ExtractionResult::fatal("The feed lists {$declared} events, more than the {$maxEvents} we read in one go.", $declared);
+            return $this->tooManyEvents($declared, $maxEvents);
         }
 
         try {
@@ -97,6 +97,14 @@ final class IcsExtractor
         $now = ($now ?? CarbonImmutable::now())->setTimezone(self::LONDON);
 
         $events = array_values(array_filter($calendar->select('VEVENT'), fn (mixed $node): bool => $node instanceof VEvent));
+
+        // T-03-11: the pre-count reads the raw, still-folded text, so a folded
+        // "BEGIN:VEV\r\n ENT" slips past it while sabre unfolds and parses it.
+        // Count again after parsing, before any per-event work.
+        if (count($events) > $maxEvents) {
+            return $this->tooManyEvents(count($events), $maxEvents);
+        }
+
         $items = [];
 
         foreach ($this->groups($events, $identity) as $externalId => $components) {
@@ -111,6 +119,11 @@ final class IcsExtractor
         });
 
         return new ExtractionResult($items, null, count($events));
+    }
+
+    private function tooManyEvents(int $count, int $maxEvents): ExtractionResult
+    {
+        return ExtractionResult::fatal("The feed lists {$count} events, more than the {$maxEvents} we read in one go.", $count);
     }
 
     /**
