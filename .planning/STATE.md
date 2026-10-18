@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 03
 current_phase_name: Ingestion Backbone, ICS & Change/Duplicate Handling
 status: executing
-stopped_at: Completed 03-08-PLAN.md
-last_updated: "2026-10-18T09:55:40.045Z"
+stopped_at: Completed 03-07-PLAN.md
+last_updated: "2026-10-18T10:12:19.433Z"
 last_activity: 2026-10-18
 last_activity_desc: Phase 2 complete, transitioned to Phase 3
-state_head: aef040ff4200eed6bf243c7187ab6ab2bb09c9e8
+state_head: 24c1e52b55582417656d80c5371d600c3eb15ae2
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 48
-  completed_plans: 36
+  completed_plans: 37
   percent: 40
 ---
 
@@ -28,9 +28,9 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 03 (Ingestion Backbone, ICS & Change/Duplicate Handling) — EXECUTING
-Plan: 8 of 17
+Plan: 9 of 17
 Status: Ready to execute
-Last activity: 2026-10-18 — Completed 03-08 (source links, accepted baseline, ICS exclusions)
+Last activity: 2026-10-18 — Completed 03-07 (source health, completeness, test-run preview and Create drafts)
 
 Progress: [███████████████░░░░░] 36/48 planned plans ([████░░░░░░] 40%); phases complete: 2/5
 
@@ -93,6 +93,7 @@ Progress: [███████████████░░░░░] 36/48 p
 | Phase 03 P05 | 15min | 3 tasks | 15 files |
 | Phase 03 P06 | 8min | 2 tasks | 9 files |
 | Phase 03 P08 | 13min | 3 tasks | 14 files |
+| Phase 03 P07 | 14min | 3 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -179,6 +180,11 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-08: PublishableEventData::excludedDates nullable — null (fromForm) leaves stored EXDATEs untouched (C2)
 - [Phase 03]: 03-08: sourced approval cancels raw_payload cancelled_keys occurrences inside the horizon via ChangeOccurrenceStatus; beyond-horizon gap deferred
 - [Phase 03]: 03-08: ReopenDraft refuses non-new drafts and items with another pending draft (DraftNotReopenable)
+- [Phase 03]: 03-07: structure_alert_at clears on the next live success that finds items
+- [Phase 03]: 03-07: is_complete = live succeeded, items_found > 0 and items × 2 ≥ previous complete run's items (exactly half counts)
+- [Phase 03]: 03-07: preview runs write nothing on the source (no last_run_at, validators, next_check_at, health) and never send conditional headers
+- [Phase 03]: 03-07: D-24 reuse requires the latest preview succeeded, same URL (preview.url), < preview_reuse_minutes old and matching raw_sha256
+- [Phase 03]: 03-07: Sources health line is warning-only in ops:health; HealthReport::all() unchanged
 
 ### Pending Todos
 
@@ -213,6 +219,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-18T09:55:39.250Z
-Stopped at: Completed 03-08-PLAN.md
+Last session: 2026-10-18T10:12:18.574Z
+Stopped at: Completed 03-07-PLAN.md
 Resume file: None

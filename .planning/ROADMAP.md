@@ -108,7 +108,7 @@ Plans:
   4. Every fetch respects robots.txt (a disallow shows as a `blocked` run), sends the descriptive User-Agent and waits at least 5s per host. A bot wall or wrong content type is logged as a failed `content_invalid` run. After 3 / 5 consecutive failures the source shows as degraded / unhealthy (paused), a sudden zero-items run is flagged, and no previously published event disappears.
   5. Approved discovered events show visible source attribution with a link, plus an excerpt of at most 200 characters with phone numbers and emails stripped and a "Read more at {source}" link.
 
-**Plans**: 7/17 plans executed
+**Plans**: 8/17 plans executed
 
 Plans:
 **Wave 1**
@@ -127,7 +127,7 @@ Plans:
 - [x] 03-08-PLAN.md — Approve discovered drafts: event_sources links, accepted baseline, EXDATE publishing, rejected stays rejected (wave 4)
 
 **Wave 5** *(blocked on Wave 4 completion)*
-- [ ] 03-07-PLAN.md — Source health (3/5 failures, structure alert, abandoned runs), test-run preview, Create drafts with body reuse (wave 5)
+- [x] 03-07-PLAN.md — Source health (3/5 failures, structure alert, abandoned runs), test-run preview, Create drafts with body reuse (wave 5)
 
 **Wave 6** *(blocked on Wave 5 completion)*
 - [ ] 03-09-PLAN.md — Change detection: update drafts with diff, cancellations, missing items over complete runs (wave 6)
@@ -197,7 +197,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Foundation & Published Calendar | 13/13 | Complete    | 2026-10-17 |
 | 2. Draft Model, Review Queue & Submissions | 16/16 | Complete    | 2026-10-17 |
-| 3. Ingestion Backbone, ICS & Change/Duplicate Handling | 7/17 | In Progress | - |
+| 3. Ingestion Backbone, ICS & Change/Duplicate Handling | 8/17 | In Progress | - |
 | 4. Extraction Ladder, Geofence & Live Sources | 0/TBD | Not started | - |
 | 5. Launch Readiness | 0/2+ | Not started | - |
 

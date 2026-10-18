@@ -74,8 +74,8 @@
 - [x] **SRC-05**: All fetching goes through one fetcher that checks robots.txt for every URL (disallowed means a `blocked` run, not a failure), sends a descriptive User-Agent with contact URL, waits at least 5 seconds per host, uses timeouts, size limits, conditional GET and an SSRF guard
 - [x] **SRC-06**: Fetched content is validated for the extraction method. Bot walls and wrong content types count as a failed `content_invalid` run, not a successful empty run
 - [x] **SRC-07**: Each run is logged with status, items found / new / changed, skipped (past, far future, out of area), drafts created and error message
-- [ ] **SRC-08**: A source becomes `degraded` after 3 consecutive failures and `unhealthy` (paused, flagged on dashboard) after 5. Zero items after previously returning items is flagged as a possible structure change
-- [ ] **SRC-09**: Source failures never delete or hide previously discovered events
+- [x] **SRC-08**: A source becomes `degraded` after 3 consecutive failures and `unhealthy` (paused, flagged on dashboard) after 5. Zero items after previously returning items is flagged as a possible structure change
+- [x] **SRC-09**: Source failures never delete or hide previously discovered events
 
 ### Extraction Ladder (EXT)
 
@@ -223,8 +223,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SRC-05 | Phase 3 | Complete |
 | SRC-06 | Phase 3 | Complete |
 | SRC-07 | Phase 3 | Complete |
-| SRC-08 | Phase 3 | Pending |
-| SRC-09 | Phase 3 | Pending |
+| SRC-08 | Phase 3 | Complete |
+| SRC-09 | Phase 3 | Complete |
 | EXT-01 | Phase 3 | Pending |
 | EXT-02 | Phase 4 | Pending |
 | EXT-03 | Phase 4 | Pending |
