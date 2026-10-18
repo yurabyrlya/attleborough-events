@@ -27,6 +27,22 @@ Schedule::command('model:prune', ['--model' => [EventDraft::class]])
     ->timezone('Europe/London')
     ->withoutOverlapping();
 
+// Source ingestion (SRC-04, D-02): every ten minutes, mark abandoned runs
+// failed and start a run for each due source (05:30 London + jitter by
+// default). The partial unique index, not withoutOverlapping, is the
+// one-run-per-source guarantee.
+Schedule::command('ingest:dispatch-due')
+    ->everyTenMinutes()
+    ->withoutOverlapping();
+
+// Raw-body retention (A10): delete fetched bodies after
+// ingest.raw_retention_days and run logs after a year (keeping each
+// source's latest). 03:50 London avoids the 01:00-02:00 DST transition hour.
+Schedule::command('ingest:prune-raw')
+    ->dailyAt('03:50')
+    ->timezone('Europe/London')
+    ->withoutOverlapping();
+
 // Scheduler liveness (OPS-04): every schedule:run proves cron is alive by
 // upserting the 'scheduler' heartbeat row (a table, never the cache).
 Schedule::call(fn () => Heartbeat::beat(Heartbeat::SCHEDULER))
