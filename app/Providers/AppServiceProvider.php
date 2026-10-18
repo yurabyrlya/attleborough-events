@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Ingestion\Http\DnsHostResolver;
+use App\Ingestion\Http\HostResolver;
 use App\Support\PrivacyDatabaseSessionHandler;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Foundation\Application;
@@ -19,7 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // SRC-05: the fetcher's SSRF guard resolves hosts through real DNS.
+        // tests/Pest.php replaces this with a fake in every suite.
+        $this->app->bind(HostResolver::class, DnsHostResolver::class);
     }
 
     /**
