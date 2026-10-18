@@ -325,7 +325,7 @@ final class ChangeDetector
     private function nextOccurrenceStart(Event $event): ?CarbonImmutable
     {
         /** @var EventOccurrence|null $next */
-        $next = $event->nextOccurrence()->first();
+        $next = $event->nextOccurrence;
 
         return $next?->starts_at->utc();
     }
@@ -336,10 +336,8 @@ final class ChangeDetector
      */
     private function keyStart(Event $event, NormalisedFacts $facts, string $key): ?CarbonImmutable
     {
-        $occurrence = EventOccurrence::query()
-            ->where('event_id', $event->id)
-            ->where('recurrence_key', $key)
-            ->first();
+        /** @var EventOccurrence|null $occurrence */
+        $occurrence = $event->occurrences->firstWhere('recurrence_key', $key);
 
         if ($occurrence !== null) {
             return $occurrence->starts_at->utc();
