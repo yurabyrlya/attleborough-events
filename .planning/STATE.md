@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 03
 current_phase_name: Ingestion Backbone, ICS & Change/Duplicate Handling
 status: executing
-stopped_at: Completed 03-14-PLAN.md
-last_updated: "2026-10-18T11:39:11.687Z"
+stopped_at: Completed 03-11-PLAN.md
+last_updated: "2026-10-18T12:00:46.399Z"
 last_activity: 2026-10-18
 last_activity_desc: Phase 2 complete, transitioned to Phase 3
-state_head: 31a0cfa62cca57728db8c73019fabc3ced1a6b2a
+state_head: 54f2b4e39859f8ce138d50e445950f97a1650205
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 48
-  completed_plans: 42
+  completed_plans: 43
   percent: 40
 ---
 
@@ -28,9 +28,9 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 03 (Ingestion Backbone, ICS & Change/Duplicate Handling) — EXECUTING
-Plan: 14 of 17
+Plan: 15 of 17
 Status: Ready to execute
-Last activity: 2026-10-18 — Completed 03-14 (per-source category mappings: category_mappings.source_id + coalesced unique index, source-preferring CategoryAssigner with source-named reason, Rules screen Source column, SaveRules per-source uniqueness)
+Last activity: 2026-10-18 — Completed 03-11 (duplicate warnings: duplicate_decisions table, CanonicalUrl, DuplicateDetector URL + pg_trgm fuzzy rule against events and other-source drafts; MarkDraftDuplicate links via event_sources and publishes nothing; RecordNotDuplicate remembered per source item)
 
 Progress: [█████████████████░░░] 42/48 planned plans ([████░░░░░░] 40%); phases complete: 2/5
 
@@ -99,6 +99,7 @@ Progress: [█████████████████░░░] 42/48 p
 | Phase 03 P16 | 12min | 3 tasks | 12 files |
 | Phase 03 P10 | 12min | 3 tasks | 13 files |
 | Phase 03 P14 | 12min | 2 tasks | 9 files |
+| Phase 03 P11 | 16min | 3 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -203,6 +204,8 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-10: ConfirmSourceCancellation appends confirmed keys to events.cancelled_dates; IgnoreSourceChange never writes events (ignored far dates stay Scheduled); cancellations move only the cancelled part of the baseline
 - [Phase 03]: 03-10: RejectReason::Ignored set only by IgnoreSourceChange (kept out of the Reject dialog); ChangeOccurrenceStatus/ChangeEventStatus log after commit (C9); REV-06/07 stay Pending until the 03-13 UI
 - [Phase 03]: 03-14: category mappings can be scoped to one source (category_mappings.source_id, unique (coalesce(source_id,0), lower(source_value))); a matching source mapping always beats a global one and the reason names the source
+- [Phase 03]: 03-11: DuplicateDetector excludes same-source candidates for events too (event_sources link), runs on new/re-drafted/replaced New drafts; URL match (1.0) before fuzzy; ties → events, then lowest id
+- [Phase 03]: 03-11: MarkDraftDuplicate sets duplicate_of_event_id (never event_id), links sourced items via LinkEventSource (duplicate) and moves the baseline; pending-draft target refused; RecordNotDuplicate remembers the pair against the source item and moves the warning to the next match; PIPE-05/REV-05 stay Pending until the 03-13 UI
 
 ### Pending Todos
 
@@ -238,6 +241,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-18T11:39:10.687Z
-Stopped at: Completed 03-14-PLAN.md
+Last session: 2026-10-18T12:00:45.345Z
+Stopped at: Completed 03-11-PLAN.md
 Resume file: None
