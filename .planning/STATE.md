@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 03
 current_phase_name: Ingestion Backbone, ICS & Change/Duplicate Handling
 status: executing
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-10-18T00:37:15.180Z"
-last_activity: 2026-10-17
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-10-18T08:20:46.267Z"
+last_activity: 2026-10-18
 last_activity_desc: Phase 2 complete, transitioned to Phase 3
-state_head: 69214a6c3412e15d175e793eb22bd391b926c6c6
+state_head: f88b0d13e4aab8df41b5bc67f532c44d947c0671
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 48
-  completed_plans: 30
+  completed_plans: 31
   percent: 40
 ---
 
@@ -27,12 +27,12 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 
 ## Current Position
 
-Phase: 03 (Ingestion Backbone, ICS & Change/Duplicate Handling) — READY TO EXECUTE
-Plan: Not started
+Phase: 03 (Ingestion Backbone, ICS & Change/Duplicate Handling) — EXECUTING
+Plan: 3 of 17
 Status: Ready to execute
-Last activity: 2026-10-17 — Phase 2 complete, transitioned to Phase 3
+Last activity: 2026-10-18 — Completed 03-02 (polite HttpFetcher core)
 
-Progress: [███████████████████░] 29/31 planned plans ([████░░░░░░] 40%); phases complete: 2/5
+Progress: [█████████████░░░░░░░] 31/48 planned plans ([████░░░░░░] 40%); phases complete: 2/5
 
 ## Performance Metrics
 
@@ -87,6 +87,7 @@ Progress: [███████████████████░] 29/31 p
 | Phase 02 P15 | 10min | 2 tasks | 7 files |
 | Phase 02 P16 | 14min | 3 tasks | 7 files |
 | Phase 03 P01 | 7min | 2 tasks | 14 files |
+| Phase 03 P02 | 40min | 2 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -150,6 +151,10 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-01: Source.is_active not fillable; changes only via Create drafts/Pause actions (D-01)
 - [Phase 03]: 03-01: SourceRun fillable = mode, trigger only; SourceItem baseline/review columns forceFill-only
 - [Phase 03]: 03-01: sources.parser_config defaults to {"identity":"uid"}; ExtractionMethod::Ics label 'ICS feed'
+- [Phase 03]: 03-02: HttpFetcher uses an explicit CurlHandler + CappedSink (never stream=>true): Guzzle 8 sends streaming requests to StreamHandler, which ignores CURLOPT_RESOLVE, so the DNS pin would vanish
+- [Phase 03]: 03-02: BodyValidator accepts any body starting with BEGIN:VCALENDAR (after BOM/whitespace) even with HTML inside X-ALT-DESC; markup/challenge markers only diagnose non-calendar bodies
+- [Phase 03]: 03-02: FetchRequest::startedAt lets the job count time already spent against ingest.fetch_deadline (55 s); per-request timeout = min(config, time left)
+- [Phase 03]: 03-02: HttpFetcher::beforeHop() is the per-hop hook 03-03 fills with robots (FetchResult::blocked) and HostThrottle
 
 ### Pending Todos
 
@@ -184,6 +189,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-18T00:37:14.445Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-10-18T08:20:36.265Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None
