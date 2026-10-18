@@ -61,6 +61,14 @@ class RawBodyStore
     }
 
     /**
+     * Whether a body is stored for this run.
+     */
+    public function exists(int $sourceId, int $runId): bool
+    {
+        return $this->disk()->exists($this->pathFor($sourceId, $runId));
+    }
+
+    /**
      * Delete stored bodies last written more than $days days ago.
      *
      * @return int how many files were deleted
