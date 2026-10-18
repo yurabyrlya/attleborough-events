@@ -91,7 +91,7 @@ jobs:
       - name: Pest (PostgreSQL)
         run: vendor/bin/pest --ci --testsuite=Unit,Feature
 
-      # Browser UAT flows F0-F10 (docs/uat/browser-uat.md), Playwright Chromium
+      # Browser UAT flows F0-F20 (docs/uat/browser-uat.md), Playwright Chromium
       # driven by pestphp/pest-plugin-browser against the built assets.
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
