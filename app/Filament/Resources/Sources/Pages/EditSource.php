@@ -20,6 +20,7 @@ use Filament\Schemas\Components\Callout;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -54,6 +55,30 @@ class EditSource extends EditRecord
         $data['parser_config'] = [...$this->source()->parser_config, ...($data['parser_config'] ?? [])];
 
         return $data;
+    }
+
+    /**
+     * WR-03: the ETag / Last-Modified stored for the old feed address (or
+     * the old way of reading it) must never be sent for the new one: a 304
+     * would mean the new feed is never read. So a save that changes the
+     * URL, the item identity or the default time zone clears them, and the
+     * next run fetches the whole body.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
+        $record->fill($data);
+
+        $identityChanged = ($record->getOriginal('parser_config')['identity'] ?? null) !== ($record->getAttribute('parser_config')['identity'] ?? null);
+
+        if ($record->isDirty(['url', 'default_timezone']) || $identityChanged) {
+            $record->forceFill(['etag' => null, 'last_modified' => null]);
+        }
+
+        $record->save();
+
+        return $record;
     }
 
     protected function getHeaderActions(): array

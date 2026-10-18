@@ -411,7 +411,11 @@ final class IngestRun
             $sourceState['last_items_found'] = $run->items_found;
         }
 
-        if ($result !== null && ($status === RunStatus::Succeeded || $status === RunStatus::NotModified)) {
+        // WR-03: a save that changed the feed URL while this run was in
+        // flight cleared the validators; never store the old address's.
+        $sameUrl = Source::query()->whereKey($source->id)->value('url') === $source->url;
+
+        if ($result !== null && $sameUrl && ($status === RunStatus::Succeeded || $status === RunStatus::NotModified)) {
             // A validator too long for its column is dropped, never cut:
             // a cut validator would never match.
             $sourceState['etag'] = $keepValidators ? self::fits($result->etag, 255) : null;

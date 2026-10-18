@@ -97,6 +97,7 @@ class SourceFieldHelp
                 'Events Calendar post id: for WordPress sites using The Events Calendar, whose IDs change when an event\'s time changes.',
                 'Title and start time: for feeds whose IDs change on every download.',
                 'Not sure? Open the feed address in a browser twice, a minute apart, and compare the "UID:" lines. If they differ, choose "Title and start time".',
+                'It is fixed once the source has recorded feed items. To change it, pause the source and add the feed again as a new source.',
             ],
             'example' => 'Baptist Church: Event UID. Town Council: Events Calendar post id. Attleborough Academy: Title and start time.',
         ],
@@ -107,6 +108,7 @@ class SourceFieldHelp
             'how' => [
                 'Leave as Europe/London for local sources: it follows British Summer Time automatically.',
                 'Only change it for a feed run from another country.',
+                'It is fixed once the source has recorded feed items. To change it, pause the source and add the feed again as a new source.',
             ],
             'example' => 'Europe/London, so a floating "19:30" in July is stored as 18:30 UTC and shown as 7:30pm.',
         ],

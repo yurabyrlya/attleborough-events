@@ -46,6 +46,10 @@ class SourceForm
 
     public const string URL_REFUSED = 'Use an http or https web address on the standard port, without a username or password.';
 
+    public const string IDENTITY_LOCKED = 'The item identity cannot be changed once this source has recorded feed items: every item would look new, and every published event from this source would be reported missing. To read the feed a different way, pause this source and add the feed again as a new source.';
+
+    public const string TIMEZONE_LOCKED = 'The default time zone cannot be changed once this source has recorded feed items: every time the feed gives without a time zone would move, and every published event from this source would get an update draft. To read the feed a different way, pause this source and add the feed again as a new source.';
+
     /**
      * year_policy values. Phase 4 adds the policies for sites that leave out
      * the year; ICS dates always carry it.
@@ -150,7 +154,8 @@ class SourceForm
                             ->default(IdentityStrategy::Uid->value)
                             ->selectablePlaceholder(false)
                             ->required()
-                            ->helperText('How the same event is recognised from one check to the next. Use "Title and start time" when the feed\'s UIDs change on every fetch.'),
+                            ->rule(static fn (?Source $record): Closure => self::unchangedOnceRecorded($record, 'identity', self::IDENTITY_LOCKED))
+                            ->helperText('How the same event is recognised from one check to the next. Use "Title and start time" when the feed\'s UIDs change on every fetch. Fixed once the source has recorded feed items.'),
                         Select::make('default_timezone')
                             ->hintAction(SourceFieldHelp::action('default_timezone'))
                             ->label('Default time zone')
@@ -158,7 +163,8 @@ class SourceForm
                             ->default('Europe/London')
                             ->searchable()
                             ->required()
-                            ->helperText('Used for times the feed gives without a time zone.'),
+                            ->rule(static fn (?Source $record): Closure => self::unchangedOnceRecorded($record, 'default_timezone', self::TIMEZONE_LOCKED))
+                            ->helperText('Used for times the feed gives without a time zone. Fixed once the source has recorded feed items.'),
                         Select::make('year_policy')
                             ->hintAction(SourceFieldHelp::action('year_policy'))
                             ->label('Year policy')
@@ -292,6 +298,36 @@ class SourceForm
         }
 
         return $data;
+    }
+
+    /**
+     * WR-03: the item identity and the default time zone decide which feed
+     * item is which and when it starts. Changing either on a source that
+     * has recorded items would turn every item into a new one (and report
+     * every linked event missing) or move every floating time (an update
+     * draft for every linked event), without the test run D-01 requires
+     * for a new source. So once source_items exist they are refused; the
+     * admin pauses the source and adds the feed again as a new source,
+     * whose drafts are then matched against the published events
+     * (PIPE-05). A new source (no record) or one with no items is free.
+     *
+     * @param  'identity'|'default_timezone'  $field
+     */
+    public static function unchangedOnceRecorded(?Source $record, string $field, string $message): Closure
+    {
+        return static function (string $attribute, mixed $value, Closure $fail) use ($record, $field, $message): void {
+            if ($record === null || ! $record->exists) {
+                return;
+            }
+
+            $stored = $field === 'identity'
+                ? (string) ($record->parser_config['identity'] ?? IdentityStrategy::Uid->value)
+                : (string) $record->default_timezone;
+
+            if ((string) $value !== $stored && $record->items()->exists()) {
+                $fail($message);
+            }
+        };
     }
 
     /**
