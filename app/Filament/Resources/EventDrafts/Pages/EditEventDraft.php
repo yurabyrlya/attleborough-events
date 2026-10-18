@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Publishing\Actions\ApproveDraft;
 use App\Review\Data\DraftData;
 use App\Review\DraftWriter;
+use App\Review\Exceptions\DraftChangedMeanwhile;
 use App\Review\Exceptions\DraftNotPublishable;
 use App\Review\Exceptions\InvalidReviewTransition;
 use App\Review\ReviewQueue;
@@ -28,6 +29,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
+use Livewire\Attributes\Locked;
 
 /**
  * Edit-and-approve (REV-03). Never writes the model itself: "Save" goes
@@ -40,6 +42,11 @@ use InvalidArgumentException;
  * suggestion; it becomes the draft's venue only when the admin saves (D-05).
  * Approved and rejected drafts redirect to their review page; a save that
  * meets a draft decided in another tab changes nothing and says so.
+ *
+ * Review CR-02: the page remembers the draft's version as it loaded it. A
+ * save (or Save & approve) that finds the draft changed meanwhile, e.g.
+ * ingestion replaced it with the feed's new time, changes nothing and asks
+ * the admin to reload, so stale values never overwrite newer feed facts.
  */
 class EditEventDraft extends EditRecord
 {
@@ -50,6 +57,13 @@ class EditEventDraft extends EditRecord
     public const END_OF_QUEUE = "You've reached the end of the queue";
 
     /**
+     * DraftWriter::version() of the draft as this page loaded it, refreshed
+     * after each successful save.
+     */
+    #[Locked]
+    public ?string $draftVersion = null;
+
+    /**
      * A draft that is no longer pending (approved or rejected, maybe in
      * another tab) is not editable: open its review page instead.
      */
@@ -58,6 +72,7 @@ class EditEventDraft extends EditRecord
         parent::mount($record);
 
         $draft = $this->draft($this->getRecord());
+        $this->draftVersion = DraftWriter::version($draft);
 
         if ($draft->review_status !== ReviewStatus::PendingReview) {
             $this->alreadyReviewedNotification()->body(null)->send();
@@ -136,21 +151,26 @@ class EditEventDraft extends EditRecord
      *
      * @param  array<string, mixed>  $data
      *
-     * @throws Halt when the draft was decided meanwhile
+     * @throws Halt when the draft was decided or changed meanwhile
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         $draft = $this->draft($record);
 
         try {
-            $saved = app(DraftWriter::class)->update($draft, DraftData::fromReviewForm($data, $draft));
+            $saved = app(DraftWriter::class)->update($draft, DraftData::fromReviewForm($data, $draft), $this->expectedVersion());
         } catch (InvalidReviewTransition|ModelNotFoundException) {
             $this->alreadyReviewedNotification()->send();
+
+            throw new Halt;
+        } catch (DraftChangedMeanwhile) {
+            $this->changedMeanwhileNotification()->send();
 
             throw new Halt;
         }
 
         $this->record = $saved;
+        $this->draftVersion = DraftWriter::version($saved);
 
         return $saved;
     }
@@ -175,7 +195,7 @@ class EditEventDraft extends EditRecord
 
         try {
             DB::transaction(fn () => app(ApproveDraft::class)(
-                app(DraftWriter::class)->update($draft, DraftData::fromReviewForm($data, $draft)),
+                app(DraftWriter::class)->update($draft, DraftData::fromReviewForm($data, $draft), $this->expectedVersion()),
                 $actor,
             ));
         } catch (DraftNotPublishable $e) {
@@ -185,6 +205,10 @@ class EditEventDraft extends EditRecord
             return;
         } catch (InvalidReviewTransition|ModelNotFoundException) {
             $this->alreadyReviewedNotification()->send();
+
+            return;
+        } catch (DraftChangedMeanwhile) {
+            $this->changedMeanwhileNotification()->send();
 
             return;
         }
@@ -209,6 +233,23 @@ class EditEventDraft extends EditRecord
             ->title(ReviewActions::ALREADY_REVIEWED)
             ->body('Refresh the page to see its current state.')
             ->danger();
+    }
+
+    private function changedMeanwhileNotification(): Notification
+    {
+        return Notification::make()
+            ->title(DraftChangedMeanwhile::MESSAGE)
+            ->danger()
+            ->persistent();
+    }
+
+    /**
+     * The version the page loaded. Never null after mount; the fallback only
+     * guards against a missing value refusing every save.
+     */
+    private function expectedVersion(): string
+    {
+        return $this->draftVersion ?? DraftWriter::version($this->draft($this->getRecord()));
     }
 
     private function draft(Model $record): EventDraft

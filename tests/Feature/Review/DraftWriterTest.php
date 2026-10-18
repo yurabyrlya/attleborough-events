@@ -9,6 +9,7 @@ use App\Models\EventDraft;
 use App\Review\CategoryAssigner;
 use App\Review\Data\DraftData;
 use App\Review\DraftWriter;
+use App\Review\Exceptions\DraftChangedMeanwhile;
 use App\Review\Exceptions\InvalidReviewTransition;
 use Database\Seeders\CategorySeeder;
 
@@ -90,6 +91,42 @@ it('updates a pending draft\'s content and recomputes its category', function ()
         ->and($updated->category_id)->toBe($this->community->id)
         ->and($updated->category_reason)->toBe('Chosen by organiser')
         ->and($updated->review_status)->toBe(ReviewStatus::PendingReview);
+});
+
+it('refuses an update whose expected version is stale and changes nothing (review CR-02)', function () {
+    $draft = EventDraft::factory()->create(['title' => 'Original', 'start_time' => '19:00:00']);
+    $opened = DraftWriter::version($draft);
+
+    // Ingestion (or another tab) rewrites the draft after the page opened.
+    EventDraft::query()->whereKey($draft->id)->update(['start_time' => '20:00:00']);
+
+    expect(fn () => app(DraftWriter::class)->update($draft, new DraftData(
+        origin: EventOrigin::Manual,
+        extractionMethod: ExtractionMethod::Manual,
+        title: 'Rewritten',
+        startTime: '19:00',
+    ), $opened))->toThrow(DraftChangedMeanwhile::class, DraftChangedMeanwhile::MESSAGE);
+
+    expect($draft->refresh()->title)->toBe('Original')
+        ->and($draft->start_time)->toBe('20:00:00');
+});
+
+it('accepts an update whose expected version is current, and the version changes with it', function () {
+    $draft = EventDraft::factory()->create(['title' => 'Original']);
+    $opened = DraftWriter::version($draft->refresh());
+
+    // Unsaved in-memory changes (e.g. a picked venue) do not change the version.
+    $draft->title = 'Not saved';
+    expect(DraftWriter::version($draft))->toBe($opened);
+
+    $updated = app(DraftWriter::class)->update($draft, new DraftData(
+        origin: EventOrigin::Manual,
+        extractionMethod: ExtractionMethod::Manual,
+        title: 'Rewritten',
+    ), $opened);
+
+    expect($updated->title)->toBe('Rewritten')
+        ->and(DraftWriter::version($updated))->not->toBe($opened);
 });
 
 it('refuses to update a draft that is no longer pending and changes nothing', function (ReviewStatus $status) {

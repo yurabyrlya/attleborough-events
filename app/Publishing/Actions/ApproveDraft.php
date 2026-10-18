@@ -4,6 +4,8 @@ namespace App\Publishing\Actions;
 
 use App\Enums\OccurrenceStatus;
 use App\Enums\ReviewStatus;
+use App\Ingestion\Data\NormalisedFacts;
+use App\Ingestion\Pipeline\ContentHasher;
 use App\Models\Event;
 use App\Models\EventDraft;
 use App\Models\EventOccurrence;
@@ -55,6 +57,7 @@ final class ApproveDraft
         private DraftPublishability $publishability,
         private LinkEventSource $link,
         private ChangeOccurrenceStatus $occurrenceStatus,
+        private ContentHasher $hasher,
     ) {}
 
     /**
@@ -99,7 +102,7 @@ final class ApproveDraft
             ])->save();
 
             if ($locked->source_item_id !== null) {
-                $this->acceptBaseline($locked->source_item_id);
+                $this->acceptBaseline($locked);
             }
 
             return [$locked, $event];
@@ -161,15 +164,53 @@ final class ApproveDraft
     /**
      * PIPE-06: what the admin approved becomes the item's baseline, so the
      * next run only drafts a change to these facts. Item locked last.
+     *
+     * Review CR-02: the baseline is the feed facts this draft was built from
+     * (raw_payload, written by ingestion with the item's payload), not
+     * whatever the item holds now. When they differ (the feed moved after
+     * the draft was written and the draft was not replaced) the baseline is
+     * the draft's facts, so the next run sees content_hash !== accepted_hash
+     * and raises the difference as an update instead of going quiet.
      */
-    private function acceptBaseline(int $sourceItemId): void
+    private function acceptBaseline(EventDraft $draft): void
     {
-        $item = SourceItem::query()->whereKey($sourceItemId)->lockForUpdate()->firstOrFail();
+        $item = SourceItem::query()->whereKey($draft->source_item_id)->lockForUpdate()->firstOrFail();
+
+        $hash = $item->content_hash;
+        $payload = $item->payload;
+        $draftFacts = self::draftFacts($draft);
+
+        if ($draftFacts !== null) {
+            $draftHash = $this->hasher->contentHashFromPayload($draftFacts);
+
+            if ($hash === null || ! hash_equals($draftHash, $hash)) {
+                $hash = $draftHash;
+                $payload = $draftFacts;
+            }
+        }
 
         $item->forceFill([
-            'accepted_hash' => $item->content_hash,
-            'accepted_payload' => $item->payload,
+            'accepted_hash' => $hash,
+            'accepted_payload' => $payload,
             'review_outcome' => 'approved',
         ])->save();
+    }
+
+    /**
+     * The feed facts a discovered draft was built from, normalised through
+     * NormalisedFacts so they hash exactly like source_items.payload; null
+     * when the draft carries none (then the item's own content is used).
+     *
+     * @return array<string, mixed>|null
+     */
+    private static function draftFacts(EventDraft $draft): ?array
+    {
+        $raw = $draft->raw_payload;
+
+        if (! is_array($raw) || ! is_string($raw['start_date'] ?? null) || $raw['start_date'] === '') {
+            return null;
+        }
+
+        return NormalisedFacts::fromPayload($raw)->toPayload();
     }
 }

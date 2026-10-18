@@ -12,6 +12,7 @@ use App\Models\EventDraft;
 use App\Models\Source;
 use App\Models\SourceItem;
 use App\Review\Data\DraftData;
+use App\Review\Exceptions\DraftChangedMeanwhile;
 use App\Review\Exceptions\InvalidReviewTransition;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -308,15 +309,25 @@ final class DraftWriter
      * pending, checked on the locked row so a stale edit page cannot rewrite
      * a decided draft. Review state is untouched.
      *
+     * Review CR-02: with $expectedVersion (version() of the draft as the edit
+     * page loaded it) the save is also refused when the locked row has
+     * changed since, e.g. ingestion replaced it with the feed's new facts;
+     * writing the page's stale values would publish facts nobody reviewed.
+     *
      * @throws InvalidReviewTransition when the draft is no longer pending review
+     * @throws DraftChangedMeanwhile when the draft is no longer the expected version
      */
-    public function update(EventDraft $draft, DraftData $data): EventDraft
+    public function update(EventDraft $draft, DraftData $data, ?string $expectedVersion = null): EventDraft
     {
-        return DB::transaction(function () use ($draft, $data): EventDraft {
+        return DB::transaction(function () use ($draft, $data, $expectedVersion): EventDraft {
             $locked = EventDraft::query()->whereKey($draft->id)->lockForUpdate()->firstOrFail();
 
             if ($locked->review_status !== ReviewStatus::PendingReview) {
                 throw new InvalidReviewTransition($locked->review_status, ReviewStatus::PendingReview);
+            }
+
+            if ($expectedVersion !== null && ! hash_equals($expectedVersion, self::version($locked))) {
+                throw new DraftChangedMeanwhile;
             }
 
             $locked->fill($data->toAttributes());
@@ -325,6 +336,21 @@ final class DraftWriter
 
             return $locked->refresh();
         });
+    }
+
+    /**
+     * A fingerprint of the draft row as stored (review CR-02): every column's
+     * raw database value, so any write by ingestion, another tab or a review
+     * action changes it, even within the same second as updated_at. Read
+     * from the original attributes, so unsaved in-memory changes (Filament
+     * associating a picked venue) do not count.
+     */
+    public static function version(EventDraft $draft): string
+    {
+        $attributes = $draft->getRawOriginal();
+        ksort($attributes);
+
+        return hash('sha256', serialize($attributes));
     }
 
     /**
