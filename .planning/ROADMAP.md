@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation & Published Calendar** - Local-dev mobile-first calendar (CI on PostgreSQL) fed by admin manual entry, with recurrence, detail pages, add-to-calendar and share (completed 2026-10-17)
 - [x] **Phase 2: Draft Model, Review Queue & Submissions** - Organiser submissions become drafts that the admin triages in a fast review queue; source research completed (completed 2026-10-17)
-- [ ] **Phase 3: Ingestion Backbone, ICS & Change/Duplicate Handling** - Polite scheduled fetching of ICS sources producing new/update/cancellation drafts with duplicate warnings and source health
+- [x] **Phase 3: Ingestion Backbone, ICS & Change/Duplicate Handling** - Polite scheduled fetching of ICS sources producing new/update/cancellation drafts with duplicate warnings and source health (completed 2026-10-18)
 - [ ] **Phase 4: Extraction Ladder, Geofence & Live Sources** - TEC, JSON-LD, selector and RSS rungs, geofence and test run; P0 sources producing drafts in production
 - [ ] **Phase 5: Launch Readiness** - Domain, VPS and zero-downtime deploy (deferred from Phase 1), production ops, SEO lifecycle, public feeds, privacy and complaints, analytics, dashboard, accessibility and restore drill
 
@@ -108,7 +108,7 @@ Plans:
   4. Every fetch respects robots.txt (a disallow shows as a `blocked` run), sends the descriptive User-Agent and waits at least 5s per host. A bot wall or wrong content type is logged as a failed `content_invalid` run. After 3 / 5 consecutive failures the source shows as degraded / unhealthy (paused), a sudden zero-items run is flagged, and no previously published event disappears.
   5. Approved discovered events show visible source attribution with a link, plus an excerpt of at most 200 characters with phone numbers and emails stripped and a "Read more at {source}" link.
 
-**Plans**: 17/17 plans executed
+**Plans**: 17/17 plans complete
 
 Plans:
 **Wave 1**
@@ -197,7 +197,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Foundation & Published Calendar | 13/13 | Complete    | 2026-10-17 |
 | 2. Draft Model, Review Queue & Submissions | 16/16 | Complete    | 2026-10-17 |
-| 3. Ingestion Backbone, ICS & Change/Duplicate Handling | 17/17 | In Progress | - |
+| 3. Ingestion Backbone, ICS & Change/Duplicate Handling | 17/17 | Complete    | 2026-10-18 |
 | 4. Extraction Ladder, Geofence & Live Sources | 0/TBD | Not started | - |
 | 5. Launch Readiness | 0/2+ | Not started | - |
 
