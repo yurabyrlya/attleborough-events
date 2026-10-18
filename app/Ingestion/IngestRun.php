@@ -37,7 +37,9 @@ use Throwable;
  *
  * Each item is recorded in its own transaction; an item that throws counts
  * as skipped_parse_error and is logged by ids only, so one bad item never
- * fails the run. error_message is built from enum labels, status codes and
+ * fails the run. Such a run stores no ETag/Last-Modified (WR-01), so the
+ * next run fetches the whole body and records the item again instead of
+ * being answered 304. error_message is built from enum labels, status codes and
  * our own wording only, never response text, and is at most 500 characters.
  *
  * Preview runs (D-01) go through the same fetch, validation, extraction and
@@ -170,6 +172,7 @@ final class IngestRun
 
         $counters = array_fill_keys(SourceRun::COUNTERS, 0);
         $observedUntil = null;
+        $itemFailures = 0;
 
         foreach ($extraction->items as $index => $item) {
             $counters['items_found']++;
@@ -186,6 +189,7 @@ final class IngestRun
                     'exception' => $e::class,
                 ]);
                 $outcome = new RecordOutcome(SourceItemRecorder::SKIPPED_PARSE_ERROR);
+                $itemFailures++;
             }
 
             $counters[SourceItemRecorder::COUNTER[$outcome->bucket]]++;
@@ -200,7 +204,11 @@ final class IngestRun
             'observed_until' => $observedUntil,
         ]);
 
-        $this->finish($run, $source, RunStatus::Succeeded, null, null, $result);
+        // WR-01: an item that threw (e.g. a deadlock victim) was not
+        // recorded. Keeping this response's validators would let the next
+        // run get a 304 and never see that item again until the feed
+        // changes, so drop them: the next run fetches the whole body.
+        $this->finish($run, $source, RunStatus::Succeeded, null, null, $result, keepValidators: $itemFailures === 0);
     }
 
     /**
@@ -377,6 +385,7 @@ final class IngestRun
         ?FetchFailureKind $failureKind = null,
         ?string $message = null,
         ?FetchResult $result = null,
+        bool $keepValidators = true,
     ): void {
         $nowUtc = CarbonImmutable::now()->utc();
 
@@ -405,8 +414,8 @@ final class IngestRun
         if ($result !== null && ($status === RunStatus::Succeeded || $status === RunStatus::NotModified)) {
             // A validator too long for its column is dropped, never cut:
             // a cut validator would never match.
-            $sourceState['etag'] = self::fits($result->etag, 255);
-            $sourceState['last_modified'] = self::fits($result->lastModified, 64);
+            $sourceState['etag'] = $keepValidators ? self::fits($result->etag, 255) : null;
+            $sourceState['last_modified'] = $keepValidators ? self::fits($result->lastModified, 64) : null;
         }
 
         $source->forceFill($sourceState)->save();

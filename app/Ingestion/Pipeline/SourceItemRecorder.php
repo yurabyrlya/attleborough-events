@@ -59,7 +59,8 @@ use Illuminate\Support\Facades\DB;
  *
  * Skipped identities that are not yet known get no source item: an item
  * far in the future today must still be drafted when it enters the window.
- * Lock order inside the item transaction: source item → draft.
+ * Lock order inside the item transaction: pending draft → source item, the
+ * same order as the review actions (WR-01, lockPendingDrafts()).
  */
 final class SourceItemRecorder
 {
@@ -101,6 +102,16 @@ final class SourceItemRecorder
     {
         return DB::transaction(function () use ($run, $source, $item, $nowLondon): RecordOutcome {
             $nowUtc = $nowLondon->utc();
+
+            $knownId = SourceItem::query()
+                ->where('source_id', $source->id)
+                ->where('external_id', $item->externalId)
+                ->value('id');
+
+            if ($knownId !== null) {
+                // WR-01: the review actions lock draft → item; so do we.
+                self::lockPendingDrafts((int) $knownId);
+            }
 
             $existing = SourceItem::query()
                 ->where('source_id', $source->id)
@@ -279,6 +290,24 @@ final class SourceItemRecorder
             ->where('review_status', ReviewStatus::PendingReview)
             ->lockForUpdate()
             ->first();
+    }
+
+    /**
+     * Locks the pending drafts of a source item BEFORE the item itself
+     * (WR-01). Every review action (approve, reject, duplicate, apply,
+     * ignore, confirm, reopen) locks its draft first and the item second,
+     * so ingestion must take the same order or PostgreSQL can abort one
+     * side as a deadlock. Call it inside the item's transaction, before
+     * the item's lockForUpdate().
+     */
+    public static function lockPendingDrafts(int $sourceItemId): void
+    {
+        EventDraft::query()
+            ->where('source_item_id', $sourceItemId)
+            ->where('review_status', ReviewStatus::PendingReview)
+            ->orderBy('id')
+            ->lockForUpdate()
+            ->pluck('id');
     }
 
     /**

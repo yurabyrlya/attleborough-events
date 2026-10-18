@@ -109,12 +109,15 @@ final class MissingItemDetector
     }
 
     /**
-     * One item, one transaction: locked first, then its draft (the
-     * recorder's order), re-checked on the locked row.
+     * One item, one transaction: its pending draft locked first, then the
+     * item (the recorder's and the review actions' order, WR-01),
+     * re-checked on the locked row.
      */
     private function markMissing(int $id, Source $source, CarbonImmutable $nowLondon): bool
     {
         return DB::transaction(function () use ($id, $source, $nowLondon): bool {
+            SourceItemRecorder::lockPendingDrafts($id);
+
             $item = SourceItem::query()->whereKey($id)->lockForUpdate()->first();
 
             if ($item === null || $item->status !== SourceItemStatus::Active || $item->missing_runs < self::RUNS_TO_MISSING) {
