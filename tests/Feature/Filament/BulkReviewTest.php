@@ -121,6 +121,17 @@ it('skips a discovered draft whose description may still hold a contact (review 
         ->and(Event::count())->toBe(0);
 });
 
+it('skips a discovered draft whose description is over 200 characters (VER-01)', function () {
+    $draft = EventDraft::factory()->create(['origin' => EventOrigin::Discovered, 'description' => str_repeat('a', 201)]);
+
+    livewire(ListEventDrafts::class)
+        ->callTableBulkAction('approveSelected', [$draft]);
+
+    expect(bulkNotificationLines())->toContain('1 skipped: description longer than 200 characters')
+        ->and($draft->refresh()->review_status)->toBe(ReviewStatus::PendingReview)
+        ->and(Event::count())->toBe(0);
+});
+
 it('skips a draft whose same-day end time equals its start time', function () {
     $draft = EventDraft::factory()->create(['start_time' => '19:00:00', 'end_time' => '19:00:00']);
 

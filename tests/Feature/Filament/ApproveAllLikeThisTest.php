@@ -171,6 +171,22 @@ it('skips a match whose description may still hold a phone number and approves t
         ->and($third->refresh()->review_status)->toBe(ReviewStatus::Approved);
 });
 
+it('skips a match whose edited description is over 200 characters and approves the rest (VER-01)', function () {
+    [$first, $second, $third] = $this->yoga->all();
+
+    $second->forceFill(['description' => str_repeat('Gentle yoga. ', 16)])->save();
+
+    livewire(ListEventDrafts::class)
+        ->callAction(TestAction::make('approveAllLikeThis')->table($first));
+
+    expect(likeNotificationLines())->toBe([
+        'Approved 2 of 3.',
+        '1 skipped: description longer than 200 characters',
+    ])
+        ->and($second->refresh()->review_status)->toBe(ReviewStatus::PendingReview)
+        ->and($third->refresh()->review_status)->toBe(ReviewStatus::Approved);
+});
+
 it('matches the title case- and space-insensitively but leaves other sources and other venues alone', function () {
     $otherSource = Source::factory()->ics()->active()->create(['name' => 'Attleborough Baptist Church']);
     $fromOtherSource = likeSourcedDraft($otherSource, ['venue_id' => $this->townHall->id]);

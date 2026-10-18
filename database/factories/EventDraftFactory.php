@@ -45,7 +45,9 @@ class EventDraftFactory extends Factory
             'review_status' => ReviewStatus::PendingReview,
             'extraction_method' => ExtractionMethod::Manual,
             'title' => ucfirst(fake()->words(3, true)),
-            'description' => fake()->paragraph(),
+            // A discovered draft's description is a short excerpt (VER-01:
+            // at most 200 characters); a paragraph can be longer.
+            'description' => fn (array $attributes): string => self::isDiscovered($attributes['origin'] ?? null) ? fake()->sentence() : fake()->paragraph(),
             'category_id' => Category::factory(),
             'category_reason' => 'Chosen by admin',
             'category_flagged' => false,
@@ -181,5 +183,10 @@ class EventDraftFactory extends Factory
             'reviewed_by' => $event->approved_by,
             'reviewed_at' => $event->approved_at,
         ]);
+    }
+
+    private static function isDiscovered(mixed $origin): bool
+    {
+        return $origin === EventOrigin::Discovered || $origin === EventOrigin::Discovered->value;
     }
 }

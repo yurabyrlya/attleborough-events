@@ -4,8 +4,11 @@ namespace App\Filament\Resources\EventDrafts\Schemas;
 
 use App\Filament\Resources\Events\Schemas\EventForm;
 use App\Models\EventDraft;
+use App\Review\DiscoveredDescription;
+use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Callout;
@@ -25,6 +28,8 @@ use Filament\Schemas\Schema;
  *   organiser's typed venue is shown read-only beside the picker. "Create
  *   new venue" opens pre-filled from it; no venue is created without that
  *   click (D-05).
+ * - A discovered draft's description keeps to the public excerpt rules
+ *   (200 characters, no phone number or email; DiscoveredDescription).
  *
  * Every organiser string reaches the page through escaped Callout and
  * TextEntry output.
@@ -35,7 +40,13 @@ class EventDraftForm
     {
         return $schema
             ->components([
-                EventForm::whatSection(),
+                // VER-01 (PIPE-09, D-15, D-17): a discovered draft's
+                // description is the public excerpt, so the admin's edit
+                // keeps to 200 characters and shows no phone number or
+                // email. Manual and submitted drafts keep the 5000 limit.
+                EventForm::whatSection(fn (Textarea $description): Textarea => $description
+                    ->helperText(fn (mixed $record): ?string => DiscoveredDescription::applies($record) ? DiscoveredDescription::HELP : null)
+                    ->rule(fn (): Closure => DiscoveredDescription::rule(), fn (mixed $record): bool => DiscoveredDescription::applies($record))),
                 EventForm::whenSection(),
                 EventForm::repeatsSection([
                     Callout::make(fn (mixed $record): string => "Organiser says it repeats: '".self::repeatsText($record)."'")

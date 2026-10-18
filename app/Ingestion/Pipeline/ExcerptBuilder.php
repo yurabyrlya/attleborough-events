@@ -23,6 +23,10 @@ use App\Support\TextLimit;
  * number ("Call 452300") is stripped when a phone word introduces it.
  * mayContainContact() is the loose deny-by-default backstop bulk approve
  * uses for whatever these patterns still miss.
+ *
+ * Verification VER-01: containsContact() is the strict twin, built from
+ * the same patterns make() strips. The edit page and single approval of a
+ * discovered draft refuse a description it matches (DiscoveredDescription).
  */
 final class ExcerptBuilder
 {
@@ -80,12 +84,37 @@ final class ExcerptBuilder
     }
 
     /**
+     * Whether a description holds a phone number or email address that
+     * make() would strip: an email, a UK number, or a local number after a
+     * phone word (VER-01). The strict rule behind the edit page and single
+     * approval of a discovered draft, so it refuses only real contacts and
+     * never ordinary text such as "Seasons 2026-2027" or "Open 0930-1630".
+     */
+    public static function containsContact(?string $text): bool
+    {
+        if ($text === null) {
+            return false;
+        }
+
+        foreach ([self::EMAIL, self::UK_PHONE, self::LOCAL_LABEL.self::LOCAL_PHONE, self::LOCAL_VERB.self::LOCAL_PHONE] as $pattern) {
+            if (preg_match('/'.$pattern.'/iu', $text) === 1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Whether a description may still hold a phone number or email address
      * (review CR-01). Deliberately loose: a match only means a human has to
      * read the draft before it is published, so bulk approve skips it.
+     * Everything containsContact() finds counts too (e.g. a number written
+     * with a space after every digit), so the loose rule is never narrower.
      */
     public static function mayContainContact(?string $text): bool
     {
-        return $text !== null && preg_match('/'.self::CONTACT_LIKE.'/u', $text) === 1;
+        return $text !== null
+            && (preg_match('/'.self::CONTACT_LIKE.'/u', $text) === 1 || self::containsContact($text));
     }
 }

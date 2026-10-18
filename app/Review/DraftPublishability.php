@@ -28,6 +28,8 @@ final class DraftPublishability
     private const SKIP_REASONS = [
         'parse_errors' => 'has parse errors',
         'contact_like' => 'description may contain a phone number or email',
+        // VER-01: a discovered draft's description is at most 200 characters.
+        'description_too_long' => 'description longer than 200 characters',
         'duplicate' => 'possible duplicate',
         'low_quality' => 'Low quality',
         'unresolved_venue' => 'no confirmed venue',
@@ -47,7 +49,7 @@ final class DraftPublishability
      * Blockers that bulk approve reports under a specific key, so they never
      * also count as "blocked".
      */
-    private const SPECIFIC_BULK_BLOCKERS = ['no_venue', 'repeats_unacknowledged', 'end_time_same_as_start'];
+    private const SPECIFIC_BULK_BLOCKERS = ['description_too_long', 'description_contact', 'no_venue', 'repeats_unacknowledged', 'end_time_same_as_start'];
 
     /**
      * What stops a single approve, in a fixed order; empty when the draft can
@@ -62,7 +64,8 @@ final class DraftPublishability
 
     /**
      * Why bulk approve skips this draft, every applicable key in the order
-     * parse_errors, contact_like, duplicate, low_quality, unresolved_venue,
+     * parse_errors, contact_like, description_too_long, duplicate,
+     * low_quality, unresolved_venue,
      * repeats_unset, end_time_same_as_start, blocked; empty when bulk
      * approve may take it.
      * Bulk approve reports the first key, so each skipped draft is counted
@@ -88,6 +91,13 @@ final class DraftPublishability
         // number or email, only a human may approve it.
         if ($draft->origin === EventOrigin::Discovered && ExcerptBuilder::mayContainContact($draft->description)) {
             $keys[] = 'contact_like';
+        }
+
+        // VER-01: the single-approve blocker for a discovered description
+        // over 200 characters, under its own key. (A contact the strict
+        // check finds is always contact_like above too.)
+        if (DiscoveredDescription::applies($draft) && DiscoveredDescription::length($draft->description) > DiscoveredDescription::LIMIT) {
+            $keys[] = 'description_too_long';
         }
 
         // PIPE-05: a likely duplicate of a published event or of another
@@ -165,6 +175,11 @@ final class DraftPublishability
 
         if (! self::filled($draft->description)) {
             $blockers['no_description'] = 'Add a description.';
+        } elseif (DiscoveredDescription::applies($draft)) {
+            // VER-01 (PIPE-09, D-15, D-17): a discovered event shows at most
+            // 200 characters and never a phone number or email, even after
+            // the admin edited the excerpt.
+            $blockers = [...$blockers, ...DiscoveredDescription::problems($draft->description)];
         }
 
         if ($draft->start_date === null) {

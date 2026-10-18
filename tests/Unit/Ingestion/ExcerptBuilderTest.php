@@ -55,6 +55,38 @@ it('flags text that may still hold a contact (bulk approve backstop)', function 
     'dotted groups' => ['Box office 01953.452.300', true],
 ]);
 
+it('finds the contacts make() strips and nothing else (VER-01 strict rule)', function (?string $text, bool $found) {
+    expect(ExcerptBuilder::containsContact($text))->toBe($found);
+
+    // The loose backstop never misses what the strict rule finds.
+    if ($found) {
+        expect(ExcerptBuilder::mayContainContact($text))->toBeTrue();
+    }
+})->with([
+    'null' => [null, false],
+    'years' => ['Seasons 2026-2027', false],
+    'times' => ['Open 0930-1630 daily, doors 7.30pm', false],
+    'prices and words' => ['Bring your phone, tickets £5.00, Call in any time', false],
+    'bare local number' => ['Box office 452300', false],
+    'UK number' => ['Call 01953 452300 today', true],
+    'bracketed area code' => ['Box office (01953) 452300', true],
+    'international' => ['Book on +44 1953 452300 now', true],
+    'a space after every digit' => ['Phone 0 1 9 5 3 4 5 2 3 0 0', true],
+    'local number after ring us on' => ['Ring us on 452 300', true],
+    'local number with label' => ['Tel: 452 300 evenings', true],
+    'email' => ['Write to Jo.Bloggs@Example.co.uk', true],
+]);
+
+it('leaves nothing containsContact() finds in an excerpt', function (string $full) {
+    expect(ExcerptBuilder::containsContact(ExcerptBuilder::make($full)))->toBeFalse();
+})->with([
+    'Call 01953 452123 today',
+    'Tel +44 (0)1953 452 123 for tickets',
+    'Ring us on 452 300 to book',
+    'Email jo.bloggs@example.co.uk please',
+    'Phone 0 1 9 5 3 4 5 2 3 0 0 or come along',
+]);
+
 it('strips markup and decodes entities into plain text', function () {
     expect(ExcerptBuilder::make('<p>Fun &amp; games</p>'))->toBe('Fun & games')
         ->and(ExcerptBuilder::make('<p>One</p><p>Two</p>'))->toBe('One Two');

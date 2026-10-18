@@ -58,19 +58,25 @@ class EventForm
     }
 
     /**
-     * Title, description, category and family-friendly.
+     * Title, description, category and family-friendly. $configureDescription
+     * receives the description Textarea and returns it with extra rules (the
+     * review form's discovered-draft limits, VER-01).
+     *
+     * @param  (Closure(Textarea): Textarea)|null  $configureDescription
      */
-    public static function whatSection(): Section
+    public static function whatSection(?Closure $configureDescription = null): Section
     {
+        $description = Textarea::make('description')
+            ->required()
+            ->rows(5)
+            ->maxLength(5000);
+
         return Section::make('What')
             ->schema([
                 TextInput::make('title')
                     ->required()
                     ->maxLength(255),
-                Textarea::make('description')
-                    ->required()
-                    ->rows(5)
-                    ->maxLength(5000),
+                $configureDescription === null ? $description : $configureDescription($description),
                 Select::make('category_id')
                     ->label('Category')
                     ->relationship('category', 'name', fn ($query) => $query->orderBy('sort'))

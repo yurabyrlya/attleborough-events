@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\Venue;
 use App\Publishing\Actions\ApproveDraft;
 use App\Review\Data\DraftData;
+use App\Review\DiscoveredDescription;
 use App\Review\DraftPublishability;
 use App\Review\DraftWriter;
 use App\Review\Exceptions\DraftNotPublishable;
@@ -282,17 +283,29 @@ it('skips a possible duplicate', function () {
     expect(app(DraftPublishability::class)->bulkBlockerKeys($draft))->toContain('duplicate');
 });
 
-it('skips a discovered draft whose description may still hold a contact (review CR-01)', function (string $description) {
+it('skips a discovered draft whose description may still hold a contact (review CR-01)', function (string $description, array $blockers) {
     $draft = EventDraft::factory()->create(['origin' => EventOrigin::Discovered, 'description' => $description]);
 
     expect(app(DraftPublishability::class)->bulkBlockerKeys($draft))->toBe(['contact_like'])
-        // A single approve, after a human has read the draft, is still allowed.
-        ->and(app(DraftPublishability::class)->blockers($draft))->toBe([]);
+        // VER-01: single approve refuses only what the strict contact rule
+        // finds; a bare number the loose backstop flags may still be
+        // approved after a human has read it.
+        ->and(app(DraftPublishability::class)->blockers($draft))->toBe($blockers);
 })->with([
-    'bracketed area code' => ['Box office (01953) 452300'],
-    'local number' => ['Box office 452300'],
-    'email' => ['Write to jo@example.org'],
+    'bracketed area code' => ['Box office (01953) 452300', [DiscoveredDescription::HAS_CONTACT]],
+    'local number' => ['Box office 452300', []],
+    'email' => ['Write to jo@example.org', [DiscoveredDescription::HAS_CONTACT]],
+    'years' => ['Seasons 2026-2027', []],
 ]);
+
+it('skips a discovered draft whose description is over 200 characters under its own key (VER-01)', function () {
+    $draft = EventDraft::factory()->create(['origin' => EventOrigin::Discovered, 'description' => str_repeat('a', 201)]);
+    $manual = EventDraft::factory()->create(['description' => str_repeat('a', 201)]);
+
+    expect(app(DraftPublishability::class)->bulkBlockerKeys($draft))->toBe(['description_too_long'])
+        ->and(app(DraftPublishability::class)->blockers($draft))->toBe([DiscoveredDescription::TOO_LONG])
+        ->and(app(DraftPublishability::class)->bulkBlockerKeys($manual))->toBe([]);
+});
 
 it('does not flag manual drafts or clean discovered descriptions as contact-like', function () {
     $manual = EventDraft::factory()->create(['description' => 'Box office (01953) 452300']);
@@ -305,6 +318,7 @@ it('does not flag manual drafts or clean discovered descriptions as contact-like
 dataset('skip messages', [
     'parse_errors' => ['parse_errors', 3, '3 skipped: has parse errors'],
     'contact_like' => ['contact_like', 1, '1 skipped: description may contain a phone number or email'],
+    'description_too_long' => ['description_too_long', 1, '1 skipped: description longer than 200 characters'],
     'duplicate' => ['duplicate', 1, '1 skipped: possible duplicate'],
     'low_quality' => ['low_quality', 4, '4 skipped: Low quality'],
     'unresolved_venue' => ['unresolved_venue', 1, '1 skipped: no confirmed venue'],
