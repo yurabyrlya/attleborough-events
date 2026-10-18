@@ -47,9 +47,9 @@
 - [x] **REV-02**: Admin can approve a draft. The event (and its occurrences) is published in one transaction, linked to the draft, with approver and time recorded. Only review actions and manual entry can write published events
 - [x] **REV-03**: Admin can edit a draft's fields and approve
 - [x] **REV-04**: Admin can reject a draft with an optional reason
-- [ ] **REV-05**: Admin can mark a draft as a duplicate of an existing event. It is linked through `event_sources` and nothing new is published
-- [ ] **REV-06**: Admin sees update drafts as a three-column diff (published now / source before / source now) and can apply or ignore. Both actions update the accepted baseline
-- [ ] **REV-07**: Admin can confirm a cancellation draft (event or occurrence becomes cancelled) or ignore it
+- [x] **REV-05**: Admin can mark a draft as a duplicate of an existing event. It is linked through `event_sources` and nothing new is published
+- [x] **REV-06**: Admin sees update drafts as a three-column diff (published now / source before / source now) and can apply or ignore. Both actions update the accepted baseline
+- [x] **REV-07**: Admin can confirm a cancellation draft (event or occurrence becomes cancelled) or ignore it
 - [x] **REV-08**: Admin can bulk approve and bulk reject. Bulk approve skips drafts with parse errors, duplicate warnings or Low quality
 - [x] **REV-09**: Admin can filter the queue by kind, source, quality band, duplicate flag and date
 - [x] **REV-10**: Admin can review on an "Approve & next" page with keyboard shortcuts
@@ -94,7 +94,7 @@
 - [ ] **PIPE-02**: Events from `filter` sources are kept only if they match postcode districts NR17, NR16, NR18 or IP24 or an allowlisted place name. Online-only events are skipped and unknown locations become flagged drafts. `local` sources skip this filter
 - [x] **PIPE-03**: Category is assigned deterministically: source default, then mapping of source values, then title keyword rules, else `Other` (flagged)
 - [x] **PIPE-04**: Each draft gets a 0-100 quality score with band (High 80+, Medium 50-79, Low <50) and the reasons behind it
-- [ ] **PIPE-05**: Likely duplicates (same canonical URL, or same date + similar venue + `pg_trgm` title similarity above a configured threshold, against published events and pending drafts) produce a duplicate warning. Same source + external ID is treated as the same item
+- [x] **PIPE-05**: Likely duplicates (same canonical URL, or same date + similar venue + `pg_trgm` title similarity above a configured threshold, against published events and pending drafts) produce a duplicate warning. Same source + external ID is treated as the same item
 - [x] **PIPE-06**: A changed known item creates an update draft only when its normalised fields differ from the accepted baseline. Unchanged raw content is skipped. Only one pending draft exists per source item (replaced in place)
 - [ ] **PIPE-07**: Items marked cancelled at the source (`STATUS:CANCELLED`, `eventStatus: EventCancelled`) create a cancellation draft
 - [x] **PIPE-08**: An item missing from its source creates a cancellation draft only after 2 consecutive complete runs, and only if its last known start is in the future, inside the run's observed date window, and the source supports missing detection
@@ -202,9 +202,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | REV-02 | Phase 2 | Complete |
 | REV-03 | Phase 2 | Complete |
 | REV-04 | Phase 2 | Complete |
-| REV-05 | Phase 3 | Pending |
-| REV-06 | Phase 3 | Pending |
-| REV-07 | Phase 3 | Pending |
+| REV-05 | Phase 3 | Complete |
+| REV-06 | Phase 3 | Complete |
+| REV-07 | Phase 3 | Complete |
 | REV-08 | Phase 2 | Complete |
 | REV-09 | Phase 2 | Complete |
 | REV-10 | Phase 2 | Complete |
@@ -237,7 +237,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PIPE-02 | Phase 4 | Pending |
 | PIPE-03 | Phase 2 | Complete |
 | PIPE-04 | Phase 2 | Complete |
-| PIPE-05 | Phase 3 | Pending |
+| PIPE-05 | Phase 3 | Complete |
 | PIPE-06 | Phase 3 | Complete |
 | PIPE-07 | Phase 3 | Pending |
 | PIPE-08 | Phase 3 | Complete |
