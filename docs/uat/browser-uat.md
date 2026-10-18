@@ -30,7 +30,7 @@ await page.getByLabel('Password').first().fill('<local password>');
 await page.getByRole('button', { name: 'Sign in' }).click();
 ```
 
-Expected: redirect to `/admin` (Dashboard), sidebar shows **Dashboard**, **Events**, **Review → Review queue** (with the pending count) and **Rules**, **System → System health**.
+Expected: redirect to `/admin` (Dashboard), sidebar shows **Dashboard**, **Events**, **Review → Review queue** (with the pending count), **Sources** (with a warning count when a live source needs attention) and **Rules**, **System → System health**.
 
 ## F1. Public calendar look (desktop and phone, light and dark)
 
@@ -247,6 +247,35 @@ Selectors: tabs are `role=tab` (`getByRole('tab', { name: 'Keyword rules' })`) a
 
 Public effect: none directly. Rules only decide the category of the **next** drafts; published events keep theirs. A category renamed here is renamed on the public chips (its slug, used in links, never changes).
 
+## F15. Sources: register an ICS source, Test run, Create drafts, Run now, Pause
+
+Sidebar **Review → Sources** (`/admin/sources`). The local database has the three seeded ICS sources (Attleborough Baptist Church, Attleborough Town Council, Attleborough Academy), all inactive. Locally a test run really fetches the feed, so only run this against sites whose `legal_basis` allows it; the automated run is offline (see below).
+
+1. **New source** → the form. Click the **?** next to **Feed URL** (`getByRole('button', { name: 'Help: Feed URL' })`): a dialog titled "Feed URL" explains why the field exists, how to find the address ("Paste it in a browser: it should download a file starting with BEGIN:VCALENDAR…") and gives real examples; **Close**. Every field has one.
+2. Fill **Name** "Attleborough Baptist Church", **Short name** "Baptist Church", **Feed URL** `https://www.attleborough.church/Calendar/Calendar.ics`; leave **Item identity** at "Event UID" → **Create**. Expected: the edit page, the "Latest test run" panel reads "No test run yet…", and the header has only **Test run** (no Create drafts, Run now or Pause): a new source is saved inactive.
+3. **Test run** → "Run a test? Nothing is drafted." → **Run test**. Expected: "Test run started"; the panel says "Checking the source… This page updates by itself." and, when the check finishes, "Would create N drafts" with the skipped counts ("Past 0 · Beyond 90 days 18 · Title rule 0 · Parse error 0") and one row per item: title, date and time in UK format ("Sat 31 Oct, 10am"), verdict ("Would draft", "Skipped") and reason ("Beyond 90 days"). Nothing appears in the review queue.
+4. All-day items: open the seeded **Attleborough Academy** and run a test. An all-day item shows its date only ("Autumn Half-Term Holiday · Mon 19 Oct"); a timed one its date and time ("Parent Council Meeting · Thu 12 Nov, 6pm"). The page must not error (fixed in `a048cc8`).
+5. Back on the Baptist source: **Create drafts** (shown only after a successful test run) → "Create drafts and check this source daily?" → **Create drafts**. Expected: "Drafts are being created"; the N drafts appear in **Review queue → Pending** with Source "Attleborough Baptist Church"; the header now shows **Run now** and **Pause**. The **Run log** at the bottom lists the "Activation" run (Live) above the "Test run", newest first, with Found / New / Drafts created and the other counters.
+6. **Run now** → "Check this source now?" → **Run now**. Expected: "Check started"; a third run (Manual, Live) appears in the run log without a reload, with New 0 and Unchanged N.
+7. **Pause** → "Pause this source?" → **Pause**. Expected: "Source paused"; **Run now** and **Pause** go, **Test run** stays. To turn it back on: a new test run, then Create drafts.
+8. `/admin/sources`: the row shows Health **Healthy**, the last run's status, and Next check "Paused" for the paused source (London times otherwise).
+
+Selectors: header actions and dialog buttons by role and name (`getByRole('button', { name: 'Test run' })`, then `.fi-modal-open` → `getByRole('button', { name: 'Run test' })`); form inputs by id (`#form.name`, `#form.short_name`, `#form.url`, `#form.parser_config.identity`). Toasts sit over the header actions: close them (or wait for them to fade) before the next header click. Dismiss buttons in the run dialogs are **Cancel**; review dialogs use **Keep as is**.
+
+Public effect: none. Drafts wait in the review queue until approved (F16–F19); a test run and Pause change nothing on `/`.
+
+## F20. Public attribution of discovered events
+
+Start from a Baptist draft published through its review page (**Approve & next (A)** → "Publish this event?" → **Publish**), e.g. "Women's Creative Club" on Sat 31 Oct.
+
+1. Open `/events/<slug>`. Expected under **Who's running it**: "Listed by **Attleborough Baptist Church**", linked to the item's own page on the church site (else the source's events page, else the feed site's home page; never the `.ics` file). Straight after the description: a "**Read more at Attleborough Baptist Church**" link to the same address. No "Listed by What's On Attleborough." and no "More information: {host}" line. Links carry `rel="nofollow noopener"`.
+2. On `/` the card shows "**via Baptist Church**" (the source's short name, plain text) instead of "Source: {host}".
+3. Also listed by: when a second source lists the same event and its draft is marked **Mark as duplicate** (F18), the event page adds "**Also listed by** {other source}" (in link order). The organiser's own site (`Organiser's own site` on the source form) is credited first.
+
+Selectors: `.listed-by-source >> getByRole('link', { name: 'Attleborough Baptist Church' })`, `getByRole('link', { name: 'Read more at Attleborough Baptist Church' })`, `.also-listed-by`, and on `/` `article:has-text("Women's Creative Club")` containing "via Baptist Church".
+
+Public effect: this is the public effect; personal data from the feed (an `ORGANIZER` name or email, a phone number in the description) is never shown (covered by `tests/Feature/Public/SourceAttributionTest.php`).
+
 ## Cleanup
 
 - Hide the UAT events (`Hide from calendar`) or remove them from the local database if they would confuse later work. Never remove real data.
@@ -258,13 +287,12 @@ Public effect: none directly. Rules only decide the category of the **next** dra
 
 When a phase adds or changes UI, add a flow here in the same shape (steps, selectors, expected result, public effect) and reference it in that phase's UAT file. Likely next flows:
 
-- Phase 3: source registry ("Run now"), update drafts with the three-column diff, cancellation drafts, duplicate warnings.
-- Phase 4: test-run preview of a source without creating drafts.
+- Phase 4: the other extraction rungs (web pages, structured data) in the Sources form and their test-run preview.
 - Phase 5: contact/complaints form, "Report a problem", expired-event banner, public ICS/RSS feeds; repeat F1–F10 against the production URL.
 
 ### Automating these flows
 
-F0–F14 are automated as Pest browser tests in [`tests/Browser`](../../tests/Browser) (`pestphp/pest-plugin-browser`, driving Playwright Chromium). Approved by the owner on 2026-10-17.
+F0–F20 are automated as Pest browser tests in [`tests/Browser`](../../tests/Browser) (`pestphp/pest-plugin-browser`, driving Playwright Chromium). Approved by the owner on 2026-10-17.
 
 | File | Flows |
 |---|---|
@@ -277,11 +305,13 @@ F0–F14 are automated as Pest browser tests in [`tests/Browser`](../../tests/Br
 | `ReviewQueueTest.php` | F12 (queue, review page reasons, Raw content, edit with Create new venue and a weekly repeat, Save & approve opens the next draft, four dates on `/`) and F13 (bulk approve skip reasons, bulk reject with Spam, Reopen) |
 | `ApproveAndNextKeyboardTest.php` | F12 keyboard shortcuts: A then Enter, the guards while typing or in a dialog, ?, J / K, the remembered off switch, A on a blocked draft |
 | `RulesTest.php` | F14: a keyword rule decides the next submission's category; Other has no Delete; a category in use is refused with "Rules not saved" |
+| `SourcesTest.php` | F15 (the "?" field help, New source saved inactive, Test run preview, Create drafts, run log, Run now, Pause, Healthy in the table, drafts in the queue; a seeded source's all-day rows show the date only) and F20 (Listed by with the item link, Also listed by after Mark as duplicate, Read more at, card "via") |
 
 How they differ from the manual run:
 
 - The app is served in-process on the `attleborough_testing` database with `RefreshDatabase`. No `php artisan serve` is needed and the dev database is never touched, so the cleanup steps don't apply.
 - Time is frozen in Europe/London, and data is published through `PublishEvent` (`Tests\Browser\UatFixtures`). Drafts are written through the submission path (`UatFixtures::submissionDraft()` → `DraftWriter::create(DraftData::fromSubmission(...))`). The form's timing check is passed by moving the frozen clock forward 5 seconds before sending.
+- Ingestion is offline too (Phase 3): `UatFixtures::fakeIngestion()` fakes every feed URL with its captured fixture from `tests/Fixtures/sources` (robots.txt allows all, other URLs answer 404), binds the fake HostResolver (no DNS) and fakes `Sleep` and the raw-body disk. `UatFixtures::ingestedSource()` takes a seeded source live through RunLauncher (test run, then Create drafts) and `UatFixtures::runSource()` runs a check; changed feeds are fixture copies served with `UatFixtures::serveFeed()`. Queued runs are worked off the real database queue (`UatFixtures::workQueue()`), so no worker runs in the background.
 - Offline: no Turnstile site key is set in tests, so the widget and Cloudflare's script are never rendered, and `UatFixtures::fakeTurnstile()` binds a verifier that accepts any token. No request leaves the app. The date pickers are driven through their Year and Month controls, so the tests don't depend on the browser's real date.
 - Selectors are Playwright role and label locators (`UatFixtures::role('button', 'Hide event')`), as in the conventions above.
 - Still manual: the worker drill in F10 (`schedule:work`, `queue:work`, `ops:drill`), the `.ics` headers (covered by `tests/Feature/Public/EventCalendarAndShareTest.php`), the branded error pages (covered by `tests/Feature/Public/ErrorPagesTest.php`) and the phone-only checks in F9. From Phase 2: `/submit` with JavaScript really switched off (the tests check the fields are visible before any choice and the `<noscript>` text is in the source), the real Turnstile widget with Cloudflare's test keys, and the rate limit (covered by `tests/Feature/Submissions/`).
