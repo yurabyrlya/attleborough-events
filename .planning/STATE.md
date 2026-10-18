@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 03
 current_phase_name: Ingestion Backbone, ICS & Change/Duplicate Handling
 status: executing
-stopped_at: Completed 03-03-PLAN.md
-last_updated: "2026-10-18T08:53:10.247Z"
+stopped_at: Completed 03-04-PLAN.md
+last_updated: "2026-10-18T09:12:11.972Z"
 last_activity: 2026-10-18
 last_activity_desc: Phase 2 complete, transitioned to Phase 3
-state_head: a74753947f560e36a20c5c6997e1014d8db9c2f5
+state_head: c6e895bbaf1136586c2ea2692ba940be970a72bb
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 48
-  completed_plans: 32
+  completed_plans: 33
   percent: 40
 ---
 
@@ -28,9 +28,9 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 03 (Ingestion Backbone, ICS & Change/Duplicate Handling) — EXECUTING
-Plan: 4 of 17
+Plan: 5 of 17
 Status: Ready to execute
-Last activity: 2026-10-18 — Completed 03-03 (robots.txt, host throttle, raw body store)
+Last activity: 2026-10-18 — Completed 03-04 (ICS extractor, hashes, window classifier)
 
 Progress: [█████████████░░░░░░░] 32/48 planned plans ([████░░░░░░] 40%); phases complete: 2/5
 
@@ -89,6 +89,7 @@ Progress: [█████████████░░░░░░░] 32/48 p
 | Phase 03 P01 | 7min | 2 tasks | 14 files |
 | Phase 03 P02 | 40min | 2 tasks | 17 files |
 | Phase 03 P03 | 25min | 2 tasks | 14 files |
+| Phase 03 P04 | 13min | 2 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -160,6 +161,10 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-03: HostThrottle::reserve(host, delay, maxWait) throws HostBusy without booking; inline wait limit = min(max_inline_wait, deadline left - request timeout)
 - [Phase 03]: 03-03: robots disallow_all (5xx/network/unreachable) cached 1 h, other robots outcomes 24 h; a spent deadline is a timeout, never an unreachable robots.txt
 - [Phase 03]: 03-03: robots wildcards matched by a linear two-pointer walk (no regex from remote text); match target is path plus ?query
+- [Phase 03]: 03-04: Import window ends at now + calendar.horizon_days (London); an instance starting exactly there is far_future
+- [Phase 03]: 03-04: Feed RRULEs are rebuilt into ManualRecurrence's exact shape (part order, implicit weekly BYDAY, timed UNTIL to London end of day) and kept only if tryFromStoredRule round-trips; otherwise a D-19 parse error
+- [Phase 03]: 03-04: Items with no readable facts (unknown TZID, end before start, sabre recurrence error) carry contentHash null; Greenwich Standard Time keeps facts plus a check-the-times parse error
+- [Phase 03]: 03-04: summary_start identity = raw DTSTART value | normalised SUMMARY; content_hash venue covers the whole LOCATION
 
 ### Pending Todos
 
@@ -194,6 +199,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-10-18T08:53:09.480Z
-Stopped at: Completed 03-03-PLAN.md
+Last session: 2026-10-18T09:12:11.162Z
+Stopped at: Completed 03-04-PLAN.md
 Resume file: None
