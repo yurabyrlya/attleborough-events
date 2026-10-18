@@ -150,6 +150,23 @@ it('names each skipped draft by its reason and approves the rest', function () {
         ->and($third->refresh()->review_status)->toBe(ReviewStatus::PendingReview);
 });
 
+it('skips a match whose description may still hold a phone number and approves the rest (review CR-01)', function () {
+    [$first, $second, $third] = $this->yoga->all();
+
+    $second->forceFill(['description' => 'Gentle yoga. Box office (01953) 452300'])->save();
+
+    livewire(ListEventDrafts::class)
+        ->callAction(TestAction::make('approveAllLikeThis')->table($first));
+
+    expect(likeNotificationLines())->toBe([
+        'Approved 2 of 3.',
+        '1 skipped: description may contain a phone number or email',
+    ])
+        ->and($second->refresh()->review_status)->toBe(ReviewStatus::PendingReview)
+        ->and($second->event_id)->toBeNull()
+        ->and($third->refresh()->review_status)->toBe(ReviewStatus::Approved);
+});
+
 it('matches the title case- and space-insensitively but leaves other sources and other venues alone', function () {
     $otherSource = Source::factory()->ics()->active()->create(['name' => 'Attleborough Baptist Church']);
     $fromOtherSource = likeSourcedDraft($otherSource, ['venue_id' => $this->townHall->id]);

@@ -282,8 +282,29 @@ it('skips a possible duplicate', function () {
     expect(app(DraftPublishability::class)->bulkBlockerKeys($draft))->toContain('duplicate');
 });
 
+it('skips a discovered draft whose description may still hold a contact (review CR-01)', function (string $description) {
+    $draft = EventDraft::factory()->create(['origin' => EventOrigin::Discovered, 'description' => $description]);
+
+    expect(app(DraftPublishability::class)->bulkBlockerKeys($draft))->toBe(['contact_like'])
+        // A single approve, after a human has read the draft, is still allowed.
+        ->and(app(DraftPublishability::class)->blockers($draft))->toBe([]);
+})->with([
+    'bracketed area code' => ['Box office (01953) 452300'],
+    'local number' => ['Box office 452300'],
+    'email' => ['Write to jo@example.org'],
+]);
+
+it('does not flag manual drafts or clean discovered descriptions as contact-like', function () {
+    $manual = EventDraft::factory()->create(['description' => 'Box office (01953) 452300']);
+    $clean = EventDraft::factory()->create(['origin' => EventOrigin::Discovered, 'description' => 'Bring your phone. Doors 7.30pm, £5.00.']);
+
+    expect(app(DraftPublishability::class)->bulkBlockerKeys($manual))->toBe([])
+        ->and(app(DraftPublishability::class)->bulkBlockerKeys($clean))->toBe([]);
+});
+
 dataset('skip messages', [
     'parse_errors' => ['parse_errors', 3, '3 skipped: has parse errors'],
+    'contact_like' => ['contact_like', 1, '1 skipped: description may contain a phone number or email'],
     'duplicate' => ['duplicate', 1, '1 skipped: possible duplicate'],
     'low_quality' => ['low_quality', 4, '4 skipped: Low quality'],
     'unresolved_venue' => ['unresolved_venue', 1, '1 skipped: no confirmed venue'],

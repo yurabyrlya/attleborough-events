@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\EventOrigin;
 use App\Enums\QualityBand;
 use App\Enums\RejectReason;
 use App\Enums\ReviewStatus;
@@ -106,6 +107,17 @@ it('skips a draft whose organiser says it repeats but has no rule', function () 
 
     expect(bulkNotificationLines())->toContain('1 skipped: repeat rule not set')
         ->and($repeats->refresh()->review_status)->toBe(ReviewStatus::PendingReview)
+        ->and(Event::count())->toBe(0);
+});
+
+it('skips a discovered draft whose description may still hold a contact (review CR-01)', function () {
+    $draft = EventDraft::factory()->create(['origin' => EventOrigin::Discovered, 'description' => 'Ring 01953.452300 to book']);
+
+    livewire(ListEventDrafts::class)
+        ->callTableBulkAction('approveSelected', [$draft]);
+
+    expect(bulkNotificationLines())->toContain('1 skipped: description may contain a phone number or email')
+        ->and($draft->refresh()->review_status)->toBe(ReviewStatus::PendingReview)
         ->and(Event::count())->toBe(0);
 });
 

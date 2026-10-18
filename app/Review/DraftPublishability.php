@@ -3,7 +3,9 @@
 namespace App\Review;
 
 use App\Enums\DraftKind;
+use App\Enums\EventOrigin;
 use App\Enums\QualityBand;
+use App\Ingestion\Pipeline\ExcerptBuilder;
 use App\Models\EventDraft;
 use App\Publishing\Data\PublishableEventData;
 use InvalidArgumentException;
@@ -25,6 +27,7 @@ final class DraftPublishability
      */
     private const SKIP_REASONS = [
         'parse_errors' => 'has parse errors',
+        'contact_like' => 'description may contain a phone number or email',
         'duplicate' => 'possible duplicate',
         'low_quality' => 'Low quality',
         'unresolved_venue' => 'no confirmed venue',
@@ -57,8 +60,9 @@ final class DraftPublishability
 
     /**
      * Why bulk approve skips this draft, every applicable key in the order
-     * parse_errors, duplicate, low_quality, unresolved_venue, repeats_unset,
-     * end_time_same_as_start, blocked; empty when bulk approve may take it.
+     * parse_errors, contact_like, duplicate, low_quality, unresolved_venue,
+     * repeats_unset, end_time_same_as_start, blocked; empty when bulk
+     * approve may take it.
      * Bulk approve reports the first key, so each skipped draft is counted
      * once.
      *
@@ -75,6 +79,13 @@ final class DraftPublishability
 
         if (! empty($draft->parse_errors)) {
             $keys[] = 'parse_errors';
+        }
+
+        // Review CR-01 / D-17: feed contacts are never published. When a
+        // discovered draft's description still looks like it holds a phone
+        // number or email, only a human may approve it.
+        if ($draft->origin === EventOrigin::Discovered && ExcerptBuilder::mayContainContact($draft->description)) {
+            $keys[] = 'contact_like';
         }
 
         // PIPE-05: a likely duplicate of a published event or of another
