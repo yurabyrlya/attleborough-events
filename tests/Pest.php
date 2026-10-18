@@ -141,36 +141,42 @@ function icsFixture(string $name): string
 }
 
 /**
- * Serves $body as the feed for every non-robots URL (robots.txt allows all).
- * The first call registers one Http::fake for the test; later calls only
- * swap the body (repeated Http::fake calls append, and the first wins).
+ * Serves $feed for every non-robots URL: a body (200, text/calendar) or a
+ * closure returning a response. robots.txt answers $robots (allow all by
+ * default). The first call registers one Http::fake for the test; later
+ * calls only swap the answers (repeated Http::fake calls append, and the
+ * first wins).
  */
-function ingestFeed(string $body): void
+function ingestFeed(string|Closure $feed, string $robots = "User-agent: *\nDisallow:\n"): void
 {
     if (app()->bound('ingest.test.feed')) {
-        app('ingest.test.feed')['body'] = $body;
+        app('ingest.test.feed')['feed'] = $feed;
+        app('ingest.test.feed')['robots'] = $robots;
 
         return;
     }
 
-    $state = new ArrayObject(['body' => $body]);
+    $state = new ArrayObject(['feed' => $feed, 'robots' => $robots]);
     app()->instance('ingest.test.feed', $state);
 
     Http::fake(function (Request $request) use ($state) {
         if (str_ends_with((string) parse_url($request->url(), PHP_URL_PATH), '/robots.txt')) {
-            return Http::response("User-agent: *\nDisallow:\n", 200, ['Content-Type' => 'text/plain']);
+            return Http::response($state['robots'], 200, ['Content-Type' => 'text/plain']);
         }
 
-        return Http::response($state['body'], 200, ['Content-Type' => 'text/calendar; charset=utf-8']);
+        return $state['feed'] instanceof Closure
+            ? ($state['feed'])($request)
+            : Http::response($state['feed'], 200, ['Content-Type' => 'text/calendar; charset=utf-8']);
     });
 }
 
 /**
- * One queued live run of $source through FetchSourceJob (offline).
+ * One queued run of $source through FetchSourceJob (offline): live unless
+ * $mode says preview.
  */
-function ingestLiveRun(Source $source): SourceRun
+function ingestLiveRun(Source $source, RunMode $mode = RunMode::Live): SourceRun
 {
-    $run = new SourceRun(['mode' => RunMode::Live, 'trigger' => RunTrigger::Manual]);
+    $run = new SourceRun(['mode' => $mode, 'trigger' => RunTrigger::Manual]);
     $run->forceFill(['source_id' => $source->id, 'status' => RunStatus::Queued])->save();
 
     FetchSourceJob::dispatchSync($run->id);

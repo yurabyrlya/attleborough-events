@@ -14,6 +14,7 @@ use App\Ingestion\Http\FetchResult;
 use App\Ingestion\Http\HostBusy;
 use App\Ingestion\Http\HttpFetcher;
 use App\Ingestion\Ics\IcsExtractor;
+use App\Ingestion\Pipeline\MissingItemDetector;
 use App\Ingestion\Pipeline\SourceItemRecorder;
 use App\Models\Source;
 use App\Models\SourceRun;
@@ -48,7 +49,8 @@ use Throwable;
  * (D-24), so the site is not asked twice.
  *
  * Every finished live run is handed to SourceHealthTracker (health,
- * structure alert, is_complete) before missing detection (03-09).
+ * structure alert, is_complete); a succeeded one then goes to
+ * MissingItemDetector, which counts only complete runs (PIPE-08, 03-09).
  */
 final class IngestRun
 {
@@ -69,6 +71,7 @@ final class IngestRun
         private readonly IcsExtractor $extractor,
         private readonly SourceItemRecorder $recorder,
         private readonly SourceHealthTracker $health,
+        private readonly MissingItemDetector $missing,
     ) {}
 
     /**
@@ -391,5 +394,10 @@ final class IngestRun
 
         // Health, structure alert and is_complete; before missing detection (03-09).
         $this->health->record($run);
+
+        if ($status === RunStatus::Succeeded) {
+            // PIPE-08: only complete live runs count (the detector re-checks).
+            $this->missing->detect($run);
+        }
     }
 }
