@@ -5,6 +5,7 @@ namespace App\Publishing\Actions;
 use App\Enums\DraftKind;
 use App\Enums\ReviewStatus;
 use App\Models\EventDraft;
+use App\Models\EventSource;
 use App\Models\SourceItem;
 use App\Models\User;
 use App\Publishing\AdminGate;
@@ -27,12 +28,20 @@ use Illuminate\Support\Facades\Log;
  * (draft → item); reopening is refused while the item has another pending
  * draft (PIPE-06), otherwise the item is pending again with this draft as
  * its current one (D-23).
+ *
+ * Review CR-03: reopening is also refused once the feed item has been
+ * published (linked to an event, or its outcome approved / duplicate),
+ * e.g. an old rejected draft of an item a later draft approved. Reopening
+ * it would turn the linked item back into a "pending new" one and stop
+ * its updates reaching the event.
  */
 final class ReopenDraft
 {
     public const KIND_REFUSED = 'Only new-event drafts can be reopened.';
 
     public const NEWER_DRAFT_PENDING = 'This feed item already has a newer draft waiting for review.';
+
+    public const ITEM_ALREADY_PUBLISHED = 'This feed item has since been published as an event, so this draft cannot be reopened. Changes from the feed reach that event as update drafts.';
 
     /**
      * @throws AuthorizationException when the reviewer is not the configured admin
@@ -58,6 +67,10 @@ final class ReopenDraft
             $item = $locked->source_item_id === null
                 ? null
                 : SourceItem::query()->whereKey($locked->source_item_id)->lockForUpdate()->first();
+
+            if ($item !== null && self::itemPublished($item)) {
+                throw new DraftNotReopenable(self::ITEM_ALREADY_PUBLISHED);
+            }
 
             if ($item !== null && EventDraft::query()
                 ->where('source_item_id', $item->id)
@@ -91,5 +104,26 @@ final class ReopenDraft
         ]));
 
         return $reopened->refresh();
+    }
+
+    /**
+     * Whether a rejected draft could be reopened as far as its feed item is
+     * concerned: false once the item is published. Display only (hides
+     * Reopen); __invoke() re-checks on the locked rows.
+     */
+    public static function itemAllowsReopen(EventDraft $draft): bool
+    {
+        if ($draft->source_item_id === null) {
+            return true;
+        }
+
+        $item = SourceItem::query()->find($draft->source_item_id);
+
+        return $item === null || ! self::itemPublished($item);
+    }
+
+    private static function itemPublished(SourceItem $item): bool
+    {
+        return in_array($item->review_outcome, ['approved', 'duplicate'], true) || EventSource::linksItem($item->id);
     }
 }

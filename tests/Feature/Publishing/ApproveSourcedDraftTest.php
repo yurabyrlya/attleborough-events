@@ -14,7 +14,9 @@ use App\Models\SourceRun;
 use App\Models\User;
 use App\Models\Venue;
 use App\Publishing\Actions\ApproveDraft;
+use App\Publishing\Actions\LinkEventSource;
 use App\Review\DraftPublishability;
+use App\Review\Exceptions\DraftNotPublishable;
 use Database\Seeders\CategorySeeder;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
@@ -164,7 +166,9 @@ it('rolls the whole approval back when the source link cannot be written', funct
         'linked_at' => now()->utc()->format('Y-m-d H:i:s'),
     ]);
 
-    expect(fn () => app(ApproveDraft::class)($draft, $this->admin))->toThrow(InvalidArgumentException::class);
+    // Review CR-03: a plain refusal the review page can show, not a 500.
+    expect(fn () => app(ApproveDraft::class)($draft, $this->admin))
+        ->toThrow(DraftNotPublishable::class, LinkEventSource::ITEM_ALREADY_PUBLISHED);
 
     $item = SourceItem::query()->findOrFail($draft->source_item_id);
 

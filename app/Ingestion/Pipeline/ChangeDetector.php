@@ -24,6 +24,9 @@ use Throwable;
  *
  * - A pending NEW draft is replaced in place when the D-06 facts changed,
  *   and superseded when the item is now cancelled (nothing was published).
+ *   A linked item is checked first (review CR-03): a stale pending NEW
+ *   draft never hides a change from the published event; an update or
+ *   cancellation for the event supersedes it.
  * - A linked item (event_sources, approved or duplicate, D-11) is compared
  *   with its accepted baseline: master STATUS:CANCELLED newly true → whole
  *   event cancellation; newly cancelled override dates from today on →
@@ -68,6 +71,12 @@ final class ChangeDetector
     ): ChangeVerdict {
         $now = ($nowLondon ?? CarbonImmutable::now())->setTimezone(self::LONDON);
 
+        $event = $link?->event;
+
+        if ($event instanceof Event) {
+            return $this->withPending($this->linked($item, $facts, $contentHash, $event, $now), $pending);
+        }
+
         if ($pending !== null && $pending->kind === DraftKind::New) {
             if ($facts->cancelled) {
                 return new ChangeVerdict(ChangeVerdict::SUPERSEDE);
@@ -76,12 +85,6 @@ final class ChangeDetector
             return $contentHash !== $item->content_hash
                 ? new ChangeVerdict(ChangeVerdict::REPLACE)
                 : ChangeVerdict::none();
-        }
-
-        $event = $link?->event;
-
-        if ($event instanceof Event) {
-            return $this->withPending($this->linked($item, $facts, $contentHash, $event, $now), $pending);
         }
 
         if ($pending !== null) {
@@ -287,7 +290,9 @@ final class ChangeDetector
      */
     private function withPending(ChangeVerdict $raised, ?EventDraft $pending): ChangeVerdict
     {
-        if ($pending === null) {
+        // Review CR-03: a stale NEW draft of a linked item. The update or
+        // cancellation is raised as is; act() supersedes the NEW draft.
+        if ($pending === null || $pending->kind === DraftKind::New) {
             return $raised;
         }
 

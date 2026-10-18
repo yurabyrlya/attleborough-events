@@ -66,7 +66,7 @@ final class MarkDraftDuplicate
      * @throws AuthorizationException when the reviewer is not the configured admin
      * @throws InvalidReviewTransition when the draft is no longer pending review
      * @throws DraftNotPublishable when the draft is not a new-event draft or the target is not a published event
-     * @throws InvalidArgumentException when the feed item is already linked to an event
+     * @throws DraftNotPublishable when the feed item is already linked to an event (review CR-03)
      */
     public function __invoke(EventDraft $draft, Event|EventDraft $of, User $reviewer): EventDraft
     {
@@ -94,7 +94,7 @@ final class MarkDraftDuplicate
 
             if ($item !== null) {
                 $source = Source::query()->findOrFail($locked->source_id ?? $item->source_id);
-                $linkId = ($this->link)($event, $source, $item, EventSource::VIA_DUPLICATE, $reviewer)->id;
+                $linkId = $this->linkItem($event, $source, $item, $reviewer);
             }
 
             $locked->forceFill([
@@ -130,6 +130,29 @@ final class MarkDraftDuplicate
         ]));
 
         return $marked->refresh();
+    }
+
+    /**
+     * Review CR-03: an item already linked (to this or another event) is a
+     * plain refusal, never a 500.
+     *
+     * @throws DraftNotPublishable when the feed item is already linked
+     */
+    private function linkItem(Event $event, Source $source, SourceItem $item, User $reviewer): int
+    {
+        if (EventSource::linksItem($item->id)) {
+            throw new DraftNotPublishable([LinkEventSource::ITEM_ALREADY_PUBLISHED]);
+        }
+
+        try {
+            return ($this->link)($event, $source, $item, EventSource::VIA_DUPLICATE, $reviewer)->id;
+        } catch (InvalidArgumentException $e) {
+            if ($e->getMessage() === LinkEventSource::ITEM_ALREADY_LINKED) {
+                throw new DraftNotPublishable([LinkEventSource::ITEM_ALREADY_PUBLISHED]);
+            }
+
+            throw $e;
+        }
     }
 
     /**

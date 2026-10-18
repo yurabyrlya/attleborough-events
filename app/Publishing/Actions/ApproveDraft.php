@@ -87,6 +87,12 @@ final class ApproveDraft
                 throw new DraftNotPublishable([$e->getMessage()]);
             }
 
+            // Review CR-03: an item has at most one event. Refused before
+            // anything is published (LinkEventSource re-checks under lock).
+            if (EventSource::linksItem($locked->source_item_id)) {
+                throw new DraftNotPublishable([LinkEventSource::ITEM_ALREADY_PUBLISHED]);
+            }
+
             $event = ($this->publish)($data, $reviewer, $locked->origin);
 
             if ($locked->source_item_id !== null) {
@@ -158,7 +164,16 @@ final class ApproveDraft
         $item = SourceItem::query()->findOrFail($draft->source_item_id);
         $source = Source::query()->findOrFail($draft->source_id ?? $item->source_id);
 
-        ($this->link)($event, $source, $item, EventSource::VIA_APPROVED, $reviewer);
+        try {
+            ($this->link)($event, $source, $item, EventSource::VIA_APPROVED, $reviewer);
+        } catch (InvalidArgumentException $e) {
+            // A concurrent link won the race: a plain refusal, not a 500.
+            if ($e->getMessage() === LinkEventSource::ITEM_ALREADY_LINKED) {
+                throw new DraftNotPublishable([LinkEventSource::ITEM_ALREADY_PUBLISHED]);
+            }
+
+            throw $e;
+        }
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Enums\DraftKind;
 use App\Enums\RejectReason;
 use App\Enums\ReviewStatus;
 use App\Models\EventDraft;
+use App\Models\EventSource;
 use App\Models\SourceItem;
 use App\Models\User;
 use App\Publishing\AdminGate;
@@ -26,7 +27,10 @@ use Illuminate\Support\Facades\Log;
  * A discovered new-event draft also marks its source item rejected and moves
  * the item's baseline to the current payload, so later runs do not re-draft
  * it unless its facts change or the admin reopens it (D-23). The item is
- * locked last (draft → item).
+ * locked last (draft → item). Review CR-03: an item already linked to an
+ * event (e.g. an old draft rejected again after a later one was approved)
+ * is left alone: its accepted baseline belongs to the published event and
+ * moving it would silently drop a feed change the event never received.
  *
  * A rejected draft is purged after the published retention (D-12): see
  * EventDraft::prunable().
@@ -60,13 +64,21 @@ final class RejectDraft
             ])->save();
 
             if ($locked->kind === DraftKind::New && $locked->source_item_id !== null) {
+                $link = EventSource::query()->where('source_item_id', $locked->source_item_id)->first();
                 $item = SourceItem::query()->whereKey($locked->source_item_id)->lockForUpdate()->first();
 
-                $item?->forceFill([
-                    'review_outcome' => 'rejected',
-                    'accepted_hash' => $item->content_hash,
-                    'accepted_payload' => $item->payload,
-                ])->save();
+                if ($link === null) {
+                    $item?->forceFill([
+                        'review_outcome' => 'rejected',
+                        'accepted_hash' => $item->content_hash,
+                        'accepted_payload' => $item->payload,
+                    ])->save();
+                } else {
+                    // Review CR-03: the item stays linked. Its baseline is
+                    // untouched; an outcome a pre-fix reopen set back to
+                    // pending is restored to how it was linked.
+                    $item?->forceFill(['review_outcome' => $link->linked_via])->save();
+                }
             }
 
             return [$locked, $from];

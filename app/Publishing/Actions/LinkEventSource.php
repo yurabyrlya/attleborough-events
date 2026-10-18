@@ -38,6 +38,13 @@ final class LinkEventSource
     public const ITEM_ALREADY_LINKED = 'This feed item is already linked to an event.';
 
     /**
+     * Review CR-03: what Approve and Mark as duplicate tell the admin when
+     * the draft's feed item is already linked (e.g. an old rejected draft of
+     * an item that was approved since).
+     */
+    public const ITEM_ALREADY_PUBLISHED = 'This feed item is already published as an event, so this draft cannot be published or linked again. Reject it instead.';
+
+    /**
      * @param  string  $linkedVia  EventSource::VIA_APPROVED | EventSource::VIA_DUPLICATE
      *
      * @throws AuthorizationException when the actor is not the configured admin

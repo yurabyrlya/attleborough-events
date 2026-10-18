@@ -44,6 +44,15 @@ class EventSource extends Model
     ];
 
     /**
+     * Whether a feed item is linked to an event (approved or marked as a
+     * duplicate, D-11). One link per item is a UNIQUE constraint.
+     */
+    public static function linksItem(?int $sourceItemId): bool
+    {
+        return $sourceItemId !== null && self::query()->where('source_item_id', $sourceItemId)->exists();
+    }
+
+    /**
      * @return BelongsTo<Event, $this>
      */
     public function event(): BelongsTo

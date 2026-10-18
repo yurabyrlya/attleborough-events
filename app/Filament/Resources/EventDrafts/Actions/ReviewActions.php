@@ -446,8 +446,10 @@ final class ReviewActions
             ->label('Reopen')
             ->color('gray')
             // C14: an ignored update or cancellation draft stays ignored.
+            // Review CR-03: hidden once the feed item has been published.
             ->visible(fn (EventDraft $record, Component $livewire): bool => $record->kind === DraftKind::New
-                && self::shownStatus($record, $livewire)->canTransitionTo(ReviewStatus::PendingReview))
+                && self::shownStatus($record, $livewire)->canTransitionTo(ReviewStatus::PendingReview)
+                && ReopenDraft::itemAllowsReopen($record))
             ->requiresConfirmation()
             ->modalHeading('Reopen this draft?')
             ->modalDescription('It goes back into the review queue as pending. The rejection note is kept.')
