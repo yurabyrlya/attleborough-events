@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Log;
  * rejected. Admin-only; asserts rejected -> pending_review on the locked row.
  * Sends nothing to the organiser (D-02).
  *
- * Only new-event drafts can be reopened: an ignored update or cancellation
+ * Reopening is for new-event drafts only (KIND_REFUSED): an ignored update or cancellation
  * stays ignored (C14). For a discovered draft the source item is locked last
  * (draft → item); reopening is refused while the item has another pending
  * draft (PIPE-06), otherwise the item is pending again with this draft as
